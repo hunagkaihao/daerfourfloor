@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>TuTa.Wms</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Repositories\新文件夹1\**" />
+    <EmbeddedResource Remove="Repositories\新文件夹1\**" />
+    <None Remove="Repositories\新文件夹1\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.BackgroundJobs.EntityFrameworkCore" Version="8.1.3" />
+    <PackageReference Include="Volo.Abp.EntityFrameworkCore.MySQL" Version="8.1.3" />
+    <PackageReference Include="Volo.Abp.EntityFrameworkCore.SqlServer" Version="8.1.3" />
+    <PackageReference Include="Volo.Abp.PermissionManagement.EntityFrameworkCore" Version="8.1.3" />
+    <PackageReference Include="Volo.Abp.Identity.EntityFrameworkCore" Version="8.1.3" />
+    <PackageReference Include="Volo.Abp.AuditLogging.EntityFrameworkCore" Version="8.1.3" />
+    <PackageReference Include="Volo.Abp.OpenIddict.EntityFrameworkCore" Version="8.1.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Volo.Abp.TenantManagement.EntityFrameworkCore" Version="8.1.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TuTa.Wms.Application.Contracts\TuTa.Wms.Application.Contracts.csproj" />
+    <ProjectReference Include="..\TuTa.Wms.Domain.Shared\TuTa.Wms.Domain.Shared.csproj" />
+    <ProjectReference Include="..\TuTa.Wms.Domain\TuTa.Wms.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

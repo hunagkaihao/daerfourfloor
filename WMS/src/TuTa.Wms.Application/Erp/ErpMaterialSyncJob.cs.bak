@@ -1,0 +1,122 @@
+﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using TuTa.Wms.Materials;
+using TuTa.Wms.Erp.Repositories;
+using Volo.Abp.Uow;
+using Wms.LogTool;
+
+namespace TuTa.Wms.Erp
+{
+    public class ErpMaterialSyncJob : IHostedService, IDisposable
+    {
+        private readonly IErpMaterialRepository _erpMaterialRepository;
+        private readonly IMaterialRepository _materialRepository;
+        private readonly MaterialManager _materialManager;
+        private readonly UnitOfWorkManager _unitOfWorkManager;
+        private readonly ILogger<ErpMaterialSyncJob> _logger;
+
+        public ErpMaterialSyncJob(
+            IErpMaterialRepository erpMaterialRepository,
+            IMaterialRepository materialRepository,
+            MaterialManager materialManager,
+            UnitOfWorkManager unitOfWorkManager,
+            ILogger<ErpMaterialSyncJob> logger)
+        {
+            _erpMaterialRepository = erpMaterialRepository;
+            _materialRepository = materialRepository;
+            _materialManager = materialManager;
+            _unitOfWorkManager = unitOfWorkManager;
+            _logger = logger;
+        }
+
+        public void Dispose()
+        {
+            
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            Task.Run(async () =>
+            {
+                while (true)
+                {
+                    await Task.Delay(60000).ConfigureAwait(false); //1分钟更新一次
+
+                    using (var uow = _unitOfWorkManager.Begin())
+                    {
+                        try
+                        {
+                            var erpMaterials = await _erpMaterialRepository.GetAllUnReceivedMaterialsAsync(cancellationToken);
+
+                            if (erpMaterials == null || erpMaterials.Count == 0)
+                                continue;
+
+                            foreach (var erpMaterial in erpMaterials)
+                            {
+                                if (erpMaterial.IFDELETE == true) //这个物料被停用了或删除了，本地的物料同步删除
+                                {
+                                    await _materialRepository.DeleteAsync(o => o.MaterialCode == erpMaterial.PRDT_ID).ConfigureAwait(false);
+                                    erpMaterial.SetIsReceived();
+                                    await _erpMaterialRepository.UpdateAsync(erpMaterial).ConfigureAwait(false);
+
+                                    await uow.SaveChangesAsync();
+                                }
+                                else
+                                {
+                                    var materialExist = await _materialRepository.FindByMaterialCodeAsync(erpMaterial.PRDT_ID).ConfigureAwait(false);
+                                    if (materialExist != null) //该物料已经在本地，说明ERP对物料进行了修改，本地物料需要更新
+                                    {
+                                        await _materialManager.ModifyMaterialAsync(materialExist, erpMaterial.PRDT_ID,
+                                            erpMaterial.PRDT_NAME, erpMaterial.PRDT_SPEC, erpMaterial.PRDT_UNIT,
+                                            erpMaterial.PRDT_TYPE, erpMaterial.PTYPE_NAME, erpMaterial.PRDT_HB,
+                                            erpMaterial.PRDT_LOW, erpMaterial.PRDTZX_BZSHL, erpMaterial.PRDT_STOREDAYS, erpMaterial.IFQCPJ,
+                                            erpMaterial.IFPPAP,erpMaterial.PRDTZX_BZSHL,erpMaterial.PRDTZX_ZL,erpMaterial.PRDTPX_LB,erpMaterial.PRDTPX_TAG,
+                                            erpMaterial.CP_SM).ConfigureAwait(false);
+                                        await _materialRepository.UpdateAsync(materialExist).ConfigureAwait(false);
+                                        erpMaterial.SetIsReceived();
+                                        await _erpMaterialRepository.UpdateAsync(erpMaterial).ConfigureAwait(false);
+
+                                        await uow.SaveChangesAsync();
+                                    }
+                                    else //属于新的物料，本地需要增加
+                                    {
+                                        var newMaterial = await _materialManager.CreateMaterialAsync(erpMaterial.PRDT_ID, erpMaterial.PRDT_NAME,
+                                            erpMaterial.PRDT_SPEC, erpMaterial.PRDT_UNIT, erpMaterial.PRDT_TYPE,
+                                            erpMaterial.PTYPE_NAME, erpMaterial.PRDT_HB, erpMaterial.PRDT_LOW, erpMaterial.PRDTZX_BZSHL,
+                                            erpMaterial.PRDT_STOREDAYS, erpMaterial.IFQCPJ, erpMaterial.IFPPAP, erpMaterial.PRDTZX_BZSHL,
+                                            erpMaterial.PRDTZX_ZL, erpMaterial.PRDTPX_LB,erpMaterial.PRDTPX_TAG,
+                                            erpMaterial.CP_SM)
+                                            .ConfigureAwait(false);
+                                        await _materialRepository.InsertAsync(newMaterial).ConfigureAwait(false);
+                                        erpMaterial.SetIsReceived();
+                                        await _erpMaterialRepository.UpdateAsync(erpMaterial).ConfigureAwait(false);
+
+                                        await uow.SaveChangesAsync();
+                                    }
+                                }
+                            }
+
+                            await uow.CompleteAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            await uow.RollbackAsync().ConfigureAwait(false);
+                            _logger.Error(ex.Message);
+                        }
+                    }
+                }
+
+            });
+
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+    }
+}
