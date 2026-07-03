@@ -1,0 +1,17 @@
+export default {
+  checkManagement: '盘点管理',
+  checkPlanManagement: '盘点计划创建',
+  checkTaskManagement: '盘点任务处理',
+  checkVerifyManagement: '盘点审核处理',
+  checkManagement_checkCode: '盘点计划编号',
+  checkManagement_checkType: '盘点类型',
+  checkManagement_areaCode: '区域编码',
+  checkManagement_creationTime: '创建时间',
+  checkManagement_checkStatus: '执行状态',
+  checkManagement_stockBarcode: '托盘条码',
+  checkManagement_cellName: '库位号',
+  checkManagement_account: '账面数',
+  checkManagement_realAmount_1: '实盘数',
+  checkManagement_realAmount_2: '实盘数2',
+  checkManagement_profitLossAmount: '盈亏数',
+};
