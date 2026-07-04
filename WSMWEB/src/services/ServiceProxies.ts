@@ -29635,7 +29635,7 @@ export interface IErpWorkstationMaterialRequestStatusUpdateDto {
 }
 
 export class PuArrVouchAddRequestDto implements IPuArrVouchAddRequestDto {
-    uid!: number;
+    uid?: number | undefined;
     cAsnCode!: string;
     cVenCode!: string;
     cpocode!: string;
@@ -29690,7 +29690,7 @@ export class PuArrVouchAddRequestDto implements IPuArrVouchAddRequestDto {
 }
 
 export interface IPuArrVouchAddRequestDto {
-    uid: number;
+    uid?: number | undefined;
     cAsnCode: string;
     cVenCode: string;
     cpocode: string;
