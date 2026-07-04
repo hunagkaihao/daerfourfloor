@@ -44,6 +44,13 @@ namespace TuTa.Wms.Erp
         Task<PuArrVouchAddResponseDto> PushPuArrVouchAsync(PuArrVouchAddRequestDto input);
 
         /// <summary>
+        /// 当同一ASN单号下所有明细均已入库完成时，自动推送到货单
+        /// </summary>
+        /// <param name="asnCode">ASN单号</param>
+        /// <returns>推送结果；未满足推送条件时返回 null</returns>
+        Task<PuArrVouchAddResponseDto> TryPushPuArrVouchIfAllLinesCompletedAsync(string asnCode);
+
+        /// <summary>
         /// 获取ASN列表
         /// </summary>
         /// <param name="page">页码</param>

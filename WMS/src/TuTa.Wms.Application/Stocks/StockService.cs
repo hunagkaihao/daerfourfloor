@@ -84,6 +84,7 @@ namespace TuTa.Wms.Stocks
         private readonly IStockInHistoryRepository _stockInHistoryRepository;
         private readonly IErpAsnStockInService _erpAsnStockInService;
         private readonly IErpAsnRepository _erpAsnRepository;
+        private readonly IErpAsnAppService _erpAsnAppService;
         private readonly CellManager _cellManager;
         private readonly AgvTaskManager _agvTaskManager;
         private readonly BoxManager _boxManager;
@@ -112,6 +113,7 @@ namespace TuTa.Wms.Stocks
             IStockInHistoryRepository stockInHistoryRepository,
             IErpAsnStockInService erpAsnStockInService,
             IErpAsnRepository erpAsnRepository,
+            IErpAsnAppService erpAsnAppService,
 
             CellManager cellManager,
             AgvTaskManager agvTaskManager,
@@ -139,6 +141,7 @@ namespace TuTa.Wms.Stocks
             _stockInHistoryRepository = stockInHistoryRepository;
             _erpAsnStockInService = erpAsnStockInService;
             _erpAsnRepository = erpAsnRepository;
+            _erpAsnAppService = erpAsnAppService;
             _agvTaskManager = agvTaskManager;
             _cellManager = cellManager;
             _boxManager = boxManager;
@@ -196,7 +199,28 @@ namespace TuTa.Wms.Stocks
                     }
 
                     await UpdateAsnOrderStockInAsync(orderCode, paras).ConfigureAwait(false);
+
+                    var asnCode = await GetAsnCodeByOrderAndMaterialAsync(orderCode, paras).ConfigureAwait(false);
                     await uow.CompleteAsync().ConfigureAwait(false);
+
+                    if (!string.IsNullOrWhiteSpace(asnCode))
+                    {
+                        var pushResult = await _erpAsnAppService.TryPushPuArrVouchIfAllLinesCompletedAsync(asnCode).ConfigureAwait(false);
+                        if (pushResult != null)
+                        {
+                            if (pushResult.Success)
+                            {
+                                result.message = string.IsNullOrWhiteSpace(pushResult.Message)
+                                    ? result.message + "，已自动推送U8到货单"
+                                    : result.message + "，" + pushResult.Message;
+                            }
+                            else
+                            {
+                                _logger.Warn($"ASN {asnCode} 自动推送到货单失败：{pushResult.Message}");
+                            }
+                        }
+                    }
+
                     return result;
                 }
                 catch (Exception ex)
@@ -503,6 +527,19 @@ namespace TuTa.Wms.Stocks
                 erpAsn.ApplyAlreadyStockInQuantity(item.Value);
                 await _erpAsnRepository.UpdateAsync(erpAsn).ConfigureAwait(false);
             }
+        }
+
+        private async Task<string> GetAsnCodeByOrderAndMaterialAsync(string orderCode, List<StockCreateDto> paras)
+        {
+            var quantityByMaterial = GetStockInQuantityByMaterial(paras);
+            if (quantityByMaterial.Count == 0)
+            {
+                return null;
+            }
+
+            var firstMaterial = quantityByMaterial.Keys.First();
+            var erpAsn = await _erpAsnRepository.GetByOrderCodeAndMaterialCodeAsync(orderCode, firstMaterial).ConfigureAwait(false);
+            return erpAsn?.AsnCode;
         }
 
         private static Dictionary<string, decimal> GetStockInQuantityByMaterial(List<StockCreateDto> paras)

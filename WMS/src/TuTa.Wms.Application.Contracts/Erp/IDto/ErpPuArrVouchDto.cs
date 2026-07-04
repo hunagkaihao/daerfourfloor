@@ -9,10 +9,9 @@ namespace TuTa.Wms.Erp.Dto
     public class PuArrVouchAddRequestDto
     {
         /// <summary>
-        /// UID（推送时作为 uid 字段）
+        /// UID（推送时作为 uid 字段；不传时由系统自动生成）
         /// </summary>
-        [Required]
-        public long Uid { get; set; }
+        public long? Uid { get; set; }
 
         /// <summary>
         /// ASN单号（入库单号 ccode）
@@ -85,6 +84,11 @@ namespace TuTa.Wms.Erp.Dto
         /// </summary>
         [Required]
         public string Cordercode { get; set; }
+
+        /// <summary>
+        /// 采购订单行ID（推送ERP时使用，不传则使用默认值）
+        /// </summary>
+        public long? IPoDetailId { get; set; }
     }
 
     /// <summary>

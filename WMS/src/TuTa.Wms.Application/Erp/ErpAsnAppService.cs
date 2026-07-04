@@ -699,14 +699,8 @@ namespace TuTa.Wms.Erp
                     };
                 }
 
-                if (input.Uid <= 0)
-                {
-                    return new PuArrVouchAddResponseDto
-                    {
-                        Success = false,
-                        Message = "UID不能为空"
-                    };
-                }
+                var pushUid = input.Uid > 0 ? input.Uid.Value : GeneratePuArrVouchUid();
+                _logger.LogInformation($"[操作ID: {operationId}] 使用推送UID：{pushUid}");
 
                 if (string.IsNullOrWhiteSpace(input.CAsnCode))
                 {
@@ -794,7 +788,7 @@ namespace TuTa.Wms.Erp
                     };
                 }
 
-                var pushPayload = BuildPuArrVouchPayload(input);
+                var pushPayload = BuildPuArrVouchPayload(input, pushUid);
                 var options = new JsonSerializerOptions
                 {
                     WriteIndented = true,
@@ -843,11 +837,103 @@ namespace TuTa.Wms.Erp
             }
         }
 
-        private static object BuildPuArrVouchPayload(PuArrVouchAddRequestDto input)
+        /// <summary>
+        /// 当同一ASN单号下所有明细均已入库完成时，自动推送到货单
+        /// </summary>
+        public async Task<PuArrVouchAddResponseDto> TryPushPuArrVouchIfAllLinesCompletedAsync(string asnCode)
+        {
+            var operationId = Guid.NewGuid().ToString();
+            if (string.IsNullOrWhiteSpace(asnCode))
+            {
+                return null;
+            }
+
+            var allLines = await _erpAsnRepository.GetListByAsnCodeAsync(asnCode).ConfigureAwait(false);
+            var activeLines = allLines.Where(x => x.Status != AsnStatus.Cancelled).ToList();
+            if (activeLines.Count == 0)
+            {
+                return null;
+            }
+
+            if (activeLines.Any(x => x.IsPushedToErp))
+            {
+                _logger.LogInformation($"[操作ID: {operationId}] ASN {asnCode} 已推送过到货单，跳过");
+                return new PuArrVouchAddResponseDto
+                {
+                    Success = true,
+                    Message = "已推送过到货单"
+                };
+            }
+
+            if (!activeLines.All(x => x.Status == AsnStatus.Completed))
+            {
+                _logger.LogInformation($"[操作ID: {operationId}] ASN {asnCode} 尚有明细未完成入库，暂不推送");
+                return null;
+            }
+
+            var firstLine = activeLines.First();
+            if (string.IsNullOrWhiteSpace(firstLine.SupplierCode))
+            {
+                _logger.LogWarning($"[操作ID: {operationId}] ASN {asnCode} 供应商编码为空，无法推送到货单");
+                return new PuArrVouchAddResponseDto
+                {
+                    Success = false,
+                    Message = "供应商编码为空，无法推送到货单"
+                };
+            }
+
+            var headerOrderCode = !string.IsNullOrWhiteSpace(firstLine.OrderCode)
+                ? firstLine.OrderCode
+                : activeLines.Select(x => x.OrderCode).FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
+
+            var request = new PuArrVouchAddRequestDto
+            {
+                CAsnCode = asnCode,
+                CVenCode = firstLine.SupplierCode,
+                Cpocode = headerOrderCode,
+                Data = activeLines.Select(line => new PuArrVouchDetailRequestDto
+                {
+                    CInvCode = line.MaterialCode,
+                    IQuantity = line.InWarehouseQuantity,
+                    INum = 1,
+                    FRealQuantity = line.AlreadyStockInQuantity ?? 0,
+                    FRealNumy = 1,
+                    CBatch = string.IsNullOrWhiteSpace(line.BatchCode) ? "0" : line.BatchCode,
+                    Cordercode = line.OrderCode,
+                    IPoDetailId = line.PoDetailId ?? line.ErpOrderDetailId
+                }).ToList()
+            };
+
+            _logger.LogInformation($"[操作ID: {operationId}] ASN {asnCode} 全部入库完成，开始自动推送到货单");
+            var result = await PushPuArrVouchAsync(request).ConfigureAwait(false);
+            if (result.Success)
+            {
+                foreach (var line in activeLines)
+                {
+                    line.MarkAsPushedToErp();
+                    await _erpAsnRepository.UpdateAsync(line).ConfigureAwait(false);
+                }
+
+                _logger.LogInformation($"[操作ID: {operationId}] ASN {asnCode} 自动推送到货单成功");
+            }
+            else
+            {
+                _logger.LogWarning($"[操作ID: {operationId}] ASN {asnCode} 自动推送到货单失败：{result.Message}");
+            }
+
+            return result;
+        }
+
+        private static long GeneratePuArrVouchUid()
+        {
+            return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        }
+
+        private static object BuildPuArrVouchPayload(PuArrVouchAddRequestDto input, long uid)
         {
             return new
             {
-                uid = input.Uid,
+                uid = uid,
                 cAsnCode = input.CAsnCode,
                 cVenCode = input.CVenCode,
                 cDepCode = "11",
@@ -872,7 +958,7 @@ namespace TuTa.Wms.Erp
                     fRealNumy = item.FRealNumy,
                     bGsp = 0,
                     cBatch = item.CBatch,
-                    iPOsID = 1000104266,
+                    iPOsID = item.IPoDetailId ?? 1000104266,
                     cordercode = item.Cordercode
                 }).ToList()
             };
