@@ -21033,7 +21033,7 @@ export class StockServiceProxy extends ServiceProxyBase {
      * @param outBoundCount (optional) 
      * @return OK
      */
-    stockOutboundDirect(stockId: string | undefined, outBoundCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<ResponseDto> {
+    stockOutboundDirect(stockId: string | undefined, outBoundCount: number | undefined, pagOrBoxCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<ResponseDto> {
         let url_ = this.baseUrl + "/wms/stock/stockOutboundDirect?";
         if (stockId === null)
             throw new Error("The parameter 'stockId' cannot be null.");
@@ -21043,6 +21043,10 @@ export class StockServiceProxy extends ServiceProxyBase {
             throw new Error("The parameter 'outBoundCount' cannot be null.");
         else if (outBoundCount !== undefined)
             url_ += "outBoundCount=" + encodeURIComponent("" + outBoundCount) + "&";
+        if (pagOrBoxCount === null)
+            throw new Error("The parameter 'pagOrBoxCount' cannot be null.");
+        else if (pagOrBoxCount !== undefined)
+            url_ += "pagOrBoxCount=" + encodeURIComponent("" + pagOrBoxCount) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ = <AxiosRequestConfig>{
@@ -32965,6 +32969,8 @@ export class StockCreateDto implements IStockCreateDto {
     supplierProductionDate!: moment.Moment | undefined;
     receivingMaterialBarcode!: string | undefined;
     asnCode!: string | undefined;
+    receivePkgOrBoxCount!: number | undefined;
+    countInOnePkgOrBox!: number | undefined;
 
     constructor(data?: IStockCreateDto) {
         if (data) {
@@ -32988,6 +32994,8 @@ export class StockCreateDto implements IStockCreateDto {
             this.supplierProductionDate = _data["supplierProductionDate"] ? moment(_data["supplierProductionDate"].toString()) : <any>undefined;
             this.receivingMaterialBarcode = _data["receivingMaterialBarcode"];
             this.asnCode = _data["asnCode"];
+            this.receivePkgOrBoxCount = _data["receivePkgOrBoxCount"];
+            this.countInOnePkgOrBox = _data["countInOnePkgOrBox"];
         }
     }
 
@@ -33011,6 +33019,8 @@ export class StockCreateDto implements IStockCreateDto {
         data["supplierProductionDate"] = this.supplierProductionDate ? this.supplierProductionDate.toISOString() : <any>undefined;
         data["receivingMaterialBarcode"] = this.receivingMaterialBarcode;
         data["asnCode"] = this.asnCode;
+        data["receivePkgOrBoxCount"] = this.receivePkgOrBoxCount;
+        data["countInOnePkgOrBox"] = this.countInOnePkgOrBox;
         return data;
     }
 }
@@ -33027,6 +33037,8 @@ export interface IStockCreateDto {
     supplierProductionDate: moment.Moment | undefined;
     receivingMaterialBarcode: string | undefined;
     asnCode: string | undefined;
+    receivePkgOrBoxCount: number | undefined;
+    countInOnePkgOrBox: number | undefined;
 }
 
 export class StockDirectCreateDto implements IStockDirectCreateDto {
@@ -33126,6 +33138,7 @@ export class StockDto implements IStockDto {
     areaCode!: string | undefined;
     areaName!: string | undefined;
     totalCountInTime!: number;
+    totalPagOrBoxInTime!: number;
     status!: string | undefined;
     runStatus!: string | undefined;
     stockInType!: string | undefined;
@@ -33183,6 +33196,7 @@ export class StockDto implements IStockDto {
             this.areaCode = _data["areaCode"];
             this.areaName = _data["areaName"];
             this.totalCountInTime = _data["totalCountInTime"];
+            this.totalPagOrBoxInTime = _data["totalPagOrBoxInTime"];
             this.status = _data["status"];
             this.runStatus = _data["runStatus"];
             this.stockInType = _data["stockInType"];
@@ -33240,6 +33254,7 @@ export class StockDto implements IStockDto {
         data["areaCode"] = this.areaCode;
         data["areaName"] = this.areaName;
         data["totalCountInTime"] = this.totalCountInTime;
+        data["totalPagOrBoxInTime"] = this.totalPagOrBoxInTime;
         data["status"] = this.status;
         data["runStatus"] = this.runStatus;
         data["stockInType"] = this.stockInType;
@@ -33290,6 +33305,7 @@ export interface IStockDto {
     areaCode: string | undefined;
     areaName: string | undefined;
     totalCountInTime: number;
+    totalPagOrBoxInTime: number;
     status: string | undefined;
     runStatus: string | undefined;
     stockInType: string | undefined;

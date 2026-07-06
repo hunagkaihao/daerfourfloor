@@ -338,6 +338,7 @@ const incell = async () => {
         p.receivingMaterialBarcode = e.receivingMaterialBarcode || '';
         p.grade = e.grade || '';
         p.processNo = e.ProcessNo || '';
+        p.countInOnePkgOrBox = e.countInOnePkgOrBox || undefined;
 
         if (e.supplierProductionDate && e.supplierProductionDate.trim() !== '' && e.supplierProductionDate.toLowerCase() !== 'invalid date') {
             p.supplierProductionDate = new Date(e.supplierProductionDate);

@@ -90,7 +90,10 @@ namespace TuTa.Wms.Stocks.Dtos
         /// </summary>
         [Column(TypeName = "decimal(18,6)")]
         public decimal TotalCountInTime { get; set; }
-
+        /// <summary>
+        /// 实时包或箱数
+        /// </summary>
+        public int? TotalPagOrBoxInTime {  get; set; }
         /// <summary>
         /// 库存状态，包括：可用的，冻结的
         /// </summary>

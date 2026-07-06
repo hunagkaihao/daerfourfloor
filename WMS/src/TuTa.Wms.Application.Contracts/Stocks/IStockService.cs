@@ -306,7 +306,7 @@ namespace TuTa.Wms.Stocks
         /// <param name="stockId"></param>
         /// <param name="outBoundCount"></param>
         /// <returns></returns>
-        Task<ResponseDto> OutBountStockDirectAsync(Guid stockId, decimal outBoundCount);
+        Task<ResponseDto> OutBountStockDirectAsync(Guid stockId, decimal outBoundCount, int? pagOrBoxCount = null);
 
 
     }

@@ -108,6 +108,10 @@ export const diskcolumns = [
     dataIndex: 'materialName',
   },
   {
+    title: '箱数',
+    dataIndex: 'totalPagOrBoxInTime',
+  },
+  {
     title: '数量',
     dataIndex: 'totalCountInTime',
   },
@@ -138,6 +142,12 @@ export const columns = [
     title: '物料编码',
     dataIndex: 'materialCode',
     key: 'materialCode',
+    align: "center",
+  },
+  {
+    title: '箱数',
+    dataIndex: 'totalPagOrBoxInTime',
+    key: 'totalPagOrBoxInTime',
     align: "center",
   },
   {

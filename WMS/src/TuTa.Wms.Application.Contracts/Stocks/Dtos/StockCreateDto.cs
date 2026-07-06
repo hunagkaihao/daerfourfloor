@@ -18,6 +18,10 @@ namespace TuTa.Wms.Stocks.Dtos
         /// 入库数量（库存数量）
         /// </summary>
         public decimal TotalCount { get; set; }
+        /// <summary>
+        /// 入库包或箱数
+        /// </summary>
+        public int TotalPagOrBox { get; set; }
 
         /// <summary>
         /// 箱号（可选，用于标识物料所在箱子）
@@ -58,5 +62,15 @@ namespace TuTa.Wms.Stocks.Dtos
         /// ASN码（入库单号）
         /// </summary>
         public string AsnCode { get; set; }
+
+        /// <summary>
+        /// 收料时的包或箱数
+        /// </summary>
+        public int? ReceivePkgOrBoxCount { get; set; }
+
+        /// <summary>
+        /// 最小包装中的物料数量（每箱数量）
+        /// </summary>
+        public decimal? CountInOnePkgOrBox { get; set; }
     }
 }

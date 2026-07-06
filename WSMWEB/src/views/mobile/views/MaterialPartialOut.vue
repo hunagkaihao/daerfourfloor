@@ -47,26 +47,45 @@
         <a-descriptions-item label="规格型号">{{ stockData.specs }}</a-descriptions-item>
         <a-descriptions-item label="批次号">{{ stockData.batchCode || '无' }}</a-descriptions-item>
         <a-descriptions-item label="箱号">{{ stockData.boxNumber || '无' }}</a-descriptions-item>
+        <a-descriptions-item label="箱数">{{ stockData.totalPagOrBoxInTime ?? stockData.receivePkgOrBoxCount ?? '无' }}</a-descriptions-item>
         <a-descriptions-item label="库存数量">{{ stockData.totalCountInTime }} {{ stockData.unit }}</a-descriptions-item>
       </a-descriptions>
     </div>
 
     <div v-if="stockData" class="qty-section">
+      <a-radio-group v-model:value="outMode" class="mode-row">
+        <a-radio value="box">按箱数出库</a-radio>
+        <a-radio value="count">按数量出库</a-radio>
+      </a-radio-group>
       <a-row class="qty-row">
         <a-col :span="8">
-          <div class="label">出库数量:</div>
+          <div class="label">{{ outMode === 'box' ? '出库箱数:' : '出库数量:' }}</div>
         </a-col>
         <a-col :span="16">
-          <a-input-number 
-            v-model:value="outQty" 
-            :min="1" 
-            :max="stockData.totalCountInTime" 
+          <a-input-number
+            v-if="outMode === 'count'"
+            v-model:value="outQty"
+            :min="1"
+            :max="stockData.totalCountInTime"
+            class="qty-input"
+            :step="1"
+          />
+          <a-input-number
+            v-else
+            v-model:value="outBoxCount"
+            :min="1"
+            :max="maxBoxCount"
             class="qty-input"
             :step="1"
           />
         </a-col>
       </a-row>
-      <div class="qty-hint">当前库存: {{ stockData.totalCountInTime }} {{ stockData.unit }}</div>
+      <div class="qty-hint">
+        当前库存: {{ stockData.totalCountInTime }} {{ stockData.unit }}
+        <span v-if="outMode === 'box' && stockData.countInOnePkgOrBox">
+          | 每箱: {{ stockData.countInOnePkgOrBox }} {{ stockData.unit }}
+        </span>
+      </div>
     </div>
 
     <a-row v-if="stockData" class="button-row">
@@ -81,7 +100,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { SearchOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 import Header from '../header/Header.vue';
@@ -124,6 +143,13 @@ const stockColumns = [
     }),
   },
   {
+    title: '箱数',
+    dataIndex: 'totalPagOrBoxInTime',
+    key: 'receivePkgOrBoxCount',
+    align: 'center',
+    width: 60,
+  },
+  {
     title: '数量',
     dataIndex: 'totalCountInTime',
     key: 'totalCountInTime',
@@ -139,8 +165,35 @@ const stockColumns = [
   },
 ];
 
+const outMode = ref('box');
+const outBoxCount = ref(1);
+
+const maxBoxCount = computed(() => {
+  if (!stockData.value) return 0;
+  if (!stockData.value.countInOnePkgOrBox) return stockData.value.totalCountInTime;
+  return Math.floor(stockData.value.totalCountInTime / stockData.value.countInOnePkgOrBox);
+});
+
 const canOut = computed(() => {
-  return stockData.value !== null && outQty.value > 0 && outQty.value <= stockData.value.totalCountInTime;
+  if (!stockData.value) return false;
+  if (outMode.value === 'count') {
+    return outQty.value > 0 && outQty.value <= stockData.value.totalCountInTime;
+  }
+  return outBoxCount.value > 0 && outBoxCount.value <= maxBoxCount.value;
+});
+
+// 按数量出库时自动计算箱数，按箱数出库时自动计算数量
+watch(outQty, (val) => {
+  if (outMode.value === 'count' && stockData.value?.countInOnePkgOrBox) {
+    const boxes = Math.floor(val / stockData.value.countInOnePkgOrBox);
+    outBoxCount.value = boxes || 1;
+  }
+});
+
+watch(outBoxCount, (val) => {
+  if (outMode.value === 'box' && stockData.value?.countInOnePkgOrBox) {
+    outQty.value = val * stockData.value.countInOnePkgOrBox;
+  }
 });
 
 onMounted(() => {
@@ -160,6 +213,8 @@ function customRow(record: any) {
 function selectStock(stock: any) {
   stockData.value = stock;
   outQty.value = 1;
+  outBoxCount.value = 1;
+  outMode.value = 'box';
   message.success('已选择物料');
 }
 
@@ -213,18 +268,33 @@ async function executeOut() {
   executing.value = true;
   
   try {
-    const response = await stockService.stockOutboundDirect(stockData.value.id, outQty.value);
-    
+    const actualQty = outMode.value === 'box'
+      ? outBoxCount.value * (stockData.value.countInOnePkgOrBox || 1)
+      : outQty.value;
+    const pagOrBoxCount = outMode.value === 'box'
+      ? outBoxCount.value
+      : (stockData.value.countInOnePkgOrBox ? Math.floor(outQty.value / stockData.value.countInOnePkgOrBox) : 0);
+    const response = await stockService.stockOutboundDirect(stockData.value.id, actualQty, pagOrBoxCount);
+
     if (response && response.success === true) {
-      stockData.value.totalCountInTime -= outQty.value;
-      
+      stockData.value.totalCountInTime -= actualQty;
+      if (pagOrBoxCount > 0 && stockData.value.totalPagOrBoxInTime != null) {
+        stockData.value.totalPagOrBoxInTime -= pagOrBoxCount;
+      }
+
       showSuccess.value = true;
-      message.success(`成功出库 ${outQty.value} ${stockData.value.unit}`);
-      
+      if (outMode.value === 'box') {
+        message.success(`成功出库 ${outBoxCount.value} 箱(${actualQty} ${stockData.value.unit})`);
+      } else {
+        message.success(`成功出库 ${actualQty} ${stockData.value.unit}`);
+      }
+
       if (stockData.value.totalCountInTime <= 0) {
         setTimeout(() => {
           reset();
         }, 2000);
+      } else if (outMode.value === 'box') {
+        outBoxCount.value = 1;
       } else {
         outQty.value = 1;
       }
@@ -244,6 +314,8 @@ function reset() {
   cellCode.value = '';
   displayCellCode.value = '';
   outQty.value = 1;
+  outBoxCount.value = 1;
+  outMode.value = 'box';
   stockData.value = null;
   stockList.value = [];
 }
@@ -337,15 +409,19 @@ function reset() {
   color: #333;
 }
 
-.qty-section { 
-  margin: 15px 0; 
+.qty-section {
+  margin: 15px 0;
   background: #fff;
   border-radius: 8px;
   padding: 15px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
-.qty-row { 
+.mode-row {
+  margin-bottom: 12px;
+}
+
+.qty-row {
   align-items: center; 
 }
 

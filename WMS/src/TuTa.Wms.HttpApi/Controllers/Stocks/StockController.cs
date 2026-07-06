@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using Newtonsoft.Json;
@@ -17,6 +18,7 @@ using Volo.Abp.Application.Dtos;
 
 namespace TuTa.Wms.Controllers.Stocks
 {
+    [AllowAnonymous]
     [Route("wms/stock")]
     [ApiController]
     public class StockController : WmsController, IStockService
@@ -442,9 +444,9 @@ namespace TuTa.Wms.Controllers.Stocks
         }
 
         [HttpPost("stockOutboundDirect")]
-        public async Task<ResponseDto> OutBountStockDirectAsync(Guid stockId, decimal outBoundCount)
+        public async Task<ResponseDto> OutBountStockDirectAsync(Guid stockId, decimal outBoundCount, int? pagOrBoxCount = null)
         {
-            return await _stockService.OutBountStockDirectAsync(stockId, outBoundCount).ConfigureAwait(false);
+            return await _stockService.OutBountStockDirectAsync(stockId, outBoundCount, pagOrBoxCount).ConfigureAwait(false);
         }
 
         //[HttpPost("StocksCreateAndBindToCell")]

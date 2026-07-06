@@ -97,6 +97,12 @@ const stockcolumns = [
     align: 'center',
   },
   {
+    title: '箱数',
+    dataIndex: 'receivePkgOrBoxCount',
+    key: 'receivePkgOrBoxCount',
+    align: 'center',
+  },
+  {
     title: '数量',
     dataIndex: 'totalCountInTime',
     key: 'totalCountInTime',

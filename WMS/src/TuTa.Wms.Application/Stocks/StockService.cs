@@ -320,8 +320,8 @@ namespace TuTa.Wms.Stocks
 
                 CountInfoOfStock countInfo = new CountInfoOfStock(
                     para.TotalCount,
-                    null,
-                    null);
+                    para.ReceivePkgOrBoxCount,
+                    para.CountInOnePkgOrBox);
 
                 SupplierInfoOfStock supplierInfo = new SupplierInfoOfStock(
                     null,
@@ -721,6 +721,13 @@ namespace TuTa.Wms.Stocks
 
                     Guid? cellId = box.CellData.CellId;
 
+                    // 在删除前查询库位中库存，用于判断是否需要重置库位状态
+                    List<Stock> stocksInCellBeforeDelete = null;
+                    if (cellId.HasValue)
+                    {
+                        stocksInCellBeforeDelete = await _stockRepository.GetByCellIdAsync(cellId.Value).ConfigureAwait(false);
+                    }
+
                     // 从容器中移除所有库存关联
                     foreach (Stock stock in stocks)
                     {
@@ -739,22 +746,18 @@ namespace TuTa.Wms.Stocks
                         await _stockRepository.DeleteAsync(stock);
                     }
 
-                    await uow.CompleteAsync().ConfigureAwait(false);
-
-                    // 根据库位中是否还有其它库存来判断是否重置库位状态
-                    if (cellId.HasValue)
+                    // 若容器中库存就是库位中全部库存，解绑后库位变为无货
+                    if (stocksInCellBeforeDelete != null && stocksInCellBeforeDelete.Count == stocks.Count)
                     {
-                        var remainingStocks = await _stockRepository.GetByCellIdAsync(cellId.Value).ConfigureAwait(false);
-                        if (remainingStocks.Count == 0)
+                        var cell = await _cellRepository.FindByIdAsync(cellId.Value).ConfigureAwait(false);
+                        if (cell != null)
                         {
-                            var cell = await _cellRepository.FindByIdAsync(cellId.Value).ConfigureAwait(false);
-                            if (cell != null)
-                            {
-                                cell.SetCellStatus(CellStatus.Nohave);
-                                await _cellRepository.UpdateAsync(cell);
-                            }
+                            cell.SetCellStatus(CellStatus.Nohave);
+                            await _cellRepository.UpdateAsync(cell);
                         }
                     }
+
+                    await uow.CompleteAsync().ConfigureAwait(false);
 
                     return new ResponseDto() { success = true, message = "库存解绑容器成功" };
                 }
@@ -2182,6 +2185,7 @@ namespace TuTa.Wms.Stocks
                         AreaCode = stock.Warehouse.AreaCode,
                         AreaName = stock.Warehouse.AreaName,
                         TotalCountInTime = stock.TotalCountInTime,
+                        TotalPagOrBoxInTime = stock.TotalPagOrBox,
                         Status = stock.Status.ToString(),
                         StockInType = StockInTypeHelper.StockInTypeToChinese(stock.StockInType),
                         BatchCode = stock.BatchCode,
@@ -2275,6 +2279,7 @@ namespace TuTa.Wms.Stocks
                         AreaCode = stock.Warehouse.AreaCode,
                         AreaName = stock.Warehouse.AreaName,
                         TotalCountInTime = stock.TotalCountInTime,
+                        TotalPagOrBoxInTime = stock.TotalPagOrBox,
                         Status = stock.Status.ToString(),
                         RunStatus = stock.RunStatus.ToString(),
                         StockInType = StockInTypeHelper.StockInTypeToChinese(stock.StockInType),
@@ -2350,6 +2355,7 @@ namespace TuTa.Wms.Stocks
                         AreaCode = stock.Warehouse.AreaCode,
                         AreaName = stock.Warehouse.AreaName,
                         TotalCountInTime = stock.TotalCountInTime,
+                        TotalPagOrBoxInTime = stock.TotalPagOrBox,
                         Status = stock.Status.ToString(),
                         StockInType = StockInTypeHelper.StockInTypeToChinese(stock.StockInType),
                         BatchCode = stock.BatchCode,
@@ -2428,6 +2434,7 @@ namespace TuTa.Wms.Stocks
                         AreaCode = stock.Warehouse.AreaCode,
                         AreaName = stock.Warehouse.AreaName,
                         TotalCountInTime = stock.TotalCountInTime,
+                        TotalPagOrBoxInTime = stock.TotalPagOrBox,
                         Status = stock.Status.ToString(),
                         StockInType = StockInTypeHelper.StockInTypeToChinese(stock.StockInType),
                         BatchCode = stock.BatchCode,
@@ -2550,6 +2557,7 @@ namespace TuTa.Wms.Stocks
                         AreaCode = stock.Warehouse.AreaCode,
                         AreaName = stock.Warehouse.AreaName,
                         TotalCountInTime = stock.TotalCountInTime,
+                        TotalPagOrBoxInTime = stock.TotalPagOrBox,
                         Status = stock.Status.ToString(),
                         StockInType = StockInTypeHelper.StockInTypeToChinese(stock.StockInType),
                         BatchCode = stock.BatchCode,
@@ -2686,6 +2694,7 @@ namespace TuTa.Wms.Stocks
                         AreaCode = stock.Warehouse.AreaCode,
                         AreaName = stock.Warehouse.AreaName,
                         TotalCountInTime = stock.TotalCountInTime,
+                        TotalPagOrBoxInTime = stock.TotalPagOrBox,
                         Status = stock.Status.ToString(),
                         StockInType = StockInTypeHelper.StockInTypeToChinese(stock.StockInType),
                         BatchCode = stock.BatchCode,
@@ -2756,6 +2765,7 @@ namespace TuTa.Wms.Stocks
                         AreaCode = stock.Warehouse.AreaCode,
                         AreaName = stock.Warehouse.AreaName,
                         TotalCountInTime = stock.TotalCountInTime,
+                        TotalPagOrBoxInTime = stock.TotalPagOrBox,
                         Status = stock.Status.ToString(),
                         StockInType = StockInTypeHelper.StockInTypeToChinese(stock.StockInType),
                         BatchCode = stock.BatchCode,
@@ -2825,6 +2835,7 @@ namespace TuTa.Wms.Stocks
                         AreaCode = stock.Warehouse.AreaCode,
                         AreaName = stock.Warehouse.AreaName,
                         TotalCountInTime = stock.TotalCountInTime,
+                        TotalPagOrBoxInTime = stock.TotalPagOrBox,
                         Status = stock.Status.ToString(),
                         StockInType = StockInTypeHelper.StockInTypeToChinese(stock.StockInType),
                         BatchCode = stock.BatchCode,
@@ -2912,6 +2923,7 @@ namespace TuTa.Wms.Stocks
                         AreaCode = stock.Warehouse.AreaCode,
                         AreaName = stock.Warehouse.AreaName,
                         TotalCountInTime = stock.TotalCountInTime,
+                        TotalPagOrBoxInTime = stock.TotalPagOrBox,
                         Status = stock.Status.ToString(),
                         StockInType = StockInTypeHelper.StockInTypeToChinese(stock.StockInType),
                         BatchCode = stock.BatchCode,
@@ -3943,6 +3955,13 @@ namespace TuTa.Wms.Stocks
                     decimal countToDel = stockExist.TotalCountInTime;
                     Guid? cellId = stockExist.CellData.CellId;
 
+                    // 在删除前查询库位中库存数量，用于判断是否需要重置库位状态
+                    List<Stock> stocksInCellBeforeDelete = null;
+                    if (cellId.HasValue)
+                    {
+                        stocksInCellBeforeDelete = await _stockRepository.GetByCellIdAsync(cellId.Value).ConfigureAwait(false);
+                    }
+
                     // 如果库存关联了料箱，从料箱中移除
                     if (stockExist.BoxData.BoxId.HasValue)
                     {
@@ -3956,22 +3975,19 @@ namespace TuTa.Wms.Stocks
                     }
 
                     await _stockRepository.DeleteAsync(stockExist).ConfigureAwait(false);
-                    await uow.CompleteAsync().ConfigureAwait(false);
 
-                    // 根据库位中是否还有其它库存来判断是否重置库位状态
-                    if (cellId.HasValue)
+                    // 若该库存是库位中唯一的一条，删除后库位变为无货
+                    if (stocksInCellBeforeDelete != null && stocksInCellBeforeDelete.Count == 1)
                     {
-                        var remainingStocks = await _stockRepository.GetByCellIdAsync(cellId.Value).ConfigureAwait(false);
-                        if (remainingStocks.Count == 0)
+                        var cell = await _cellRepository.FindByIdAsync(cellId.Value).ConfigureAwait(false);
+                        if (cell != null)
                         {
-                            var cell = await _cellRepository.FindByIdAsync(cellId.Value).ConfigureAwait(false);
-                            if (cell != null)
-                            {
-                                cell.SetCellStatus(CellStatus.Nohave);
-                                await _cellRepository.UpdateAsync(cell);
-                            }
+                            cell.SetCellStatus(CellStatus.Nohave);
+                            await _cellRepository.UpdateAsync(cell);
                         }
                     }
+
+                    await uow.CompleteAsync().ConfigureAwait(false);
 
                     _logger.Info($"Id为{stockId}，barcode为{stockExist.Barcode}，物料码为{stockExist.Material.MaterialCode}, 物料名为{stockExist.Material.MaterialName}，数量为{countToDel}的库存被直接手动删除");
                     return new ResponseDto() { success = true, message = $"删除库存{stockId}成功" };
@@ -3984,7 +4000,7 @@ namespace TuTa.Wms.Stocks
             }
         }
 
-        public async Task<ResponseDto> OutBountStockDirectAsync(Guid stockId, decimal outBoundCount)
+        public async Task<ResponseDto> OutBountStockDirectAsync(Guid stockId, decimal outBoundCount, int? pagOrBoxCount = null)
         {
             using (var uow = UnitOfWorkManager.Begin(true, true))
             {
@@ -3994,10 +4010,32 @@ namespace TuTa.Wms.Stocks
                     if (stockExist == null)
                         return new ResponseDto() { success = false, message = $"库存{stockId}不存在" };
 
-                    stockExist.Remove(outBoundCount);
+                    Guid? cellId = stockExist.CellData.CellId;
+                    bool willBeFullyConsumed = stockExist.TotalCountInTime <= outBoundCount;
+
+                    // 在删除前查询库位中库存数量，用于判断是否需要重置库位状态
+                    List<Stock> stocksInCellBeforeDelete = null;
+                    if (willBeFullyConsumed && cellId.HasValue)
+                    {
+                        stocksInCellBeforeDelete = await _stockRepository.GetByCellIdAsync(cellId.Value).ConfigureAwait(false);
+                    }
+
+                    stockExist.Remove(outBoundCount, pagOrBoxCount);
 
                     if (stockExist.TotalCountInTime == 0)
+                    {
+                        if (stockExist.BoxData.BoxId.HasValue)
+                        {
+                            var box = await _boxRepository.FindByBoxIdAsync(stockExist.BoxData.BoxId.Value).ConfigureAwait(false);
+                            if (box != null)
+                            {
+                                box.RemoveStock(stockId);
+                                await _boxStockRepository.DeleteAsync(bs => bs.StockId == stockId);
+                                await _boxRepository.UpdateAsync(box);
+                            }
+                        }
                         await _stockRepository.DeleteAsync(stockExist).ConfigureAwait(false);
+                    }
                     else
                         await _stockRepository.UpdateAsync(stockExist).ConfigureAwait(false);
 
@@ -4039,6 +4077,17 @@ namespace TuTa.Wms.Stocks
                     {
                         await _stockOutHistoryRepository.InsertAsync(stockOutHistory).ConfigureAwait(false);
                         _logger.Info("出库历史记录已插入仓库");
+                    }
+
+                    // 若该库存是库位中唯一的一条，出库后库位变为无货
+                    if (stocksInCellBeforeDelete != null && stocksInCellBeforeDelete.Count == 1)
+                    {
+                        var cell = await _cellRepository.FindByIdAsync(cellId.Value).ConfigureAwait(false);
+                        if (cell != null)
+                        {
+                            cell.SetCellStatus(CellStatus.Nohave);
+                            await _cellRepository.UpdateAsync(cell);
+                        }
                     }
 
                     await uow.CompleteAsync().ConfigureAwait(false);

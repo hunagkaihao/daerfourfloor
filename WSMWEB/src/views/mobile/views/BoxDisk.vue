@@ -46,7 +46,7 @@
                 </template>
                 <div class="goods-info">
                     <a-row>
-                        <a-col :span="12">
+                        <a-col :span="12">stockCreateAndBindBox
                             <p>物料编号:{{ i.materialCode }}</p>
                         </a-col>
                         <a-col :span="12">
@@ -396,6 +396,8 @@ const incell = async () => {
         p.barcode = e.materialCode
         p.materialCode = e.materialCode
         p.boxNumber = e.boxNumber || undefined
+        p.receivePkgOrBoxCount = e.baoshu || undefined
+        p.countInOnePkgOrBox = e.countInOnePkgOrBox || undefined
         p.batchCode = e.goodsBatchNo || ''
         p.grade = e.grade || ''
         p.processNo = e.ProcessNo || ''

@@ -80,7 +80,8 @@ namespace TuTa.Wms.Stocks.Aggregates
             //    throw new Exception($"已检测库存的库存总数不能大于检测通过总数，当前库存总数为{totalCountInTime}，检测通过数为{CheckData.PassCnt}");
             //}
             TotalCountInTime = totalCountInTime;
-            
+            TotalPagOrBox = countInformation.ReceivePkgOrBoxCount;
+
             BatchCode = batchCode;
             BLCode = bLCode;
             BHCode = bHCode;
@@ -274,7 +275,7 @@ namespace TuTa.Wms.Stocks.Aggregates
         /// </summary>
         /// <param name="outCount"></param>
         /// <exception cref="ArgumentException"></exception>
-        public virtual void Remove(decimal outCount)
+        public virtual void Remove(decimal outCount, int? pagOrBoxCount = null)
         {
             if (outCount < 0)
                 throw new ArgumentException("出库数量不能小于0");
@@ -283,6 +284,8 @@ namespace TuTa.Wms.Stocks.Aggregates
                 throw new ArgumentException("出库数量超过已有数量");
 
             TotalCountInTime -= outCount;
+            if (pagOrBoxCount.HasValue && TotalPagOrBox.HasValue && TotalPagOrBox >= pagOrBoxCount.Value)
+                TotalPagOrBox = TotalPagOrBox - pagOrBoxCount.Value;
 
             if (TotalCountInTime == 0) //领完了
             {
@@ -478,6 +481,11 @@ namespace TuTa.Wms.Stocks.Aggregates
         /// </summary>
         [Column(TypeName = "decimal(18,6)")]
         public virtual decimal TotalCountInTime { get; private set; }
+
+        /// <summary>
+        /// 实时包或箱数
+        /// </summary>
+        public virtual int? TotalPagOrBox { get; set; }
 
         /// <summary>
         /// 库存状态，包括：可用的，冻结的

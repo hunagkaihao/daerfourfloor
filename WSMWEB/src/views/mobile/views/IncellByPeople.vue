@@ -320,6 +320,8 @@ const incell = async () => {
         let p = new StockCreateDto()
         p.barcode = e.barcode
         p.totalCount = e.incellshu
+        p.receivePkgOrBoxCount = e.baoshu || undefined
+        p.countInOnePkgOrBox = e.countInOnePkgOrBox || undefined
         stockCreateDto.push(p)
     })
     console.log(stockCreateDto)
