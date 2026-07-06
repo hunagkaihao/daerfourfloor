@@ -20,6 +20,7 @@ using TuTa.Wms.BarcodeLists;
 using TuTa.Wms.BarcodeLists.Aggregates;
 using TuTa.Wms.Boxes;
 using TuTa.Wms.Boxes.Aggregates;
+using TuTa.Wms.Boxes.Entities;
 using TuTa.Wms.Boxes.Events;
 using TuTa.Wms.Cells;
 using TuTa.Wms.Cells.Aggregates;
@@ -70,6 +71,7 @@ namespace TuTa.Wms.Stocks
         private readonly StocksManager _stocksManager;
         private readonly IChkResultListRepository _chkResultListRepository;
         private readonly IBoxRepository _boxRepository;
+        private readonly IRepository<BoxStock> _boxStockRepository;
         private readonly ICellRepository _cellRepository;
         private readonly IWarehouseRepository _warehouseRepository;
         private readonly IBarcodeListRepository _barcodeListRepository;
@@ -99,6 +101,7 @@ namespace TuTa.Wms.Stocks
             StocksManager stocksManager,
             IChkResultListRepository chkResultListRepository,
             IBoxRepository boxRepository,
+            IRepository<BoxStock> boxStockRepository,
             ICellRepository cellRepository,
             IWarehouseRepository warehouseRepository,
             IBarcodeListRepository barcodeListRepository,
@@ -127,6 +130,7 @@ namespace TuTa.Wms.Stocks
             _stocksManager = stocksManager;
             _chkResultListRepository = chkResultListRepository;
             _boxRepository = boxRepository;
+            _boxStockRepository = boxStockRepository;
             _cellRepository = cellRepository;
             _warehouseRepository = warehouseRepository;
             _barcodeListRepository = barcodeListRepository;
@@ -233,236 +237,236 @@ namespace TuTa.Wms.Stocks
 
         private async Task<ResponseDto> CreateStockAndBindBoxCoreAsync(List<StockCreateDto> paras, string boxCode)
         {
-                    if (string.IsNullOrWhiteSpace(boxCode))
-                        return new ResponseDto() { success = false, message = "容器编号不能为空" };
+            if (string.IsNullOrWhiteSpace(boxCode))
+                return new ResponseDto() { success = false, message = "容器编号不能为空" };
 
-                    // 按容器编号查找容器
-                    var box = await _boxRepository.FindByBoxCodeAsync(boxCode).ConfigureAwait(false);
-                    Cell cell = null;
+            // 按容器编号查找容器
+            var box = await _boxRepository.FindByBoxCodeAsync(boxCode).ConfigureAwait(false);
+            Cell cell = null;
 
-                    if (box == null)
+            if (box == null)
+            {
+                // 容器不存在，使用传入的容器编号创建
+                var boxSpecs = new TuTa.Wms.Boxes.ValueObjects.BoxSpecsValObj("默认规格", 1, 1, 1);
+                box = await _boxManager.CreateBoxAsync(boxCode, "容器" + boxCode, "1", boxSpecs).ConfigureAwait(false);
+                await _boxRepository.InsertAsync(box).ConfigureAwait(false);
+            }
+
+            // 解析库位：优先从容器的库位绑定获取，否则按同编号查找库位
+            if (box.CellData?.CellId != null)
+            {
+                cell = await _cellRepository.FindByIdAsync(box.CellData.CellId.Value).ConfigureAwait(false);
+            }
+            else
+            {
+                cell = await _cellRepository.FindByCellCodeAsync(boxCode).ConfigureAwait(false);
+            }
+
+            if (cell == null)
+                return new ResponseDto() { success = false, message = $"容器码为{boxCode}的容器未绑定库位，且找不到对应库位" };
+
+            if (boxCode.StartsWith("4A", StringComparison.OrdinalIgnoreCase))
+            {
+                var laneValidation = await Validate4ALaneGroupingOrderAsync(cell).ConfigureAwait(false);
+                if (laneValidation != null)
+                    return laneValidation;
+            }
+
+            // 容器未绑定库位时，绑定容器到库位
+            if (box.CellData?.CellId == null)
+            {
+                if (cell.CellStatus != CellStatus.Nohave && !cell.IsBoxInThisCell(box.Id))
+                    return new ResponseDto() { success = false, message = $"{cell.CellCode}库位已有容器绑定" };
+
+                Warehouse warehouse = await _warehouseRepository.FindByIdAsync(cell.WarehouseId).ConfigureAwait(false);
+                WarehouseArea warehouseArea = warehouse.GetAreaByAreaId((int)cell.WarehouseAreaId);
+                box.BindCell(cell, warehouse, warehouseArea);
+                await _boxRepository.UpdateAsync(box).ConfigureAwait(false);
+
+                cell.SetCellStatus(CellStatus.Have);
+                await _cellRepository.UpdateAsync(cell).ConfigureAwait(false);
+            }
+
+            // 检查参数
+            if (paras == null || paras.Count == 0)
+                return new ResponseDto() { success = false, message = "库存创建参数不能为空" };
+
+            foreach (var para in paras)
+            {
+                var materialCode = !string.IsNullOrWhiteSpace(para.MaterialCode) ? para.MaterialCode : para.Barcode;
+                if (string.IsNullOrWhiteSpace(materialCode))
+                    return new ResponseDto() { success = false, message = "物料码不能为空" };
+
+                if (para.TotalCount <= 0)
+                    return new ResponseDto() { success = false, message = "库存数量必须大于0" };
+
+                // 查找收料条码
+                /*BarcodeList barcodeResult = await _barcodeListRepository.FindByBarcodeAsync(para.Barcode).ConfigureAwait(false);
+                if (barcodeResult == null)
+                    return new ResponseDto() { success = false, message = $"收料码为{para.Barcode}的收料条目不存在" };*/
+
+                // 查找物料信息
+                Material materialResult = await _materialRepository.FindByMaterialCodeAsync(materialCode);
+                if (materialResult == null)
+                    return new ResponseDto() { success = false, message = $"物料码为{materialCode}的物料数据不存在" };
+
+                // 创建库存信息
+                MaterialInfoOfStock material = new MaterialInfoOfStock(
+                    materialResult.MaterialCode,
+                    materialResult.MaterialName,
+                    materialResult.Specs,
+                    materialResult.Unit,
+                    materialResult.FinGoodsList);
+
+                CountInfoOfStock countInfo = new CountInfoOfStock(
+                    para.TotalCount,
+                    null,
+                    null);
+
+                SupplierInfoOfStock supplierInfo = new SupplierInfoOfStock(
+                    null,
+                    null,
+                    para.SupplierBatchCode);
+
+                // 创建库存，传入批次、等级等信息
+                var stock = await _stocksManager.CreateStockAsync(
+                    materialCode,
+                    para.TotalCount,
+                    material,
+                    countInfo,
+                    supplierInfo,
+                    StockInType.AdjustStockIn,
+                    2,
+                    para.BatchCode,
+                    null,
+                    null);
+
+                // 设置生产日期
+                if (para.SupplierProductionDate.HasValue)
+                {
+                    stock.UpdateStockInDate(para.SupplierProductionDate.Value);
+                }
+
+                // 设置等级
+                if (!string.IsNullOrWhiteSpace(para.Grade))
+                {
+                    stock.SetGrade(para.Grade);
+                }
+
+                // 设置工序号
+                if (!string.IsNullOrWhiteSpace(para.ProcessNo))
+                {
+                    stock.SetProcessNo(para.ProcessNo);
+                }
+
+                // 设置收料条形码
+                if (!string.IsNullOrWhiteSpace(para.ReceivingMaterialBarcode))
+                {
+                    var existingStockByReceivingBarcode = await _stockRepository.FindByReceivingMaterialBarcodeAsync(para.ReceivingMaterialBarcode).ConfigureAwait(false);
+                    if (existingStockByReceivingBarcode != null)
                     {
-                        // 容器不存在，使用传入的容器编号创建
-                        var boxSpecs = new TuTa.Wms.Boxes.ValueObjects.BoxSpecsValObj("默认规格", 1, 1, 1);
-                        box = await _boxManager.CreateBoxAsync(boxCode, "容器" + boxCode, "1", boxSpecs).ConfigureAwait(false);
-                        await _boxRepository.InsertAsync(box).ConfigureAwait(false);
+                        existingStockByReceivingBarcode.CombineStock(para.TotalCount);
+                        await _stockRepository.UpdateAsync(existingStockByReceivingBarcode).ConfigureAwait(false);
+
+                        if (cell != null)
+                        {
+                            Warehouse warehouse = await _warehouseRepository.FindByIdAsync(cell.WarehouseId).ConfigureAwait(false);
+                            WarehouseArea warehouseArea = warehouse.GetAreaByAreaId((int)cell.WarehouseAreaId);
+
+                            var stockInHistory = new StockInHistory(
+                                existingStockByReceivingBarcode.Barcode,
+                                materialResult.MaterialCode,
+                                materialResult.MaterialName,
+                                materialResult.Specs,
+                                materialResult.Unit,
+                                warehouse.WarehouseCode,
+                                warehouse.WarehouseName,
+                                warehouseArea.WarehouseAreaCode,
+                                warehouseArea.WarehouseAreaName,
+                                cell.CellCode,
+                                cell.CellName,
+                                box.BoxCode,
+                                box.BoxName,
+                                StockInTypeHelper.StockInTypeToChinese(StockInType.AdjustStockIn),
+                                para.TotalCount,
+                                DateTime.Now,
+                                batchNo: para.BatchCode);
+
+                            await _stockInHistoryRepository.InsertAsync(stockInHistory).ConfigureAwait(false);
+
+                            if (!string.IsNullOrWhiteSpace(para.AsnCode))
+                            {
+                                await _erpAsnStockInService.HandleStockInCompletedAsync(para.AsnCode, para.TotalCount).ConfigureAwait(false);
+                            }
+                        }
+
+                        continue;
                     }
 
-                    // 解析库位：优先从容器的库位绑定获取，否则按同编号查找库位
-                    if (box.CellData?.CellId != null)
+                    stock.SetReceivingMaterialBarcode(para.ReceivingMaterialBarcode);
+                }
+ 
+                // 检查是否已存在相同库存
+                var stockExist = await _stockRepository.FindByBoxIdAndBarcodeAsync(box.Id, materialCode).ConfigureAwait(false);
+                if (stockExist != null)
+                {
+                    // 合并库存
+                    stockExist.CombineStock(stock);
+                    await _stockRepository.UpdateAsync(stockExist).ConfigureAwait(false);
+                }
+                else
+                {
+                    // 绑定库存到容器
+                    stock.BindBox(box.Id, box.BoxCode, box.BoxName, para.BoxNumber);
+                            
+                    if (cell != null)
                     {
-                        cell = await _cellRepository.FindByIdAsync(box.CellData.CellId.Value).ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        cell = await _cellRepository.FindByCellCodeAsync(boxCode).ConfigureAwait(false);
-                    }
-
-                    if (cell == null)
-                        return new ResponseDto() { success = false, message = $"容器码为{boxCode}的容器未绑定库位，且找不到对应库位" };
-
-                    if (boxCode.StartsWith("4A", StringComparison.OrdinalIgnoreCase))
-                    {
-                        var laneValidation = await Validate4ALaneGroupingOrderAsync(cell).ConfigureAwait(false);
-                        if (laneValidation != null)
-                            return laneValidation;
-                    }
-
-                    // 容器未绑定库位时，绑定容器到库位
-                    if (box.CellData?.CellId == null)
-                    {
-                        if (cell.CellStatus != CellStatus.Nohave && !cell.IsBoxInThisCell(box.Id))
-                            return new ResponseDto() { success = false, message = $"{cell.CellCode}库位已有容器绑定" };
-
                         Warehouse warehouse = await _warehouseRepository.FindByIdAsync(cell.WarehouseId).ConfigureAwait(false);
                         WarehouseArea warehouseArea = warehouse.GetAreaByAreaId((int)cell.WarehouseAreaId);
-                        box.BindCell(cell, warehouse, warehouseArea);
-                        await _boxRepository.UpdateAsync(box).ConfigureAwait(false);
+                        stock.BindCell(cell, warehouse, warehouseArea);
 
-                        cell.SetCellStatus(CellStatus.Have);
-                        await _cellRepository.UpdateAsync(cell).ConfigureAwait(false);
-                    }
-
-                    // 检查参数
-                    if (paras == null || paras.Count == 0)
-                        return new ResponseDto() { success = false, message = "库存创建参数不能为空" };
-
-                    foreach (var para in paras)
-                    {
-                        var materialCode = !string.IsNullOrWhiteSpace(para.MaterialCode) ? para.MaterialCode : para.Barcode;
-                        if (string.IsNullOrWhiteSpace(materialCode))
-                            return new ResponseDto() { success = false, message = "物料码不能为空" };
-
-                        if (para.TotalCount <= 0)
-                            return new ResponseDto() { success = false, message = "库存数量必须大于0" };
-
-                        // 查找收料条码
-                        /*BarcodeList barcodeResult = await _barcodeListRepository.FindByBarcodeAsync(para.Barcode).ConfigureAwait(false);
-                        if (barcodeResult == null)
-                            return new ResponseDto() { success = false, message = $"收料码为{para.Barcode}的收料条目不存在" };*/
-
-                        // 查找物料信息
-                        Material materialResult = await _materialRepository.FindByMaterialCodeAsync(materialCode);
-                        if (materialResult == null)
-                            return new ResponseDto() { success = false, message = $"物料码为{materialCode}的物料数据不存在" };
-
-                        // 创建库存信息
-                        MaterialInfoOfStock material = new MaterialInfoOfStock(
+                        var stockInHistory = new StockInHistory(
+                            stock.Barcode,
                             materialResult.MaterialCode,
                             materialResult.MaterialName,
                             materialResult.Specs,
                             materialResult.Unit,
-                            materialResult.FinGoodsList);
-
-                        CountInfoOfStock countInfo = new CountInfoOfStock(
+                            warehouse.WarehouseCode,
+                            warehouse.WarehouseName,
+                            warehouseArea.WarehouseAreaCode,
+                            warehouseArea.WarehouseAreaName,
+                            cell.CellCode,
+                            cell.CellName,
+                            box.BoxCode,
+                            box.BoxName,
+                            StockInTypeHelper.StockInTypeToChinese(StockInType.AdjustStockIn),
                             para.TotalCount,
-                            null,
-                            null);
+                            DateTime.Now,
+                            batchNo: para.BatchCode);
 
-                        SupplierInfoOfStock supplierInfo = new SupplierInfoOfStock(
-                            null,
-                            null,
-                            para.SupplierBatchCode);
+                        await _stockInHistoryRepository.InsertAsync(stockInHistory).ConfigureAwait(false);
 
-                        // 创建库存，传入批次、等级等信息
-                        var stock = await _stocksManager.CreateStockAsync(
-                            materialCode,
-                            para.TotalCount,
-                            material,
-                            countInfo,
-                            supplierInfo,
-                            StockInType.AdjustStockIn,
-                            2,
-                            para.BatchCode,
-                            null,
-                            null);
-
-                        // 设置生产日期
-                        if (para.SupplierProductionDate.HasValue)
+                        if (!string.IsNullOrWhiteSpace(para.AsnCode))
                         {
-                            stock.UpdateStockInDate(para.SupplierProductionDate.Value);
-                        }
-
-                        // 设置等级
-                        if (!string.IsNullOrWhiteSpace(para.Grade))
-                        {
-                            stock.SetGrade(para.Grade);
-                        }
-
-                        // 设置工序号
-                        if (!string.IsNullOrWhiteSpace(para.ProcessNo))
-                        {
-                            stock.SetProcessNo(para.ProcessNo);
-                        }
-
-                        // 设置收料条形码
-                        if (!string.IsNullOrWhiteSpace(para.ReceivingMaterialBarcode))
-                        {
-                            var existingStockByReceivingBarcode = await _stockRepository.FindByReceivingMaterialBarcodeAsync(para.ReceivingMaterialBarcode).ConfigureAwait(false);
-                            if (existingStockByReceivingBarcode != null)
-                            {
-                                existingStockByReceivingBarcode.CombineStock(para.TotalCount);
-                                await _stockRepository.UpdateAsync(existingStockByReceivingBarcode).ConfigureAwait(false);
-
-                                if (cell != null)
-                                {
-                                    Warehouse warehouse = await _warehouseRepository.FindByIdAsync(cell.WarehouseId).ConfigureAwait(false);
-                                    WarehouseArea warehouseArea = warehouse.GetAreaByAreaId((int)cell.WarehouseAreaId);
-
-                                    var stockInHistory = new StockInHistory(
-                                        existingStockByReceivingBarcode.Barcode,
-                                        materialResult.MaterialCode,
-                                        materialResult.MaterialName,
-                                        materialResult.Specs,
-                                        materialResult.Unit,
-                                        warehouse.WarehouseCode,
-                                        warehouse.WarehouseName,
-                                        warehouseArea.WarehouseAreaCode,
-                                        warehouseArea.WarehouseAreaName,
-                                        cell.CellCode,
-                                        cell.CellName,
-                                        box.BoxCode,
-                                        box.BoxName,
-                                        StockInTypeHelper.StockInTypeToChinese(StockInType.AdjustStockIn),
-                                        para.TotalCount,
-                                        DateTime.Now,
-                                        batchNo: para.BatchCode);
-
-                                    await _stockInHistoryRepository.InsertAsync(stockInHistory).ConfigureAwait(false);
-
-                                    if (!string.IsNullOrWhiteSpace(para.AsnCode))
-                                    {
-                                        await _erpAsnStockInService.HandleStockInCompletedAsync(para.AsnCode, para.TotalCount).ConfigureAwait(false);
-                                    }
-                                }
-
-                                continue;
-                            }
-
-                            stock.SetReceivingMaterialBarcode(para.ReceivingMaterialBarcode);
-                        }
- 
-                        // 检查是否已存在相同库存
-                        var stockExist = await _stockRepository.FindByBoxIdAndBarcodeAsync(box.Id, materialCode).ConfigureAwait(false);
-                        if (stockExist != null)
-                        {
-                            // 合并库存
-                            stockExist.CombineStock(stock);
-                            await _stockRepository.UpdateAsync(stockExist).ConfigureAwait(false);
-                        }
-                        else
-                        {
-                            // 绑定库存到容器
-                            stock.BindBox(box.Id, box.BoxCode, box.BoxName, para.BoxNumber);
-                            
-                                if (cell != null)
-                                {
-                                    Warehouse warehouse = await _warehouseRepository.FindByIdAsync(cell.WarehouseId).ConfigureAwait(false);
-                                    WarehouseArea warehouseArea = warehouse.GetAreaByAreaId((int)cell.WarehouseAreaId);
-                                    stock.BindCell(cell, warehouse, warehouseArea);
-
-                                    var stockInHistory = new StockInHistory(
-                                        stock.Barcode,
-                                        materialResult.MaterialCode,
-                                        materialResult.MaterialName,
-                                        materialResult.Specs,
-                                        materialResult.Unit,
-                                        warehouse.WarehouseCode,
-                                        warehouse.WarehouseName,
-                                        warehouseArea.WarehouseAreaCode,
-                                        warehouseArea.WarehouseAreaName,
-                                        cell.CellCode,
-                                        cell.CellName,
-                                        box.BoxCode,
-                                        box.BoxName,
-                                        StockInTypeHelper.StockInTypeToChinese(StockInType.AdjustStockIn),
-                                        para.TotalCount,
-                                        DateTime.Now,
-                                        batchNo: para.BatchCode);
-
-                                    await _stockInHistoryRepository.InsertAsync(stockInHistory).ConfigureAwait(false);
-
-                                    if (!string.IsNullOrWhiteSpace(para.AsnCode))
-                                    {
-                                        await _erpAsnStockInService.HandleStockInCompletedAsync(para.AsnCode, para.TotalCount).ConfigureAwait(false);
-                                    }
-                                }
-                            
-                            await _stockRepository.InsertAsync(stock).ConfigureAwait(false);
+                            await _erpAsnStockInService.HandleStockInCompletedAsync(para.AsnCode, para.TotalCount).ConfigureAwait(false);
                         }
                     }
+                            
+                    await _stockRepository.InsertAsync(stock).ConfigureAwait(false);
+                }
+            }
 
-                    // 创建库存后，更新容器状态为有货
-                    box.SetHave();
-                    await _boxRepository.UpdateAsync(box).ConfigureAwait(false);
+            // 创建库存后，更新容器状态为有货
+            box.SetHave();
+            await _boxRepository.UpdateAsync(box).ConfigureAwait(false);
 
-                    if (cell != null && cell.CellStatus != CellStatus.Have)
-                    {
-                        cell.SetCellStatus(CellStatus.Have);
-                        await _cellRepository.UpdateAsync(cell).ConfigureAwait(false);
-                    }
+            if (cell != null && cell.CellStatus != CellStatus.Have)
+            {
+                cell.SetCellStatus(CellStatus.Have);
+                await _cellRepository.UpdateAsync(cell).ConfigureAwait(false);
+            }
 
-                    return new ResponseDto() { success = true, message = "创建库存并绑定容器成功" };
+            return new ResponseDto() { success = true, message = "创建库存并绑定容器成功" };
         }
 
         private async Task<ResponseDto> ValidateAsnOrderStockInAsync(string orderCode, List<StockCreateDto> paras)
@@ -715,11 +719,16 @@ namespace TuTa.Wms.Stocks
                     if (stocks == null || stocks.Count == 0)
                         return new ResponseDto() { success = false, message = "容器中没有库存" };
 
+                    Guid? cellId = box.CellData.CellId;
+
                     // 从容器中移除所有库存关联
                     foreach (Stock stock in stocks)
                     {
                         box.RemoveStock(stock.Id);
                     }
+
+                    // 删除所有BoxStock中间表记录
+                    await _boxStockRepository.DeleteAsync(bs => bs.BoxId == box.Id);
 
                     // 更新容器状态
                     await _boxRepository.UpdateAsync(box);
@@ -731,6 +740,21 @@ namespace TuTa.Wms.Stocks
                     }
 
                     await uow.CompleteAsync().ConfigureAwait(false);
+
+                    // 根据库位中是否还有其它库存来判断是否重置库位状态
+                    if (cellId.HasValue)
+                    {
+                        var remainingStocks = await _stockRepository.GetByCellIdAsync(cellId.Value).ConfigureAwait(false);
+                        if (remainingStocks.Count == 0)
+                        {
+                            var cell = await _cellRepository.FindByIdAsync(cellId.Value).ConfigureAwait(false);
+                            if (cell != null)
+                            {
+                                cell.SetCellStatus(CellStatus.Nohave);
+                                await _cellRepository.UpdateAsync(cell);
+                            }
+                        }
+                    }
 
                     return new ResponseDto() { success = true, message = "库存解绑容器成功" };
                 }
@@ -3917,14 +3941,37 @@ namespace TuTa.Wms.Stocks
                         return new ResponseDto() { success = true, message = $"库存{stockId}原本不存在" };
 
                     decimal countToDel = stockExist.TotalCountInTime;
-                    //stockExist.Remove(countToDel);
+                    Guid? cellId = stockExist.CellData.CellId;
 
-                    //if (stockExist.TotalCountInTime == 0)
-                        await _stockRepository.DeleteAsync(stockExist).ConfigureAwait(false);
-                    /*else
-                        await _stockRepository.UpdateAsync(stockExist).ConfigureAwait(false);*/
+                    // 如果库存关联了料箱，从料箱中移除
+                    if (stockExist.BoxData.BoxId.HasValue)
+                    {
+                        var box = await _boxRepository.FindByBoxIdAsync(stockExist.BoxData.BoxId.Value).ConfigureAwait(false);
+                        if (box != null)
+                        {
+                            box.RemoveStock(stockId);
+                            await _boxStockRepository.DeleteAsync(bs => bs.StockId == stockId);
+                            await _boxRepository.UpdateAsync(box);
+                        }
+                    }
 
+                    await _stockRepository.DeleteAsync(stockExist).ConfigureAwait(false);
                     await uow.CompleteAsync().ConfigureAwait(false);
+
+                    // 根据库位中是否还有其它库存来判断是否重置库位状态
+                    if (cellId.HasValue)
+                    {
+                        var remainingStocks = await _stockRepository.GetByCellIdAsync(cellId.Value).ConfigureAwait(false);
+                        if (remainingStocks.Count == 0)
+                        {
+                            var cell = await _cellRepository.FindByIdAsync(cellId.Value).ConfigureAwait(false);
+                            if (cell != null)
+                            {
+                                cell.SetCellStatus(CellStatus.Nohave);
+                                await _cellRepository.UpdateAsync(cell);
+                            }
+                        }
+                    }
 
                     _logger.Info($"Id为{stockId}，barcode为{stockExist.Barcode}，物料码为{stockExist.Material.MaterialCode}, 物料名为{stockExist.Material.MaterialName}，数量为{countToDel}的库存被直接手动删除");
                     return new ResponseDto() { success = true, message = $"删除库存{stockId}成功" };

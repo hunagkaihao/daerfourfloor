@@ -368,10 +368,11 @@ const deleteStock = async (record: Recordable, index: number) => {
             try {
                 // 这里需要调用删除单个库存的API
                 await stockRemoveDirect(record.id);
-                // 暂时使用模拟数据
                 message.success('删除成功');
-                // 从数据源中移除
-                dataSource.value.splice(index, 1);
+                // 重新查询当前库位的库存和同巷道库位状态
+                if (boxCode.value) {
+                    await scanboxCode();
+                }
             } catch (error) {
                 message.error('删除失败');
             }
