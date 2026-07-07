@@ -14,6 +14,13 @@
           {{ getStatusText(record.agvTaskStatus) }}
         </Tag>
       </template>
+      <template #operation="{ record }">
+        <a v-if="record.agvTaskStatus == 0 || record.agvTaskStatus == 1 || record.agvTaskStatus == 2"
+           style="color: #ff4d4f; cursor: pointer" @click="handleCancel(record)">
+          取消任务
+        </a>
+        <span v-else style="color: #999">-</span>
+      </template>
     </BasicTable>
 
     <ExpExcelModal @register="register" @success="defaultHeader" />
@@ -32,11 +39,14 @@ import {
   searchFormSchema,
   getAgvTaskListAsync,
   getAllAgvTasksAsync,
+  cancelAgvTask,
 } from './AgvTaskManagement';
 import moment from 'moment';
 import { useI18n } from '/@/hooks/web/useI18n';
 import { useRoute } from 'vue-router';
-import { onMounted } from 'vue';
+import { onMounted, createVNode } from 'vue';
+import { Modal } from 'ant-design-vue';
+import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 
 const [register, { openModal: openExportModal }] = useModal();
 const { createMessage } = useMessage();
@@ -152,6 +162,30 @@ function getManageTypeText(type: ManageType) {
     [ManageType._2]: '移库',
   };
   return typeMap[type] || '未知';
+}
+
+// 取消任务
+function handleCancel(record: any) {
+  Modal.confirm({
+    title: '确认取消任务',
+    icon: createVNode(ExclamationCircleOutlined),
+    content: `确定要取消任务 ${record.taskCode || record.id} 吗？此操作将下发给RCS取消任务、解绑容器、恢复库位状态并删除组盘库存。`,
+    okText: '确定',
+    cancelText: '取消',
+    onOk: async () => {
+      try {
+        const res = await cancelAgvTask(record.id);
+        if (res && res.success) {
+          createMessage.success('任务取消成功');
+          reload();
+        } else {
+          createMessage.error(res?.message || '取消失败');
+        }
+      } catch (err: any) {
+        createMessage.error(err?.message || '操作异常');
+      }
+    },
+  });
 }
 
 // 页面挂载时处理URL参数

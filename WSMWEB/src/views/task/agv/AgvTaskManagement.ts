@@ -10,6 +10,9 @@ import {
 import { message } from 'ant-design-vue';
 import { useLoading } from '/@/components/Loading';
 import { useI18n } from '/@/hooks/web/useI18n';
+import { createVNode } from 'vue';
+import { Modal } from 'ant-design-vue';
+import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 
 const { t } = useI18n();
 const [openFullLoading, closeFullLoading] = useLoading({
@@ -145,6 +148,13 @@ export const tableColumns: BasicColumn[] = [
       return text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : '';
     },
   },
+  {
+    title: '操作',
+    dataIndex: 'operation',
+    width: 100,
+    fixed: 'right',
+    slots: { customRender: 'operation' },
+  },
 ];
 
 // 搜索表单配置
@@ -249,6 +259,20 @@ export async function getAllAgvTasksAsync(params: any): Promise<any> {
     return await _AgvTaskServiceProxy.pagedList(exportParams);
   } catch (error) {
     console.error('获取所有AGV任务失败:', error);
+    throw error;
+  }
+}
+
+/**
+ * 取消AGV任务
+ * @param taskId 任务ID
+ * @returns
+ */
+export async function cancelAgvTask(taskId: number): Promise<any> {
+  try {
+    return await _AgvTaskServiceProxy.cancel(taskId);
+  } catch (error) {
+    console.error('取消AGV任务失败:', error);
     throw error;
   }
 }

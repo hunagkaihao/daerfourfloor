@@ -563,14 +563,23 @@ namespace TuTa.Wms.Stocks
                 {
                     var box = await _boxRepository.FindByBoxCodeAsync(boxCode).ConfigureAwait(false);
                     if (box == null)
-                        return new ResponseDto() { success = false, message = "任务创建失败" };
+                    {
+                        _logger.Warn($"创建搬运任务失败：容器{boxCode}不存在");
+                        return new ResponseDto() { success = false, message = $"容器{boxCode}不存在" };
+                    }
 
                     if (await _agvTaskManager.IsExistBoxTask(boxCode))
-                        return new ResponseDto() { success = false, message = "任务创建失败" };
+                    {
+                        _logger.Warn($"创建搬运任务失败：容器{boxCode}已有未完成任务");
+                        return new ResponseDto() { success = false, message = $"容器{boxCode}已有未完成任务" };
+                    }
 
                     var startCell = await _cellRepository.FindByCellCodeAsync(startCellCode).ConfigureAwait(false);
                     if (startCell == null)
-                        return new ResponseDto() { success = false, message = "任务创建失败" };
+                    {
+                        _logger.Warn($"创建搬运任务失败：起始库位{startCellCode}不存在");
+                        return new ResponseDto() { success = false, message = $"起始库位{startCellCode}不存在" };
+                    }
 
                     Cell endCell = null;
 
@@ -582,31 +591,46 @@ namespace TuTa.Wms.Stocks
                                  && f.RunStatus == CellRunStatus.Enable).ConfigureAwait(false);
                         endCell = SelectEndCellBy4FOrdering(availableCells);
                         if (endCell == null)
-                            return new ResponseDto() { success = false, message = "任务创建失败" };
+                        {
+                            _logger.Warn($"创建搬运任务失败：4F区域无可用空库位(共检查{availableCells.Count}个)");
+                            return new ResponseDto() { success = false, message = "4F区域无可用空库位" };
+                        }
                     }
                     else
                     {
                         endCell = await _cellRepository.FindByCellCodeAsync(endCellCode).ConfigureAwait(false);
                         if (endCell == null)
-                            return new ResponseDto() { success = false, message = "任务创建失败" };
+                        {
+                            _logger.Warn($"创建搬运任务失败：目标库位{endCellCode}不存在");
+                            return new ResponseDto() { success = false, message = $"目标库位{endCellCode}不存在" };
+                        }
                     }
 
                     if (startCell.RunStatus != CellRunStatus.Enable)
-                        return new ResponseDto() { success = false, message = "任务创建失败" };
+                    {
+                        _logger.Warn($"创建搬运任务失败：起始库位{startCellCode}运行状态为{startCell.RunStatus}，不可用");
+                        return new ResponseDto() { success = false, message = $"起始库位{startCellCode}当前不可用" };
+                    }
 
                     if (startCell.CellType != CellType.Cell)
-                        return new ResponseDto() { success = false, message = "任务创建失败" };
+                    {
+                        _logger.Warn($"创建搬运任务失败：起始库位{startCellCode}类型为{startCell.CellType}，不允许搬运");
+                        return new ResponseDto() { success = false, message = $"起始库位{startCellCode}类型不允许搬运" };
+                    }
 
                     var dispatchToRcs = true;
                     if (startCell.CellCode.StartsWith("4A", StringComparison.OrdinalIgnoreCase))
                     {
                         var laneCheck = await Evaluate4AInboundLaneAsync(startCell).ConfigureAwait(false);
                         if (!laneCheck.CanCreate)
-                            return new ResponseDto() { success = false, message = "任务创建失败" };
+                        {
+                            _logger.Warn($"创建搬运任务失败：4A库位{startCellCode}巷道校验不通过");
+                            return new ResponseDto() { success = false, message = "4A库位巷道校验不通过" };
+                        }
                         dispatchToRcs = laneCheck.DispatchToRcs;
                     }
 
-                    _logger.Info("开始创建agv任务");
+                    _logger.Info($"开始创建agv任务，容器:{boxCode}，起点:{startCellCode}，终点:{endCell.CellCode}");
 
                     // 根据容器类型选择合适的任务类型
                     ManageType taskType = ManageType.CTUStockIn;
@@ -621,12 +645,13 @@ namespace TuTa.Wms.Stocks
 
                     await SetAsExecutingAsync(startCell, endCell, null, box, taskType, dispatchToRcs, _aGVOptions.CreateStockTaskType).ConfigureAwait(false);
                     await uow.CompleteAsync().ConfigureAwait(false);
+                    _logger.Info($"AGV任务创建成功，容器:{boxCode}，任务类型:{taskType}");
                     return new ResponseDto() { success = true, message = "任务创建成功" };
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex.Message);
-                    return new ResponseDto() { success = false, message = "任务创建失败" };
+                    _logger.Error($"创建搬运任务异常：{ex.Message}\n{ex.StackTrace}");
+                    return new ResponseDto() { success = false, message = $"任务创建异常：{ex.Message}" };
                 }
             }
         }
@@ -643,14 +668,23 @@ namespace TuTa.Wms.Stocks
                 {
                     var box = await _boxRepository.FindByBoxCodeAsync(boxCode).ConfigureAwait(false);
                     if (box == null)
-                        return new ResponseDto() { success = false, message = "任务创建失败" };
+                    {
+                        _logger.Warn($"创建搬运任务V2失败：容器{boxCode}不存在");
+                        return new ResponseDto() { success = false, message = $"容器{boxCode}不存在" };
+                    }
 
                     if (await _agvTaskManager.IsExistBoxTask(boxCode))
-                        return new ResponseDto() { success = false, message = "任务创建失败" };
+                    {
+                        _logger.Warn($"创建搬运任务V2失败：容器{boxCode}已有未完成任务");
+                        return new ResponseDto() { success = false, message = $"容器{boxCode}已有未完成任务" };
+                    }
 
                     var startCell = await _cellRepository.FindByCellCodeAsync(startCellCode).ConfigureAwait(false);
                     if (startCell == null)
-                        return new ResponseDto() { success = false, message = "任务创建失败" };
+                    {
+                        _logger.Warn($"创建搬运任务V2失败：起始库位{startCellCode}不存在");
+                        return new ResponseDto() { success = false, message = $"起始库位{startCellCode}不存在" };
+                    }
 
                     Cell endCell = null;
 
@@ -662,22 +696,34 @@ namespace TuTa.Wms.Stocks
                                  && f.RunStatus == CellRunStatus.Enable).ConfigureAwait(false);
                         endCell = SelectEndCellBy4FOrdering(availableCells);
                         if (endCell == null)
-                            return new ResponseDto() { success = false, message = "任务创建失败" };
+                        {
+                            _logger.Warn($"创建搬运任务V2失败：4F区域无可用空库位(共检查{availableCells.Count}个)");
+                            return new ResponseDto() { success = false, message = "4F区域无可用空库位" };
+                        }
                     }
                     else
                     {
                         endCell = await _cellRepository.FindByCellCodeAsync(endCellCode).ConfigureAwait(false);
                         if (endCell == null)
-                            return new ResponseDto() { success = false, message = "任务创建失败" };
+                        {
+                            _logger.Warn($"创建搬运任务V2失败：目标库位{endCellCode}不存在");
+                            return new ResponseDto() { success = false, message = $"目标库位{endCellCode}不存在" };
+                        }
                     }
 
                     if (startCell.RunStatus != CellRunStatus.Enable)
-                        return new ResponseDto() { success = false, message = "任务创建失败" };
+                    {
+                        _logger.Warn($"创建搬运任务V2失败：起始库位{startCellCode}运行状态为{startCell.RunStatus}，不可用");
+                        return new ResponseDto() { success = false, message = $"起始库位{startCellCode}当前不可用" };
+                    }
 
                     if (startCell.CellType != CellType.Cell)
-                        return new ResponseDto() { success = false, message = "任务创建失败" };
+                    {
+                        _logger.Warn($"创建搬运任务V2失败：起始库位{startCellCode}类型为{startCell.CellType}，不允许搬运");
+                        return new ResponseDto() { success = false, message = $"起始库位{startCellCode}类型不允许搬运" };
+                    }
 
-                    _logger.Info("开始创建agv任务(V2)");
+                    _logger.Info($"开始创建agv任务(V2)，容器:{boxCode}，起点:{startCellCode}，终点:{endCell?.CellCode ?? "自动分配"}");
 
                     ManageType taskType = ManageType.CTUStockIn;
                     if (box.BoxTypeName == "1")
@@ -692,12 +738,13 @@ namespace TuTa.Wms.Stocks
                     var taskTypOverride = _aGVOptions.CreateStockOutTaskType ?? "De02";
                     await SetAsExecutingAsync(startCell, endCell, null, box, taskType, true, taskTypOverride).ConfigureAwait(false);
                     await uow.CompleteAsync().ConfigureAwait(false);
+                    _logger.Info($"AGV任务V2创建成功，容器:{boxCode}，任务类型:{taskType}");
                     return new ResponseDto() { success = true, message = "任务创建成功" };
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex.Message);
-                    return new ResponseDto() { success = false, message = "任务创建失败" };
+                    _logger.Error($"创建搬运任务V2异常：{ex.Message}\n{ex.StackTrace}");
+                    return new ResponseDto() { success = false, message = $"任务创建异常：{ex.Message}" };
                 }
             }
         }

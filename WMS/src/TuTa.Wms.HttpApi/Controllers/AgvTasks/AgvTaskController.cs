@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 using TuTa.Wms.AgvTasks;
 using TuTa.Wms.AgvTasks.Dtos;
+using TuTa.Wms.Application.Contracts.Shared;
 using TuTa.Wms.BarcodeLists;
 using TuTa.Wms.BarcodeLists.Dtos;
 
@@ -37,6 +38,13 @@ namespace TuTa.Wms.Controllers.AgvTasks
         public async Task<AgvTaskPagedResultDto> GetPagedListAsync(AgvTaskPagedQueryDto input)
         {
             return await _agvTaskService.GetPagedListAsync(input);
+        }
+
+        [HttpPost("cancel")]
+        [SwaggerOperation(summary: "取消AGV任务", Tags = new[] { "AgvTask" })]
+        public async Task<ResponseDto> CancelAgvTaskAsync(int taskId)
+        {
+            return await _agvTaskService.CancelAgvTaskAsync(taskId);
         }
     }
 }

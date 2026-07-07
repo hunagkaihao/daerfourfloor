@@ -194,7 +194,7 @@ namespace TuTa.Wms.AgvTasks
         */
 
         /// <summary>
-        /// 解绑和绑定料箱和仓位
+        /// 容器与仓位绑定、解绑
         /// </summary>
         /// <param name="reqCode"></param>
         /// <param name="stgBinCode"></param>
@@ -210,8 +210,8 @@ namespace TuTa.Wms.AgvTasks
                 BindCtnrAndBinDto bindCtnrAndBinDto = new BindCtnrAndBinDto(reqCode, stgBinCode, ctnrTyp, ctnrCode, indBind);
                 //查询AGV任务状态接口
                 var response =
-      await HttpApiHelper.PostAsync<BindCtnrAndBinDto, ResultAgvTaskDto>("TTWMS",
-      $"{CMSServer}/rcms/services/rest/hikRpcService/bindCtnrAndBin", bindCtnrAndBinDto);
+                      await HttpApiHelper.PostAsync<BindCtnrAndBinDto, ResultAgvTaskDto>("TTWMS",
+                      $"{CMSServer}/rcms/services/rest/hikRpcService/bindCtnrAndBin", bindCtnrAndBinDto);
                 return response;
             }
             else

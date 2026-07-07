@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using TuTa.Wms.AgvTasks.Dtos;
+using TuTa.Wms.Application.Contracts.Shared;
 using Volo.Abp.Application.Services;
 
 namespace TuTa.Wms.AgvTasks
@@ -22,5 +23,10 @@ namespace TuTa.Wms.AgvTasks
         /// <param name="input">查询参数</param>
         /// <returns>分页结果</returns>
         Task<AgvTaskPagedResultDto> GetPagedListAsync(AgvTaskPagedQueryDto input);
+
+        /// <summary>
+        /// 取消AGV任务：下发给RCS取消任务、容器解绑、恢复库位状态、删除组盘库存
+        /// </summary>
+        Task<ResponseDto> CancelAgvTaskAsync(int taskId);
     }
 }
