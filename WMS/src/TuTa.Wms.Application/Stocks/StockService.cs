@@ -618,6 +618,21 @@ namespace TuTa.Wms.Stocks
                         return new ResponseDto() { success = false, message = $"起始库位{startCellCode}类型不允许搬运" };
                     }
 
+                    // 巷道校验：外侧(更大的LanePosition)是否有已组盘但未创建任务的库位
+                    if (!string.IsNullOrWhiteSpace(startCell.LaneToColumn) && startCell.LanePosition.HasValue)
+                    {
+                        var outerCells = await _cellRepository.GetListAsync(c =>
+                            c.LaneToColumn == startCell.LaneToColumn
+                            && c.LanePosition > startCell.LanePosition.Value
+                            && c.CellStatus != CellStatus.Nohave).ConfigureAwait(false);
+                        if (outerCells.Count > 0)
+                        {
+                            var outerCellCodes = string.Join("、", outerCells.OrderBy(c => c.LanePosition).Select(c => c.CellCode));
+                            _logger.Warn($"创建搬运任务失败：外侧库位({outerCellCodes})已组盘，请先创建外侧库位的搬运任务");
+                            return new ResponseDto() { success = false, message = $"外侧库位({outerCellCodes})已组盘，请先将外侧库位的搬运任务创建后再创建库位{startCellCode}的任务" };
+                        }
+                    }
+
                     var dispatchToRcs = true;
                     if (startCell.CellCode.StartsWith("4A", StringComparison.OrdinalIgnoreCase))
                     {
@@ -721,6 +736,21 @@ namespace TuTa.Wms.Stocks
                     {
                         _logger.Warn($"创建搬运任务V2失败：起始库位{startCellCode}类型为{startCell.CellType}，不允许搬运");
                         return new ResponseDto() { success = false, message = $"起始库位{startCellCode}类型不允许搬运" };
+                    }
+
+                    // 巷道校验：外侧(更大的LanePosition)是否有已组盘但未创建任务的库位
+                    if (!string.IsNullOrWhiteSpace(startCell.LaneToColumn) && startCell.LanePosition.HasValue)
+                    {
+                        var outerCells = await _cellRepository.GetListAsync(c =>
+                            c.LaneToColumn == startCell.LaneToColumn
+                            && c.LanePosition > startCell.LanePosition.Value
+                            && c.CellStatus != CellStatus.Nohave).ConfigureAwait(false);
+                        if (outerCells.Count > 0)
+                        {
+                            var outerCellCodes = string.Join("、", outerCells.OrderBy(c => c.LanePosition).Select(c => c.CellCode));
+                            _logger.Warn($"创建搬运任务V2失败：外侧库位({outerCellCodes})已组盘，请先创建外侧库位的搬运任务");
+                            return new ResponseDto() { success = false, message = $"外侧库位({outerCellCodes})已组盘，请先将外侧库位的搬运任务创建后再创建库位{startCellCode}的任务" };
+                        }
                     }
 
                     _logger.Info($"开始创建agv任务(V2)，容器:{boxCode}，起点:{startCellCode}，终点:{endCell?.CellCode ?? "自动分配"}");
