@@ -624,7 +624,8 @@ namespace TuTa.Wms.Stocks
                         var outerCells = await _cellRepository.GetListAsync(c =>
                             c.LaneToColumn == startCell.LaneToColumn
                             && c.LanePosition > startCell.LanePosition.Value
-                            && c.CellStatus != CellStatus.Nohave).ConfigureAwait(false);
+                            && c.CellStatus != CellStatus.Nohave
+                            && c.RunStatus != CellRunStatus.Selected).ConfigureAwait(false);
                         if (outerCells.Count > 0)
                         {
                             var outerCellCodes = string.Join("、", outerCells.OrderBy(c => c.LanePosition).Select(c => c.CellCode));
@@ -744,7 +745,8 @@ namespace TuTa.Wms.Stocks
                         var outerCells = await _cellRepository.GetListAsync(c =>
                             c.LaneToColumn == startCell.LaneToColumn
                             && c.LanePosition > startCell.LanePosition.Value
-                            && c.CellStatus != CellStatus.Nohave).ConfigureAwait(false);
+                            && c.CellStatus != CellStatus.Nohave
+                            && c.RunStatus != CellRunStatus.Selected).ConfigureAwait(false);
                         if (outerCells.Count > 0)
                         {
                             var outerCellCodes = string.Join("、", outerCells.OrderBy(c => c.LanePosition).Select(c => c.CellCode));
