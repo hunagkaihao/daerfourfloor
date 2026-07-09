@@ -362,7 +362,7 @@ namespace TuTa.Wms.Controllers.Stocks
             return await _stockService.GetChecksByBox(boxcode);
         }
 
-
+        // 其他项目的物料抽检
         [HttpPost("stockCheck")]
         [SwaggerOperation(summary: "物料抽检", Tags = new[] { "Stock" })]
         public async Task<ResponseDto> StockCheckAsync(string barcode,string boxcode, int count)
@@ -447,6 +447,18 @@ namespace TuTa.Wms.Controllers.Stocks
         public async Task<ResponseDto> OutBountStockDirectAsync(Guid stockId, decimal outBoundCount, int? pagOrBoxCount = null)
         {
             return await _stockService.OutBountStockDirectAsync(stockId, outBoundCount, pagOrBoxCount).ConfigureAwait(false);
+        }
+
+        [HttpPost("stockInspection")]
+        public async Task<ResponseDto> StockInspectionAsync(Guid stockId, decimal outBoundCount, int? pagOrBoxCount = null)
+        {
+            return await _stockService.StockInspectionAsync(stockId, outBoundCount, pagOrBoxCount).ConfigureAwait(false);
+        }
+
+        [HttpPost("setInspectionCompleted")]
+        public async Task<ResponseDto> SetInspectionCompletedAsync(Guid stockId)
+        {
+            return await _stockService.SetInspectionCompletedAsync(stockId).ConfigureAwait(false);
         }
 
         //[HttpPost("StocksCreateAndBindToCell")]

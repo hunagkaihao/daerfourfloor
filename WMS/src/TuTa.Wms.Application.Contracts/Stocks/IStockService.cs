@@ -308,6 +308,21 @@ namespace TuTa.Wms.Stocks
         /// <returns></returns>
         Task<ResponseDto> OutBountStockDirectAsync(Guid stockId, decimal outBoundCount, int? pagOrBoxCount = null);
 
+        /// <summary>
+        /// 物料抽检
+        /// </summary>
+        /// <param name="stockId"></param>
+        /// <param name="outBoundCount"></param>
+        /// <param name="pagOrBoxCount"></param>
+        /// <returns></returns>
+        Task<ResponseDto> StockInspectionAsync(Guid stockId, decimal outBoundCount, int? pagOrBoxCount = null);
+
+        /// <summary>
+        /// 抽检完成
+        /// </summary>
+        /// <param name="stockId"></param>
+        /// <returns></returns>
+        Task<ResponseDto> SetInspectionCompletedAsync(Guid stockId);
 
     }
 }

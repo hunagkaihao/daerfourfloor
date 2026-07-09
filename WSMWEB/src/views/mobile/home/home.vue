@@ -97,6 +97,8 @@
               <div class="menu-item-text">扫描ASN</div>
             </div>
           </a-col>
+        </a-row>
+        <a-row justify="center" style="margin-top: 20px; margin-bottom: 20px">
           <a-col :span="8">
             <div class="menu-item-card" @click="boxdiskWithAsn">
               <div class="menu-item-icon-wrapper">
@@ -106,6 +108,26 @@
             </div>
           </a-col>
         </a-row>
+        <a-row justify="center" style="margin-top: 20px; margin-bottom: 20px">
+          <a-col :span="8">
+            <div class="menu-item-card" @click="materialSampling">
+              <div class="menu-item-icon-wrapper">
+                <AppstoreOutlined class="menu-item-icon" />
+              </div>
+              <div class="menu-item-text">物料抽检</div>
+            </div>
+          </a-col>
+        </a-row> 
+        <a-row justify="center" style="margin-top: 20px; margin-bottom: 20px">
+          <a-col :span="8">
+            <div class="menu-item-card" @click="createStockTask">
+              <div class="menu-item-icon-wrapper">
+                <InboxOutlined class="menu-item-icon" />
+              </div>
+              <div class="menu-item-text">创建入库任务</div>
+            </div>
+          </a-col>
+        </a-row> 
       </a-tab-pane>
       <a-tab-pane key="3" tab="出库" force-render>
         <div>
@@ -303,6 +325,10 @@ const materialOut = async () => {
 
 const materialPartialOut = async () => {
   await router.replace('/materialPartialOut');
+};
+
+const materialSampling = async () => {
+  await router.replace('/materialSampling');
 };
 
 const agvIncell = async () => {

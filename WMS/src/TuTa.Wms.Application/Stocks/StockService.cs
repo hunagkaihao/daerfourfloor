@@ -645,6 +645,11 @@ namespace TuTa.Wms.Stocks
                         }
                         dispatchToRcs = laneCheck.DispatchToRcs;
                     }
+                    //if (!dispatchToRcs)
+                    //{
+                    //    _logger.Warn($"创建搬运任务失败：4A库位{startCellCode}外侧库位任务未完成，无法下发给RCS");
+                    //    return new ResponseDto() { success = false, message = "外侧库位任务仍在执行中，请等待外侧库位任务完成后再创建" };
+                    //}
 
                     _logger.Info($"开始创建agv任务，容器:{boxCode}，起点:{startCellCode}，终点:{endCell.CellCode}");
 
@@ -4178,6 +4183,127 @@ namespace TuTa.Wms.Stocks
                 {
                     _logger.Error($"出库历史记录创建失败: {ex.Message}");
                     _logger.Error($"异常堆栈: {ex.StackTrace}");
+                    throw new UserFriendlyException(ex.Message);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 物料抽检
+        /// </summary>
+        /// <param name="stockId"></param>
+        /// <param name="outBoundCount"></param>
+        /// <param name="pagOrBoxCount"></param>
+        /// <returns></returns>
+        /// <exception cref="UserFriendlyException"></exception>
+        public async Task<ResponseDto> StockInspectionAsync(Guid stockId, decimal outBoundCount, int? pagOrBoxCount = null)
+        {
+            using (var uow = UnitOfWorkManager.Begin(true, true))
+            {
+                try
+                {
+                    var stockExist = await _stockRepository.FindAsync(stockId).ConfigureAwait(false);
+                    if (stockExist == null)
+                        return new ResponseDto() { success = false, message = $"库存{stockId}不存在" };
+
+                    // 累积抽检数量
+                    stockExist.InspectionCount += outBoundCount;
+                    stockExist.InspectionStatus = Stocks.InspectionStatus.InProgressInspection;
+
+                    stockExist.Remove(outBoundCount, pagOrBoxCount);
+
+                    if (stockExist.TotalCountInTime == 0)
+                    {
+                        if (stockExist.BoxData.BoxId.HasValue)
+                        {
+                            var box = await _boxRepository.FindByBoxIdAsync(stockExist.BoxData.BoxId.Value).ConfigureAwait(false);
+                            if (box != null)
+                            {
+                                box.RemoveStock(stockId);
+                                await _boxStockRepository.DeleteAsync(bs => bs.StockId == stockId);
+                                await _boxRepository.UpdateAsync(box);
+                            }
+                        }
+                        await _stockRepository.DeleteAsync(stockExist).ConfigureAwait(false);
+                    }
+                    else
+                        await _stockRepository.UpdateAsync(stockExist).ConfigureAwait(false);
+
+                    _logger.Info($"物料抽检成功，stockId={stockId}，抽检数量={outBoundCount}，累计抽检={stockExist.InspectionCount}");
+
+                    // 创建抽检历史记录
+                    var material = stockExist.Material;
+                    var cellData = stockExist.CellData;
+                    var boxData = stockExist.BoxData;
+                    var warehouseData = stockExist.Warehouse;
+
+                    var stockOutHistory = new StockOutHistory(
+                        stockExist.Barcode,
+                        material.MaterialCode,
+                        material.MaterialName,
+                        material.Specs,
+                        material.Unit,
+                        warehouseData?.HouseCode,
+                        warehouseData?.HouseName,
+                        warehouseData?.AreaCode,
+                        warehouseData?.AreaName,
+                        cellData?.CellCode,
+                        cellData?.CellName,
+                        boxData?.BoxCode,
+                        boxData?.BoxName,
+                        "物料抽检",
+                        outBoundCount,
+                        DateTime.Now,
+                        batchNo: stockExist.BatchCode);
+
+                    if (_stockOutHistoryRepository != null)
+                    {
+                        await _stockOutHistoryRepository.InsertAsync(stockOutHistory).ConfigureAwait(false);
+                    }
+
+                    await uow.CompleteAsync().ConfigureAwait(false);
+
+                    _logger.Info($"Id为{stockId}，barcode为{stockExist.Barcode}，物料抽检数量为{outBoundCount}的库存");
+                    return new ResponseDto() { success = true, message = $"物料抽检成功，抽检数量{outBoundCount}" };
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error($"物料抽检失败: {ex.Message}");
+                    throw new UserFriendlyException(ex.Message);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 抽检完成
+        /// </summary>
+        /// <param name="stockId"></param>
+        /// <returns></returns>
+        /// <exception cref="UserFriendlyException"></exception>
+        public async Task<ResponseDto> SetInspectionCompletedAsync(Guid stockId)
+        {
+            using (var uow = UnitOfWorkManager.Begin(true, true))
+            {
+                try
+                {
+                    var stockExist = await _stockRepository.FindAsync(stockId).ConfigureAwait(false);
+                    if (stockExist == null)
+                        return new ResponseDto() { success = false, message = $"库存{stockId}不存在" };
+
+                    stockExist.InspectionStatus = Stocks.InspectionStatus.InspectionCompleted;
+                    await _stockRepository.UpdateAsync(stockExist).ConfigureAwait(false);
+                    await uow.CompleteAsync().ConfigureAwait(false);
+
+                    // 推送来料报检单
+
+
+
+                    _logger.Info($"库存{stockId}抽检完成，InspectionStatus={stockExist.InspectionStatus}");
+                    return new ResponseDto() { success = true, message = "抽检完成" };
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error($"设置抽检完成状态失败: {ex.Message}");
                     throw new UserFriendlyException(ex.Message);
                 }
             }

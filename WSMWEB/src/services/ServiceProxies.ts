@@ -21033,6 +21033,98 @@ export class StockServiceProxy extends ServiceProxyBase {
      * @param stockId (optional) 
      * @return OK
      */
+    stockInspection(stockId: string | undefined, outBoundCount: number | undefined, pagOrBoxCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<ResponseDto> {
+        let url_ = this.baseUrl + "/wms/stock/stockInspection?";
+        if (stockId === null)
+            throw new Error("The parameter 'stockId' cannot be null.");
+        else if (stockId !== undefined)
+            url_ += "stockId=" + encodeURIComponent("" + stockId) + "&";
+        if (outBoundCount === null)
+            throw new Error("The parameter 'outBoundCount' cannot be null.");
+        else if (outBoundCount !== undefined)
+            url_ += "outBoundCount=" + encodeURIComponent("" + outBoundCount) + "&";
+        if (pagOrBoxCount !== undefined && pagOrBoxCount !== null)
+            url_ += "pagOrBoxCount=" + encodeURIComponent("" + pagOrBoxCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = <AxiosRequestConfig>{
+            method: "POST",
+            url: url_,
+            headers: { "Accept": "text/plain" },
+            cancelToken
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.instance.request(transformedOptions_);
+        }).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processStockInspection(_response));
+        });
+    }
+
+    protected processStockInspection(response: AxiosResponse): Promise<ResponseDto> {
+        const status = response.status;
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = ResponseDto.fromJS(resultData200);
+            return Promise.resolve<ResponseDto>(result200);
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, {});
+        }
+        return Promise.resolve<ResponseDto>(null as any);
+    }
+
+    setInspectionCompleted(stockId: string | undefined , cancelToken?: CancelToken | undefined): Promise<ResponseDto> {
+        let url_ = this.baseUrl + "/wms/stock/setInspectionCompleted?";
+        if (stockId === null)
+            throw new Error("The parameter 'stockId' cannot be null.");
+        else if (stockId !== undefined)
+            url_ += "stockId=" + encodeURIComponent("" + stockId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = <AxiosRequestConfig>{
+            method: "POST",
+            url: url_,
+            headers: { "Accept": "text/plain" },
+            cancelToken
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.instance.request(transformedOptions_);
+        }).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processSetInspectionCompleted(_response));
+        });
+    }
+
+    protected processSetInspectionCompleted(response: AxiosResponse): Promise<ResponseDto> {
+        const status = response.status;
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = ResponseDto.fromJS(resultData200);
+            return Promise.resolve<ResponseDto>(result200);
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, {});
+        }
+        return Promise.resolve<ResponseDto>(null as any);
+    }
+
     stockRemoveDirect(stockId: string | undefined , cancelToken?: CancelToken | undefined): Promise<ResponseDto> {
         let url_ = this.baseUrl + "/wms/stock/stockRemoveDirect?";
         if (stockId === null)

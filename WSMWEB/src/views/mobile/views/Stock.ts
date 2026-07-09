@@ -94,9 +94,23 @@ export function stocksDisBindBox(
 }
 //库存清空
 export function stockRemoveDirect(
-  stockId 
+  stockId
 ):Promise<any> {
   return _stockServiceProxy.stockRemoveDirect(stockId);
+}
+//物料抽检
+export function stockInspection(
+  stockId: string,
+  outBoundCount: number,
+  pagOrBoxCount?: number
+):Promise<any> {
+  return _stockServiceProxy.stockInspection(stockId, outBoundCount, pagOrBoxCount);
+}
+//抽检完成
+export function setInspectionCompleted(
+  stockId: string
+):Promise<any> {
+  return _stockServiceProxy.setInspectionCompleted(stockId);
 }
 export const diskcolumns = [
   {

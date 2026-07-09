@@ -156,6 +156,15 @@ export const BoxIncell: AppRouteRecordRaw = {
   },
 };
 //物料抽检
+export const MaterialSampling: AppRouteRecordRaw = {
+  path: '/materialSampling',
+  name: 'MaterialSampling',
+  component: () => import('/@/views/mobile/views/MaterialSampling.vue'),
+  meta: {
+    title: t('物料抽检'),
+    ignoreAuth: true,
+  },
+};
 // GoodSpotCheck路由已删除
 // EmptyShelfEdit路由已删除
 // GoodsDevan路由已删除
@@ -358,6 +367,7 @@ export const basicRoutes = [
   BoxDisk,
   BoxDiskWithAsn,
   BoxIncell,
+  MaterialSampling,
   GoodsBind,
   AcceptanceCall2,
   Handoutcell,

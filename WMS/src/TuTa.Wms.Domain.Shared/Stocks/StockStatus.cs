@@ -27,4 +27,20 @@
         /// </summary>
         Filtrate
     }
+
+    public enum InspectionStatus
+    {
+        /// <summary>
+        /// 等待抽检
+        /// </summary>
+        AwaitingInspection,
+        /// <summary>
+        /// 抽检中
+        /// </summary>
+        InProgressInspection,
+        /// <summary>
+        /// 抽检完成
+        /// </summary>
+        InspectionCompleted
+    }
 }

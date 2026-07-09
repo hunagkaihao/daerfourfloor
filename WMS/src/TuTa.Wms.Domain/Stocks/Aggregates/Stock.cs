@@ -488,6 +488,16 @@ namespace TuTa.Wms.Stocks.Aggregates
         public virtual int? TotalPagOrBox { get; set; }
 
         /// <summary>
+        /// 抽检数量
+        /// </summary>
+
+        public virtual decimal? InspectionCount { get; set; } = 0;
+        /// <summary>
+        /// 抽检状态
+        /// </summary>
+        public virtual InspectionStatus? InspectionStatus { get; set; } = 0;
+
+        /// <summary>
         /// 库存状态，包括：可用的，冻结的
         /// </summary>
         public virtual StockStatus Status { get; private set; }
