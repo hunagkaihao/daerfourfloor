@@ -235,6 +235,7 @@ namespace TuTa.Wms.AgvTasks
                                 if (cell != null)
                                 {
                                     cell.SetCellStatus(CellStatus.Nohave);
+                                    cell.SetEnable();
                                     await _cellRepository.UpdateAsync(cell).ConfigureAwait(false);
                                     _logger.LogInformation($"库位{cell.CellCode}状态已重置为Nohave");
                                 }
@@ -243,6 +244,21 @@ namespace TuTa.Wms.AgvTasks
                             }
                             else
                                 _logger.LogInformation("容器未绑定库位，跳过库位恢复");
+
+                            // 恢复终点库位锁定状态
+                            if (!string.IsNullOrEmpty(task.EndPositionCode))
+                            {
+                                _logger.LogInformation($"步骤3.1.1: 恢复终点库位{task.EndPositionCode}状态");
+                                var endCell = await _cellRepository.FindByCellCodeAsync(task.EndPositionCode).ConfigureAwait(false);
+                                if (endCell != null && endCell.RunStatus == CellRunStatus.Selected)
+                                {
+                                    endCell.SetEnable();
+                                    await _cellRepository.UpdateAsync(endCell).ConfigureAwait(false);
+                                    _logger.LogInformation($"终点库位{endCell.CellCode}已恢复为Enable");
+                                }
+                                else
+                                    _logger.LogInformation($"终点库位{task.EndPositionCode}不存在或未锁定，跳过");
+                            }
 
                             // 删除BoxStock中间表记录
                             _logger.LogInformation("步骤3.2: 删除BoxStock中间表记录");
@@ -289,6 +305,7 @@ namespace TuTa.Wms.AgvTasks
                             // 解绑容器(清空CellData)
                             _logger.LogInformation("步骤3.5: 解绑容器清空CellData");
                             box.DisBindCell();
+                            box.SetNoHave();
                             await _boxRepository.UpdateAsync(box).ConfigureAwait(false);
                         }
                         else
