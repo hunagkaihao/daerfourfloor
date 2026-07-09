@@ -866,8 +866,6 @@ namespace TuTa.Wms.AgvTasks
                     throw new UserFriendlyException(message: "AGV任务不存在");
                 entity.SetAsCellOut();
 
-
-
                 if (entity.StockTyp == ManageType.SkipMove || entity.StockTyp == ManageType.SkipCall || entity.StockTyp == ManageType.SkipSend)
                 {
                     var startCell = await _cellRepository.FindByCellCodeAsync(entity.StartPositionCode);
@@ -936,7 +934,8 @@ namespace TuTa.Wms.AgvTasks
         }
 
         /// <summary>
-        /// 4A巷道：当前任务出库/完成后，尝试下发后一位（LanePosition-1）处于Created状态的排队任务
+        /// 4A巷道：当前任务出库/完成后，尝试下发后一位（LanePosition-1）处于Created状态的排队任务。
+        /// 若因终点库位容器未解绑而失败，自动间隔重试（最多20次，每次间隔10秒）。
         /// </summary>
         private async Task TryDispatchWaiting4ALaneTaskAsync(AgvTask currentTask)
         {
@@ -993,6 +992,55 @@ namespace TuTa.Wms.AgvTasks
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"4A巷道排队任务下发失败，当前任务={currentTask.ReqCode}");
+                // 若为"已绑定容器"类错误，自动重试
+                if (ex.Message.Contains("已绑定容器"))
+                {
+                    _logger.LogInformation($"4A巷道下发重试：终点库位容器未解绑，10秒后重试...");
+                    _ = RetryDispatchWaiting4ALaneTaskAsync(currentTask.StartPositionCode, 1);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 4A巷道下发失败重试（最多20次，每次间隔10秒）
+        /// </summary>
+        private async Task RetryDispatchWaiting4ALaneTaskAsync(string startPositionCode, int retryCount)
+        {
+            if (retryCount > 20)
+            {
+                _logger.LogWarning($"4A巷道下发重试{retryCount}次均失败，放弃重试，startPositionCode={startPositionCode}");
+                return;
+            }
+
+            await Task.Delay(10000).ConfigureAwait(false);
+
+            try
+            {
+                var waitingTasks = await _agvTaskRepository.GetListAsync(t =>
+                    t.StartPositionCode == startPositionCode && t.AgvTaskStatus == AgvTaskStatus.Created).ConfigureAwait(false);
+
+                var waitingTask = waitingTasks
+                    .OrderBy(t => t.CreationTime)
+                    .ThenBy(t => t.Id)
+                    .FirstOrDefault();
+
+                if (waitingTask == null)
+                {
+                    _logger.Info($"4A巷道下发重试{retryCount}：库位{startPositionCode}已无Created任务，跳过");
+                    return;
+                }
+
+                _logger.Info($"4A巷道下发重试{retryCount}：尝试下发任务{waitingTask.ReqCode}");
+                await SetAsExecutingAsync(waitingTask).ConfigureAwait(false);
+                _logger.Info($"4A巷道下发重试{retryCount}成功：任务{waitingTask.ReqCode}已下发RCS");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning($"4A巷道下发重试{retryCount}仍失败: {ex.Message}");
+                if (ex.Message.Contains("已绑定容器"))
+                {
+                    _ = RetryDispatchWaiting4ALaneTaskAsync(startPositionCode, retryCount + 1);
+                }
             }
         }
 
