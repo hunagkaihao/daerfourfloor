@@ -324,5 +324,12 @@ namespace TuTa.Wms.Stocks
         /// <returns></returns>
         Task<ResponseDto> SetInspectionCompletedAsync(Guid stockId);
 
+        /// <summary>
+        /// 推送来料报检单到ERP
+        /// </summary>
+        /// <param name="stockIds">已抽检的库存ID列表</param>
+        /// <returns></returns>
+        Task<ResponseDto> PushInspectionReportAsync(List<Guid> stockIds);
+
     }
 }

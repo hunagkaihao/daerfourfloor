@@ -944,7 +944,7 @@ namespace TuTa.Wms.AgvTasks
 
             if (!currentTask.StartPositionCode.StartsWith("4A", StringComparison.OrdinalIgnoreCase))
                 return;
-
+            //var nextPos = (Cell)null;
             try
             {
                 var startCell = await _cellRepository.FindByCellCodeAsync(currentTask.StartPositionCode).ConfigureAwait(false);
@@ -964,7 +964,7 @@ namespace TuTa.Wms.AgvTasks
                 var nextCells = await _cellRepository.GetListAsync(c =>
                     c.LaneToColumn == startCell.LaneToColumn && c.LanePosition == nextLanePosition).ConfigureAwait(false);
                 var nextCell = nextCells.FirstOrDefault();
-
+                //nextPos = nextCell;
                 if (nextCell == null)
                 {
                     _logger.Info($"4A巷道下发：巷道列{startCell.LaneToColumn}不存在LanePosition={nextLanePosition}的库位，跳过");
@@ -992,12 +992,12 @@ namespace TuTa.Wms.AgvTasks
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"4A巷道排队任务下发失败，当前任务={currentTask.ReqCode}");
-                // 若为"已绑定容器"类错误，自动重试
-                if (ex.Message.Contains("已绑定容器"))
-                {
-                    _logger.LogInformation($"4A巷道下发重试：终点库位容器未解绑，10秒后重试...");
-                    _ = RetryDispatchWaiting4ALaneTaskAsync(currentTask.StartPositionCode, 1);
-                }
+                //// 若为"已绑定容器"类错误，自动重试
+                //if (ex.Message.Contains("已绑定容器"))
+                //{
+                //    _logger.LogInformation($"4A巷道下发：库位{nextPos.CellCode}任务：终点库位容器未解绑，60秒后重试...");
+                //    _ = RetryDispatchWaiting4ALaneTaskAsync(nextPos.CellCode, 1);
+                //}
             }
         }
 
@@ -1006,13 +1006,13 @@ namespace TuTa.Wms.AgvTasks
         /// </summary>
         private async Task RetryDispatchWaiting4ALaneTaskAsync(string startPositionCode, int retryCount)
         {
-            if (retryCount > 20)
+            if (retryCount > 3)
             {
-                _logger.LogWarning($"4A巷道下发重试{retryCount}次均失败，放弃重试，startPositionCode={startPositionCode}");
+                _logger.LogWarning($"4A巷道下发库位{startPositionCode}任务重试{retryCount}次均失败，放弃重试，startPositionCode={startPositionCode}");
                 return;
             }
 
-            await Task.Delay(10000).ConfigureAwait(false);
+            await Task.Delay(60000).ConfigureAwait(false);
 
             try
             {

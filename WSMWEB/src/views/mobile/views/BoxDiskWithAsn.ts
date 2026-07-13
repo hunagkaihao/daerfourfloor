@@ -21,7 +21,9 @@ export interface IncompleteAsnItem {
   rowKey?: string;
   ccode?: string;
   cordercode?: string;
+  cinvcode?: string;
   cinvname?: string;
+  cinvstd?: string;
   iquantity?: number;
   alreadyStockInQuantity?: number;
 }
@@ -133,8 +135,7 @@ export async function stockCreateAndBindBoxWithAsn(boxcode: string, orderCode: s
 export async function validateAsn(asnCode: string): Promise<any> {
   openFullLoading();
   try {
-    const response = await fetch(`/api/erp/asn/get?asnCode=${encodeURIComponent(asnCode)}`);
-    const result = await response.json();
+    const result = await _erpAsnServiceProxy.get(asnCode);
     closeFullLoading();
     return result;
   } catch (error) {

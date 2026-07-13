@@ -830,6 +830,22 @@ namespace TuTa.Wms.Stocks
                         await _stockRepository.DeleteAsync(stock);
                     }
 
+                    // 重置关联的ASN已入库数量
+                    foreach (Stock stock in stocks)
+                    {
+                        var orderCode = stock.BatchCode;
+                        var materialCode = stock.Material?.MaterialCode;
+                        if (!string.IsNullOrEmpty(orderCode) && !string.IsNullOrEmpty(materialCode))
+                        {
+                            var erpAsn = await _erpAsnRepository.GetByOrderCodeAndMaterialCodeAsync(orderCode, materialCode).ConfigureAwait(false);
+                            if (erpAsn != null)
+                            {
+                                erpAsn.SetAlreadyStockInQuantity(null);
+                                await _erpAsnRepository.UpdateAsync(erpAsn).ConfigureAwait(false);
+                            }
+                        }
+                    }
+
                     // 若容器中库存就是库位中全部库存，解绑后库位变为无货
                     if (stocksInCellBeforeDelete != null && stocksInCellBeforeDelete.Count == stocks.Count)
                     {
@@ -4294,10 +4310,6 @@ namespace TuTa.Wms.Stocks
                     await _stockRepository.UpdateAsync(stockExist).ConfigureAwait(false);
                     await uow.CompleteAsync().ConfigureAwait(false);
 
-                    // 推送来料报检单
-
-
-
                     _logger.Info($"库存{stockId}抽检完成，InspectionStatus={stockExist.InspectionStatus}");
                     return new ResponseDto() { success = true, message = "抽检完成" };
                 }
@@ -4306,6 +4318,66 @@ namespace TuTa.Wms.Stocks
                     _logger.Error($"设置抽检完成状态失败: {ex.Message}");
                     throw new UserFriendlyException(ex.Message);
                 }
+            }
+        }
+
+        public async Task<ResponseDto> PushInspectionReportAsync(List<Guid> stockIds)
+        {
+            try
+            {
+                if (stockIds == null || stockIds.Count == 0)
+                    return new ResponseDto() { success = false, message = "无待推送的抽检记录" };
+
+                var stockList = new List<Stock>();
+                foreach (var id in stockIds)
+                {
+                    var stock = await _stockRepository.FindAsync(id).ConfigureAwait(false);
+                    if (stock != null && stock.InspectionCount > 0)
+                        stockList.Add(stock);
+                }
+
+                if (stockList.Count == 0)
+                    return new ResponseDto() { success = false, message = "无有效的抽检记录" };
+
+                var items = stockList.Select(s => new TuTa.Wms.Erp.IDto.LLBJDDataItem
+                {
+                    AddType = 0,
+                    CSourceCode = s.ReceivingMaterialBarcode ?? s.Barcode,
+                    CMemo = $"物料抽检-{s.Material?.MaterialName}",
+                    CMAKER = "WMS",
+                    Details = new List<TuTa.Wms.Erp.IDto.LLBJDDetail>
+                    {
+                        new TuTa.Wms.Erp.IDto.LLBJDDetail
+                        {
+                            SourceAutoId = 0,
+                            CInvCode = s.Material?.MaterialCode,
+                            CBatch = s.BatchCode,
+                            FQuantity = s.InspectionCount ?? 0
+                        }
+                    }
+                }).ToList();
+
+                var request = new TuTa.Wms.Erp.IDto.LLBJDAddRequestDto
+                {
+                    Cmd = "LLBJDAdd",
+                    Maker = "WMS",
+                    Data = items
+                };
+
+                var result = await _erpAsnAppService.PushLLBJDAddAsync(request).ConfigureAwait(false);
+                if (result != null && result.Success)
+                {
+                    _logger.Info($"推送来料报检单成功，共{stockList.Count}条");
+                    return new ResponseDto() { success = true, message = "推送来料报检单成功" };
+                }
+
+                _logger.Warn($"推送来料报检单失败: {result?.Message}");
+                return new ResponseDto() { success = false, message = result?.Message ?? "推送来料报检单失败" };
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"推送来料报检单异常: {ex.Message}");
+                return new ResponseDto() { success = false, message = ex.Message };
             }
         }
 

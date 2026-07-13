@@ -1,20 +1,23 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using TuTa.Wms.Erp.Dto;
 using TuTa.Wms.Erp.Entities;
+using TuTa.Wms.Erp.IDto;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace TuTa.Wms.Erp
 {
@@ -25,6 +28,7 @@ namespace TuTa.Wms.Erp
         public string GetAsnListUrl { get; set; }
         public string PushReceiptUrl { get; set; }
         public string PuArrVouchAddUrl { get; set; }
+        public string U8ApiUrl { get; set; }
         public string AppKey { get; set; }
         public string AppSecret { get; set; }
     }
@@ -838,6 +842,90 @@ namespace TuTa.Wms.Erp
         }
 
         /// <summary>
+        /// 推送生成来料报检单请求
+        /// </summary>
+        public async Task<LLBJDAddResponseDto> PushLLBJDAddAsync(LLBJDAddRequestDto input)
+        {
+            var operationId = Guid.NewGuid().ToString();
+            _logger.LogInformation($"[操作ID: {operationId}] 开始生成来料报检单推送");
+
+            // 1. 基础参数校验
+            if (input == null || string.IsNullOrWhiteSpace(input.Cmd))
+            {
+                return new LLBJDAddResponseDto { Success = false, Message = "请求参数无效" };
+            }
+
+            try
+            {
+                _logger.LogInformation($"开始推送来料报检单，指令：{input.Cmd}，制单人：{input.Maker}");
+
+                var token = await GetErpTokenAsync(operationId);
+                if (string.IsNullOrEmpty(token))
+                {
+                    return new LLBJDAddResponseDto
+                    {
+                        Success = false,
+                        Message = "登录ERP失败"
+                    };
+                }
+
+                // 2. 处理 Data 字段（将其序列化为 JSON 字符串，以契合目标接口要求）
+                var jsonOptions = new JsonSerializerOptions
+                {
+                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase // 根据实际接口大小写要求调整
+                };
+
+                // 将 Data 列表序列化为字符串
+                string dataJsonString = JsonSerializer.Serialize(input.Data, jsonOptions);
+
+                // 构建最终发送的匿名对象（确保 Data 是字符串类型）
+                var payload = new
+                {
+                    Cmd = input.Cmd,
+                    TaskId = input.TaskId ?? string.Empty,
+                    Maker = input.Maker,
+                    Id = input.Id,
+                    Data = dataJsonString
+                };
+
+                string jsonContent = JsonSerializer.Serialize(payload, jsonOptions);
+                _logger.LogDebug($"推送报文内容：{jsonContent}");
+
+                // 3. 发送 HTTP POST 请求
+                using var pushClient = new HttpClient();
+                pushClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                pushClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                var response = await pushClient.PostAsync(_erpSettings.U8ApiUrl, content);
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                _logger.LogInformation($"推送来料报检单响应状态码：{(int)response.StatusCode}，响应内容：{responseBody}");
+
+                // 4. 解析响应结果
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonSerializer.Deserialize<LLBJDAddResponseDto>(responseBody, jsonOptions);
+                    return result ?? new LLBJDAddResponseDto { Success = false, Message = "响应结果解析为空" };
+                }
+                else
+                {
+                    return new LLBJDAddResponseDto
+                    {
+                        Success = false,
+                        Message = $"第三方接口调用失败，状态码：{(int)response.StatusCode}，原因：{responseBody}"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"推送来料报检单发生异常，指令：{input.Cmd}");
+                return new LLBJDAddResponseDto { Success = false, Message = $"系统异常：{ex.Message}" };
+            }
+        }
+        /// <summary>
         /// 当同一ASN单号下所有明细均已入库完成时，自动推送到货单
         /// </summary>
         public async Task<PuArrVouchAddResponseDto> TryPushPuArrVouchIfAllLinesCompletedAsync(string asnCode)
@@ -1078,6 +1166,31 @@ namespace TuTa.Wms.Erp
                     Success = false,
                     Message = $"获取未完成ASN信息异常：{ex.Message}"
                 };
+            }
+        }
+
+        public async Task<ErpAsnValidateResponseDto> GetLocalAsnByCodeAsync(string asnCode)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(asnCode))
+                    return new ErpAsnValidateResponseDto { Success = false, Message = "ASN码不能为空" };
+
+                _logger.LogInformation($"从本地ErpAsns表查询ASN数据，ASN码：{asnCode}");
+                var asnList = await _erpAsnRepository.GetListByAsnCodeAsync(asnCode.Trim());
+                var items = asnList.Select(MapToErpAsnDto).ToList();
+
+                return new ErpAsnValidateResponseDto
+                {
+                    Success = true,
+                    Message = items.Count > 0 ? "查询成功" : "未找到该ASN数据",
+                    Data = items
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"查询本地ASN数据异常，ASN码：{asnCode}");
+                return new ErpAsnValidateResponseDto { Success = false, Message = $"查询异常：{ex.Message}" };
             }
         }
 

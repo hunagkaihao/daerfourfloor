@@ -3,7 +3,8 @@ import { BasicColumn } from '/@/components/Table';
 import moment from 'moment';
 import {
   MaterialServiceProxy,
-  StockServiceProxy
+  StockServiceProxy,
+  ERP_ASNServiceProxy,
 } from '/@/services/ServiceProxies';
 import { message } from 'ant-design-vue';
 import { useLoading } from '/@/components/Loading';
@@ -15,6 +16,7 @@ const [openFullLoading, closeFullLoading] = useLoading({
 });
 const _materialServiceProxy = new MaterialServiceProxy();
 const _stockServiceProxy = new StockServiceProxy();
+const _erpAsnServiceProxy = new ERP_ASNServiceProxy();
 /**
  * 通过物料码查询物料信息
  * @param params
@@ -45,8 +47,7 @@ export async function stockCreateAndBindBox(
 export async function validateAsn(asnCode: string): Promise<any> {
   openFullLoading();
   try {
-    const response = await fetch(`/api/erp/asn/get?asnCode=${encodeURIComponent(asnCode)}`);
-    const result = await response.json();
+    const result = await _erpAsnServiceProxy.get(asnCode);
     closeFullLoading();
     return result;
   } catch (error) {

@@ -1,5 +1,7 @@
+using System;
 using System.Threading.Tasks;
 using TuTa.Wms.Erp.Dto;
+using TuTa.Wms.Erp.IDto;
 using Volo.Abp.Application.Services;
 
 namespace TuTa.Wms.Erp
@@ -44,6 +46,12 @@ namespace TuTa.Wms.Erp
         Task<PuArrVouchAddResponseDto> PushPuArrVouchAsync(PuArrVouchAddRequestDto input);
 
         /// <summary>
+        /// 生成来料报检单并推送到ERP
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        Task<LLBJDAddResponseDto> PushLLBJDAddAsync(LLBJDAddRequestDto input);
+        /// <summary>
         /// 当同一ASN单号下所有明细均已入库完成时，自动推送到货单
         /// </summary>
         /// <param name="asnCode">ASN单号</param>
@@ -69,5 +77,12 @@ namespace TuTa.Wms.Erp
         /// <param name="materialCode">物料编号</param>
         /// <returns>ASN明细列表</returns>
         Task<ErpAsnValidateResponseDto> GetIncompleteAsnByMaterialCodeAsync(string materialCode);
+
+        /// <summary>
+        /// 从本地ErpAsns表根据ASN码获取数据
+        /// </summary>
+        /// <param name="asnCode">ASN码</param>
+        /// <returns>ASN明细列表</returns>
+        Task<ErpAsnValidateResponseDto> GetLocalAsnByCodeAsync(string asnCode);
     }
 }

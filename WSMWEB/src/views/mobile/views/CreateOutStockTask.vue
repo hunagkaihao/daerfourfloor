@@ -97,6 +97,18 @@ const stockcolumns = [
     align: 'center',
   },
   {
+    title: '箱号',
+    dataIndex: 'boxNumber',
+    key: 'boxNumber',
+    align: 'center',
+  },
+  {
+    title: '等级',
+    dataIndex: 'grade',
+    key: 'grade',
+    align: 'center',
+  },
+  {
     title: '箱数',
     dataIndex: 'receivePkgOrBoxCount',
     key: 'receivePkgOrBoxCount',

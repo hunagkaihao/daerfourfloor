@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using System;
 using System.Threading.Tasks;
 using TuTa.Wms.Erp;
 using TuTa.Wms.Erp.Dto;
+using TuTa.Wms.Erp.IDto;
 
 namespace TuTa.Wms.Controllers.Erp
 {
@@ -34,8 +36,15 @@ namespace TuTa.Wms.Controllers.Erp
         /// <param name="asnCode">ASN码</param>
         /// <returns>ASN信息</returns>
         [HttpGet("get")]
-        [SwaggerOperation(summary: "通过ASN码获取信息", Tags = new[] { "ERP ASN" })]
+        [SwaggerOperation(summary: "通过ASN码获取信息(本地ErpAsns表)", Tags = new[] { "ERP ASN" })]
         public async Task<ErpAsnValidateResponseDto> GetAsnInfoAsync(string asnCode)
+        {
+            return await _erpAsnAppService.GetLocalAsnByCodeAsync(asnCode);
+        }
+
+        [HttpGet("get-from-erp")]
+        [SwaggerOperation(summary: "通过ASN码从ERP系统获取信息", Tags = new[] { "ERP ASN" })]
+        public async Task<ErpAsnValidateResponseDto> GetAsnInfoFromErpAsync(string asnCode)
         {
             return await _erpAsnAppService.GetAsnInfoAsync(asnCode);
         }
@@ -80,6 +89,12 @@ namespace TuTa.Wms.Controllers.Erp
         public async Task<PuArrVouchAddResponseDto> PushPuArrVouchAsync([FromBody] PuArrVouchAddRequestDto input)
         {
             return await _erpAsnAppService.PushPuArrVouchAsync(input);
+        }
+
+        [HttpPost("push-llbjd")]
+        public async Task<LLBJDAddResponseDto> PushLLBJDAddAsync([FromBody] LLBJDAddRequestDto input)
+        {
+            return await _erpAsnAppService.PushLLBJDAddAsync(input);
         }
 
         /// <summary>

@@ -21125,6 +21125,48 @@ export class StockServiceProxy extends ServiceProxyBase {
         return Promise.resolve<ResponseDto>(null as any);
     }
 
+    pushInspectionReport(stockIds: string[] | undefined , cancelToken?: CancelToken | undefined): Promise<ResponseDto> {
+        let url_ = this.baseUrl + "/wms/stock/pushInspectionReport";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(stockIds);
+
+        let options_ = <AxiosRequestConfig>{
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: { "Content-Type": "application/json", "Accept": "text/plain" },
+            cancelToken
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.instance.request(transformedOptions_);
+        }).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processPushInspectionReport(_response));
+        });
+    }
+
+    protected processPushInspectionReport(response: AxiosResponse): Promise<ResponseDto> {
+        const status = response.status;
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = ResponseDto.fromJS(resultData200);
+            return Promise.resolve<ResponseDto>(result200);
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, {});
+        }
+        return Promise.resolve<ResponseDto>(null as any);
+    }
+
     stockRemoveDirect(stockId: string | undefined , cancelToken?: CancelToken | undefined): Promise<ResponseDto> {
         let url_ = this.baseUrl + "/wms/stock/stockRemoveDirect?";
         if (stockId === null)

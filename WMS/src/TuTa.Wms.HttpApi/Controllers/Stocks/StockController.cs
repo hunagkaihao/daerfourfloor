@@ -443,6 +443,13 @@ namespace TuTa.Wms.Controllers.Stocks
             return await _stockService.RemoveStockDirectAsync(stockId).ConfigureAwait(false);
         }
 
+        [HttpPost("pushInspectionReport")]
+        [SwaggerOperation(summary: "推送来料报检单", Tags = new[] { "Stock" })]
+        public async Task<ResponseDto> PushInspectionReportAsync(List<Guid> stockIds)
+        {
+            return await _stockService.PushInspectionReportAsync(stockIds).ConfigureAwait(false);
+        }
+
         [HttpPost("stockOutboundDirect")]
         public async Task<ResponseDto> OutBountStockDirectAsync(Guid stockId, decimal outBoundCount, int? pagOrBoxCount = null)
         {

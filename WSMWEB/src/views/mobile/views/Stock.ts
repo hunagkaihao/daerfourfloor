@@ -112,6 +112,11 @@ export function setInspectionCompleted(
 ):Promise<any> {
   return _stockServiceProxy.setInspectionCompleted(stockId);
 }
+export function pushInspectionReport(
+  stockIds: string[]
+):Promise<any> {
+  return _stockServiceProxy.pushInspectionReport(stockIds);
+}
 export const diskcolumns = [
   {
     title: '物料编号',

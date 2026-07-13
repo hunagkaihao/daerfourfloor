@@ -93,6 +93,7 @@
 
     <a-row v-if="stockData" class="button-row">
       <a-button type="primary" @click="executeOut" :disabled="!canOut" :loading="executing">确认抽检</a-button>
+      <a-button type="default" @click="finishCheck">抽检完成</a-button>
       <a-button @click="backToList">返回抽检列表</a-button>
       <a-button @click="reset">重置</a-button>
     </a-row>
@@ -108,7 +109,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { SearchOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 import Header from '../header/Header.vue';
-import { stocksGetInCell, stockInspection, setInspectionCompleted } from './Stock';
+import { stocksGetInCell, stockInspection, setInspectionCompleted, pushInspectionReport } from './Stock';
 
 const cellCode = ref('');
 const cellInputRef = ref<any>();
@@ -319,12 +320,30 @@ function backToList() {
 }
 
 async function finishCheck() {
-  if (stockList.value.length > 0) {
-    for (const stock of stockList.value) {
-      await setInspectionCompleted(stock.id);
-    }
+  const stockIds: string[] = stockList.value.length > 0
+    ? stockList.value.map((s: any) => s.id)
+    : stockData.value ? [stockData.value.id] : [];
+
+  if (stockIds.length === 0) {
+    message.success('抽检完成');
+    return;
   }
-  message.success('抽检完成');
+
+  // 设置抽检完成状态
+  for (const id of stockIds) {
+    await setInspectionCompleted(id);
+  }
+  // 推送来料报检单
+  try {
+    const res = await pushInspectionReport(stockIds);
+    if (res && res.success) {
+      message.success('抽检完成，来料报检单已推送');
+    } else {
+      message.warning('抽检完成，但来料报检单推送失败: ' + (res?.message || ''));
+    }
+  } catch (err: any) {
+    message.warning('抽检完成，但来料报检单推送异常');
+  }
   reset();
 }
 
