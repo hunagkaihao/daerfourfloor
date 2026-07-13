@@ -33379,6 +33379,7 @@ export class StockDto implements IStockDto {
     stockInType!: string | undefined;
     batchCode!: string | undefined;
     grade!: string | undefined;
+    processNo!: string | undefined;
     boxNumber!: string | undefined;
     boxData_BoxNumber!: string | undefined;
     blCode!: string | undefined;
@@ -33437,6 +33438,7 @@ export class StockDto implements IStockDto {
             this.stockInType = _data["stockInType"];
             this.batchCode = _data["batchCode"];
             this.grade = _data["grade"];
+            this.processNo = _data["processNo"];
             this.boxNumber = _data["boxNumber"];
             this.boxData_BoxNumber = _data["boxData_BoxNumber"];
             this.blCode = _data["blCode"];
@@ -33495,6 +33497,7 @@ export class StockDto implements IStockDto {
         data["stockInType"] = this.stockInType;
         data["batchCode"] = this.batchCode;
         data["grade"] = this.grade;
+        data["processNo"] = this.processNo;
         data["boxNumber"] = this.boxNumber;
         data["boxData_BoxNumber"] = this.boxData_BoxNumber;
         data["blCode"] = this.blCode;
@@ -33546,6 +33549,7 @@ export interface IStockDto {
     stockInType: string | undefined;
     batchCode: string | undefined;
     grade: string | undefined;
+    processNo: string | undefined;
     boxNumber: string | undefined;
     boxData_BoxNumber: string | undefined;
     blCode: string | undefined;

@@ -58,7 +58,7 @@
                 <div class="goods-info">
                     <a-row><a-col :span="12"><p>物料编号:{{ i.materialCode }}</p></a-col>
                            <a-col :span="12"><p>批次号:{{ i.goodsBatchNo || '-' }}</p></a-col></a-row>
-                    <a-row><a-col :span="12"><p>工序号:{{ i.ProcessNo || '-' }}</p></a-col>
+                    <a-row><a-col :span="12"><p>工序号:{{ i.processNo || '-' }}</p></a-col>
                            <a-col :span="12"><p>等级:{{ i.grade || '-' }}</p></a-col></a-row>
                     <a-row class="goods-info-bold">
                         <a-col :span="12"><p>整箱数量:{{ i.quantity || '-' }}</p></a-col>
@@ -243,7 +243,7 @@ const incell = async () => {
         let p = new StockCreateDto(); p.totalCount = e.incellshu; p.barcode = e.materialCode; p.materialCode = e.materialCode;
         p.boxNumber = e.boxNumber || undefined; p.receivePkgOrBoxCount = e.baoshu || undefined;
         p.countInOnePkgOrBox = e.countInOnePkgOrBox || undefined; p.batchCode = e.goodsBatchNo || '';
-        p.grade = e.grade || ''; p.processNo = e.ProcessNo || '';
+        p.grade = e.grade || ''; p.processNo = e.processNo || '';
         stockCreateDto.push(p);
     });
     try {

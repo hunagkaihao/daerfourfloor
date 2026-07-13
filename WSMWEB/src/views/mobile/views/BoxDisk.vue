@@ -55,7 +55,7 @@
                     </a-row>
                     <a-row>
                         <a-col :span="12">
-                            <p>工序号:{{ i.ProcessNo || '-' }}</p>
+                            <p>箱号:{{ i.processNo || '-' }}</p>
                         </a-col>
                         <a-col :span="12">
                             <p>等级:{{ i.grade || '-' }}</p>
@@ -66,7 +66,7 @@
                             <p>整箱数量:{{ i.quantity || '-' }}</p>
                         </a-col>
                         <a-col :span="12">
-                            <p>箱号:{{ i.boxNumber ?? '-' }}</p>
+                            <p>箱数号:{{ i.boxNumber ?? '-' }}</p>
                         </a-col>
                     </a-row>
                     <a-row class="goods-input-row" align="middle">
@@ -284,7 +284,7 @@ async function scangoodsCode() {
         goodsItemData.quantity = fullBoxQty as unknown as number;
         goodsItemData.countInOnePkgOrBox = fullBoxQty as unknown as number;
         goodsItemData.goodsUnits = "PCS";
-        goodsItemData.ProcessNo = processNo;
+        goodsItemData.processNo = processNo;
         goodsItemData.grade = grade;
         goodsItemData.goodsBatchNo = batchCode;
         goodsItemData.dataCode = barcode;
@@ -400,7 +400,7 @@ const incell = async () => {
         p.countInOnePkgOrBox = e.countInOnePkgOrBox || undefined
         p.batchCode = e.goodsBatchNo || ''
         p.grade = e.grade || ''
-        p.processNo = e.ProcessNo || ''
+        p.processNo = e.processNo || ''
         // 处理生产日期，如果为空则使用当前日期
         if (e.supplierProductionDate && e.supplierProductionDate.trim() !== '') {
             p.supplierProductionDate = new Date(e.supplierProductionDate)

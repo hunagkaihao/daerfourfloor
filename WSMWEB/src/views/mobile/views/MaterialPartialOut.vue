@@ -46,7 +46,8 @@
         <a-descriptions-item label="物料名称">{{ stockData.materialName }}</a-descriptions-item>
         <a-descriptions-item label="规格型号">{{ stockData.specs }}</a-descriptions-item>
         <a-descriptions-item label="批次号">{{ stockData.batchCode || '无' }}</a-descriptions-item>
-        <a-descriptions-item label="箱号">{{ stockData.boxNumber || '无' }}</a-descriptions-item>
+        <a-descriptions-item label="箱号">{{ stockData.processNo || '无' }}</a-descriptions-item>
+        <a-descriptions-item label="等级">{{ stockData.grade || '无' }}</a-descriptions-item>
         <a-descriptions-item label="箱数">{{ stockData.totalPagOrBoxInTime ?? stockData.receivePkgOrBoxCount ?? '无' }}</a-descriptions-item>
         <a-descriptions-item label="库存数量">{{ stockData.totalCountInTime }} {{ stockData.unit }}</a-descriptions-item>
       </a-descriptions>

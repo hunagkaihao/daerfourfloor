@@ -98,8 +98,8 @@ const stockcolumns = [
   },
   {
     title: '箱号',
-    dataIndex: 'boxNumber',
-    key: 'boxNumber',
+    dataIndex: 'processNo',
+    key: 'processNo',
     align: 'center',
   },
   {

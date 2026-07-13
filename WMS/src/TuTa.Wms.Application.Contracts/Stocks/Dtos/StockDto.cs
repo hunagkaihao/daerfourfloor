@@ -113,6 +113,10 @@ namespace TuTa.Wms.Stocks.Dtos
         /// 生产批号
         /// </summary>
         public string BatchCode { get; set; }
+        /// <summary>
+        /// 箱号
+        /// </summary>
+        public string ProcessNo { get; set; }
 
         /// <summary>
         /// 等级
@@ -120,7 +124,7 @@ namespace TuTa.Wms.Stocks.Dtos
         public string Grade { get; set; }
 
         /// <summary>
-        /// 箱号
+        /// 箱数号
         /// </summary>
         public string BoxNumber { get; set; }
 

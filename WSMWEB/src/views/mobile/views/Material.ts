@@ -339,7 +339,7 @@ export class DataItem {
   goodsProperty1:string | undefined;
   supplierCode:string | undefined;
   dataCode:string | undefined;
-  ProcessNo:string | undefined;
+  processNo:string | undefined;
   grade:string | undefined;
   supplierProductionDate:string | undefined;
   boxNumber:string | undefined;
