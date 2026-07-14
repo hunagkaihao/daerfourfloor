@@ -67,6 +67,17 @@ const warehouse: AppRouteModule = {
         ignoreAuth: true,
       },
     },
+    {
+      path: 'stockQuery',
+      name: 'WarehouseStockQuery',
+      component: () => import('/@/views/warehouse/goods/YdStockQuery.vue'),
+      meta: {
+        title: '库存查询',
+        policy: 'Wms.Read',
+        icon: 'ant-design:search-outlined',
+        ignoreAuth: true,
+      },
+    },
   ],
 };
 
