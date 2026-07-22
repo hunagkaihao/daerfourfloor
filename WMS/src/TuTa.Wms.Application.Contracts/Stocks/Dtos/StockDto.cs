@@ -228,6 +228,16 @@ namespace TuTa.Wms.Stocks.Dtos
         public string CheckResult { get; set; }
 
         /// <summary>
+        /// 抽检状态 0待检 1抽检中 2合格 3不合格 4抽检完成
+        /// </summary>
+        public int InspectionStatus { get; set; }
+
+        /// <summary>
+        /// 检验数量
+        /// </summary>
+        public decimal? InspectionCount { get; set; }
+
+        /// <summary>
         /// 检验合格放行数
         /// </summary>
         [Column(TypeName = "decimal(18,6)")]

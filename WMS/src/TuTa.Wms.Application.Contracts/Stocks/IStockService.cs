@@ -325,6 +325,21 @@ namespace TuTa.Wms.Stocks
         Task<ResponseDto> SetInspectionCompletedAsync(Guid stockId);
 
         /// <summary>
+        /// 确认抽检合格 -- 加回库存并更新检验状态
+        /// </summary>
+        Task<ResponseDto> ConfirmInspectionQualifiedAsync(Guid stockId, decimal qualifiedQty);
+
+        /// <summary>
+        /// 设置抽检不合格 -- 更新状态
+        /// </summary>
+        Task<ResponseDto> SetInspectionNotQualifiedAsync(Guid stockId);
+
+        /// <summary>
+        /// 根据库位和物料编码查找库存
+        /// </summary>
+        Task<StockDto> FindByCellAndMaterialAsync(string cellCode, string materialCode);
+
+        /// <summary>
         /// 推送来料报检单到ERP
         /// </summary>
         /// <param name="stockIds">已抽检的库存ID列表</param>

@@ -2408,7 +2408,8 @@ namespace TuTa.Wms.Stocks
                         PassCnt = stock.CheckData.PassCnt,
                         SupplierCode = stock.Supplier.SupplierCode,
                         SupplierName = stock.Supplier.SupplierName,
-                        FullBoxRate = stock.BoxData.FullRate
+                        FullBoxRate = stock.BoxData.FullRate,
+                        InspectionStatus = (int)(stock.InspectionStatus ?? 0)
                     };
                     stockDtos.Add(dto);
                 }
@@ -4327,6 +4328,136 @@ namespace TuTa.Wms.Stocks
                     throw new UserFriendlyException(ex.Message);
                 }
             }
+        }
+
+        [UnitOfWork]
+        public async Task<ResponseDto> ConfirmInspectionQualifiedAsync(Guid stockId, decimal qualifiedQty)
+        {
+            using (var uow = UnitOfWorkManager.Begin(true, true))
+            {
+                try
+                {
+                    var stock = await _stockRepository.FindAsync(stockId).ConfigureAwait(false);
+                    if (stock == null)
+                        return new ResponseDto { success = false, message = $"库存{stockId}不存在" };
+
+                    if (stock.InspectionStatus != InspectionStatus.InProgressInspection)
+                        return new ResponseDto { success = false, message = "当前不处于抽检状态" };
+
+                    if (qualifiedQty <= 0)
+                        return new ResponseDto { success = false, message = "合格数量必须大于0" };
+
+                    var inspectionCount = stock.InspectionCount ?? 0;
+                    if (qualifiedQty > inspectionCount)
+                        return new ResponseDto { success = false, message = $"合格数量({qualifiedQty})不能超过抽检数量({inspectionCount})" };
+
+                    stock.CombineStock(qualifiedQty);
+                    stock.InspectionCount = inspectionCount - qualifiedQty;
+                    stock.InspectionStatus = InspectionStatus.InspectionQualified;
+
+                    await _stockRepository.UpdateAsync(stock).ConfigureAwait(false);
+
+                    var material = stock.Material;
+                    var cellData = stock.CellData;
+                    var boxData = stock.BoxData;
+                    var warehouseData = stock.Warehouse;
+
+                    var stockInHistory = new StockInHistory(
+                        stock.Barcode,
+                        material?.MaterialCode,
+                        material?.MaterialName,
+                        material?.Specs,
+                        material?.Unit,
+                        warehouseData?.HouseCode,
+                        warehouseData?.HouseName,
+                        warehouseData?.AreaCode,
+                        warehouseData?.AreaName,
+                        cellData?.CellCode,
+                        cellData?.CellName,
+                        boxData?.BoxCode,
+                        boxData?.BoxName,
+                        "抽检合格入库",
+                        qualifiedQty,
+                        DateTime.Now,
+                        batchNo: stock.BatchCode);
+
+                    if (_stockInHistoryRepository != null)
+                        await _stockInHistoryRepository.InsertAsync(stockInHistory).ConfigureAwait(false);
+
+                    await uow.CompleteAsync().ConfigureAwait(false);
+
+                    _logger.Info($"库存{stockId}确认抽检合格，加回数量{qualifiedQty}");
+                    return new ResponseDto { success = true, message = "确认合格成功" };
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error($"确认抽检合格失败: {ex.Message}");
+                    throw new UserFriendlyException(ex.Message);
+                }
+            }
+        }
+
+        [UnitOfWork]
+        public async Task<ResponseDto> SetInspectionNotQualifiedAsync(Guid stockId)
+        {
+            using (var uow = UnitOfWorkManager.Begin(true, true))
+            {
+                try
+                {
+                    var stock = await _stockRepository.FindAsync(stockId).ConfigureAwait(false);
+                    if (stock == null)
+                        return new ResponseDto { success = false, message = $"库存{stockId}不存在" };
+
+                    if (stock.InspectionStatus != InspectionStatus.InProgressInspection)
+                        return new ResponseDto { success = false, message = "当前不处于抽检状态" };
+
+                    stock.InspectionStatus = InspectionStatus.InspectionNotQualified;
+                    await _stockRepository.UpdateAsync(stock).ConfigureAwait(false);
+                    await uow.CompleteAsync().ConfigureAwait(false);
+
+                    _logger.Info($"库存{stockId}设置抽检不合格");
+                    return new ResponseDto { success = true, message = "设置不合格成功" };
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error($"设置抽检不合格失败: {ex.Message}");
+                    throw new UserFriendlyException(ex.Message);
+                }
+            }
+        }
+
+        public async Task<StockDto> FindByCellAndMaterialAsync(string cellCode, string materialCode)
+        {
+            if (string.IsNullOrWhiteSpace(cellCode) || string.IsNullOrWhiteSpace(materialCode))
+                return null;
+
+            var stock = await _stockRepository.FindByCellCodeAndMaterialCodeAsync(cellCode, materialCode).ConfigureAwait(false);
+            if (stock == null)
+                return null;
+
+            return new StockDto
+            {
+                Id = stock.Id,
+                Barcode = stock.Barcode,
+                TotalCountInTime = stock.TotalCountInTime,
+                Status = stock.Status.ToString(),
+                InspectionStatus = (int)(stock.InspectionStatus ?? 0),
+                InspectionCount = stock.InspectionCount,
+                CellCode = stock.CellData?.CellCode,
+                CellName = stock.CellData?.CellName,
+                HouseCode = stock.Warehouse?.HouseCode,
+                HouseName = stock.Warehouse?.HouseName,
+                AreaCode = stock.Warehouse?.AreaCode,
+                AreaName = stock.Warehouse?.AreaName,
+                BoxCode = stock.BoxData?.BoxCode,
+                BoxName = stock.BoxData?.BoxName,
+                BoxNumber = stock.BoxData?.BoxNumber,
+                BatchCode = stock.BatchCode,
+                MaterialCode = stock.Material?.MaterialCode,
+                MaterialName = stock.Material?.MaterialName,
+                Specs = stock.Material?.Specs,
+                Unit = stock.Material?.Unit
+            };
         }
 
         public async Task<ResponseDto> PushInspectionReportAsync(List<Guid> stockIds)
