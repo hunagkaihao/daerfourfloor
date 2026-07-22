@@ -4458,7 +4458,7 @@ export class ERP_ASNServiceProxy extends ServiceProxyBase {
     }
 
     /**
-     * 通过ASN码获取信息
+     * 通过ASN码获取信息(本地ErpAsns表)
      * @param asnCode (optional) 
      * @return OK
      */
@@ -4515,7 +4515,64 @@ export class ERP_ASNServiceProxy extends ServiceProxyBase {
         }
         return Promise.resolve<ErpAsnValidateResponseDto>(null as any);
     }
+    /**
+     * 通过ASN码从ERP系统获取信息
+     * @param asnCode (optional) 
+     * @return OK
+     */
+    getFromErp(asnCode: string | undefined , cancelToken?: CancelToken | undefined): Promise<ErpAsnValidateResponseDto> {
+        let url_ = this.baseUrl + "/erp/asn/get-from-erp?";
+        if (asnCode === null)
+            throw new Error("The parameter 'asnCode' cannot be null.");
+        else if (asnCode !== undefined)
+            url_ += "asnCode=" + encodeURIComponent("" + asnCode) + "&";
+        url_ = url_.replace(/[?&]$/, "");
 
+        let options_ = <AxiosRequestConfig>{
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.instance.request(transformedOptions_);
+        }).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processGet(_response));
+        });
+    }
+
+    protected processGetFromErp(response: AxiosResponse): Promise<ErpAsnValidateResponseDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = ErpAsnValidateResponseDto.fromJS(resultData200);
+            return Promise.resolve<ErpAsnValidateResponseDto>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ErpAsnValidateResponseDto>(null as any);
+    }
     /**
      * 保存ASN信息到数据库
      * @param asnCode (optional) 
@@ -4835,6 +4892,39 @@ export class ERP_ASNServiceProxy extends ServiceProxyBase {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<ErpAsnValidateResponseDto>(null as any);
+    }
+
+    pushCGRKDAdd(input: any | undefined , cancelToken?: CancelToken | undefined): Promise<CGRKDAddResponseDto> {
+        let url_ = this.baseUrl + "/erp/asn/pushCGRKDAdd";
+        url_ = url_.replace(/[?&]$/, "");
+        let content_ = JSON.stringify(input);
+        let options_ = <AxiosRequestConfig>{ method: "POST", url: url_, headers: { "Content-Type": "application/json", "Accept": "text/plain" }, data: content_ };
+        return this.transformOptions(options_).then(transformedOptions_ => this.instance.request(transformedOptions_))
+            .catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+                    return _error.response;
+                } else {
+                    throw _error;
+                }
+            })
+            .then((_response: AxiosResponse) => this.transformResult(url_, _response, (_response: AxiosResponse) => this.processPushCGRKDAdd(_response)));
+    }
+    protected processPushCGRKDAdd(response: AxiosResponse): Promise<CGRKDAddResponseDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) { if (response.headers.hasOwnProperty(k)) { _headers[k] = response.headers[k]; } }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            result200 = CGRKDAddResponseDto.fromJS(_responseText);
+            return Promise.resolve<CGRKDAddResponseDto>(result200);
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<CGRKDAddResponseDto>(null as any);
     }
 }
 
@@ -21125,6 +21215,112 @@ export class StockServiceProxy extends ServiceProxyBase {
         return Promise.resolve<ResponseDto>(null as any);
     }
 
+    confirmInspectionQualified(stockId: string | undefined, qualifiedQty: number | undefined , cancelToken?: CancelToken | undefined): Promise<ResponseDto> {
+        let url_ = this.baseUrl + "/wms/stock/confirmInspectionQualified?";
+        if (stockId === null) throw new Error("The parameter 'stockId' cannot be null.");
+        else if (stockId !== undefined) url_ += "stockId=" + encodeURIComponent("" + stockId) + "&";
+        if (qualifiedQty === null) throw new Error("The parameter 'qualifiedQty' cannot be null.");
+        else if (qualifiedQty !== undefined) url_ += "qualifiedQty=" + encodeURIComponent("" + qualifiedQty) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+        let options_ = <AxiosRequestConfig>{ method: "POST", url: url_, headers: { "Accept": "text/plain" } };
+        return this.transformOptions(options_).then(transformedOptions_ => this.instance.request(transformedOptions_))
+            .catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+                    return _error.response;
+                } else {
+                    throw _error;
+                }
+            })
+            .then((_response: AxiosResponse) => this.transformResult(url_, _response, (_response: AxiosResponse) => this.processConfirmInspectionQualified(_response)));
+    }
+    protected processConfirmInspectionQualified(response: AxiosResponse): Promise<ResponseDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) { if (response.headers.hasOwnProperty(k)) { _headers[k] = response.headers[k]; } }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            result200 = ResponseDto.fromJS(_responseText);
+            return Promise.resolve<ResponseDto>(result200);
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ResponseDto>(null as any);
+    }
+
+    setInspectionNotQualified(stockId: string | undefined , cancelToken?: CancelToken | undefined): Promise<ResponseDto> {
+        let url_ = this.baseUrl + "/wms/stock/setInspectionNotQualified?";
+        if (stockId === null) throw new Error("The parameter 'stockId' cannot be null.");
+        else if (stockId !== undefined) url_ += "stockId=" + encodeURIComponent("" + stockId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+        let options_ = <AxiosRequestConfig>{ method: "POST", url: url_, headers: { "Accept": "text/plain" } };
+        return this.transformOptions(options_).then(transformedOptions_ => this.instance.request(transformedOptions_))
+            .catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+                    return _error.response;
+                } else {
+                    throw _error;
+                }
+            })
+            .then((_response: AxiosResponse) => this.transformResult(url_, _response, (_response: AxiosResponse) => this.processSetInspectionNotQualified(_response)));
+    }
+    protected processSetInspectionNotQualified(response: AxiosResponse): Promise<ResponseDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) { if (response.headers.hasOwnProperty(k)) { _headers[k] = response.headers[k]; } }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            result200 = ResponseDto.fromJS(_responseText);
+            return Promise.resolve<ResponseDto>(result200);
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ResponseDto>(null as any);
+    }
+
+    findByCellAndMaterial(cellCode: string | undefined, materialCode: string | undefined , cancelToken?: CancelToken | undefined): Promise<StockDto> {
+        let url_ = this.baseUrl + "/wms/stock/findByCellAndMaterial?";
+        if (cellCode === null) throw new Error("The parameter 'cellCode' cannot be null.");
+        else if (cellCode !== undefined) url_ += "cellCode=" + encodeURIComponent("" + cellCode) + "&";
+        if (materialCode === null) throw new Error("The parameter 'materialCode' cannot be null.");
+        else if (materialCode !== undefined) url_ += "materialCode=" + encodeURIComponent("" + materialCode) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+        let options_ = <AxiosRequestConfig>{ method: "GET", url: url_, headers: { "Accept": "text/plain" } };
+        return this.transformOptions(options_).then(transformedOptions_ => this.instance.request(transformedOptions_))
+            .catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+                    return _error.response;
+                } else {
+                    throw _error;
+                }
+            })
+            .then((_response: AxiosResponse) => this.transformResult(url_, _response, (_response: AxiosResponse) => this.processFindByCellAndMaterial(_response)));
+    }
+    protected processFindByCellAndMaterial(response: AxiosResponse): Promise<StockDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) { if (response.headers.hasOwnProperty(k)) { _headers[k] = response.headers[k]; } }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            result200 = StockDto.fromJS(_responseText);
+            return Promise.resolve<StockDto>(result200);
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<StockDto>(null as any);
+    }
+
     pushInspectionReport(stockIds: string[] | undefined , cancelToken?: CancelToken | undefined): Promise<ResponseDto> {
         let url_ = this.baseUrl + "/wms/stock/pushInspectionReport";
         url_ = url_.replace(/[?&]$/, "");
@@ -33404,6 +33600,7 @@ export class StockDto implements IStockDto {
     checkCount!: number | undefined;
     fullBoxRate!: number | undefined;
     avaType!: string | undefined;
+    inspectionStatus!: number;
 
     constructor(data?: IStockDto) {
         if (data) {
@@ -33463,6 +33660,7 @@ export class StockDto implements IStockDto {
             this.checkCount = _data["checkCount"];
             this.fullBoxRate = _data["fullBoxRate"];
             this.avaType = _data["avaType"];
+            this.inspectionStatus = _data["inspectionStatus"];
         }
     }
 
@@ -33522,6 +33720,7 @@ export class StockDto implements IStockDto {
         data["checkCount"] = this.checkCount;
         data["fullBoxRate"] = this.fullBoxRate;
         data["avaType"] = this.avaType;
+        data["inspectionStatus"] = this.inspectionStatus;
         return data;
     }
 }
@@ -33574,6 +33773,7 @@ export interface IStockDto {
     checkCount: number | undefined;
     fullBoxRate: number | undefined;
     avaType: string | undefined;
+    inspectionStatus: number;
 }
 
 export class StockMoveDto implements IStockMoveDto {
@@ -40090,6 +40290,91 @@ export interface IIValueValidator {
     name: string | undefined;
     properties: { [key: string]: any; } | undefined;
 }
+
+export class CGRKDAddRequestDto implements ICGRKDAddRequestDto {
+    cmd?: string | undefined;
+    setBook?: string | undefined;
+    setYear?: string | undefined;
+    loginDate?: string | undefined;
+    loginName?: string | undefined;
+    loginPwd?: string | undefined;
+    params?: CGRKDParams | undefined;
+    constructor(data?: ICGRKDAddRequestDto) { if (data) { Object.assign(this, data); } }
+    init(_data?: any) {
+        if (_data) {
+            this.cmd = _data["cmd"];
+            this.setBook = _data["setBook"];
+            this.setYear = _data["setYear"];
+            this.loginDate = _data["loginDate"];
+            this.loginName = _data["loginName"];
+            this.loginPwd = _data["loginPwd"];
+            this.params = _data["params"] ? CGRKDParams.fromJS(_data["params"]) : undefined;
+        }
+    }
+    static fromJS(data: any): CGRKDAddRequestDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CGRKDAddRequestDto();
+        result.init(data);
+        return result;
+    }
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["cmd"] = this.cmd;
+        data["setBook"] = this.setBook;
+        data["setYear"] = this.setYear;
+        data["loginDate"] = this.loginDate;
+        data["loginName"] = this.loginName;
+        data["loginPwd"] = this.loginPwd;
+        data["params"] = this.params ? this.params.toJSON() : undefined;
+        return data;
+    }
+}
+export interface ICGRKDAddRequestDto { cmd?: string | undefined; setBook?: string | undefined; setYear?: string | undefined; loginDate?: string | undefined; loginName?: string | undefined; loginPwd?: string | undefined; params?: CGRKDParams | undefined; }
+
+export class CGRKDParams implements ICGRKDParams {
+    json?: string | undefined;
+    constructor(data?: ICGRKDParams) { if (data) { Object.assign(this, data); } }
+    init(_data?: any) { if (_data) { this.json = _data["json"]; } }
+    static fromJS(data: any): CGRKDParams {
+        data = typeof data === 'object' ? data : {};
+        let result = new CGRKDParams();
+        result.init(data);
+        return result;
+    }
+    toJSON(data?: any) { data = typeof data === 'object' ? data : {}; data["json"] = this.json; return data; }
+}
+export interface ICGRKDParams { json?: string | undefined; }
+
+export class CGRKDAddResponseDto implements ICGRKDAddResponseDto {
+    success?: boolean;
+    message?: string | undefined;
+    code?: number;
+    data?: string | undefined;
+    constructor(data?: ICGRKDAddResponseDto) { if (data) { Object.assign(this, data); } }
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.message = _data["message"];
+            this.code = _data["code"];
+            this.data = _data["data"];
+        }
+    }
+    static fromJS(data: any): CGRKDAddResponseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CGRKDAddResponseDto();
+        result.init(data);
+        return result;
+    }
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["message"] = this.message;
+        data["code"] = this.code;
+        data["data"] = this.data;
+        return data;
+    }
+}
+export interface ICGRKDAddResponseDto { success?: boolean; message?: string | undefined; code?: number; data?: string | undefined; }
 
 export interface FileParameter {
     data: any;
