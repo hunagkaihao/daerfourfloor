@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace TuTa.Wms.Erp.IDto
 {
     public class CGRKDAddRequestDto

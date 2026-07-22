@@ -4332,7 +4332,6 @@ namespace TuTa.Wms.Stocks
             }
         }
 
-        [UnitOfWork]
         public async Task<ResponseDto> ConfirmInspectionQualifiedAsync(Guid stockId, decimal qualifiedQty)
         {
             using (var uow = UnitOfWorkManager.Begin(true, true))
@@ -4399,7 +4398,6 @@ namespace TuTa.Wms.Stocks
             }
         }
 
-        [UnitOfWork]
         public async Task<ResponseDto> SetInspectionNotQualifiedAsync(Guid stockId)
         {
             using (var uow = UnitOfWorkManager.Begin(true, true))

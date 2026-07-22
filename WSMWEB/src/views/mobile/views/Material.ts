@@ -348,4 +348,6 @@ export class DataItem {
   sanjianshu:number | undefined;
   incellshu:number | undefined;
   countInOnePkgOrBox:number | undefined;
+  stockId: string | undefined;
+  inspectionstatus: number | undefined;
 }
