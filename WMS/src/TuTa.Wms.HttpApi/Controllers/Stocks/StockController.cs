@@ -468,15 +468,26 @@ namespace TuTa.Wms.Controllers.Stocks
             return await _stockService.SetInspectionCompletedAsync(stockId).ConfigureAwait(false);
         }
 
-        //[HttpPost("StocksCreateAndBindToCell")]
-        //public async Task<ResponseDto> CreateStockAndBindToCellAsync(List<StockCreateDto> paras, string cellCode)
-        //{
-        //    await Task.Delay(1);
-        //    lock(_lock)
-        //    {
-        //        return _stockService.CreateStockAndBindToCellAsync(paras, cellCode).GetAwaiter().GetResult();
-        //    }
-        //}
+        [HttpGet("findByCellAndMaterial")]
+        [SwaggerOperation(summary: "按库位和物料编码查找抽检中的库存", Tags = new[] { "Stock" })]
+        public async Task<StockDto> FindByCellAndMaterialAsync(string cellCode, string materialCode)
+        {
+            return await _stockService.FindByCellAndMaterialAsync(cellCode, materialCode).ConfigureAwait(false);
+        }
+
+        [HttpPost("confirmInspectionQualified")]
+        [SwaggerOperation(summary: "确认抽检合格", Tags = new[] { "Stock" })]
+        public async Task<ResponseDto> ConfirmInspectionQualifiedAsync(Guid stockId, decimal qualifiedQty)
+        {
+            return await _stockService.ConfirmInspectionQualifiedAsync(stockId, qualifiedQty).ConfigureAwait(false);
+        }
+
+        [HttpPost("setInspectionNotQualified")]
+        [SwaggerOperation(summary: "设置抽检不合格", Tags = new[] { "Stock" })]
+        public async Task<ResponseDto> SetInspectionNotQualifiedAsync(Guid stockId)
+        {
+            return await _stockService.SetInspectionNotQualifiedAsync(stockId).ConfigureAwait(false);
+        }
     }
 }
 
