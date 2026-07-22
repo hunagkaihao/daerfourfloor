@@ -46,7 +46,7 @@
                 </template>
                 <div class="goods-info">
                     <a-row>
-                        <a-col :span="12">stockCreateAndBindBox
+                        <a-col :span="12">
                             <p>物料编号:{{ i.materialCode }}</p>
                         </a-col>
                         <a-col :span="12">

@@ -2,9 +2,11 @@ import { FormSchema } from '/@/components/Table';
 import { BasicColumn } from '/@/components/Table';
 import moment from 'moment';
 import {
-  StockServiceProxy
+  StockServiceProxy,
+  ERP_ASNServiceProxy
 } from '/@/services/ServiceProxies';
-import { message } from 'ant-design-vue';
+import { h } from 'vue';
+import { Tag, message } from 'ant-design-vue';
 import { useLoading } from '/@/components/Loading';
 
 import { useI18n } from '/@/hooks/web/useI18n';
@@ -13,6 +15,7 @@ const [openFullLoading, closeFullLoading] = useLoading({
   tip: 'Loading...',
 });
 const _stockServiceProxy = new StockServiceProxy();
+const _erpAsnServiceProxy = new ERP_ASNServiceProxy();
 /**
  * 获取容器里库存物料信息
  * @param params
@@ -117,6 +120,32 @@ export function pushInspectionReport(
 ):Promise<any> {
   return _stockServiceProxy.pushInspectionReport(stockIds);
 }
+//查找抽检中的库存
+export function findStockByCellAndMaterial(
+  cellCode: string,
+  materialCode: string
+): Promise<any> {
+  return _stockServiceProxy.findByCellAndMaterial(cellCode, materialCode);
+}
+//确认抽检合格
+export function confirmInspectionQualified(
+  stockId: string,
+  qualifiedQty: number
+): Promise<any> {
+  return _stockServiceProxy.confirmInspectionQualified(stockId, qualifiedQty);
+}
+//设置抽检不合格
+export function setInspectionNotQualified(
+  stockId: string
+): Promise<any> {
+  return _stockServiceProxy.setInspectionNotQualified(stockId);
+}
+//推送采购入库单到U8
+export function pushCGRKDAdd(
+  params: any
+): Promise<any> {
+  return _erpAsnServiceProxy.pushCGRKDAdd(params);
+}
 export const diskcolumns = [
   {
     title: '物料编号',
@@ -174,6 +203,25 @@ export const columns = [
     key: 'totalCountInTime',
     dataIndex: 'totalCountInTime',
     align: "center",
+  },
+  {
+    title: '抽检状态',
+    dataIndex: 'inspectionStatus',
+    key: 'inspectionStatus',
+    align: "center",
+    width: 100,
+    customRender: ({ text }) => {
+      const statusMap: Record<number, { label: string; color: string }> = {
+        0: { label: '待检', color: 'default' },
+        1: { label: '抽检中', color: 'processing' },
+        2: { label: '合格', color: 'success' },
+        3: { label: '不合格', color: 'error' },
+        4: { label: '抽检完成', color: 'default' },
+      };
+      const status = statusMap[text];
+      if (!status) return text ?? '-';
+      return h(Tag, { color: status.color }, () => status.label);
+    },
   },
   {
     title: '操作',
