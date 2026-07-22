@@ -82,5 +82,7 @@ namespace TuTa.Wms.Stocks
             CancellationToken cancellationToken = default);
 
         Task<Stock> FindByReceivingMaterialBarcodeAsync(string receivingMaterialBarcode, bool isTrack = true, CancellationToken cancellationToken = default);
+
+        Task<Stock> FindByCellCodeAndMaterialCodeAsync(string cellCode, string materialCode);
     }
 }

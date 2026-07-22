@@ -315,6 +315,17 @@ namespace TuTa.Wms.Repositories.Stocks
                 cellCodes.Contains(o.CellData.CellCode)).ToList();
         }
 
+        public async Task<Stock> FindByCellCodeAndMaterialCodeAsync(string cellCode, string materialCode)
+        {
+            var query = await GetQueryableAsync();
+            return await query
+                .Include(s => s.Material)
+                .FirstOrDefaultAsync(s =>
+                    s.CellData.CellCode == cellCode
+                    && s.Barcode == materialCode
+                    && s.InspectionStatus == InspectionStatus.InProgressInspection);
+        }
+
         public async Task<Stock> FindByReceivingMaterialBarcodeAsync(
             string receivingMaterialBarcode,
             bool isTrack = true,

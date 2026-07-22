@@ -1,0 +1,390 @@
+2025-08-20 09:40:11.156 +08:00 [INF] Started database migrations...
+2025-08-20 09:40:11.162 +08:00 [INF] Migrating schema for host database...
+2025-08-20 09:40:13.360 +08:00 [ERR] An exception was thrown while activating Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext -> λ:Microsoft.EntityFrameworkCore.DbContextOptions`1[[Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext, Volo.Abp.PermissionManagement.EntityFrameworkCore, Version=8.1.3.0, Culture=neutral, PublicKeyToken=null]].
+Autofac.Core.DependencyResolutionException: An exception was thrown while activating Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext -> λ:Microsoft.EntityFrameworkCore.DbContextOptions`1[[Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext, Volo.Abp.PermissionManagement.EntityFrameworkCore, Version=8.1.3.0, Culture=neutral, PublicKeyToken=null]].
+ ---> MySqlConnector.MySqlException (0x80004005): Access denied for user ''@'LAPTOP-7OJDK6RL' (using password: NO)
+   at MySqlConnector.Core.ServerSession.ReceiveReplyAsync(IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ServerSession.cs:line 894
+   at MySqlConnector.Core.ServerSession.SwitchAuthenticationAsync(ConnectionSettings cs, String password, PayloadData payload, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ServerSession.cs:line 692
+   at MySqlConnector.Core.ServerSession.ConnectAsync(ConnectionSettings cs, MySqlConnection connection, Int64 startingTimestamp, ILoadBalancer loadBalancer, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ServerSession.cs:line 537
+   at MySqlConnector.Core.ConnectionPool.ConnectSessionAsync(MySqlConnection connection, Action`4 logMessage, Int64 startingTimestamp, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ConnectionPool.cs:line 428
+   at MySqlConnector.Core.ConnectionPool.ConnectSessionAsync(MySqlConnection connection, Action`4 logMessage, Int64 startingTimestamp, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ConnectionPool.cs:line 433
+   at MySqlConnector.Core.ConnectionPool.GetSessionAsync(MySqlConnection connection, Int64 startingTimestamp, Int32 timeoutMilliseconds, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ConnectionPool.cs:line 111
+   at MySqlConnector.Core.ConnectionPool.GetSessionAsync(MySqlConnection connection, Int64 startingTimestamp, Int32 timeoutMilliseconds, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ConnectionPool.cs:line 144
+   at MySqlConnector.MySqlConnection.CreateSessionAsync(ConnectionPool pool, Int64 startingTimestamp, Activity activity, Nullable`1 ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlConnection.cs:line 919
+   at MySqlConnector.MySqlConnection.OpenAsync(Nullable`1 ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlConnection.cs:line 419
+   at MySqlConnector.MySqlConnection.Open() in /_/src/MySqlConnector/MySqlConnection.cs:line 381
+   at Microsoft.EntityFrameworkCore.ServerVersion.AutoDetect(String connectionString)
+   at Volo.Abp.EntityFrameworkCore.AbpDbContextConfigurationContextMySQLExtensions.UseMySQL(AbpDbContextConfigurationContext context, Action`1 mySQLOptionsAction)
+   at Volo.Abp.EntityFrameworkCore.AbpDbContextOptionsMySQLExtensions.<>c__DisplayClass1_0`1.<UseMySQL>b__0(AbpDbContextConfigurationContext`1 context)
+   at Volo.Abp.EntityFrameworkCore.DependencyInjection.DbContextOptionsFactory.Configure[TDbContext](AbpDbContextOptions options, AbpDbContextConfigurationContext`1 context)
+   at Volo.Abp.EntityFrameworkCore.DependencyInjection.DbContextOptionsFactory.Create[TDbContext](IServiceProvider serviceProvider)
+   at Autofac.Extensions.DependencyInjection.AutofacRegistration.<>c__DisplayClass4_0.<Register>b__1(IComponentContext context, IEnumerable`1 parameters)
+   at Autofac.Core.Activators.Delegate.DelegateActivator.ActivateInstance(IComponentContext context, IEnumerable`1 parameters)
+   at Autofac.Core.Activators.Delegate.DelegateActivator.<ConfigurePipeline>b__2_0(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Middleware.DelegateMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Middleware.DisposalTrackingMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Middleware.ActivatorErrorHandlingMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   --- End of inner exception stack trace ---
+   at Autofac.Core.Resolving.Middleware.ActivatorErrorHandlingMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Pipeline.ResolvePipeline.Invoke(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Middleware.RegistrationPipelineInvokeMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Middleware.SharingMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Middleware.CircularDependencyDetectorMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Extensions.DependencyInjection.KeyedServiceMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Pipeline.ResolvePipeline.Invoke(ResolveRequestContext context)
+   at Autofac.Core.Resolving.ResolveOperation.GetOrCreateInstance(ISharingLifetimeScope currentOperationScope, ResolveRequest& request)
+   at Autofac.Core.Resolving.ResolveOperation.ExecuteOperation(ResolveRequest& request)
+   at Autofac.Core.Resolving.ResolveOperation.Execute(ResolveRequest& request)
+   at Autofac.Core.Lifetime.LifetimeScope.ResolveComponent(ResolveRequest& request)
+   at Autofac.Core.Lifetime.LifetimeScope.Autofac.IComponentContext.ResolveComponent(ResolveRequest& request)
+   at Autofac.ResolutionExtensions.TryResolveService(IComponentContext context, Service service, IEnumerable`1 parameters, Object& instance)
+   at Autofac.ResolutionExtensions.ResolveService(IComponentContext context, Service service, IEnumerable`1 parameters)
+   at Autofac.ResolutionExtensions.Resolve(IComponentContext context, Type serviceType, IEnumerable`1 parameters)
+   at Autofac.ResolutionExtensions.Resolve(IComponentContext context, Type serviceType)
+   at Autofac.Extensions.DependencyInjection.AutofacServiceProvider.GetRequiredService(Type serviceType)
+   at Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService(IServiceProvider provider, Type serviceType)
+   at Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService[T](IServiceProvider provider)
+   at Volo.Abp.Uow.EntityFrameworkCore.UnitOfWorkDbContextProvider`1.CreateDbContextWithTransactionAsync(IUnitOfWork unitOfWork)
+   at Volo.Abp.Uow.EntityFrameworkCore.UnitOfWorkDbContextProvider`1.CreateDbContextAsync(IUnitOfWork unitOfWork)
+   at Volo.Abp.Uow.EntityFrameworkCore.UnitOfWorkDbContextProvider`1.CreateDbContextAsync(IUnitOfWork unitOfWork, String connectionStringName, String connectionString)
+   at Volo.Abp.Uow.EntityFrameworkCore.UnitOfWorkDbContextProvider`1.GetDbContextAsync()
+   at Volo.Abp.Domain.Repositories.EntityFrameworkCore.EfCoreRepository`2.GetDbSetAsync()
+   at Volo.Abp.Domain.Repositories.EntityFrameworkCore.EfCoreRepository`2.GetQueryableAsync()
+   at Volo.Abp.Domain.Repositories.EntityFrameworkCore.EfCoreRepository`2.GetListAsync(Boolean includeDetails, CancellationToken cancellationToken)
+   at Castle.DynamicProxy.AsyncInterceptorBase.ProceedAsynchronous[TResult](IInvocation invocation, IInvocationProceedInfo proceedInfo)
+   at Volo.Abp.Castle.DynamicProxy.CastleAbpMethodInvocationAdapterWithReturnValue`1.ProceedAsync()
+   at Volo.Abp.Uow.UnitOfWorkInterceptor.InterceptAsync(IAbpMethodInvocation invocation)
+   at Volo.Abp.Castle.DynamicProxy.CastleAsyncAbpInterceptorAdapter`1.InterceptAsync[TResult](IInvocation invocation, IInvocationProceedInfo proceedInfo, Func`3 proceed)
+   at Volo.Abp.PermissionManagement.StaticPermissionSaver.UpdateChangedPermissionGroupsAsync(IEnumerable`1 permissionGroupRecords)
+   at Volo.Abp.PermissionManagement.StaticPermissionSaver.SaveAsync()
+   at Volo.Abp.PermissionManagement.StaticPermissionSaver.SaveAsync()
+   at Volo.Abp.PermissionManagement.StaticPermissionSaver.SaveAsync()
+   at Volo.Abp.PermissionManagement.StaticPermissionSaver.SaveAsync()
+   at Volo.Abp.PermissionManagement.AbpPermissionManagementDomainModule.<>c__DisplayClass8_0.<<SaveStaticPermissionsToDatabaseAsync>b__1>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Polly.AsyncPolicy.<>c__DisplayClass40_0.<<ImplementationAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Polly.Retry.AsyncRetryEngine.ImplementationAsync[TResult](Func`3 action, Context context, CancellationToken cancellationToken, ExceptionPredicates shouldRetryExceptionPredicates, ResultPredicates`1 shouldRetryResultPredicates, Func`5 onRetryAsync, Int32 permittedRetryCount, IEnumerable`1 sleepDurationsEnumerable, Func`4 sleepDurationProvider, Boolean continueOnCapturedContext)
+2025-08-20 09:40:13.361 +08:00 [ERR] ---------- Exception Data ----------
+ActivatorChain = Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext -> λ:Microsoft.EntityFrameworkCore.DbContextOptions`1[[Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext, Volo.Abp.PermissionManagement.EntityFrameworkCore, Version=8.1.3.0, Culture=neutral, PublicKeyToken=null]]
+
+2025-08-20 10:09:07.223 +08:00 [INF] Started database migrations...
+2025-08-20 10:09:07.228 +08:00 [INF] Migrating schema for host database...
+2025-08-20 10:09:09.426 +08:00 [ERR] An exception was thrown while activating Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext -> λ:Microsoft.EntityFrameworkCore.DbContextOptions`1[[Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext, Volo.Abp.PermissionManagement.EntityFrameworkCore, Version=8.1.3.0, Culture=neutral, PublicKeyToken=null]].
+Autofac.Core.DependencyResolutionException: An exception was thrown while activating Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext -> λ:Microsoft.EntityFrameworkCore.DbContextOptions`1[[Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext, Volo.Abp.PermissionManagement.EntityFrameworkCore, Version=8.1.3.0, Culture=neutral, PublicKeyToken=null]].
+ ---> MySqlConnector.MySqlException (0x80004005): Access denied for user ''@'LAPTOP-7OJDK6RL' (using password: NO)
+   at MySqlConnector.Core.ServerSession.ReceiveReplyAsync(IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ServerSession.cs:line 894
+   at MySqlConnector.Core.ServerSession.SwitchAuthenticationAsync(ConnectionSettings cs, String password, PayloadData payload, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ServerSession.cs:line 692
+   at MySqlConnector.Core.ServerSession.ConnectAsync(ConnectionSettings cs, MySqlConnection connection, Int64 startingTimestamp, ILoadBalancer loadBalancer, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ServerSession.cs:line 537
+   at MySqlConnector.Core.ConnectionPool.ConnectSessionAsync(MySqlConnection connection, Action`4 logMessage, Int64 startingTimestamp, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ConnectionPool.cs:line 428
+   at MySqlConnector.Core.ConnectionPool.ConnectSessionAsync(MySqlConnection connection, Action`4 logMessage, Int64 startingTimestamp, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ConnectionPool.cs:line 433
+   at MySqlConnector.Core.ConnectionPool.GetSessionAsync(MySqlConnection connection, Int64 startingTimestamp, Int32 timeoutMilliseconds, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ConnectionPool.cs:line 111
+   at MySqlConnector.Core.ConnectionPool.GetSessionAsync(MySqlConnection connection, Int64 startingTimestamp, Int32 timeoutMilliseconds, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ConnectionPool.cs:line 144
+   at MySqlConnector.MySqlConnection.CreateSessionAsync(ConnectionPool pool, Int64 startingTimestamp, Activity activity, Nullable`1 ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlConnection.cs:line 919
+   at MySqlConnector.MySqlConnection.OpenAsync(Nullable`1 ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlConnection.cs:line 419
+   at MySqlConnector.MySqlConnection.Open() in /_/src/MySqlConnector/MySqlConnection.cs:line 381
+   at Microsoft.EntityFrameworkCore.ServerVersion.AutoDetect(String connectionString)
+   at Volo.Abp.EntityFrameworkCore.AbpDbContextConfigurationContextMySQLExtensions.UseMySQL(AbpDbContextConfigurationContext context, Action`1 mySQLOptionsAction)
+   at Volo.Abp.EntityFrameworkCore.AbpDbContextOptionsMySQLExtensions.<>c__DisplayClass1_0`1.<UseMySQL>b__0(AbpDbContextConfigurationContext`1 context)
+   at Volo.Abp.EntityFrameworkCore.DependencyInjection.DbContextOptionsFactory.Configure[TDbContext](AbpDbContextOptions options, AbpDbContextConfigurationContext`1 context)
+   at Volo.Abp.EntityFrameworkCore.DependencyInjection.DbContextOptionsFactory.Create[TDbContext](IServiceProvider serviceProvider)
+   at Autofac.Extensions.DependencyInjection.AutofacRegistration.<>c__DisplayClass4_0.<Register>b__1(IComponentContext context, IEnumerable`1 parameters)
+   at Autofac.Core.Activators.Delegate.DelegateActivator.ActivateInstance(IComponentContext context, IEnumerable`1 parameters)
+   at Autofac.Core.Activators.Delegate.DelegateActivator.<ConfigurePipeline>b__2_0(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Middleware.DelegateMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Middleware.DisposalTrackingMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Middleware.ActivatorErrorHandlingMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   --- End of inner exception stack trace ---
+   at Autofac.Core.Resolving.Middleware.ActivatorErrorHandlingMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Pipeline.ResolvePipeline.Invoke(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Middleware.RegistrationPipelineInvokeMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Middleware.SharingMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Middleware.CircularDependencyDetectorMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Extensions.DependencyInjection.KeyedServiceMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Pipeline.ResolvePipeline.Invoke(ResolveRequestContext context)
+   at Autofac.Core.Resolving.ResolveOperation.GetOrCreateInstance(ISharingLifetimeScope currentOperationScope, ResolveRequest& request)
+   at Autofac.Core.Resolving.ResolveOperation.ExecuteOperation(ResolveRequest& request)
+   at Autofac.Core.Resolving.ResolveOperation.Execute(ResolveRequest& request)
+   at Autofac.Core.Lifetime.LifetimeScope.ResolveComponent(ResolveRequest& request)
+   at Autofac.Core.Lifetime.LifetimeScope.Autofac.IComponentContext.ResolveComponent(ResolveRequest& request)
+   at Autofac.ResolutionExtensions.TryResolveService(IComponentContext context, Service service, IEnumerable`1 parameters, Object& instance)
+   at Autofac.ResolutionExtensions.ResolveService(IComponentContext context, Service service, IEnumerable`1 parameters)
+   at Autofac.ResolutionExtensions.Resolve(IComponentContext context, Type serviceType, IEnumerable`1 parameters)
+   at Autofac.ResolutionExtensions.Resolve(IComponentContext context, Type serviceType)
+   at Autofac.Extensions.DependencyInjection.AutofacServiceProvider.GetRequiredService(Type serviceType)
+   at Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService(IServiceProvider provider, Type serviceType)
+   at Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService[T](IServiceProvider provider)
+   at Volo.Abp.Uow.EntityFrameworkCore.UnitOfWorkDbContextProvider`1.CreateDbContextWithTransactionAsync(IUnitOfWork unitOfWork)
+   at Volo.Abp.Uow.EntityFrameworkCore.UnitOfWorkDbContextProvider`1.CreateDbContextAsync(IUnitOfWork unitOfWork)
+   at Volo.Abp.Uow.EntityFrameworkCore.UnitOfWorkDbContextProvider`1.CreateDbContextAsync(IUnitOfWork unitOfWork, String connectionStringName, String connectionString)
+   at Volo.Abp.Uow.EntityFrameworkCore.UnitOfWorkDbContextProvider`1.GetDbContextAsync()
+   at Volo.Abp.Domain.Repositories.EntityFrameworkCore.EfCoreRepository`2.GetDbSetAsync()
+   at Volo.Abp.Domain.Repositories.EntityFrameworkCore.EfCoreRepository`2.GetQueryableAsync()
+   at Volo.Abp.Domain.Repositories.EntityFrameworkCore.EfCoreRepository`2.GetListAsync(Boolean includeDetails, CancellationToken cancellationToken)
+   at Castle.DynamicProxy.AsyncInterceptorBase.ProceedAsynchronous[TResult](IInvocation invocation, IInvocationProceedInfo proceedInfo)
+   at Volo.Abp.Castle.DynamicProxy.CastleAbpMethodInvocationAdapterWithReturnValue`1.ProceedAsync()
+   at Volo.Abp.Uow.UnitOfWorkInterceptor.InterceptAsync(IAbpMethodInvocation invocation)
+   at Volo.Abp.Castle.DynamicProxy.CastleAsyncAbpInterceptorAdapter`1.InterceptAsync[TResult](IInvocation invocation, IInvocationProceedInfo proceedInfo, Func`3 proceed)
+   at Volo.Abp.PermissionManagement.StaticPermissionSaver.UpdateChangedPermissionGroupsAsync(IEnumerable`1 permissionGroupRecords)
+   at Volo.Abp.PermissionManagement.StaticPermissionSaver.SaveAsync()
+   at Volo.Abp.PermissionManagement.StaticPermissionSaver.SaveAsync()
+   at Volo.Abp.PermissionManagement.StaticPermissionSaver.SaveAsync()
+   at Volo.Abp.PermissionManagement.StaticPermissionSaver.SaveAsync()
+   at Volo.Abp.PermissionManagement.AbpPermissionManagementDomainModule.<>c__DisplayClass8_0.<<SaveStaticPermissionsToDatabaseAsync>b__1>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Polly.AsyncPolicy.<>c__DisplayClass40_0.<<ImplementationAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Polly.Retry.AsyncRetryEngine.ImplementationAsync[TResult](Func`3 action, Context context, CancellationToken cancellationToken, ExceptionPredicates shouldRetryExceptionPredicates, ResultPredicates`1 shouldRetryResultPredicates, Func`5 onRetryAsync, Int32 permittedRetryCount, IEnumerable`1 sleepDurationsEnumerable, Func`4 sleepDurationProvider, Boolean continueOnCapturedContext)
+2025-08-20 10:09:09.427 +08:00 [ERR] ---------- Exception Data ----------
+ActivatorChain = Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext -> λ:Microsoft.EntityFrameworkCore.DbContextOptions`1[[Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext, Volo.Abp.PermissionManagement.EntityFrameworkCore, Version=8.1.3.0, Culture=neutral, PublicKeyToken=null]]
+
+2025-08-20 10:10:20.442 +08:00 [INF] Started database migrations...
+2025-08-20 10:10:20.448 +08:00 [INF] Migrating schema for host database...
+2025-08-20 10:10:22.674 +08:00 [ERR] An exception was thrown while activating Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext -> λ:Microsoft.EntityFrameworkCore.DbContextOptions`1[[Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext, Volo.Abp.PermissionManagement.EntityFrameworkCore, Version=8.1.3.0, Culture=neutral, PublicKeyToken=null]].
+Autofac.Core.DependencyResolutionException: An exception was thrown while activating Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext -> λ:Microsoft.EntityFrameworkCore.DbContextOptions`1[[Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext, Volo.Abp.PermissionManagement.EntityFrameworkCore, Version=8.1.3.0, Culture=neutral, PublicKeyToken=null]].
+ ---> MySqlConnector.MySqlException (0x80004005): Access denied for user ''@'LAPTOP-7OJDK6RL' (using password: NO)
+   at MySqlConnector.Core.ServerSession.ReceiveReplyAsync(IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ServerSession.cs:line 894
+   at MySqlConnector.Core.ServerSession.SwitchAuthenticationAsync(ConnectionSettings cs, String password, PayloadData payload, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ServerSession.cs:line 692
+   at MySqlConnector.Core.ServerSession.ConnectAsync(ConnectionSettings cs, MySqlConnection connection, Int64 startingTimestamp, ILoadBalancer loadBalancer, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ServerSession.cs:line 537
+   at MySqlConnector.Core.ConnectionPool.ConnectSessionAsync(MySqlConnection connection, Action`4 logMessage, Int64 startingTimestamp, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ConnectionPool.cs:line 428
+   at MySqlConnector.Core.ConnectionPool.ConnectSessionAsync(MySqlConnection connection, Action`4 logMessage, Int64 startingTimestamp, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ConnectionPool.cs:line 433
+   at MySqlConnector.Core.ConnectionPool.GetSessionAsync(MySqlConnection connection, Int64 startingTimestamp, Int32 timeoutMilliseconds, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ConnectionPool.cs:line 111
+   at MySqlConnector.Core.ConnectionPool.GetSessionAsync(MySqlConnection connection, Int64 startingTimestamp, Int32 timeoutMilliseconds, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ConnectionPool.cs:line 144
+   at MySqlConnector.MySqlConnection.CreateSessionAsync(ConnectionPool pool, Int64 startingTimestamp, Activity activity, Nullable`1 ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlConnection.cs:line 919
+   at MySqlConnector.MySqlConnection.OpenAsync(Nullable`1 ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlConnection.cs:line 419
+   at MySqlConnector.MySqlConnection.Open() in /_/src/MySqlConnector/MySqlConnection.cs:line 381
+   at Microsoft.EntityFrameworkCore.ServerVersion.AutoDetect(String connectionString)
+   at Volo.Abp.EntityFrameworkCore.AbpDbContextConfigurationContextMySQLExtensions.UseMySQL(AbpDbContextConfigurationContext context, Action`1 mySQLOptionsAction)
+   at Volo.Abp.EntityFrameworkCore.AbpDbContextOptionsMySQLExtensions.<>c__DisplayClass1_0`1.<UseMySQL>b__0(AbpDbContextConfigurationContext`1 context)
+   at Volo.Abp.EntityFrameworkCore.DependencyInjection.DbContextOptionsFactory.Configure[TDbContext](AbpDbContextOptions options, AbpDbContextConfigurationContext`1 context)
+   at Volo.Abp.EntityFrameworkCore.DependencyInjection.DbContextOptionsFactory.Create[TDbContext](IServiceProvider serviceProvider)
+   at Autofac.Extensions.DependencyInjection.AutofacRegistration.<>c__DisplayClass4_0.<Register>b__1(IComponentContext context, IEnumerable`1 parameters)
+   at Autofac.Core.Activators.Delegate.DelegateActivator.ActivateInstance(IComponentContext context, IEnumerable`1 parameters)
+   at Autofac.Core.Activators.Delegate.DelegateActivator.<ConfigurePipeline>b__2_0(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Middleware.DelegateMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Middleware.DisposalTrackingMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Middleware.ActivatorErrorHandlingMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   --- End of inner exception stack trace ---
+   at Autofac.Core.Resolving.Middleware.ActivatorErrorHandlingMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Pipeline.ResolvePipeline.Invoke(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Middleware.RegistrationPipelineInvokeMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Middleware.SharingMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Middleware.CircularDependencyDetectorMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Extensions.DependencyInjection.KeyedServiceMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Pipeline.ResolvePipeline.Invoke(ResolveRequestContext context)
+   at Autofac.Core.Resolving.ResolveOperation.GetOrCreateInstance(ISharingLifetimeScope currentOperationScope, ResolveRequest& request)
+   at Autofac.Core.Resolving.ResolveOperation.ExecuteOperation(ResolveRequest& request)
+   at Autofac.Core.Resolving.ResolveOperation.Execute(ResolveRequest& request)
+   at Autofac.Core.Lifetime.LifetimeScope.ResolveComponent(ResolveRequest& request)
+   at Autofac.Core.Lifetime.LifetimeScope.Autofac.IComponentContext.ResolveComponent(ResolveRequest& request)
+   at Autofac.ResolutionExtensions.TryResolveService(IComponentContext context, Service service, IEnumerable`1 parameters, Object& instance)
+   at Autofac.ResolutionExtensions.ResolveService(IComponentContext context, Service service, IEnumerable`1 parameters)
+   at Autofac.ResolutionExtensions.Resolve(IComponentContext context, Type serviceType, IEnumerable`1 parameters)
+   at Autofac.ResolutionExtensions.Resolve(IComponentContext context, Type serviceType)
+   at Autofac.Extensions.DependencyInjection.AutofacServiceProvider.GetRequiredService(Type serviceType)
+   at Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService(IServiceProvider provider, Type serviceType)
+   at Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService[T](IServiceProvider provider)
+   at Volo.Abp.Uow.EntityFrameworkCore.UnitOfWorkDbContextProvider`1.CreateDbContextWithTransactionAsync(IUnitOfWork unitOfWork)
+   at Volo.Abp.Uow.EntityFrameworkCore.UnitOfWorkDbContextProvider`1.CreateDbContextAsync(IUnitOfWork unitOfWork)
+   at Volo.Abp.Uow.EntityFrameworkCore.UnitOfWorkDbContextProvider`1.CreateDbContextAsync(IUnitOfWork unitOfWork, String connectionStringName, String connectionString)
+   at Volo.Abp.Uow.EntityFrameworkCore.UnitOfWorkDbContextProvider`1.GetDbContextAsync()
+   at Volo.Abp.Domain.Repositories.EntityFrameworkCore.EfCoreRepository`2.GetDbSetAsync()
+   at Volo.Abp.Domain.Repositories.EntityFrameworkCore.EfCoreRepository`2.GetQueryableAsync()
+   at Volo.Abp.Domain.Repositories.EntityFrameworkCore.EfCoreRepository`2.GetListAsync(Boolean includeDetails, CancellationToken cancellationToken)
+   at Castle.DynamicProxy.AsyncInterceptorBase.ProceedAsynchronous[TResult](IInvocation invocation, IInvocationProceedInfo proceedInfo)
+   at Volo.Abp.Castle.DynamicProxy.CastleAbpMethodInvocationAdapterWithReturnValue`1.ProceedAsync()
+   at Volo.Abp.Uow.UnitOfWorkInterceptor.InterceptAsync(IAbpMethodInvocation invocation)
+   at Volo.Abp.Castle.DynamicProxy.CastleAsyncAbpInterceptorAdapter`1.InterceptAsync[TResult](IInvocation invocation, IInvocationProceedInfo proceedInfo, Func`3 proceed)
+   at Volo.Abp.PermissionManagement.StaticPermissionSaver.UpdateChangedPermissionGroupsAsync(IEnumerable`1 permissionGroupRecords)
+   at Volo.Abp.PermissionManagement.StaticPermissionSaver.SaveAsync()
+   at Volo.Abp.PermissionManagement.StaticPermissionSaver.SaveAsync()
+   at Volo.Abp.PermissionManagement.StaticPermissionSaver.SaveAsync()
+   at Volo.Abp.PermissionManagement.StaticPermissionSaver.SaveAsync()
+   at Volo.Abp.PermissionManagement.AbpPermissionManagementDomainModule.<>c__DisplayClass8_0.<<SaveStaticPermissionsToDatabaseAsync>b__1>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Polly.AsyncPolicy.<>c__DisplayClass40_0.<<ImplementationAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Polly.Retry.AsyncRetryEngine.ImplementationAsync[TResult](Func`3 action, Context context, CancellationToken cancellationToken, ExceptionPredicates shouldRetryExceptionPredicates, ResultPredicates`1 shouldRetryResultPredicates, Func`5 onRetryAsync, Int32 permittedRetryCount, IEnumerable`1 sleepDurationsEnumerable, Func`4 sleepDurationProvider, Boolean continueOnCapturedContext)
+2025-08-20 10:10:22.675 +08:00 [ERR] ---------- Exception Data ----------
+ActivatorChain = Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext -> λ:Microsoft.EntityFrameworkCore.DbContextOptions`1[[Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext, Volo.Abp.PermissionManagement.EntityFrameworkCore, Version=8.1.3.0, Culture=neutral, PublicKeyToken=null]]
+
+2026-05-20 17:36:12.832 +08:00 [INF] Started database migrations...
+2026-05-20 17:36:12.841 +08:00 [INF] Migrating schema for host database...
+2026-05-20 17:36:13.281 +08:00 [ERR] An exception was thrown while activating Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext -> λ:Microsoft.EntityFrameworkCore.DbContextOptions`1[[Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext, Volo.Abp.PermissionManagement.EntityFrameworkCore, Version=8.1.3.0, Culture=neutral, PublicKeyToken=null]].
+Autofac.Core.DependencyResolutionException: An exception was thrown while activating Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext -> λ:Microsoft.EntityFrameworkCore.DbContextOptions`1[[Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext, Volo.Abp.PermissionManagement.EntityFrameworkCore, Version=8.1.3.0, Culture=neutral, PublicKeyToken=null]].
+ ---> MySqlConnector.MySqlException (0x80004005): Access denied for user ''@'LAPTOP-1BO4K28D' (using password: NO)
+   at MySqlConnector.Core.ServerSession.ReceiveReplyAsync(IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ServerSession.cs:line 894
+   at MySqlConnector.Core.ServerSession.SwitchAuthenticationAsync(ConnectionSettings cs, String password, PayloadData payload, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ServerSession.cs:line 692
+   at MySqlConnector.Core.ServerSession.ConnectAsync(ConnectionSettings cs, MySqlConnection connection, Int64 startingTimestamp, ILoadBalancer loadBalancer, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ServerSession.cs:line 537
+   at MySqlConnector.Core.ConnectionPool.ConnectSessionAsync(MySqlConnection connection, Action`4 logMessage, Int64 startingTimestamp, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ConnectionPool.cs:line 428
+   at MySqlConnector.Core.ConnectionPool.ConnectSessionAsync(MySqlConnection connection, Action`4 logMessage, Int64 startingTimestamp, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ConnectionPool.cs:line 433
+   at MySqlConnector.Core.ConnectionPool.GetSessionAsync(MySqlConnection connection, Int64 startingTimestamp, Int32 timeoutMilliseconds, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ConnectionPool.cs:line 111
+   at MySqlConnector.Core.ConnectionPool.GetSessionAsync(MySqlConnection connection, Int64 startingTimestamp, Int32 timeoutMilliseconds, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ConnectionPool.cs:line 144
+   at MySqlConnector.MySqlConnection.CreateSessionAsync(ConnectionPool pool, Int64 startingTimestamp, Activity activity, Nullable`1 ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlConnection.cs:line 919
+   at MySqlConnector.MySqlConnection.OpenAsync(Nullable`1 ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlConnection.cs:line 419
+   at MySqlConnector.MySqlConnection.Open() in /_/src/MySqlConnector/MySqlConnection.cs:line 381
+   at Microsoft.EntityFrameworkCore.ServerVersion.AutoDetect(String connectionString)
+   at Volo.Abp.EntityFrameworkCore.AbpDbContextConfigurationContextMySQLExtensions.UseMySQL(AbpDbContextConfigurationContext context, Action`1 mySQLOptionsAction)
+   at Volo.Abp.EntityFrameworkCore.AbpDbContextOptionsMySQLExtensions.<>c__DisplayClass1_0`1.<UseMySQL>b__0(AbpDbContextConfigurationContext`1 context)
+   at Volo.Abp.EntityFrameworkCore.DependencyInjection.DbContextOptionsFactory.Configure[TDbContext](AbpDbContextOptions options, AbpDbContextConfigurationContext`1 context)
+   at Volo.Abp.EntityFrameworkCore.DependencyInjection.DbContextOptionsFactory.Create[TDbContext](IServiceProvider serviceProvider)
+   at Autofac.Extensions.DependencyInjection.AutofacRegistration.<>c__DisplayClass4_0.<Register>b__1(IComponentContext context, IEnumerable`1 parameters)
+   at Autofac.Core.Activators.Delegate.DelegateActivator.ActivateInstance(IComponentContext context, IEnumerable`1 parameters)
+   at Autofac.Core.Activators.Delegate.DelegateActivator.<ConfigurePipeline>b__2_0(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Middleware.DelegateMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Middleware.DisposalTrackingMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Middleware.ActivatorErrorHandlingMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   --- End of inner exception stack trace ---
+   at Autofac.Core.Resolving.Middleware.ActivatorErrorHandlingMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Pipeline.ResolvePipeline.Invoke(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Middleware.RegistrationPipelineInvokeMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Middleware.SharingMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Middleware.CircularDependencyDetectorMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Extensions.DependencyInjection.KeyedServiceMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Pipeline.ResolvePipeline.Invoke(ResolveRequestContext context)
+   at Autofac.Core.Resolving.ResolveOperation.GetOrCreateInstance(ISharingLifetimeScope currentOperationScope, ResolveRequest& request)
+   at Autofac.Core.Resolving.ResolveOperation.ExecuteOperation(ResolveRequest& request)
+   at Autofac.Core.Resolving.ResolveOperation.Execute(ResolveRequest& request)
+   at Autofac.Core.Lifetime.LifetimeScope.ResolveComponent(ResolveRequest& request)
+   at Autofac.Core.Lifetime.LifetimeScope.Autofac.IComponentContext.ResolveComponent(ResolveRequest& request)
+   at Autofac.ResolutionExtensions.TryResolveService(IComponentContext context, Service service, IEnumerable`1 parameters, Object& instance)
+   at Autofac.ResolutionExtensions.ResolveService(IComponentContext context, Service service, IEnumerable`1 parameters)
+   at Autofac.ResolutionExtensions.Resolve(IComponentContext context, Type serviceType, IEnumerable`1 parameters)
+   at Autofac.ResolutionExtensions.Resolve(IComponentContext context, Type serviceType)
+   at Autofac.Extensions.DependencyInjection.AutofacServiceProvider.GetRequiredService(Type serviceType)
+   at Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService(IServiceProvider provider, Type serviceType)
+   at Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService[T](IServiceProvider provider)
+   at Volo.Abp.Uow.EntityFrameworkCore.UnitOfWorkDbContextProvider`1.CreateDbContextWithTransactionAsync(IUnitOfWork unitOfWork)
+   at Volo.Abp.Uow.EntityFrameworkCore.UnitOfWorkDbContextProvider`1.CreateDbContextAsync(IUnitOfWork unitOfWork)
+   at Volo.Abp.Uow.EntityFrameworkCore.UnitOfWorkDbContextProvider`1.CreateDbContextAsync(IUnitOfWork unitOfWork, String connectionStringName, String connectionString)
+   at Volo.Abp.Uow.EntityFrameworkCore.UnitOfWorkDbContextProvider`1.GetDbContextAsync()
+   at Volo.Abp.Domain.Repositories.EntityFrameworkCore.EfCoreRepository`2.GetDbSetAsync()
+   at Volo.Abp.Domain.Repositories.EntityFrameworkCore.EfCoreRepository`2.GetQueryableAsync()
+   at Volo.Abp.Domain.Repositories.EntityFrameworkCore.EfCoreRepository`2.GetListAsync(Boolean includeDetails, CancellationToken cancellationToken)
+   at Castle.DynamicProxy.AsyncInterceptorBase.ProceedAsynchronous[TResult](IInvocation invocation, IInvocationProceedInfo proceedInfo)
+   at Volo.Abp.Castle.DynamicProxy.CastleAbpMethodInvocationAdapterWithReturnValue`1.ProceedAsync()
+   at Volo.Abp.Uow.UnitOfWorkInterceptor.InterceptAsync(IAbpMethodInvocation invocation)
+   at Volo.Abp.Castle.DynamicProxy.CastleAsyncAbpInterceptorAdapter`1.InterceptAsync[TResult](IInvocation invocation, IInvocationProceedInfo proceedInfo, Func`3 proceed)
+   at Volo.Abp.PermissionManagement.StaticPermissionSaver.UpdateChangedPermissionGroupsAsync(IEnumerable`1 permissionGroupRecords)
+   at Volo.Abp.PermissionManagement.StaticPermissionSaver.SaveAsync()
+   at Volo.Abp.PermissionManagement.StaticPermissionSaver.SaveAsync()
+   at Volo.Abp.PermissionManagement.StaticPermissionSaver.SaveAsync()
+   at Volo.Abp.PermissionManagement.StaticPermissionSaver.SaveAsync()
+   at Volo.Abp.PermissionManagement.AbpPermissionManagementDomainModule.<>c__DisplayClass8_0.<<SaveStaticPermissionsToDatabaseAsync>b__1>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Polly.AsyncPolicy.<>c__DisplayClass40_0.<<ImplementationAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Polly.Retry.AsyncRetryEngine.ImplementationAsync[TResult](Func`3 action, Context context, CancellationToken cancellationToken, ExceptionPredicates shouldRetryExceptionPredicates, ResultPredicates`1 shouldRetryResultPredicates, Func`5 onRetryAsync, Int32 permittedRetryCount, IEnumerable`1 sleepDurationsEnumerable, Func`4 sleepDurationProvider, Boolean continueOnCapturedContext)
+2026-05-20 17:36:13.282 +08:00 [ERR] ---------- Exception Data ----------
+ActivatorChain = Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext -> λ:Microsoft.EntityFrameworkCore.DbContextOptions`1[[Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext, Volo.Abp.PermissionManagement.EntityFrameworkCore, Version=8.1.3.0, Culture=neutral, PublicKeyToken=null]]
+
+2026-05-20 17:49:18.774 +08:00 [INF] Started database migrations...
+2026-05-20 17:49:18.782 +08:00 [INF] Migrating schema for host database...
+2026-05-20 17:49:19.096 +08:00 [ERR] An exception was thrown while activating Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext -> λ:Microsoft.EntityFrameworkCore.DbContextOptions`1[[Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext, Volo.Abp.PermissionManagement.EntityFrameworkCore, Version=8.1.3.0, Culture=neutral, PublicKeyToken=null]].
+Autofac.Core.DependencyResolutionException: An exception was thrown while activating Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext -> λ:Microsoft.EntityFrameworkCore.DbContextOptions`1[[Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext, Volo.Abp.PermissionManagement.EntityFrameworkCore, Version=8.1.3.0, Culture=neutral, PublicKeyToken=null]].
+ ---> MySqlConnector.MySqlException (0x80004005): Access denied for user ''@'LAPTOP-1BO4K28D' (using password: NO)
+   at MySqlConnector.Core.ServerSession.ReceiveReplyAsync(IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ServerSession.cs:line 894
+   at MySqlConnector.Core.ServerSession.SwitchAuthenticationAsync(ConnectionSettings cs, String password, PayloadData payload, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ServerSession.cs:line 692
+   at MySqlConnector.Core.ServerSession.ConnectAsync(ConnectionSettings cs, MySqlConnection connection, Int64 startingTimestamp, ILoadBalancer loadBalancer, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ServerSession.cs:line 537
+   at MySqlConnector.Core.ConnectionPool.ConnectSessionAsync(MySqlConnection connection, Action`4 logMessage, Int64 startingTimestamp, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ConnectionPool.cs:line 428
+   at MySqlConnector.Core.ConnectionPool.ConnectSessionAsync(MySqlConnection connection, Action`4 logMessage, Int64 startingTimestamp, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ConnectionPool.cs:line 433
+   at MySqlConnector.Core.ConnectionPool.GetSessionAsync(MySqlConnection connection, Int64 startingTimestamp, Int32 timeoutMilliseconds, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ConnectionPool.cs:line 111
+   at MySqlConnector.Core.ConnectionPool.GetSessionAsync(MySqlConnection connection, Int64 startingTimestamp, Int32 timeoutMilliseconds, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ConnectionPool.cs:line 144
+   at MySqlConnector.MySqlConnection.CreateSessionAsync(ConnectionPool pool, Int64 startingTimestamp, Activity activity, Nullable`1 ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlConnection.cs:line 919
+   at MySqlConnector.MySqlConnection.OpenAsync(Nullable`1 ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlConnection.cs:line 419
+   at MySqlConnector.MySqlConnection.Open() in /_/src/MySqlConnector/MySqlConnection.cs:line 381
+   at Microsoft.EntityFrameworkCore.ServerVersion.AutoDetect(String connectionString)
+   at Volo.Abp.EntityFrameworkCore.AbpDbContextConfigurationContextMySQLExtensions.UseMySQL(AbpDbContextConfigurationContext context, Action`1 mySQLOptionsAction)
+   at Volo.Abp.EntityFrameworkCore.AbpDbContextOptionsMySQLExtensions.<>c__DisplayClass1_0`1.<UseMySQL>b__0(AbpDbContextConfigurationContext`1 context)
+   at Volo.Abp.EntityFrameworkCore.DependencyInjection.DbContextOptionsFactory.Configure[TDbContext](AbpDbContextOptions options, AbpDbContextConfigurationContext`1 context)
+   at Volo.Abp.EntityFrameworkCore.DependencyInjection.DbContextOptionsFactory.Create[TDbContext](IServiceProvider serviceProvider)
+   at Autofac.Extensions.DependencyInjection.AutofacRegistration.<>c__DisplayClass4_0.<Register>b__1(IComponentContext context, IEnumerable`1 parameters)
+   at Autofac.Core.Activators.Delegate.DelegateActivator.ActivateInstance(IComponentContext context, IEnumerable`1 parameters)
+   at Autofac.Core.Activators.Delegate.DelegateActivator.<ConfigurePipeline>b__2_0(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Middleware.DelegateMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Middleware.DisposalTrackingMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Middleware.ActivatorErrorHandlingMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   --- End of inner exception stack trace ---
+   at Autofac.Core.Resolving.Middleware.ActivatorErrorHandlingMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Pipeline.ResolvePipeline.Invoke(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Middleware.RegistrationPipelineInvokeMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Middleware.SharingMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Resolving.Middleware.CircularDependencyDetectorMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Extensions.DependencyInjection.KeyedServiceMiddleware.Execute(ResolveRequestContext context, Action`1 next)
+   at Autofac.Core.Resolving.Pipeline.ResolvePipelineBuilder.<>c__DisplayClass14_0.<BuildPipeline>b__1(ResolveRequestContext context)
+   at Autofac.Core.Pipeline.ResolvePipeline.Invoke(ResolveRequestContext context)
+   at Autofac.Core.Resolving.ResolveOperation.GetOrCreateInstance(ISharingLifetimeScope currentOperationScope, ResolveRequest& request)
+   at Autofac.Core.Resolving.ResolveOperation.ExecuteOperation(ResolveRequest& request)
+   at Autofac.Core.Resolving.ResolveOperation.Execute(ResolveRequest& request)
+   at Autofac.Core.Lifetime.LifetimeScope.ResolveComponent(ResolveRequest& request)
+   at Autofac.Core.Lifetime.LifetimeScope.Autofac.IComponentContext.ResolveComponent(ResolveRequest& request)
+   at Autofac.ResolutionExtensions.TryResolveService(IComponentContext context, Service service, IEnumerable`1 parameters, Object& instance)
+   at Autofac.ResolutionExtensions.ResolveService(IComponentContext context, Service service, IEnumerable`1 parameters)
+   at Autofac.ResolutionExtensions.Resolve(IComponentContext context, Type serviceType, IEnumerable`1 parameters)
+   at Autofac.ResolutionExtensions.Resolve(IComponentContext context, Type serviceType)
+   at Autofac.Extensions.DependencyInjection.AutofacServiceProvider.GetRequiredService(Type serviceType)
+   at Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService(IServiceProvider provider, Type serviceType)
+   at Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService[T](IServiceProvider provider)
+   at Volo.Abp.Uow.EntityFrameworkCore.UnitOfWorkDbContextProvider`1.CreateDbContextWithTransactionAsync(IUnitOfWork unitOfWork)
+   at Volo.Abp.Uow.EntityFrameworkCore.UnitOfWorkDbContextProvider`1.CreateDbContextAsync(IUnitOfWork unitOfWork)
+   at Volo.Abp.Uow.EntityFrameworkCore.UnitOfWorkDbContextProvider`1.CreateDbContextAsync(IUnitOfWork unitOfWork, String connectionStringName, String connectionString)
+   at Volo.Abp.Uow.EntityFrameworkCore.UnitOfWorkDbContextProvider`1.GetDbContextAsync()
+   at Volo.Abp.Domain.Repositories.EntityFrameworkCore.EfCoreRepository`2.GetDbSetAsync()
+   at Volo.Abp.Domain.Repositories.EntityFrameworkCore.EfCoreRepository`2.GetQueryableAsync()
+   at Volo.Abp.Domain.Repositories.EntityFrameworkCore.EfCoreRepository`2.GetListAsync(Boolean includeDetails, CancellationToken cancellationToken)
+   at Castle.DynamicProxy.AsyncInterceptorBase.ProceedAsynchronous[TResult](IInvocation invocation, IInvocationProceedInfo proceedInfo)
+   at Volo.Abp.Castle.DynamicProxy.CastleAbpMethodInvocationAdapterWithReturnValue`1.ProceedAsync()
+   at Volo.Abp.Uow.UnitOfWorkInterceptor.InterceptAsync(IAbpMethodInvocation invocation)
+   at Volo.Abp.Castle.DynamicProxy.CastleAsyncAbpInterceptorAdapter`1.InterceptAsync[TResult](IInvocation invocation, IInvocationProceedInfo proceedInfo, Func`3 proceed)
+   at Volo.Abp.PermissionManagement.StaticPermissionSaver.UpdateChangedPermissionGroupsAsync(IEnumerable`1 permissionGroupRecords)
+   at Volo.Abp.PermissionManagement.StaticPermissionSaver.SaveAsync()
+   at Volo.Abp.PermissionManagement.StaticPermissionSaver.SaveAsync()
+   at Volo.Abp.PermissionManagement.StaticPermissionSaver.SaveAsync()
+   at Volo.Abp.PermissionManagement.StaticPermissionSaver.SaveAsync()
+   at Volo.Abp.PermissionManagement.AbpPermissionManagementDomainModule.<>c__DisplayClass8_0.<<SaveStaticPermissionsToDatabaseAsync>b__1>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Polly.AsyncPolicy.<>c__DisplayClass40_0.<<ImplementationAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Polly.Retry.AsyncRetryEngine.ImplementationAsync[TResult](Func`3 action, Context context, CancellationToken cancellationToken, ExceptionPredicates shouldRetryExceptionPredicates, ResultPredicates`1 shouldRetryResultPredicates, Func`5 onRetryAsync, Int32 permittedRetryCount, IEnumerable`1 sleepDurationsEnumerable, Func`4 sleepDurationProvider, Boolean continueOnCapturedContext)
+2026-05-20 17:49:19.098 +08:00 [ERR] ---------- Exception Data ----------
+ActivatorChain = Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext -> λ:Microsoft.EntityFrameworkCore.DbContextOptions`1[[Volo.Abp.PermissionManagement.EntityFrameworkCore.PermissionManagementDbContext, Volo.Abp.PermissionManagement.EntityFrameworkCore, Version=8.1.3.0, Culture=neutral, PublicKeyToken=null]]
+
