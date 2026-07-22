@@ -2756,7 +2756,9 @@ namespace TuTa.Wms.Stocks
                     CheckResult = stock.CheckData.CheckResultInChs(),
                     PassCnt = stock.CheckData.PassCnt,
                     SupplierCode = stock.Supplier.SupplierCode,
-                    SupplierName = stock.Supplier.SupplierName
+                    SupplierName = stock.Supplier.SupplierName,
+                    InspectionStatus = (int)(stock.InspectionStatus ?? 0),
+                    InspectionCount = stock.InspectionCount
                 };
             }
             catch (Exception ex)
