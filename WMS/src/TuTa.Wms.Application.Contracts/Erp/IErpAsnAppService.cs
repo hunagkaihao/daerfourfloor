@@ -52,6 +52,10 @@ namespace TuTa.Wms.Erp
         /// <returns></returns>
         Task<LLBJDAddResponseDto> PushLLBJDAddAsync(LLBJDAddRequestDto input);
         /// <summary>
+        /// 推送采购入库单到U8
+        /// </summary>
+        Task<CGRKDAddResponseDto> PushCGRKDAddAsync(CGRKDAddRequestDto input);
+        /// <summary>
         /// 当同一ASN单号下所有明细均已入库完成时，自动推送到货单
         /// </summary>
         /// <param name="asnCode">ASN单号</param>

@@ -893,6 +893,11 @@ namespace TuTa.Wms.Erp
                 _logger.LogDebug($"推送报文内容：{jsonContent}");
 
                 // 3. 发送 HTTP POST 请求
+                if (string.IsNullOrWhiteSpace(_erpSettings.U8ApiUrl))
+                {
+                    return new LLBJDAddResponseDto { Success = false, Message = "U8ApiUrl 未配置或为空" };
+                }
+
                 using var pushClient = new HttpClient();
                 pushClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 pushClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -925,6 +930,83 @@ namespace TuTa.Wms.Erp
                 return new LLBJDAddResponseDto { Success = false, Message = $"系统异常：{ex.Message}" };
             }
         }
+        /// <summary>
+        /// 推送采购入库单到U8
+        /// </summary>
+        public async Task<CGRKDAddResponseDto> PushCGRKDAddAsync(CGRKDAddRequestDto input)
+        {
+            var operationId = Guid.NewGuid().ToString();
+            _logger.LogInformation($"[操作ID: {operationId}] 开始推送采购入库单");
+
+            if (input == null || string.IsNullOrWhiteSpace(input.Cmd))
+            {
+                return new CGRKDAddResponseDto { Success = false, Message = "请求参数无效" };
+            }
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(_erpSettings.U8ApiUrl))
+                {
+                    return new CGRKDAddResponseDto { Success = false, Message = "U8ApiUrl 未配置" };
+                }
+
+                var token = await GetErpTokenAsync(operationId);
+                if (string.IsNullOrEmpty(token))
+                {
+                    return new CGRKDAddResponseDto { Success = false, Message = "登录ERP失败" };
+                }
+
+                var jsonOptions = new JsonSerializerOptions
+                {
+                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                };
+
+                var payload = new
+                {
+                    Cmd = input.Cmd,
+                    SetBook = input.SetBook,
+                    SetYear = input.SetYear,
+                    LoginDate = input.LoginDate,
+                    LoginName = input.LoginName ?? string.Empty,
+                    LoginPwd = input.LoginPwd ?? string.Empty,
+                    Params = input.Params
+                };
+
+                string jsonContent = JsonSerializer.Serialize(payload, jsonOptions);
+                _logger.LogInformation($"[操作ID: {operationId}] 推送采购入库单报文：{jsonContent}");
+
+                using var pushClient = new HttpClient();
+                pushClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                pushClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                var response = await pushClient.PostAsync(_erpSettings.U8ApiUrl, content);
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                _logger.LogInformation($"[操作ID: {operationId}] 采购入库单响应：{responseBody}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonSerializer.Deserialize<CGRKDAddResponseDto>(responseBody, jsonOptions);
+                    return result ?? new CGRKDAddResponseDto { Success = false, Message = "响应结果为空" };
+                }
+                else
+                {
+                    return new CGRKDAddResponseDto
+                    {
+                        Success = false,
+                        Message = $"U8接口调用失败，状态码：{(int)response.StatusCode}"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[操作ID: {operationId}] 推送采购入库单异常");
+                return new CGRKDAddResponseDto { Success = false, Message = $"系统异常：{ex.Message}" };
+            }
+        }
+
         /// <summary>
         /// 当同一ASN单号下所有明细均已入库完成时，自动推送到货单
         /// </summary>
