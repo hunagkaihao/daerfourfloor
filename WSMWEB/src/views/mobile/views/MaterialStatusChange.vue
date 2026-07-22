@@ -126,8 +126,8 @@
             </a-table>
 
             <div class="tab-bar">
-                <a-button @click="openCancelModal" type="primary" class="modern-btn">
-                    组盘取消
+                <a-button @click="confirmNotQualified" type="primary" danger class="modern-btn">
+                    确认不合格
                 </a-button>
                 <a-button @click="confirmQualified" type="primary" class="modern-btn">
                     确认合格
@@ -137,11 +137,11 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { ref, h, onMounted, onUnmounted,Ref} from 'vue';
+import { ref, h, onMounted, Ref} from 'vue';
 import { ScanOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 import { useMessage } from '/@/hooks/web/useMessage';
-import { columns, stocksDisBindBox, stockRemoveDirect, stocksQuery, findStockByCellAndMaterial, confirmInspectionQualified, setInspectionNotQualified, pushCGRKDAdd } from './Stock';
+import { columns, stockRemoveDirect, stocksQuery, findStockByCellAndMaterial, confirmInspectionQualified, setInspectionNotQualified, pushCGRKDAdd } from './Stock';
 import { getLaneCellStatusByCellCode } from '/@/views/warehouse/cells/Cell';
 import LaneCellChips from '../components/LaneCellChips.vue';
 import { PagedStockQueryDto, CellLaneStatusDto } from '/@/services/ServiceProxies';
@@ -196,9 +196,6 @@ onMounted(() => {
         }
     }
     
-    // 监听组盘取消成功事件
-    window.addEventListener('boxDiskCancelSuccess', handleBoxDiskCancelSuccess);
-    
     // 页面加载完成后，自动聚焦到容器码输入框
     setTimeout(() => {
         if (focus1.value) {
@@ -207,18 +204,8 @@ onMounted(() => {
     }, 100);
 })
 
-onUnmounted(() => {
-    window.removeEventListener('boxDiskCancelSuccess', handleBoxDiskCancelSuccess);
-})
 
-// 处理组盘取消成功事件
-const handleBoxDiskCancelSuccess = () => {
-    // 刷新数据
-    goods.value.length = 0;
-    QRcode.value = '';
-    scanboxCode();
-    boxCode.value = '';
-}
+
 var lock = true
 
 function parseReceivingBarcode(barcode: string) {
@@ -440,61 +427,54 @@ const confirmQualified = async () => {
         message.error(error?.message || '操作失败');
     }
 }
-// 打开组盘取消弹窗
-const openCancelModal = () => {
-    if (boxCode.value == '') {
-        message.error("没有容器信息")
-        return
+const confirmNotQualified = async () => {
+    if (goods.value.length === 0) {
+        message.error("没有物料信息");
+        return;
     }
-    
-    if (dataSource.value.length === 0) {
-        message.error("没有已组盘信息")
-        return
+    if (!boxCode.value) {
+        message.error("没有库位信息");
+        return;
     }
 
-    // 打开确认弹框
     createConfirm({
-        title: '确认取消组盘',
-        content: '您确定要取消当前容器的组盘吗？此操作将清空所有已组盘的物料信息。',
+        title: '确认不合格',
+        content: `您确定要将当前 ${goods.value.length} 个物料全部标记为不合格吗？`,
         okText: '确定',
         cancelText: '取消',
-        onOk: () => {
-            // 执行组盘取消操作
-            diskcancel();
+        onOk: async () => {
+            let hasError = false;
+            for (const item of goods.value) {
+                if (!item.stockId) {
+                    message.error(`物料 ${item.materialName} 缺少库存ID`);
+                    hasError = true;
+                    continue;
+                }
+                try {
+                    const res = await setInspectionNotQualified(item.stockId);
+                    if (res.success) {
+                        message.success(`物料 ${item.materialName} 已标记为不合格`);
+                    } else {
+                        message.error(`物料 ${item.materialName} 设置不合格失败: ${res.message}`);
+                        hasError = true;
+                    }
+                } catch (error: any) {
+                    message.error(`物料 ${item.materialName} 操作失败: ${error?.message || '未知错误'}`);
+                    hasError = true;
+                }
+            }
+
+            if (!hasError) {
+                goods.value.length = 0;
+                QRcode.value = '';
+                boxCode.value = '';
+                laneCellStatusList.value = [];
+            }
+            setTimeout(() => {
+                if (focus1.value) focus1.value.focus();
+            }, 100);
         }
     });
-}
-
-const diskcancel = async () => {
-    if (boxCode.value == '') {
-        message.error("没有容器信息")
-        return
-    }
-
-    try{
-        await stocksDisBindBox(boxCode.value).then((res) => {
-            if (res.success == true) {
-                message.success(res.message)
-                goods.value.length = 0
-                QRcode.value = ''
-                boxCode.value = ''
-                laneCellStatusList.value = []
-                setTimeout(() => {
-                    if (focus1.value) {
-                        focus1.value.focus();
-                    }
-                }, 100);
-            } else if(res.success == false){
-                message.error(res.message)
-            }else{
-                message.error("接口推送异常，解绑失败")
-            }
-        }).catch((error) => {
-            message.error(error.error.message)
-        })
-    }catch(err){
-        message.error(err)
-    }
 }
 //软件盘弹出屏蔽
 function focusFn(e) {
