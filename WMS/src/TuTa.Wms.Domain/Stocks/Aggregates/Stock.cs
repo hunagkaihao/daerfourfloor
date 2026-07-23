@@ -328,9 +328,11 @@ namespace TuTa.Wms.Stocks.Aggregates
         /// </summary>
         /// <param name="otherStock"></param>
         /// <exception cref="ArgumentException"></exception>
-        public virtual void CombineStock(decimal count)
+        public virtual void CombineStock(decimal count, int? pagOrBoxCount = null)
         {
             TotalCountInTime += count;
+            if (pagOrBoxCount.HasValue && pagOrBoxCount.Value > 0)
+                TotalPagOrBox = (TotalPagOrBox ?? 0) + pagOrBoxCount.Value;
         }
 
         public virtual void SetCheck(CheckInfoOfStock check)

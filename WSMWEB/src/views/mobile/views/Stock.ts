@@ -205,6 +205,12 @@ export const columns = [
     align: "center",
   },
   {
+    title: '被抽检数量',
+    key: 'inspectionCount',
+    dataIndex: 'inspectionCount',
+    align: "center",
+  },
+  {
     title: '抽检状态',
     dataIndex: 'inspectionStatus',
     key: 'inspectionStatus',

@@ -66,7 +66,7 @@
 <script lang="ts" setup>
 import { ref, h, onMounted,computed } from 'vue';
 import { ScanOutlined } from '@ant-design/icons-vue';
-import { message } from 'ant-design-vue';
+import { message, Tag } from 'ant-design-vue';
 import { StockCreateDto, CellDto, CellLaneStatusDto } from '/@/services/ServiceProxies';
 import { createStockTask, stocksGetInCell } from './Stock';
 import { getLaneCellStatusByCellCode } from '/@/views/warehouse/cells/Cell';
@@ -127,6 +127,25 @@ const stockcolumns = [
     dataIndex: 'totalCountInTime',
     key: 'totalCountInTime',
     align: 'center',
+  },
+  {
+    title: '抽检状态',
+    dataIndex: 'inspectionStatus',
+    key: 'inspectionStatus',
+    align: 'center',
+    width: 80,
+    customRender: ({ text }) => {
+      const statusMap = {
+        0: { label: '待检', color: 'default' },
+        1: { label: '抽检中', color: 'processing' },
+        2: { label: '合格', color: 'success' },
+        3: { label: '不合格', color: 'error' },
+        4: { label: '抽检完成', color: 'default' },
+      };
+      const status = statusMap[text];
+      if (!status) return text ?? '-';
+      return h(Tag, { color: status.color }, () => status.label);
+    },
   },
   {
     title: '库位',

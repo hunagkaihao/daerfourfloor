@@ -33595,6 +33595,7 @@ export class StockDto implements IStockDto {
     checkType!: string | undefined;
     checkResult!: string | undefined;
     passCnt!: number | undefined;
+    inspectionCount!: number | undefined;
     supplierCode!: string | undefined;
     supplierName!: string | undefined;
     checkCount!: number | undefined;
@@ -33655,6 +33656,7 @@ export class StockDto implements IStockDto {
             this.checkType = _data["checkType"];
             this.checkResult = _data["checkResult"];
             this.passCnt = _data["passCnt"];
+            this.inspectionCount = _data["inspectionCount"];
             this.supplierCode = _data["supplierCode"];
             this.supplierName = _data["supplierName"];
             this.checkCount = _data["checkCount"];
@@ -33715,6 +33717,7 @@ export class StockDto implements IStockDto {
         data["checkType"] = this.checkType;
         data["checkResult"] = this.checkResult;
         data["passCnt"] = this.passCnt;
+        data["inspectionCount"] = this.inspectionCount;
         data["supplierCode"] = this.supplierCode;
         data["supplierName"] = this.supplierName;
         data["checkCount"] = this.checkCount;
@@ -33768,6 +33771,7 @@ export interface IStockDto {
     checkType: string | undefined;
     checkResult: string | undefined;
     passCnt: number | undefined;
+    inspectionCount: number | undefined;
     supplierCode: string | undefined;
     supplierName: string | undefined;
     checkCount: number | undefined;

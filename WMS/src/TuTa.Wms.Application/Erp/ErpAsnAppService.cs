@@ -814,9 +814,19 @@ namespace TuTa.Wms.Erp
                 };
 
                 var response = await pushClient.SendAsync(request);
-                response.EnsureSuccessStatusCode();
 
                 var responseBody = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning($"[操作ID: {operationId}] 生成到货单失败，HTTP {(int)response.StatusCode}，ERP响应：{responseBody}");
+                    return new PuArrVouchAddResponseDto
+                    {
+                        Success = false,
+                        Message = $"生成到货单失败(HTTP {(int)response.StatusCode})：{responseBody}"
+                    };
+                }
+
                 _logger.LogInformation($"[操作ID: {operationId}] 生成到货单响应：{responseBody}");
 
                 var jObject = JObject.Parse(responseBody);
@@ -1120,11 +1130,11 @@ namespace TuTa.Wms.Erp
                     ivouchrowno = index + 1,
                     cWhCode = "200",
                     cInvCode = item.CInvCode,
-                    iQuantity = item.IQuantity,
+                    iQuantity = Math.Round(item.IQuantity, 0),
                     iinvexchrate = 1500,
                     cunitid = "202",
-                    iNum = item.INum,
-                    fRealQuantity = item.FRealQuantity,
+                    iNum = Math.Round(item.INum, 0),
+                    fRealQuantity = Math.Round(item.FRealQuantity, 0),
                     fRealNumy = item.FRealNumy,
                     bGsp = 0,
                     cBatch = item.CBatch,

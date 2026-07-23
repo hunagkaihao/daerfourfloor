@@ -120,6 +120,16 @@
         </a-row> 
         <a-row justify="center" style="margin-top: 20px; margin-bottom: 20px">
           <a-col :span="8">
+            <div class="menu-item-card" @click="materialStatusChange">
+              <div class="menu-item-icon-wrapper">
+                <AppstoreOutlined class="menu-item-icon" />
+              </div>
+              <div class="menu-item-text">物料状态变更</div>
+            </div>
+          </a-col>
+        </a-row>
+        <a-row justify="center" style="margin-top: 20px; margin-bottom: 20px">
+          <a-col :span="8">
             <div class="menu-item-card" @click="createStockTask">
               <div class="menu-item-icon-wrapper">
                 <InboxOutlined class="menu-item-icon" />
@@ -329,6 +339,10 @@ const materialPartialOut = async () => {
 
 const materialSampling = async () => {
   await router.replace('/materialSampling');
+};
+
+const materialStatusChange = async () => {
+  await router.replace('/materialStatusChange');
 };
 
 const agvIncell = async () => {

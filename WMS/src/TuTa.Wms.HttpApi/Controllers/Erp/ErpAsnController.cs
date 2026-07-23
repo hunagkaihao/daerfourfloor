@@ -31,7 +31,7 @@ namespace TuTa.Wms.Controllers.Erp
         }
 
         /// <summary>
-        /// 通过ASN码获取信息
+        /// 通过ASN码获取信息(本地ErpAsns表)
         /// </summary>
         /// <param name="asnCode">ASN码</param>
         /// <returns>ASN信息</returns>
@@ -42,6 +42,11 @@ namespace TuTa.Wms.Controllers.Erp
             return await _erpAsnAppService.GetLocalAsnByCodeAsync(asnCode);
         }
 
+        /// <summary>
+        /// 通过ASN码从ERP系统获取信息
+        /// </summary>
+        /// <param name="asnCode"></param>
+        /// <returns></returns>
         [HttpGet("get-from-erp")]
         [SwaggerOperation(summary: "通过ASN码从ERP系统获取信息", Tags = new[] { "ERP ASN" })]
         public async Task<ErpAsnValidateResponseDto> GetAsnInfoFromErpAsync(string asnCode)
@@ -89,6 +94,12 @@ namespace TuTa.Wms.Controllers.Erp
         public async Task<PuArrVouchAddResponseDto> PushPuArrVouchAsync([FromBody] PuArrVouchAddRequestDto input)
         {
             return await _erpAsnAppService.PushPuArrVouchAsync(input);
+        }
+
+        [HttpPost("pushCGRKDAdd")]
+        public async Task<CGRKDAddResponseDto> PushCGRKDAddAsync([FromBody] CGRKDAddRequestDto input)
+        {
+            return await _erpAsnAppService.PushCGRKDAddAsync(input);
         }
 
         [HttpPost("push-llbjd")]

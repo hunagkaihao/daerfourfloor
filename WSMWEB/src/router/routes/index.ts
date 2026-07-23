@@ -165,6 +165,16 @@ export const MaterialSampling: AppRouteRecordRaw = {
     ignoreAuth: true,
   },
 };
+//物料状态变更
+export const MaterialStatusChange: AppRouteRecordRaw = {
+  path: '/materialStatusChange',
+  name: 'MaterialStatusChange',
+  component: () => import('/@/views/mobile/views/MaterialStatusChange.vue'),
+  meta: {
+    title: t('物料状态变更'),
+    ignoreAuth: true,
+  },
+};
 // GoodSpotCheck路由已删除
 // EmptyShelfEdit路由已删除
 // GoodsDevan路由已删除
@@ -368,6 +378,7 @@ export const basicRoutes = [
   BoxDiskWithAsn,
   BoxIncell,
   MaterialSampling,
+  MaterialStatusChange,
   GoodsBind,
   AcceptanceCall2,
   Handoutcell,

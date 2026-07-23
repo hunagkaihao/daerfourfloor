@@ -86,7 +86,7 @@
                                     <p>检验合格数:</p>
                                 </a-col>
                                 <a-col :span="9">
-                                    <a-input-number size="large" v-model:value="i.incellshu" :min="0" :max="i.inspectionCount" style="width:100%" />
+                                    <a-input-number size="large" v-model:value="i.incellshu" :min="0" :max="i.quantity" style="width:100%" />
                                 </a-col>
                             </a-row>
                         </a-col>
@@ -115,7 +115,7 @@
         </div>
         <div v-show="showtable">
             <p style="margin-left: 20px">已组盘信息:{{ dataSource.length }}</p>
-            <a-table ref="tableRef" :dataSource="dataSource" :columns="diskcolumns" :pagination="false"
+            <a-table ref="tableRef" :dataSource="dataSource" :columns="diskcolumns" :pagination="false" rowKey="id"
                 :scroll="{ x: screenWidth, y: 128 }">
                 <template #bodyCell="{ column, record, index }">
                     <template v-if="column.key === 'operation'">
@@ -264,7 +264,7 @@ async function scangoodsCode() {
             inspectionCount: stock.inspectionCount || 0,
             inspectionstatus: undefined,
             dataCode: barcode,
-            incellshu: stock.inspectionCount || 0,
+            incellshu: null,
         };
         goods.value.push(goodsItem);
         message.success('扫码成功');
@@ -288,10 +288,7 @@ const scanboxCode = async () => {
     params.cellCode = boxCode.value;
     await stocksQuery(params).then((res) => {
         // 清空现有数据，添加库存信息
-        dataSource.value.length = 0;
-        res.forEach((e) => {
-            dataSource.value.push(e);
-        });
+        dataSource.value = [...res];
     }).catch((err) => {
         // 库存查询失败不影响容器查询结果
     });
@@ -360,8 +357,8 @@ const confirmQualified = async () => {
                 message.error(`物料 ${item.materialName} 检验合格数必须大于0`);
                 return;
             }
-            if (item.incellshu > item.inspectionCount) {
-                message.error(`物料 ${item.materialName} 检验合格数不能超过抽检数量(${item.inspectionCount})`);
+            if (item.incellshu > item.quantity) {
+                message.error(`物料 ${item.materialName} 检验合格数不能超过整箱数量(${item.quantity})`);
                 return;
             }
         } else if (item.inspectionstatus === 3) {
@@ -467,8 +464,9 @@ const confirmNotQualified = async () => {
             if (!hasError) {
                 goods.value.length = 0;
                 QRcode.value = '';
-                boxCode.value = '';
-                laneCellStatusList.value = [];
+                if (boxCode.value) {
+                    await scanboxCode();
+                }
             }
             setTimeout(() => {
                 if (focus1.value) focus1.value.focus();

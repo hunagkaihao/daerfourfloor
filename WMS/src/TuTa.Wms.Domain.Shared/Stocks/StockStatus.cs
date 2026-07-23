@@ -39,6 +39,14 @@
         /// </summary>
         InProgressInspection,
         /// <summary>
+        /// 抽检合格
+        /// </summary>
+        InspectionQualified,
+        /// <summary>
+        /// 抽检不合格
+        /// </summary>
+        InspectionNotQualified,
+        /// <summary>
         /// 抽检完成
         /// </summary>
         InspectionCompleted

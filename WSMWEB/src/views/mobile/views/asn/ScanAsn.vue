@@ -124,7 +124,7 @@ async function scanAsn() {
     showSaveSuccess.value = false;
 
     try {
-        const result: ErpAsnValidateResponseDto = await asnService.get(asnCode.value.trim());
+        const result: ErpAsnValidateResponseDto = await asnService.getFromErp(asnCode.value.trim());
         if (result.success && result.data?.length) {
             message.success(`获取ASN信息成功，共 ${result.data.length} 条明细`);
             asnDataList.value = result.data;

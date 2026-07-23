@@ -2409,6 +2409,7 @@ namespace TuTa.Wms.Stocks
                         SupplierCode = stock.Supplier.SupplierCode,
                         SupplierName = stock.Supplier.SupplierName,
                         FullBoxRate = stock.BoxData.FullRate,
+                        InspectionCount = stock.InspectionCount,
                         InspectionStatus = (int)(stock.InspectionStatus ?? 0)
                     };
                     stockDtos.Add(dto);
@@ -2825,6 +2826,8 @@ namespace TuTa.Wms.Stocks
                         CheckType = stock.CheckData.CheckTypeInChs(),
                         CheckResult = stock.CheckData.CheckResultInChs(),
                         PassCnt = stock.CheckData.PassCnt,
+                        InspectionCount = stock.InspectionCount,
+                        InspectionStatus = (int)(stock.InspectionStatus ?? 0),
                         SupplierCode = stock.Supplier.SupplierCode,
                         SupplierName = stock.Supplier.SupplierName
                     };
@@ -4317,7 +4320,7 @@ namespace TuTa.Wms.Stocks
                     if (stockExist == null)
                         return new ResponseDto() { success = false, message = $"库存{stockId}不存在" };
 
-                    stockExist.InspectionStatus = Stocks.InspectionStatus.InspectionCompleted;
+                    stockExist.InspectionStatus = Stocks.InspectionStatus.InProgressInspection;
                     await _stockRepository.UpdateAsync(stockExist).ConfigureAwait(false);
                     await uow.CompleteAsync().ConfigureAwait(false);
 
@@ -4352,7 +4355,10 @@ namespace TuTa.Wms.Stocks
                     if (qualifiedQty > inspectionCount)
                         return new ResponseDto { success = false, message = $"合格数量({qualifiedQty})不能超过抽检数量({inspectionCount})" };
 
-                    stock.CombineStock(qualifiedQty);
+                    var pagOrBoxDelta = stock.ReceiveCount?.CountInOnePkgOrBox > 0
+                        ? (int)(qualifiedQty / stock.ReceiveCount.CountInOnePkgOrBox.Value)
+                        : 0;
+                    stock.CombineStock(qualifiedQty, pagOrBoxDelta);
                     stock.InspectionCount = inspectionCount - qualifiedQty;
                     stock.InspectionStatus = InspectionStatus.InspectionQualified;
 
