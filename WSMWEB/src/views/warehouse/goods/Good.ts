@@ -103,7 +103,12 @@ export const tableColumns: BasicColumn[] = [
   },
   {
     title: t('箱号'),
-    dataIndex: 'boxData_BoxNumber',
+    dataIndex: 'processNo',
+    // 原先是boxData_BoxNumber
+  },
+  {
+    title: t('等级'),
+    dataIndex: 'grade',
   },
   {
     title: t('库存数量'),
