@@ -89,6 +89,21 @@ namespace TuTa.Wms.Erp.Dto
         /// 采购订单行ID（推送ERP时使用，不传则使用默认值）
         /// </summary>
         public long? IPoDetailId { get; set; }
+
+        /// <summary>
+        /// 标贴
+        /// </summary>
+        public string? CFree2 { get; set; }
+
+        /// <summary>
+        /// 包装箱
+        /// </summary>
+        public string? CFree3 { get; set; }
+
+        /// <summary>
+        /// 等级
+        /// </summary>
+        public string? CFree5 { get; set; }
     }
 
     /// <summary>

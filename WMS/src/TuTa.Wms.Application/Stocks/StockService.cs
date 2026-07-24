@@ -220,7 +220,8 @@ namespace TuTa.Wms.Stocks
                             }
                             else
                             {
-                                _logger.Warn($"ASN {asnCode} 自动推送到货单失败：{pushResult.Message}");
+                                _logger.Warn($"ASN {asnCode} 自动推送到货单失败：{pushResult.Message}，开始回滚ASN已入库数量和状态");
+                                await RevertAsnOrderStockInAsync(orderCode, paras).ConfigureAwait(false);
                             }
                         }
                     }
@@ -530,6 +531,24 @@ namespace TuTa.Wms.Stocks
 
                 erpAsn.ApplyAlreadyStockInQuantity(item.Value);
                 await _erpAsnRepository.UpdateAsync(erpAsn).ConfigureAwait(false);
+            }
+        }
+
+        private async Task RevertAsnOrderStockInAsync(string orderCode, List<StockCreateDto> paras)
+        {
+            var quantityByMaterial = GetStockInQuantityByMaterial(paras);
+            foreach (var item in quantityByMaterial)
+            {
+                var erpAsn = await _erpAsnRepository.GetByOrderCodeAndMaterialCodeAsync(orderCode, item.Key).ConfigureAwait(false);
+                if (erpAsn == null)
+                {
+                    _logger.Warn($"回滚ASN失败：未找到订单号{orderCode}、物料{item.Key}对应的ASN单据");
+                    continue;
+                }
+
+                erpAsn.RevertAlreadyStockInQuantity(item.Value);
+                await _erpAsnRepository.UpdateAsync(erpAsn).ConfigureAwait(false);
+                _logger.Warn($"已回滚ASN {erpAsn.AsnCode} 物料 {item.Key} 已入库数量 {item.Value}");
             }
         }
 

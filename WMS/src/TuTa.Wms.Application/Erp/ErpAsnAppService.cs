@@ -1080,7 +1080,10 @@ namespace TuTa.Wms.Erp
                     FRealNumy = 1,
                     CBatch = string.IsNullOrWhiteSpace(line.BatchCode) ? "0" : line.BatchCode,
                     Cordercode = line.OrderCode,
-                    IPoDetailId = line.PoDetailId ?? line.ErpOrderDetailId
+                    IPoDetailId = line.PoDetailId ?? line.ErpOrderDetailId,
+                    CFree2 = line.Free2,
+                    CFree3 = line.Free3,
+                    CFree5 = line.Free5
                 }).ToList()
             };
 
@@ -1139,7 +1142,10 @@ namespace TuTa.Wms.Erp
                     bGsp = 0,
                     cBatch = item.CBatch,
                     iPOsID = item.IPoDetailId ?? 1000104266,
-                    cordercode = item.Cordercode
+                    cordercode = item.Cordercode,
+                    cFree2 = item.CFree2,
+                    cFree3 = item.CFree3,
+                    cFree5 = item.CFree5
                 }).ToList()
             };
         }

@@ -265,6 +265,39 @@ namespace TuTa.Wms.Erp.Entities
             AlreadyStockInQuantity = quantity;
         }
 
+        /// <summary>
+        /// 组盘入库推送失败时回滚：还原已入库数量并更新状态
+        /// </summary>
+        public void RevertAlreadyStockInQuantity(decimal quantity)
+        {
+            if (quantity <= 0)
+            {
+                throw new BusinessException("回滚数量必须大于0");
+            }
+
+            var current = AlreadyStockInQuantity ?? 0;
+            if (current < quantity)
+            {
+                throw new BusinessException(
+                    $"订单号{OrderCode}当前已入库数量{current}小于需要回滚的数量{quantity}");
+            }
+
+            AlreadyStockInQuantity = current - quantity;
+
+            if (AlreadyStockInQuantity <= 0)
+            {
+                Status = AsnStatus.Created;
+            }
+            else if (AlreadyStockInQuantity >= InWarehouseQuantity)
+            {
+                Status = AsnStatus.Completed;
+            }
+            else
+            {
+                Status = AsnStatus.Received;
+            }
+        }
+
         public void AddAlreadyStockInQuantity(decimal quantity)
         {
             AlreadyStockInQuantity = (AlreadyStockInQuantity ?? 0) + quantity;
