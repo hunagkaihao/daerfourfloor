@@ -900,7 +900,7 @@ namespace TuTa.Wms.Erp
                 };
 
                 string jsonContent = JsonSerializer.Serialize(payload, jsonOptions);
-                _logger.LogDebug($"推送报文内容：{jsonContent}");
+                _logger.LogInformation($"推送报文内容：{jsonContent}");
 
                 // 3. 发送 HTTP POST 请求
                 if (string.IsNullOrWhiteSpace(_erpSettings.U8ApiUrl))

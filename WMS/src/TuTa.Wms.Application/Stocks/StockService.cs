@@ -196,11 +196,7 @@ namespace TuTa.Wms.Stocks
                         return validateResult;
                     }
 
-                    var result = await CreateStockAndBindBoxCoreAsync(paras, boxCode).ConfigureAwait(false);
-                    if (!result.success)
-                    {
-                        return result;
-                    }
+                    var result = new ResponseDto();
 
                     await UpdateAsnOrderStockInAsync(orderCode, paras).ConfigureAwait(false);
 
@@ -214,6 +210,13 @@ namespace TuTa.Wms.Stocks
                         {
                             if (pushResult.Success)
                             {
+                                // U8推送成功后，才创建库存和绑定容器
+                                result = await CreateStockAndBindBoxCoreAsync(paras, boxCode).ConfigureAwait(false);
+                                if (!result.success)
+                                {
+                                    return result;
+                                }
+
                                 result.message = string.IsNullOrWhiteSpace(pushResult.Message)
                                     ? result.message + "，已自动推送U8到货单"
                                     : result.message + "，" + pushResult.Message;
