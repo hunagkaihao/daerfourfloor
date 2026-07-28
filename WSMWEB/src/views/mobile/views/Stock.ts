@@ -8,6 +8,7 @@ import {
 import { h } from 'vue';
 import { Tag, message } from 'ant-design-vue';
 import { useLoading } from '/@/components/Loading';
+import { defHttp } from '/@/utils/http/axios';
 
 import { useI18n } from '/@/hooks/web/useI18n';
 const { t } = useI18n();
@@ -94,6 +95,23 @@ export function stocksDisBindBox(
   PagedStockQueryDto 
 ):Promise<any> {
   return _stockServiceProxy.stocksDisBindBox(PagedStockQueryDto);
+}
+//容器解绑（调用后端 BindCtnrAndBinAsync 接口）
+export async function containerUnbindByCell(
+  cellCode: string
+): Promise<any> {
+  const reqCode = 'UNBIND_' + Date.now()
+  const query = `reqCode=${encodeURIComponent(reqCode)}&stgBinCode=${encodeURIComponent(cellCode)}&ctnrType=5&ctnrCode=&indBind=0`
+  try {
+    const res = await defHttp.post(
+      { url: `/wms/agvtask/BindCtnrAndBin?${query}` },
+      { isTransformResponse: false }
+    )
+    return { success: res?.code === '0', message: res?.message || (res?.code === '0' ? '解绑成功' : '解绑失败') }
+  } catch (err: any) {
+    const data = err?.response?.data || {}
+    return { success: false, message: data?.message || err?.error?.message || err?.message || '解绑失败' }
+  }
 }
 //库存清空
 export function stockRemoveDirect(

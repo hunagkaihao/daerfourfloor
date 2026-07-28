@@ -28,5 +28,11 @@ namespace TuTa.Wms.AgvTasks
         /// 取消AGV任务：下发给RCS取消任务、容器解绑、恢复库位状态、删除组盘库存
         /// </summary>
         Task<ResponseDto> CancelAgvTaskAsync(int taskId);
+
+        /// <summary>
+        /// 仓位与容器的关系绑定, 容器类型编号写入仓位表。
+        /// </summary>
+        /// <returns></returns>
+        Task<ResultAgvTaskDto> BindCtnrAndBinAsync(string reqCode, string stgBinCode, string ctnrType = "5", string ctnrCode = null, string indBind = "0");
     }
 }

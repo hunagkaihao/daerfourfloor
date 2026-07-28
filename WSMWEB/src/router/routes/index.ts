@@ -124,6 +124,16 @@ export const BoxBind: AppRouteRecordRaw = {
     ignoreAuth: true,
   },
 };
+//容器解绑
+export const ContainerUnbind: AppRouteRecordRaw = {
+  path: '/containerUnbind',
+  name: 'ContainerUnbind',
+  component: () => import('/@/views/mobile/views/ContainerUnbind.vue'),
+  meta: {
+    title: t('容器解绑'),
+    ignoreAuth: true,
+  },
+};
 // GoodAndBoxBind路由已删除
 //容器组盘
 export const BoxDisk: AppRouteRecordRaw = {
@@ -377,6 +387,7 @@ export const basicRoutes = [
   BoxDisk,
   BoxDiskWithAsn,
   BoxIncell,
+  ContainerUnbind,
   MaterialSampling,
   MaterialStatusChange,
   GoodsBind,

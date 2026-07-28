@@ -46,5 +46,10 @@ namespace TuTa.Wms.Controllers.AgvTasks
         {
             return await _agvTaskService.CancelAgvTaskAsync(taskId);
         }
+        [HttpPost("BindCtnrAndBin")]
+        public async Task<ResultAgvTaskDto> BindCtnrAndBinAsync(string reqCode, string stgBinCode, string ctnrType, string ctnrCode, string indBind)
+        {
+            return await _agvTaskService.BindCtnrAndBinAsync(reqCode, stgBinCode, ctnrType,  ctnrCode ,  indBind);
+        }
     }
 }

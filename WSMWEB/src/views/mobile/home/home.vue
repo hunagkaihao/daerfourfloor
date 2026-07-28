@@ -75,7 +75,16 @@
             </div>
           </a-col>
         </a-row>
-
+        <a-row justify="center" style="margin-top: 20px; margin-bottom: 20px">
+          <a-col :span="8">
+            <div class="menu-item-card" @click="containerUnbind">
+              <div class="menu-item-icon-wrapper">
+                <DisconnectOutlined class="menu-item-icon" />
+              </div>
+              <div class="menu-item-text">容器解绑</div>
+            </div>
+          </a-col>
+        </a-row>
 
         <a-row justify="center" style="margin-top: 20px; margin-bottom: 20px">
 
@@ -300,6 +309,9 @@ const acceptanceCall2 = async () => {
 // tiaoboIncell函数已删除
 const boxbind = async () => {
   await router.replace('/boxBind');
+};
+const containerUnbind = async () => {
+  await router.replace('/containerUnbind');
 };
 const boxdisk = async () => {
   await router.replace('/boxDisk');

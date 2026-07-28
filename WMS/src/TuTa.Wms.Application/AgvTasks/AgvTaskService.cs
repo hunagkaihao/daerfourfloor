@@ -326,5 +326,31 @@ namespace TuTa.Wms.AgvTasks
                 }
             }
         }
+
+        /// <summary>
+        /// 容器与仓位绑定与解绑
+        /// </summary>
+        /// <param name="reqCode">请求编号</param>
+        /// <param name="stgBinCode">仓位编号</param>
+        /// <param name="ctnrType">容器类型</param>
+        /// <param name="ctnrCode">容器编号</param>
+        /// <param name="indBind">"1"：绑定， "0"：解绑</param>
+        /// <returns></returns>
+        [UnitOfWork]
+        public async Task<ResultAgvTaskDto> BindCtnrAndBinAsync(string reqCode, string stgBinCode, string ctnrType = "5", string ctnrCode = null, string indBind = "0")
+        {
+            //reqCode = Guid.NewGuid().ToString("N");
+
+            var bindResult = await _rcsApiManager.BindCtnrAndBinAsync(reqCode, stgBinCode, ctnrType, ctnrCode, indBind).ConfigureAwait(false);
+            if (bindResult.Code == "0")
+            {
+                return new ResultAgvTaskDto("0", "成功", bindResult.ReqCode, "");
+            }
+            else
+            {
+                return new ResultAgvTaskDto("1", bindResult.Message, bindResult.ReqCode, "");
+            }
+            
+        }
     }
 }
