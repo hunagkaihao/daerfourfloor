@@ -35,6 +35,10 @@
             <span class="info-label">操作类型:</span>
             <span class="info-value">解绑</span>
           </div>
+          <div class="info-item" v-if="resolvedCode && resolvedCode !== stgBinCode.trim()">
+            <span class="info-label">解析仓位:</span>
+            <span class="info-value resolved">{{ resolvedCode }}</span>
+          </div>
         </div>
       </a-col>
     </a-row>
@@ -69,6 +73,20 @@ const loading = ref(false)
 const resultMessage = ref<string>('')
 const resultSuccess = ref(false)
 const inputRef = ref<any>()
+const resolvedCode = ref<string>('')
+
+function resolveCellCode(input: string): string {
+  const trimmed = input.trim()
+  const match = trimmed.match(/(\d+)$/)
+  if (!match) return trimmed
+  const digits = match[1]
+  if (digits.length <= 8) {
+    const shelf = digits.substring(0, 4)
+    const position = digits.substring(4)
+    return shelf + '01095' + position + '01'
+  }
+  return digits
+}
 
 onMounted(() => {
   setTimeout(() => {
@@ -79,15 +97,21 @@ onMounted(() => {
 })
 
 async function handleUnbind() {
-  if (!stgBinCode.value.trim()) {
+  const raw = stgBinCode.value.trim()
+  if (!raw) {
     message.error('请先扫描仓位编号')
     return
+  }
+  const code = resolveCellCode(raw)
+  resolvedCode.value = code
+  if (code !== raw) {
+    message.info(`仓位编号已转换: ${raw} → ${code}`)
   }
 
   loading.value = true
   resultMessage.value = ''
   try {
-    const res = await containerUnbindByCell(stgBinCode.value.trim())
+    const res = await containerUnbindByCell(code)
     resultSuccess.value = res.success !== false
     resultMessage.value = res.message || '解绑完成'
   } catch (error: any) {
@@ -189,6 +213,11 @@ function focusFn(e: any) {
     font-size: 14px;
     font-weight: 600;
     color: #333;
+  }
+
+  .info-value.resolved {
+    color: #1890ff;
+    font-size: 15px;
   }
 }
 
