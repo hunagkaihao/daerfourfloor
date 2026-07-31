@@ -106,6 +106,14 @@
               <div class="menu-item-text">扫描ASN</div>
             </div>
           </a-col>
+          <a-col :span="8">
+            <div class="menu-item-card" @click="scanOutboundOrder">
+              <div class="menu-item-icon-wrapper">
+                <ExportOutlined class="menu-item-icon" />
+              </div>
+              <div class="menu-item-text">扫描出库单</div>
+            </div>
+          </a-col>
         </a-row>
         <a-row justify="center" style="margin-top: 20px; margin-bottom: 20px">
           <a-col :span="8">
@@ -321,6 +329,9 @@ const boxdiskWithAsn = async () => {
 };
 const scanAsn = async () => {
   await router.replace('/scanAsn');
+};
+const scanOutboundOrder = async () => {
+  await router.replace('/deliveryOrderScan');
 };
 const boxIncell = async () => {
   await router.replace('/boxIncell');

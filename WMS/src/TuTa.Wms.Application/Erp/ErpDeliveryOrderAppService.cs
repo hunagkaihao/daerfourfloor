@@ -14,17 +14,17 @@ namespace TuTa.Wms.Application.Erp
 {
     public class ErpDeliveryOrderAppService : ApplicationService, IErpDeliveryOrderAppService
     {
-        private readonly IErpDeliveryOrderRepository _deliveryOrderRepository;
-        private readonly IErpDeliveryOrderItemRepository _deliveryOrderItemRepository;
+        private readonly IErpoutboundRepository _outboundRepository;
+        private readonly IErpDeliveryOrderItemRepository _outboundItemRepository;
         private readonly ILogger<ErpDeliveryOrderAppService> _logger;
 
         public ErpDeliveryOrderAppService(
-            IErpDeliveryOrderRepository deliveryOrderRepository,
+            IErpoutboundRepository outboundRepository,
             IErpDeliveryOrderItemRepository deliveryOrderItemRepository,
             ILogger<ErpDeliveryOrderAppService> logger)
         {
-            _deliveryOrderRepository = deliveryOrderRepository;
-            _deliveryOrderItemRepository = deliveryOrderItemRepository;
+            _outboundRepository = outboundRepository;
+            _outboundItemRepository = deliveryOrderItemRepository;
             _logger = logger;
         }
 
@@ -53,14 +53,14 @@ namespace TuTa.Wms.Application.Erp
                     endDateTime = end;
                 }
 
-                var (orders, total) = await _deliveryOrderRepository.GetDeliveryOrdersAsync(
+                var (orders, total) = await _outboundRepository.GetDeliveryOrdersAsync(
                     page, pageSize, deliveryOrderNo, warehouseCode, startDateTime, endDateTime);
 
                 var items = new List<ErpDeliveryOrderDto>();
 
                 foreach (var order in orders)
                 {
-                    var orderItems = await _deliveryOrderItemRepository.GetByOrderIdAsync(order.Id);
+                    var orderItems = await _outboundItemRepository.GetByOrderIdAsync(order.Id);
 
                     items.Add(new ErpDeliveryOrderDto
                     {
@@ -123,7 +123,7 @@ namespace TuTa.Wms.Application.Erp
             {
                 _logger.LogInformation($"获取发货单详情，ID：{id}");
 
-                var order = await _deliveryOrderRepository.GetAsync(id);
+                var order = await _outboundRepository.GetAsync(id);
 
                 if (order == null)
                 {
@@ -131,7 +131,7 @@ namespace TuTa.Wms.Application.Erp
                     return null;
                 }
 
-                var items = await _deliveryOrderItemRepository.GetByOrderIdAsync(order.Id);
+                var items = await _outboundItemRepository.GetByOrderIdAsync(order.Id);
 
                 return new ErpDeliveryOrderDto
                 {
@@ -176,7 +176,7 @@ namespace TuTa.Wms.Application.Erp
             {
                 _logger.LogInformation($"创建发货单，单号：{input.DeliveryOrderNo}");
 
-                if (await _deliveryOrderRepository.ExistsByOrderNoAsync(input.DeliveryOrderNo))
+                if (await _outboundRepository.ExistsByOrderNoAsync(input.DeliveryOrderNo))
                 {
                     _logger.LogWarning($"发货单已存在，单号：{input.DeliveryOrderNo}");
                     throw new Exception($"发货单已存在：{input.DeliveryOrderNo}");
@@ -196,7 +196,7 @@ namespace TuTa.Wms.Application.Erp
                     order.UpdateRemarks(input.Remarks);
                 }
 
-                await _deliveryOrderRepository.InsertAsync(order);
+                await _outboundRepository.InsertAsync(order);
 
                 foreach (var itemInput in input.Items)
                 {
@@ -215,7 +215,7 @@ namespace TuTa.Wms.Application.Erp
                         itemInput.LabelPrint,
                         itemInput.QuantityPerBox);
 
-                    await _deliveryOrderItemRepository.InsertAsync(item);
+                    await _outboundItemRepository.InsertAsync(item);
                 }
 
                 _logger.LogInformation($"创建发货单成功，ID：{orderId}");
@@ -235,7 +235,7 @@ namespace TuTa.Wms.Application.Erp
             {
                 _logger.LogInformation($"更新发货单，ID：{id}");
 
-                var order = await _deliveryOrderRepository.GetAsync(id);
+                var order = await _outboundRepository.GetAsync(id);
 
                 if (order == null)
                 {
@@ -251,13 +251,13 @@ namespace TuTa.Wms.Application.Erp
 
                 order.UpdateRemarks(input.Remarks);
 
-                await _deliveryOrderRepository.UpdateAsync(order);
+                await _outboundRepository.UpdateAsync(order);
 
-                var existingItems = await _deliveryOrderItemRepository.GetByOrderIdAsync(id);
+                var existingItems = await _outboundItemRepository.GetByOrderIdAsync(id);
 
                 foreach (var existingItem in existingItems)
                 {
-                    await _deliveryOrderItemRepository.DeleteAsync(existingItem);
+                    await _outboundItemRepository.DeleteAsync(existingItem);
                 }
 
                 foreach (var itemInput in input.Items)
@@ -277,7 +277,7 @@ namespace TuTa.Wms.Application.Erp
                         itemInput.LabelPrint,
                         itemInput.QuantityPerBox);
 
-                    await _deliveryOrderItemRepository.InsertAsync(item);
+                    await _outboundItemRepository.InsertAsync(item);
                 }
 
                 _logger.LogInformation($"更新发货单成功，ID：{id}");
@@ -297,7 +297,7 @@ namespace TuTa.Wms.Application.Erp
             {
                 _logger.LogInformation($"删除发货单，ID：{id}");
 
-                var order = await _deliveryOrderRepository.GetAsync(id);
+                var order = await _outboundRepository.GetAsync(id);
 
                 if (order == null)
                 {
@@ -311,14 +311,14 @@ namespace TuTa.Wms.Application.Erp
                     throw new Exception("发货单已完成，无法删除");
                 }
 
-                var items = await _deliveryOrderItemRepository.GetByOrderIdAsync(id);
+                var items = await _outboundItemRepository.GetByOrderIdAsync(id);
 
                 foreach (var item in items)
                 {
-                    await _deliveryOrderItemRepository.DeleteAsync(item);
+                    await _outboundItemRepository.DeleteAsync(item);
                 }
 
-                await _deliveryOrderRepository.DeleteAsync(order);
+                await _outboundRepository.DeleteAsync(order);
 
                 _logger.LogInformation($"删除发货单成功，ID：{id}");
             }
@@ -335,7 +335,7 @@ namespace TuTa.Wms.Application.Erp
             {
                 _logger.LogInformation($"完成发货单，ID：{id}");
 
-                var order = await _deliveryOrderRepository.GetAsync(id);
+                var order = await _outboundRepository.GetAsync(id);
 
                 if (order == null)
                 {
@@ -345,7 +345,7 @@ namespace TuTa.Wms.Application.Erp
 
                 order.SetStatus(DeliveryOrderStatus.Completed);
 
-                await _deliveryOrderRepository.UpdateAsync(order);
+                await _outboundRepository.UpdateAsync(order);
 
                 _logger.LogInformation($"完成发货单成功，ID：{id}");
 

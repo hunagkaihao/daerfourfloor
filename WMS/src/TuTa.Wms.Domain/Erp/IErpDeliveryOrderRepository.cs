@@ -6,7 +6,7 @@ using Volo.Abp.Domain.Repositories;
 
 namespace TuTa.Wms.Erp
 {
-    public interface IErpDeliveryOrderRepository : IRepository<ErpDeliveryOrder, Guid>
+    public interface IErpoutboundRepository : IRepository<ErpDeliveryOrder, Guid>
     {
         Task<(List<ErpDeliveryOrder>, int)> GetDeliveryOrdersAsync(
             int page,
@@ -21,6 +21,8 @@ namespace TuTa.Wms.Erp
         Task<List<ErpDeliveryOrderItem>> GetItemsByOrderIdAsync(Guid deliveryOrderId);
 
         Task<bool> ExistsByOrderNoAsync(string deliveryOrderNo);
+
+        Task<ErpDeliveryOrder> FindByOrderNoAsync(string deliveryOrderNo);
     }
 
     public interface IErpDeliveryOrderItemRepository : IRepository<ErpDeliveryOrderItem, Guid>

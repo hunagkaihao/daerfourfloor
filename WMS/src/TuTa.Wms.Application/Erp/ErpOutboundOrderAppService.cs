@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using TuTa.Wms.Erp;
 using TuTa.Wms.Erp.Aggregates;
 using TuTa.Wms.Erp.Dto;
+using TuTa.Wms.Erp.Entities;
 using TuTa.Wms.Erp.Repositories;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
@@ -22,15 +23,21 @@ namespace TuTa.Wms.Erp
         private readonly IErpOutboundOrderRepository _erpOutboundOrderRepository;
         private readonly ErpOutboundOrderManager _erpOutboundOrderManager;
         private readonly ILogger<ErpOutboundOrderAppService> _logger;
+        private readonly IErpoutboundRepository _outboundRepository;
+        private readonly IRepository<ErpOutboundRecord, string> _erpOutboundRecordRepository;
 
         public ErpOutboundOrderAppService(
             IErpOutboundOrderRepository erpOutboundOrderRepository,
             ErpOutboundOrderManager erpOutboundOrderManager,
-            ILogger<ErpOutboundOrderAppService> logger)
+            ILogger<ErpOutboundOrderAppService> logger,
+            IErpoutboundRepository outboundRepository,
+            IRepository<ErpOutboundRecord, string> erpOutboundRecordRepository)
         {
             _erpOutboundOrderRepository = erpOutboundOrderRepository;
             _erpOutboundOrderManager = erpOutboundOrderManager;
             _logger = logger;
+            _outboundRepository = outboundRepository;
+            _erpOutboundRecordRepository = erpOutboundRecordRepository;
         }
 
         /// <summary>
@@ -110,6 +117,112 @@ namespace TuTa.Wms.Erp
                     Message = $"出库单接收失败：{ex.Message}"
                 };
             }
+        }
+
+        /// <summary>
+        /// 根据发货单号创建出库单（已有存货编码则不重复录入）
+        /// </summary>
+        [UnitOfWork]
+        public async Task<ErpOutboundOrderDto> CreateFromDeliveryOrderAsync(string deliveryOrderNo)
+        {
+            var deliveryOrder = await _outboundRepository.FindByOrderNoAsync(deliveryOrderNo);
+            if (deliveryOrder == null)
+                throw new UserFriendlyException($"发货单 {deliveryOrderNo} 不存在");
+
+            var items = await _outboundRepository.GetItemsByOrderIdAsync(deliveryOrder.Id);
+
+            var outboundOrder = await _erpOutboundOrderRepository.FindByOutboundOrderNoAsync(deliveryOrderNo);
+            if (outboundOrder == null)
+            {
+                outboundOrder = await _erpOutboundOrderManager.CreateOutboundOrderAsync(
+                    deliveryOrderNo,
+                    deliveryOrder.WarehouseCode,
+                    deliveryOrder.DeliveryDate,
+                    sourceDocument: "发货单",
+                    sourceDocumentNo: deliveryOrderNo);
+
+                foreach (var item in items)
+                {
+                    outboundOrder.AddOutboundItem(
+                        item.MaterialCode,
+                        item.MaterialName ?? item.MaterialCode,
+                        item.DeliveryQuantity,
+                        0,
+                        item.Unit ?? "个",
+                        null,
+                        item.Grade,
+                        item.BatchCode);
+                }
+
+                await _erpOutboundOrderRepository.InsertAsync(outboundOrder);
+            }
+            else
+            {
+                foreach (var item in items)
+                {
+                    var exists = outboundOrder.OutboundItems
+                        .Any(i => i.MaterialCode == item.MaterialCode);
+                    if (!exists)
+                    {
+                        outboundOrder.AddOutboundItem(
+                            item.MaterialCode,
+                            item.MaterialName ?? item.MaterialCode,
+                            item.DeliveryQuantity,
+                            0,
+                            item.Unit ?? "个",
+                            null,
+                            item.Grade,
+                            item.BatchCode);
+                    }
+                }
+
+                await _erpOutboundOrderRepository.UpdateAsync(outboundOrder);
+            }
+
+            return ObjectMapper.Map<ErpOutboundOrder, ErpOutboundOrderDto>(outboundOrder);
+        }
+
+        /// <summary>
+        /// 根据条码创建出库记录（已有存货编码则不重复录入）
+        /// </summary>
+        [UnitOfWork]
+        public async Task<ErpOutboundRecordDto> CreateFromBarcodeAsync(CreateFromBarcodeDto dto)
+        {
+            var exists = await _erpOutboundRecordRepository.AnyAsync(e =>
+                e.DeliveryOrderNo == dto.DeliveryOrderNo && e.MaterialCode == dto.MaterialCode);
+
+            if (exists)
+                throw new UserFriendlyException($"存货编码 {dto.MaterialCode} 已存在于出库单 {dto.DeliveryOrderNo} 中，不能重复录入");
+
+            var record = ErpOutboundRecord.Create(
+                dto.WarehouseCode,
+                dto.CustomerCode,
+                dto.MasterId,
+                dto.Quantity,
+                dto.QtyPerBox,
+                dto.MaterialCode,
+                dto.Packaging,
+                dto.Grade,
+                dto.LabelPrint,
+                dto.DeliveryOrderNo);
+
+            await _erpOutboundRecordRepository.InsertAsync(record);
+
+            return new ErpOutboundRecordDto
+            {
+                Id = record.Id,
+                Warehouse = record.Warehouse,
+                CustomerCode = record.CustomerCode,
+                MasterId = record.MasterId,
+                Quantity = record.Quantity,
+                QtyPerBox = record.QtyPerBox,
+                MaterialCode = record.MaterialCode,
+                Package = record.Package,
+                Grade = record.Grade,
+                LabelText = record.LabelText,
+                DeliveryOrderNo = record.DeliveryOrderNo,
+                CreationTime = record.CreationTime,
+            };
         }
 
         /// <summary>

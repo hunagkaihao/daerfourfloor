@@ -11,9 +11,9 @@ using Volo.Abp.EntityFrameworkCore;
 
 namespace TuTa.Wms.Erp
 {
-    public class ErpDeliveryOrderRepository : EfCoreRepository<WmsDbContext, ErpDeliveryOrder, Guid>, IErpDeliveryOrderRepository
+    public class ErpoutboundRepository : EfCoreRepository<WmsDbContext, ErpDeliveryOrder, Guid>, IErpoutboundRepository
     {
-        public ErpDeliveryOrderRepository(IDbContextProvider<WmsDbContext> dbContextProvider)
+        public ErpoutboundRepository(IDbContextProvider<WmsDbContext> dbContextProvider)
             : base(dbContextProvider)
         {
         }
@@ -28,7 +28,7 @@ namespace TuTa.Wms.Erp
         {
             var dbContext = await GetDbContextAsync();
 
-            var query = dbContext.ErpDeliveryOrders.AsQueryable();
+            var query = dbContext.ErpOutbound.AsQueryable();
 
             if (!string.IsNullOrEmpty(deliveryOrderNo))
             {
@@ -65,7 +65,7 @@ namespace TuTa.Wms.Erp
         {
             var dbContext = await GetDbContextAsync();
 
-            return await dbContext.ErpDeliveryOrders
+            return await dbContext.ErpOutbound
                 .Include(o => o.Id)
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
@@ -83,8 +83,15 @@ namespace TuTa.Wms.Erp
         {
             var dbContext = await GetDbContextAsync();
 
-            return await dbContext.ErpDeliveryOrders
+            return await dbContext.ErpOutbound
                 .AnyAsync(o => o.DeliveryOrderNo == deliveryOrderNo);
+        }
+
+        public async Task<ErpDeliveryOrder> FindByOrderNoAsync(string deliveryOrderNo)
+        {
+            var dbContext = await GetDbContextAsync();
+            return await dbContext.ErpOutbound
+                .FirstOrDefaultAsync(o => o.DeliveryOrderNo == deliveryOrderNo);
         }
     }
 

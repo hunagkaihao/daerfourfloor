@@ -11,10 +11,10 @@
         <a-input
           v-model:value="stgBinCode"
           placeholder="扫描仓位编号"
-          @keyup.enter="handleUnbind"
           ref="inputRef"
           :allowClear="true"
           @focus="focusFn"
+          @input="resultMessage = ''; resolvedCode = ''"
           class="modern-input"
         >
           <template #suffix>

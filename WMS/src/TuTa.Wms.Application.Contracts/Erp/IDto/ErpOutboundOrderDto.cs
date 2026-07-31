@@ -27,7 +27,7 @@ namespace TuTa.Wms.Erp.Dto
         /// <summary>
         /// 实际出库日期
         /// </summary>
-        public DateTime? ActualOutboundDate { get; set; }
+        public DateTime? OutboundDate { get; set; }
 
         /// <summary>
         /// 出库原因
@@ -68,6 +68,61 @@ namespace TuTa.Wms.Erp.Dto
         /// 出库单项集合
         /// </summary>
         public List<ErpOutboundItemDto> OutboundItems { get; set; } = new List<ErpOutboundItemDto>();
+    }
+
+    /// <summary>
+    /// 条码创建出库单请求DTO
+    /// </summary>
+    public class CreateFromBarcodeDto
+    {
+        /// <summary>仓库</summary>
+        public string WarehouseCode { get; set; }
+
+        /// <summary>客户编码</summary>
+        public string CustomerCode { get; set; }
+
+        /// <summary>主表id</summary>
+        public string MasterId { get; set; }
+
+        /// <summary>数量</summary>
+        public decimal Quantity { get; set; }
+
+        /// <summary>存货编码</summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>包装</summary>
+        public string Packaging { get; set; }
+
+        /// <summary>等级</summary>
+        public string Grade { get; set; }
+
+        /// <summary>标贴打字</summary>
+        public string LabelPrint { get; set; }
+
+        /// <summary>发货单号</summary>
+        public string DeliveryOrderNo { get; set; }
+
+        /// <summary>每箱数量</summary>
+        public decimal QtyPerBox { get; set; }
+    }
+
+    /// <summary>
+    /// 条码出库记录DTO
+    /// </summary>
+    public class ErpOutboundRecordDto
+    {
+        public string Id { get; set; }
+        public string Warehouse { get; set; }
+        public string CustomerCode { get; set; }
+        public string MasterId { get; set; }
+        public decimal Quantity { get; set; }
+        public decimal QtyPerBox { get; set; }
+        public string MaterialCode { get; set; }
+        public string Package { get; set; }
+        public string Grade { get; set; }
+        public string LabelText { get; set; }
+        public string DeliveryOrderNo { get; set; }
+        public DateTime CreationTime { get; set; }
     }
 
     /// <summary>

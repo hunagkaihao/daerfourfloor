@@ -32,6 +32,21 @@
                 </a-input>
             </a-col>
         </a-row>
+        <a-row class="input-row">
+            <a-col :span="6">
+                <div class="htext">
+                    <h1>到货单号:</h1>
+                </div>
+            </a-col>
+            <a-col :span="17">
+                <a-input v-model:value="asnCode" placeholder="扫描到货单号" @keyup.enter="handleAsnCodeEnter"
+                    :allowClear="true" @focus="focusFn" class="modern-input" ref="asnInputRef">
+                    <template #suffix>
+                        <scan-outlined class="scan-icon" />
+                    </template>
+                </a-input>
+            </a-col>
+        </a-row>
       
         <p style="margin-left: 20px">收料码数量:{{ goods.length }}</p>
         <div style=" overflow:auto;" :style="{
@@ -144,15 +159,19 @@ import { useMessage } from '/@/hooks/web/useMessage';
 import { columns, stockRemoveDirect, stocksQuery, findStockByCellAndMaterial, confirmInspectionQualified, setInspectionNotQualified, pushCGRKDAdd } from './Stock';
 import { getLaneCellStatusByCellCode } from '/@/views/warehouse/cells/Cell';
 import LaneCellChips from '../components/LaneCellChips.vue';
-import { PagedStockQueryDto, CellLaneStatusDto } from '/@/services/ServiceProxies';
+import { PagedStockQueryDto, CellLaneStatusDto, ErpAsnDto } from '/@/services/ServiceProxies';
 import Header from '../header/Header.vue'
+import { validateAsn } from './Material'
 // 使用从Stock.ts导入的列定义
 const diskcolumns = columns;
 import { DeleteOutlined } from '@ant-design/icons-vue';
 const focus1 = ref<any>();
 const focus2 = ref<any>();
+const asnInputRef = ref<any>();
 let QRcode = ref<string>('');
 let boxCode = ref<string>('');
+let asnCode = ref<string>('');
+const asnDataList = ref<ErpAsnDto[]>([]);
 const laneCellStatusList = ref<CellLaneStatusDto[]>([]);
  const { createConfirm } = useMessage();
 
@@ -337,6 +356,24 @@ const deleteStock = async (record: Recordable, index: number) => {
     });
 };
 
+const handleAsnCodeEnter = async () => {
+    if (!asnCode.value.trim()) return
+    try {
+        const res = await validateAsn(asnCode.value.trim())
+        if (res.success && res.data && res.data.length > 0) {
+            asnDataList.value = res.data
+            message.success(`到货单加载成功，${res.data.length}条物料`)
+        } else {
+            message.warning(res.message || '到货单数据为空')
+        }
+    } catch (err: any) {
+        message.error(err?.message || '到货单加载失败')
+    }
+    setTimeout(() => {
+        if (focus2.value) focus2.value.focus()
+    }, 100)
+}
+
 const confirmQualified = async () => {
     if (goods.value.length === 0) {
         message.error("没有物料信息");
@@ -344,6 +381,10 @@ const confirmQualified = async () => {
     }
     if (!boxCode.value) {
         message.error("没有库位信息");
+        return;
+    }
+    if (!asnCode.value.trim()) {
+        message.error("请先扫描到货单号");
         return;
     }
 
@@ -371,6 +412,7 @@ const confirmQualified = async () => {
         return;
     }
 
+    const qualifiedItems: any[] = []
     try {
         for (const item of goods.value) {
             if (item.inspectionstatus === 2) {
@@ -380,28 +422,7 @@ const confirmQualified = async () => {
                     continue;
                 }
                 message.success(`物料 ${item.materialName} 确认合格成功`);
-
-                const cgParams = {
-                    cmd: "CGRKDAdd",
-                    setBook: "666",
-                    setYear: "2020",
-                    loginDate: "",
-                    loginName: "",
-                    loginPwd: "",
-                    params: {
-                        json: JSON.stringify([{
-                            cInvCode: item.materialCode,
-                            cBatch: item.goodsBatchNo,
-                            fQuantity: item.incellshu
-                        }])
-                    }
-                };
-                const pushRes = await pushCGRKDAdd(cgParams);
-                if (pushRes.success) {
-                    message.success(`物料 ${item.materialName} 采购入库单已推送`);
-                } else {
-                    message.warning(`物料 ${item.materialName} 采购入库单推送失败: ${pushRes.message}`);
-                }
+                qualifiedItems.push(item)
             } else if (item.inspectionstatus === 3) {
                 const res = await setInspectionNotQualified(item.stockId);
                 if (res.success) {
@@ -412,8 +433,53 @@ const confirmQualified = async () => {
             }
         }
 
+        if (qualifiedItems.length > 0) {
+            const asnData = asnDataList.value
+            const orderMap: Record<string, any> = {}
+
+            for (const item of qualifiedItems) {
+                const asnItem = asnData.find(
+                    a => a.cinvcode === item.materialCode && a.cbatch === item.goodsBatchNo
+                )
+                const orderCode = asnItem?.cordercode || ''
+                if (!orderMap[orderCode]) {
+                    orderMap[orderCode] = {
+                        AddType: 3,
+                        cOrderCode: orderCode,
+                        cwarehousecode: asnItem?.cwhcode || '',
+                        cmemo: '',
+                        CMAKER: asnItem?.cmaker || '',
+                        Details: [],
+                    }
+                }
+                orderMap[orderCode].Details.push({
+                    sourceautoid: asnItem?.autoid ? Number(asnItem.autoid) : 0,
+                    cinvcode: item.materialCode,
+                    cbatch: item.goodsBatchNo,
+                    fquantity: item.incellshu,
+                })
+            }
+
+            const entries = Object.values(orderMap)
+            const cgParams = {
+                Cmd: 'CGRKDAdd',
+                taskid: '',
+                maker: entries[0]?.CMAKER || '',
+                id: 0,
+                Data: JSON.stringify(entries),
+            }
+            const pushRes = await pushCGRKDAdd(cgParams)
+            if (pushRes.success) {
+                message.success(`采购入库单已推送，共${qualifiedItems.length}条物料`)
+            } else {
+                message.warning(`采购入库单推送失败: ${pushRes.message}`)
+            }
+        }
+
         goods.value.length = 0;
         QRcode.value = '';
+        asnCode.value = '';
+        asnDataList.value = [];
         if (boxCode.value) {
             await scanboxCode();
         }

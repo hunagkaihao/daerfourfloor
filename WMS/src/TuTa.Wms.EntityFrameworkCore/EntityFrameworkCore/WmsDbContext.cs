@@ -113,9 +113,11 @@ public class WmsDbContext :
 
     public DbSet<ErpDeliveryStation> ErpDeliveryStations { get; set; }
 
-    public DbSet<ErpDeliveryOrder> ErpDeliveryOrders { get; set; }
+    public DbSet<ErpDeliveryOrder> ErpOutbound { get; set; }
 
     public DbSet<ErpDeliveryOrderItem> ErpDeliveryOrderItems { get; set; }
+
+    public DbSet<ErpOutboundRecord> ErpOutboundRecords { get; set; }
 
 
     public DbSet<AgvTask> AgvTasks { get; set; }
@@ -281,6 +283,13 @@ public class WmsDbContext :
             b.HasIndex(o => o.MaterialCode);
         });
 
+        builder.Entity<ErpDeliveryOrder>(b =>
+        {
+            b.ToTable("ErpDeliveryOrders", WmsConsts.DbSchema);
+            b.ConfigureByConvention();
+            b.HasIndex(o => o.DeliveryOrderNo).IsUnique();
+        });
+
         builder.Entity<Material>(b =>
         {
             b.ToTable("Materials", WmsConsts.DbSchema);
@@ -312,14 +321,29 @@ public class WmsDbContext :
             b.ToTable("BarcodeLists",WmsConsts.DbSchema);
             b.ConfigureByConvention();
         });
-
         builder.Entity<Skip>(b =>
         {
             b.ToTable("Skips", WmsConsts.DbSchema);
             b.ConfigureByConvention();
         });
 
-        
-       
+        builder.Entity<ErpOutboundRecord>(b =>
+        {
+            b.ToTable("erpoutbound", WmsConsts.DbSchema);
+            b.HasKey(e => e.Id);
+            b.Property(e => e.Id).HasMaxLength(36).IsRequired();
+            b.Property(e => e.Warehouse).HasMaxLength(50);
+            b.Property(e => e.CustomerCode).HasMaxLength(50);
+            b.Property(e => e.MasterId).HasMaxLength(50);
+            b.Property(e => e.Quantity).HasColumnType("decimal(18,4)");
+            b.Property(e => e.QtyPerBox).HasColumnType("decimal(18,4)");
+            b.Property(e => e.MaterialCode).HasMaxLength(50).IsRequired();
+            b.Property(e => e.Package).HasMaxLength(50);
+            b.Property(e => e.Grade).HasMaxLength(20);
+            b.Property(e => e.LabelText).HasMaxLength(200);
+            b.Property(e => e.DeliveryOrderNo).HasMaxLength(50);
+            b.HasIndex(e => new { e.DeliveryOrderNo, e.MaterialCode }).IsUnique();
+        });
+
     }
 }

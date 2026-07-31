@@ -7421,6 +7421,206 @@ export class ErpOutboundOrderServiceProxy extends ServiceProxyBase {
     }
 
     /**
+     * 根据发货单号创建出库单（已有存货编码则不重复录入）
+     * @return OK
+     */
+    createFromDeliveryOrder(deliveryOrderNo: string , cancelToken?: CancelToken | undefined): Promise<ErpOutboundOrderDto> {
+        let url_ = this.baseUrl + "/api/erp/outboundOrder/create-from-delivery/{deliveryOrderNo}";
+        if (deliveryOrderNo === undefined || deliveryOrderNo === null)
+            throw new Error("The parameter 'deliveryOrderNo' must be defined.");
+        url_ = url_.replace("{deliveryOrderNo}", encodeURIComponent("" + deliveryOrderNo));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = <AxiosRequestConfig>{
+            method: "POST",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.instance.request(transformedOptions_);
+        }).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processCreateFromDeliveryOrder(_response));
+        });
+    }
+
+    protected processCreateFromDeliveryOrder(response: AxiosResponse): Promise<ErpOutboundOrderDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = ErpOutboundOrderDto.fromJS(resultData200);
+            return Promise.resolve<ErpOutboundOrderDto>(result200);
+
+        } else if (status === 403) {
+            const _responseText = response.data;
+            let result403: any = null;
+            let resultData403  = _responseText;
+            result403 = RemoteServiceErrorResponse.fromJS(resultData403);
+            return throwException("Forbidden", status, _responseText, _headers, result403);
+
+        } else if (status === 401) {
+            const _responseText = response.data;
+            let result401: any = null;
+            let resultData401  = _responseText;
+            result401 = RemoteServiceErrorResponse.fromJS(resultData401);
+            return throwException("Unauthorized", status, _responseText, _headers, result401);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = RemoteServiceErrorResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = RemoteServiceErrorResponse.fromJS(resultData404);
+            return throwException("Not Found", status, _responseText, _headers, result404);
+
+        } else if (status === 501) {
+            const _responseText = response.data;
+            let result501: any = null;
+            let resultData501  = _responseText;
+            result501 = RemoteServiceErrorResponse.fromJS(resultData501);
+            return throwException("Not Implemented", status, _responseText, _headers, result501);
+
+        } else if (status === 500) {
+            const _responseText = response.data;
+            let result500: any = null;
+            let resultData500  = _responseText;
+            result500 = RemoteServiceErrorResponse.fromJS(resultData500);
+            return throwException("Internal Server Error", status, _responseText, _headers, result500);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ErpOutboundOrderDto>(null as any);
+    }
+
+    /**
+     * 根据条码创建出库单
+     * @param body (optional) 
+     * @return OK
+     */
+    createFromBarcode(body: CreateFromBarcodeDto | undefined , cancelToken?: CancelToken | undefined): Promise<ErpOutboundRecordDto> {
+        let url_ = this.baseUrl + "/api/erp/outboundOrder/create-from-barcode";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ = <AxiosRequestConfig>{
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.instance.request(transformedOptions_);
+        }).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processCreateFromBarcode(_response));
+        });
+    }
+
+    protected processCreateFromBarcode(response: AxiosResponse): Promise<ErpOutboundRecordDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = ErpOutboundRecordDto.fromJS(resultData200);
+            return Promise.resolve<ErpOutboundRecordDto>(result200);
+
+        } else if (status === 403) {
+            const _responseText = response.data;
+            let result403: any = null;
+            let resultData403  = _responseText;
+            result403 = RemoteServiceErrorResponse.fromJS(resultData403);
+            return throwException("Forbidden", status, _responseText, _headers, result403);
+
+        } else if (status === 401) {
+            const _responseText = response.data;
+            let result401: any = null;
+            let resultData401  = _responseText;
+            result401 = RemoteServiceErrorResponse.fromJS(resultData401);
+            return throwException("Unauthorized", status, _responseText, _headers, result401);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = RemoteServiceErrorResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = RemoteServiceErrorResponse.fromJS(resultData404);
+            return throwException("Not Found", status, _responseText, _headers, result404);
+
+        } else if (status === 501) {
+            const _responseText = response.data;
+            let result501: any = null;
+            let resultData501  = _responseText;
+            result501 = RemoteServiceErrorResponse.fromJS(resultData501);
+            return throwException("Not Implemented", status, _responseText, _headers, result501);
+
+        } else if (status === 500) {
+            const _responseText = response.data;
+            let result500: any = null;
+            let resultData500  = _responseText;
+            result500 = RemoteServiceErrorResponse.fromJS(resultData500);
+            return throwException("Internal Server Error", status, _responseText, _headers, result500);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ErpOutboundRecordDto>(null as any);
+    }
+
+    /**
      * @return OK
      */
     byOrderNo(outboundOrderNo: string , cancelToken?: CancelToken | undefined): Promise<ErpOutboundOrderDto> {
@@ -29426,6 +29626,86 @@ export interface IErpOutboundOrderDto {
     outboundItems: ErpOutboundItemDto[] | undefined;
 }
 
+export class ErpOutboundRecordDto implements IErpOutboundRecordDto {
+    id!: string;
+    warehouse!: string | undefined;
+    customerCode!: string | undefined;
+    masterId!: string | undefined;
+    quantity!: number;
+    qtyPerBox!: number;
+    materialCode!: string | undefined;
+    package!: string | undefined;
+    grade!: string | undefined;
+    labelText!: string | undefined;
+    deliveryOrderNo!: string | undefined;
+    creationTime!: moment.Moment;
+
+    constructor(data?: IErpOutboundRecordDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.warehouse = _data["warehouse"];
+            this.customerCode = _data["customerCode"];
+            this.masterId = _data["masterId"];
+            this.quantity = _data["quantity"];
+            this.qtyPerBox = _data["qtyPerBox"];
+            this.materialCode = _data["materialCode"];
+            this.package = _data["package"];
+            this.grade = _data["grade"];
+            this.labelText = _data["labelText"];
+            this.deliveryOrderNo = _data["deliveryOrderNo"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ErpOutboundRecordDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ErpOutboundRecordDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["warehouse"] = this.warehouse;
+        data["customerCode"] = this.customerCode;
+        data["masterId"] = this.masterId;
+        data["quantity"] = this.quantity;
+        data["qtyPerBox"] = this.qtyPerBox;
+        data["materialCode"] = this.materialCode;
+        data["package"] = this.package;
+        data["grade"] = this.grade;
+        data["labelText"] = this.labelText;
+        data["deliveryOrderNo"] = this.deliveryOrderNo;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IErpOutboundRecordDto {
+    id: string;
+    warehouse: string | undefined;
+    customerCode: string | undefined;
+    masterId: string | undefined;
+    quantity: number;
+    qtyPerBox: number;
+    materialCode: string | undefined;
+    package: string | undefined;
+    grade: string | undefined;
+    labelText: string | undefined;
+    deliveryOrderNo: string | undefined;
+    creationTime: moment.Moment;
+}
+
 export class ErpOutboundOrderRequestDto implements IErpOutboundOrderRequestDto {
     fStkOutLogNo!: string;
     fStkCode!: string;
@@ -29523,6 +29803,78 @@ export class ErpOutboundOrderResponseDto implements IErpOutboundOrderResponseDto
 export interface IErpOutboundOrderResponseDto {
     succeed: boolean;
     message: string | undefined;
+}
+
+export class CreateFromBarcodeDto implements ICreateFromBarcodeDto {
+    warehouseCode!: string | undefined;
+    customerCode!: string | undefined;
+    masterId!: string | undefined;
+    quantity!: number;
+    materialCode!: string | undefined;
+    packaging!: string | undefined;
+    grade!: string | undefined;
+    labelPrint!: string | undefined;
+    deliveryOrderNo!: string | undefined;
+    qtyPerBox!: number;
+
+    constructor(data?: ICreateFromBarcodeDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.warehouseCode = _data["warehouseCode"];
+            this.customerCode = _data["customerCode"];
+            this.masterId = _data["masterId"];
+            this.quantity = _data["quantity"];
+            this.materialCode = _data["materialCode"];
+            this.packaging = _data["packaging"];
+            this.grade = _data["grade"];
+            this.labelPrint = _data["labelPrint"];
+            this.deliveryOrderNo = _data["deliveryOrderNo"];
+            this.qtyPerBox = _data["qtyPerBox"];
+        }
+    }
+
+    static fromJS(data: any): CreateFromBarcodeDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateFromBarcodeDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["warehouseCode"] = this.warehouseCode;
+        data["customerCode"] = this.customerCode;
+        data["masterId"] = this.masterId;
+        data["quantity"] = this.quantity;
+        data["materialCode"] = this.materialCode;
+        data["packaging"] = this.packaging;
+        data["grade"] = this.grade;
+        data["labelPrint"] = this.labelPrint;
+        data["deliveryOrderNo"] = this.deliveryOrderNo;
+        data["qtyPerBox"] = this.qtyPerBox;
+        return data;
+    }
+}
+
+export interface ICreateFromBarcodeDto {
+    warehouseCode: string | undefined;
+    customerCode: string | undefined;
+    masterId: string | undefined;
+    quantity: number;
+    materialCode: string | undefined;
+    packaging: string | undefined;
+    grade: string | undefined;
+    labelPrint: string | undefined;
+    deliveryOrderNo: string | undefined;
+    qtyPerBox: number;
 }
 
 export class ErpWorkshopMaterialTransferDto implements IErpWorkshopMaterialTransferDto {

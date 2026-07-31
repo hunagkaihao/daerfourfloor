@@ -3,7 +3,8 @@ import { BasicColumn } from '/@/components/Table';
 import moment from 'moment';
 import {
   StockServiceProxy,
-  ERP_ASNServiceProxy
+  ERP_ASNServiceProxy,
+  ERP_Delivery_OrderServiceProxy,
 } from '/@/services/ServiceProxies';
 import { h } from 'vue';
 import { Tag, message } from 'ant-design-vue';
@@ -17,6 +18,7 @@ const [openFullLoading, closeFullLoading] = useLoading({
 });
 const _stockServiceProxy = new StockServiceProxy();
 const _erpAsnServiceProxy = new ERP_ASNServiceProxy();
+const _deliveryOrderServiceProxy = new ERP_Delivery_OrderServiceProxy();
 /**
  * 获取容器里库存物料信息
  * @param params
@@ -163,6 +165,12 @@ export function pushCGRKDAdd(
   params: any
 ): Promise<any> {
   return _erpAsnServiceProxy.pushCGRKDAdd(params);
+}
+//创建发货通知单
+export function createDeliveryNotice(
+  dto: any
+): Promise<any> {
+  return _deliveryOrderServiceProxy.deliveryOrderPost(dto);
 }
 export const diskcolumns = [
   {

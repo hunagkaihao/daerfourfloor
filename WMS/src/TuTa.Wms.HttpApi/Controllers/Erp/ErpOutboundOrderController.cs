@@ -97,5 +97,27 @@ namespace TuTa.Wms.HttpApi.Controllers.Erp
         {
             return await _erpOutboundOrderAppService.DeleteAsync(id);
         }
+
+        /// <summary>
+        /// 根据发货单号创建出库单
+        /// </summary>
+        /// <param name="deliveryOrderNo">发货单号</param>
+        /// <returns>出库单</returns>
+        [HttpPost("create-from-delivery/{deliveryOrderNo}")]
+        public async Task<ErpOutboundOrderDto> CreateFromDeliveryOrderAsync(string deliveryOrderNo)
+        {
+            return await _erpOutboundOrderAppService.CreateFromDeliveryOrderAsync(deliveryOrderNo);
+        }
+
+        /// <summary>
+        /// 根据条码创建出库记录
+        /// </summary>
+        /// <param name="dto">条码数据</param>
+        /// <returns>出库记录</returns>
+        [HttpPost("create-from-barcode")]
+        public async Task<ErpOutboundRecordDto> CreateFromBarcodeAsync([FromBody] CreateFromBarcodeDto dto)
+        {
+            return await _erpOutboundOrderAppService.CreateFromBarcodeAsync(dto);
+        }
     }
 }

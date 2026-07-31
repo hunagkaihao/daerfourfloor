@@ -42,7 +42,7 @@ namespace TuTa.Wms.Erp.Aggregates
             Handler = handler;
             Remarks = remarks;
             Status = OutboundOrderStatus.Created;
-            ActualOutboundDate = null;
+            OutboundDate = null;
             OutboundItems = new List<ErpOutboundItem>();
         }
 
@@ -110,9 +110,9 @@ namespace TuTa.Wms.Erp.Aggregates
         /// <summary>
         /// 设置实际出库日期
         /// </summary>
-        internal void SetActualOutboundDate(DateTime actualOutboundDate)
+        internal void SetOutboundDate(DateTime OutboundDate)
         {
-            ActualOutboundDate = actualOutboundDate;
+            OutboundDate = OutboundDate;
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace TuTa.Wms.Erp.Aggregates
         /// <summary>
         /// 实际出库日期
         /// </summary>
-        public virtual DateTime? ActualOutboundDate { get; private set; }
+        public virtual DateTime? OutboundDate { get; private set; }
 
         /// <summary>
         /// 出库原因

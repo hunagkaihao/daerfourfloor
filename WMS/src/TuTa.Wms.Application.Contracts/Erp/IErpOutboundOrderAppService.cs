@@ -60,5 +60,19 @@ namespace TuTa.Wms.Erp
         /// <param name="id">出库单ID</param>
         /// <returns>是否成功</returns>
         Task<bool> DeleteAsync(Guid id);
+
+        /// <summary>
+        /// 根据发货单号创建出库单
+        /// </summary>
+        /// <param name="deliveryOrderNo">发货单号</param>
+        /// <returns>出库单</returns>
+        Task<ErpOutboundOrderDto> CreateFromDeliveryOrderAsync(string deliveryOrderNo);
+
+        /// <summary>
+        /// 根据条码创建出库记录（已有存货编码则不重复录入）
+        /// </summary>
+        /// <param name="dto">条码数据</param>
+        /// <returns>出库记录</returns>
+        Task<ErpOutboundRecordDto> CreateFromBarcodeAsync(CreateFromBarcodeDto dto);
     }
 }

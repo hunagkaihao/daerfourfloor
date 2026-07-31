@@ -1,251 +1,165 @@
 <template>
   <div class="page-container">
     <Header numb="发货单扫码"></Header>
-    
+
     <a-row class="input-row">
       <a-col :span="6">
-        <div class="label">发货单号:</div>
+        <div class="label">发货单据行条码:</div>
       </a-col>
       <a-col :span="17">
-        <a-input v-model:value="deliveryOrderNo" placeholder="扫描发货单号" @keyup.enter="scanDeliveryOrder" :allowClear="true" class="search-input" autofocus>
+        <a-input v-model:value="barcode" placeholder="扫描发货单条码" @keyup.enter="onScan" :allowClear="true" class="search-input" autofocus>
           <template #suffix>
-            <search-outlined class="icon" />
+            <scan-outlined class="icon" />
           </template>
         </a-input>
       </a-col>
     </a-row>
 
     <a-row class="button-row">
-      <a-button type="primary" @click="scanDeliveryOrder" :loading="loading">查询</a-button>
+      <a-button type="primary" @click="onScan" :loading="loading">保存出库单</a-button>
     </a-row>
 
-    <div v-if="deliveryOrder" class="info-card">
-      <a-descriptions title="发货单信息" :column="2" bordered size="small">
-        <a-descriptions-item label="单号">{{ deliveryOrder.deliveryOrderNo }}</a-descriptions-item>
-        <a-descriptions-item label="仓库">{{ deliveryOrder.warehouseName || deliveryOrder.warehouseCode }}</a-descriptions-item>
-        <a-descriptions-item label="发货日期">{{ formatDate(deliveryOrder.deliveryDate) }}</a-descriptions-item>
-        <a-descriptions-item label="状态">{{ getStatusText(deliveryOrder.status) }}</a-descriptions-item>
+    <div v-if="parsed" class="parsed-card">
+      <a-descriptions title="条码解析" :column="2" bordered size="small">
+        <a-descriptions-item label="仓库">{{ parsed.fields[0] }}</a-descriptions-item>
+        <a-descriptions-item label="客户编码">{{ parsed.fields[1] }}</a-descriptions-item>
+        <a-descriptions-item label="主表id">{{ parsed.fields[2] }}</a-descriptions-item>
+        <a-descriptions-item label="数量">{{ parsed.fields[3] }}</a-descriptions-item>
+        <a-descriptions-item label="存货编码" :span="2"><b>{{ parsed.fields[4] }}</b></a-descriptions-item>
+        <a-descriptions-item label="包装">{{ parsed.fields[5] }}</a-descriptions-item>
+        <a-descriptions-item label="等级">{{ parsed.fields[6] }}</a-descriptions-item>
+        <a-descriptions-item label="标贴打字">{{ parsed.fields[7] }}</a-descriptions-item>
+        <a-descriptions-item label="发货单号" :span="2">{{ parsed.fields[8] }}</a-descriptions-item>
+        <a-descriptions-item label="每箱数量">{{ parsed.fields[9] }}</a-descriptions-item>
       </a-descriptions>
     </div>
 
-    <div v-if="stockItems.length" class="stock-section">
-      <h3>库存匹配结果</h3>
-      <a-table :columns="stockColumns" :data-source="stockItems" :pagination="false" size="small">
-        <template #bodyCell="{ column, record }">
-          <template v-if="column.key === 'select'">
-            <a-checkbox 
-              :checked="selectedStockIds.includes(record.id)" 
-              @change="() => toggleSelect(record)"
-              :disabled="record.status !== 0"
-            />
-          </template>
-          <template v-if="column.key === 'action'">
-            <a-button size="small" type="text" @click="scanBoxCode(record)">扫描箱号</a-button>
-          </template>
-        </template>
-      </a-table>
+    <div v-if="errorMsg" class="alert-box">
+      <a-alert type="error" :message="errorMsg" closable @close="errorMsg = ''" />
     </div>
 
-    <a-row v-if="deliveryOrder && deliveryOrder.status === 'Created'" class="button-row">
-      <a-button type="primary" @click="executeDelivery" :disabled="selectedStockIds.length === 0" :loading="executing">执行发货</a-button>
-      <a-button @click="reset">重置</a-button>
-    </a-row>
+    <div v-if="resultMsg" class="alert-box">
+      <a-alert :type="resultMsg.type" closable @close="resultMsg = null">
+        <template #message>
+          <div>{{ resultMsg.text }}</div>
+          <div v-if="resultMsg.detail" style="font-size:12px;margin-top:4px;">{{ resultMsg.detail }}</div>
+        </template>
+      </a-alert>
+    </div>
+
+    <div v-if="record" class="info-card">
+      <a-descriptions title="出库单保存记录" :column="2" bordered size="small">
+        <a-descriptions-item label="存货编码" :span="2"><b>{{ record.materialCode }}</b></a-descriptions-item>
+        <a-descriptions-item label="仓库">{{ record.warehouse }}</a-descriptions-item>
+        <a-descriptions-item label="客户编码">{{ record.customerCode }}</a-descriptions-item>
+        <a-descriptions-item label="数量">{{ record.quantity }}</a-descriptions-item>
+        <a-descriptions-item label="每箱数量">{{ record.qtyPerBox }}</a-descriptions-item>
+        <a-descriptions-item label="包装">{{ record.package }}</a-descriptions-item>
+        <a-descriptions-item label="等级">{{ record.grade }}</a-descriptions-item>
+        <a-descriptions-item label="标贴打字">{{ record.labelText }}</a-descriptions-item>
+        <a-descriptions-item label="发货单号" :span="2">{{ record.deliveryOrderNo }}</a-descriptions-item>
+        <a-descriptions-item label="主表id" :span="2">{{ record.masterId }}</a-descriptions-item>
+      </a-descriptions>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
-import { SearchOutlined } from '@ant-design/icons-vue';
+import { ScanOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 import Header from '../header/Header.vue';
-import { ERP_Delivery_OrderServiceProxy, StockServiceProxy, PagedStockQueryDto } from '/@/services/ServiceProxies';
-import moment from 'moment';
+import { ErpOutboundOrderServiceProxy, CreateFromBarcodeDto, ErpOutboundRecordDto } from '/@/services/ServiceProxies';
 
-const deliveryOrderNo = ref('');
+const barcode = ref('');
 const loading = ref(false);
-const executing = ref(false);
-const deliveryOrder = ref<any>(null);
-const stockItems = ref<any[]>([]);
-const selectedStockIds = ref<string[]>([]);
+const errorMsg = ref('');
+const resultMsg = ref<{ type: 'success' | 'warning' | 'error'; text: string; detail?: string } | null>(null);
+const record = ref<ErpOutboundRecordDto | null>(null);
 
-const deliveryOrderService = new ERP_Delivery_OrderServiceProxy();
-const stockService = new StockServiceProxy();
+const outboundService = new ErpOutboundOrderServiceProxy();
 
-const stockColumns = [
-  {
-    title: '选择',
-    key: 'select',
-    width: 50,
-    align: 'center',
-  },
-  { title: '物料编码', dataIndex: 'materialCode', key: 'materialCode' },
-  { title: '物料名称', dataIndex: 'materialName', key: 'materialName' },
-  { title: '规格', dataIndex: 'specs', key: 'specs' },
-  { title: '批次号', dataIndex: 'batchCode', key: 'batchCode' },
-  { title: '库存数量', dataIndex: 'totalCountInTime', key: 'totalCountInTime' },
-  { title: '库位', dataIndex: 'cellCode', key: 'cellCode' },
-  { title: '容器', dataIndex: 'boxCode', key: 'boxCode' },
-  {
-    title: '操作',
-    key: 'action',
-    width: 80,
-    align: 'center',
-  },
-];
-
-function formatDate(date: any): string {
-  return date ? moment(date).format('YYYY-MM-DD') : '';
+interface ParsedBarcode {
+  raw: string;
+  fields: string[];
+  warehouseCode: string;
+  customerCode: string;
+  masterId: string;
+  quantity: number;
+  materialCode: string;
+  packaging: string;
+  grade: string;
+  labelPrint: string;
+  deliveryOrderNo: string;
+  qtyPerBox: number;
 }
 
-function getStatusText(status?: string): string {
-  const statusMap: Record<string, string> = {
-    'Created': '待发货',
-    'Processing': '处理中',
-    'Completed': '已完成',
-    'Cancelled': '已取消'
+const parsed = computed<ParsedBarcode | null>(() => {
+  const v = barcode.value.trim();
+  if (!v) return null;
+  const parts = v.split('@');
+  if (parts.length !== 10) return null;
+  return {
+    raw: v,
+    fields: parts,
+    warehouseCode: parts[0],
+    customerCode: parts[1],
+    masterId: parts[2],
+    quantity: Number(parts[3]) || 0,
+    materialCode: parts[4],
+    packaging: parts[5],
+    grade: parts[6],
+    labelPrint: parts[7],
+    deliveryOrderNo: parts[8],
+    qtyPerBox: Number(parts[9]) || 0,
   };
-  return statusMap[status || ''] || '未知';
-}
+});
 
-async function scanDeliveryOrder() {
-  if (!deliveryOrderNo.value.trim()) {
-    message.error('请输入发货单号');
+async function onScan() {
+  const p = parsed.value;
+  if (!p) {
+    message.error('条码格式错误，需要10个@分隔的字段');
     return;
   }
-  
+
   loading.value = true;
-  
+  errorMsg.value = '';
+  resultMsg.value = null;
+
+  const dto = new CreateFromBarcodeDto();
+  dto.warehouseCode = p.warehouseCode;
+  dto.customerCode = p.customerCode;
+  dto.masterId = p.masterId;
+  dto.quantity = p.quantity;
+  dto.materialCode = p.materialCode;
+  dto.packaging = p.packaging;
+  dto.grade = p.grade;
+  dto.labelPrint = p.labelPrint;
+  dto.deliveryOrderNo = p.deliveryOrderNo;
+  dto.qtyPerBox = p.qtyPerBox;
+
   try {
-    const result = await deliveryOrderService.list(1, 100, deliveryOrderNo.value, undefined, undefined, undefined);
-    
-    if (result && result.items && result.items.length > 0) {
-      deliveryOrder.value = result.items[0];
-      await findStockForDeliveryOrder(deliveryOrder.value);
-      message.success('查询成功');
-    } else {
-      message.warning('未找到该发货单');
-      deliveryOrder.value = null;
-      stockItems.value = [];
-    }
+    const result = await outboundService.createFromBarcode(dto);
+    record.value = result;
+    resultMsg.value = {
+      type: 'success',
+      text: `存货编码 ${p.materialCode} 保存成功`,
+      detail: `发货单号: ${p.deliveryOrderNo}`,
+    };
+    message.success('保存成功');
+    barcode.value = '';
   } catch (error: any) {
-    message.error(error?.response?.data?.message || '查询失败');
-    deliveryOrder.value = null;
-    stockItems.value = [];
+    const msg = error?.response?.data?.message || error?.message || '保存失败';
+    errorMsg.value = msg;
+    if (msg.includes('已存在')) {
+      resultMsg.value = { type: 'warning', text: `存货编码 ${p.materialCode} 已存在`, detail: '跳过重复录入' };
+    } else {
+      resultMsg.value = { type: 'error', text: msg };
+    }
+    // message.error(msg);
   } finally {
     loading.value = false;
   }
-}
-
-async function findStockForDeliveryOrder(order: any) {
-  if (!order.items || order.items.length === 0) {
-    message.warning('发货单没有明细项');
-    return;
-  }
-  
-  stockItems.value = [];
-  
-  for (const item of order.items) {
-    try {
-      const queryDto = new PagedStockQueryDto();
-      queryDto.materialCode = item.materialCode;
-      queryDto.batchCode = item.batchCode;
-      queryDto.page = 1;
-      queryDto.pageSize = 50;
-      
-      const stockResult = await stockService.pagedStocksQuery(queryDto);
-      
-      if (stockResult && stockResult.items && stockResult.items.length > 0) {
-        stockItems.value.push(...stockResult.items.map((stock: any) => ({
-          ...stock,
-          deliveryItemId: item.id,
-          requiredQty: item.deliveryQuantity,
-          matched: true
-        })));
-      } else {
-        stockItems.value.push({
-          id: item.id,
-          materialCode: item.materialCode,
-          materialName: item.materialName,
-          specs: item.specs,
-          batchCode: item.batchCode,
-          totalCountInTime: 0,
-          cellCode: '-',
-          boxCode: '-',
-          deliveryItemId: item.id,
-          requiredQty: item.deliveryQuantity,
-          matched: false,
-          status: -1
-        });
-      }
-    } catch (error) {
-      console.error('查询库存失败:', error);
-    }
-  }
-}
-
-function toggleSelect(record: any) {
-  const index = selectedStockIds.value.indexOf(record.id);
-  if (index >= 0) {
-    selectedStockIds.value.splice(index, 1);
-  } else {
-    selectedStockIds.value.push(record.id);
-  }
-}
-
-function scanBoxCode(record: any) {
-  const boxCode = prompt('请扫描箱号:', record.boxCode || '');
-  if (boxCode) {
-    record.boxCode = boxCode;
-    message.success('箱号已更新');
-  }
-}
-
-async function executeDelivery() {
-  if (selectedStockIds.value.length === 0) {
-    message.error('请选择要发货的库存');
-    return;
-  }
-  
-  executing.value = true;
-  
-  try {
-    const selectedItems = stockItems.value.filter(s => selectedStockIds.value.includes(s.id));
-    let successCount = 0;
-    
-    for (const item of selectedItems) {
-      try {
-        const response = await stockService.stockOutboundDirect(item.id, item.totalCountInTime);
-        
-        if (response && response.success === true) {
-          successCount++;
-          item.status = 1;
-        }
-      } catch {
-        console.error('出库失败:', item);
-      }
-    }
-    
-    if (successCount === selectedItems.length) {
-      await deliveryOrderService.complete(deliveryOrder.value.id);
-      deliveryOrder.value.status = 'Completed';
-      message.success('发货完成');
-    } else {
-      message.warning(`部分发货成功: ${successCount}/${selectedItems.length}`);
-    }
-    
-    selectedStockIds.value = [];
-  } catch (error: any) {
-    message.error(error?.response?.data?.message || '发货失败');
-  } finally {
-    executing.value = false;
-  }
-}
-
-function reset() {
-  deliveryOrderNo.value = '';
-  deliveryOrder.value = null;
-  stockItems.value = [];
-  selectedStockIds.value = [];
 }
 </script>
 
@@ -257,7 +171,7 @@ function reset() {
 .icon { color: #1890ff; }
 .button-row { display: flex; gap: 10px; padding: 10px 0; }
 .button-row button { flex: 1; }
+.parsed-card { margin: 10px 0; }
+.alert-box { margin: 10px 0; }
 .info-card { margin: 10px 0; }
-.stock-section { margin: 10px 0; }
-.stock-section h3 { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
 </style>
