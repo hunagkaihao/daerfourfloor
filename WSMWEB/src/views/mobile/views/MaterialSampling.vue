@@ -57,9 +57,10 @@
 
     <div v-if="stockData" class="qty-section">
       <a-radio-group v-model:value="outMode" class="mode-row">
-        <a-radio value="box">按箱数抽检</a-radio>
+        <a-radio value="box" :disabled="!hasBoxQty">按箱数抽检</a-radio>
         <a-radio value="count">按数量抽检</a-radio>
       </a-radio-group>
+      <div v-if="!hasBoxQty" class="no-box-hint">该物料无每箱数量记录，不允许按箱抽检</div>
       <a-row class="qty-row">
         <a-col :span="8">
           <div class="label">{{ outMode === 'box' ? '抽检箱数:' : '抽检数量:' }}</div>
@@ -170,9 +171,13 @@ const stockColumns = [
 const outMode = ref('box');
 const outBoxCount = ref(1);
 
+const hasBoxQty = computed(() => {
+  return stockData.value?.countInOnePkgOrBox > 0;
+});
+
 const maxBoxCount = computed(() => {
   if (!stockData.value) return 0;
-  if (!stockData.value.countInOnePkgOrBox) return stockData.value.totalCountInTime;
+  if (!hasBoxQty.value) return 0;
   return Math.floor(stockData.value.totalCountInTime / stockData.value.countInOnePkgOrBox);
 });
 
@@ -216,7 +221,7 @@ function selectStock(stock: any) {
   stockData.value = stock;
   outQty.value = 1;
   outBoxCount.value = 1;
-  outMode.value = 'box';
+  outMode.value = stock.countInOnePkgOrBox > 0 ? 'box' : 'count';
   message.success('已选择物料');
 }
 
@@ -473,6 +478,13 @@ function reset() {
   color: #999; 
   margin-top: 8px; 
   text-align: right; 
+}
+
+.no-box-hint {
+  font-size: 12px;
+  color: #ff4d4f;
+  margin-bottom: 8px;
+  padding: 4px 0;
 }
 
 .success-message { 
