@@ -58,7 +58,7 @@
         <a-radio value="box" :disabled="!hasBoxQty">按箱数出库</a-radio>
         <a-radio value="count">按数量出库</a-radio>
       </a-radio-group>
-      <div v-if="!hasBoxQty" class="no-box-hint">该物料无每箱数量记录，不允许按箱出库，请按数量出库</div>
+      <div v-if="!hasBoxQty" class="no-box-hint">该物料无每箱数量记录，不允许按箱数出库，请按数量出库</div>
       <a-row class="qty-row">
         <a-col :span="8">
           <div class="label">{{ outMode === 'box' ? '出库箱数:' : '出库数量:' }}</div>
@@ -241,6 +241,8 @@ async function scanCellCode() {
         stockData.value = result[0];
         stockList.value = [];
         outQty.value = 1;
+        outBoxCount.value = 1;
+        outMode.value = result[0].countInOnePkgOrBox > 0 ? 'box' : 'count';
         message.success('查询成功');
       } else {
         stockList.value = result;
@@ -284,7 +286,9 @@ async function executeOut() {
 
     if (response && response.success === true) {
       stockData.value.totalCountInTime -= actualQty;
-      if (pagOrBoxCount > 0 && stockData.value.totalPagOrBoxInTime != null) {
+      if (stockData.value.countInOnePkgOrBox > 0) {
+        stockData.value.totalPagOrBoxInTime = Math.ceil(stockData.value.totalCountInTime / stockData.value.countInOnePkgOrBox);
+      } else if (pagOrBoxCount > 0 && stockData.value.totalPagOrBoxInTime != null) {
         stockData.value.totalPagOrBoxInTime -= pagOrBoxCount;
       }
 

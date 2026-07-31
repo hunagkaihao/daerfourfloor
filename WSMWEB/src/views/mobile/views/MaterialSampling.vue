@@ -242,6 +242,8 @@ async function scanCellCode() {
         stockData.value = result[0];
         stockList.value = [];
         outQty.value = 1;
+        outBoxCount.value = 1;
+        outMode.value = result[0].countInOnePkgOrBox > 0 ? 'box' : 'count';
         message.success('查询成功');
       } else {
         stockList.value = result;
@@ -285,7 +287,9 @@ async function executeOut() {
 
     if (response && response.success === true) {
       stockData.value.totalCountInTime -= actualQty;
-      if (pagOrBoxCount > 0 && stockData.value.totalPagOrBoxInTime != null) {
+      if (stockData.value.countInOnePkgOrBox > 0) {
+        stockData.value.totalPagOrBoxInTime = Math.ceil(stockData.value.totalCountInTime / stockData.value.countInOnePkgOrBox);
+      } else if (pagOrBoxCount > 0 && stockData.value.totalPagOrBoxInTime != null) {
         stockData.value.totalPagOrBoxInTime -= pagOrBoxCount;
       }
 
