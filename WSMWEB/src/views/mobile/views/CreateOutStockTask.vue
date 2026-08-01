@@ -1,6 +1,16 @@
 <template>
     <div class="components-input-demo-presuffix">
-        <Header numb="创建出库任务"></Header>
+        <Header numb="创建出库任务">
+            <template #action>
+                <a-button
+                    size="small"
+                    :type="showAllStocks ? 'primary' : 'default'"
+                    @click="toggleShowAll"
+                >
+                    {{ showAllStocks ? '只看未下任务' : '所有库存信息' }}
+                </a-button>
+            </template>
+        </Header>
         <a-row class="input-row">
             <a-col :span="9" :offset="1">
                 <a-select v-model:value="findtype" class="modern-select" style="width: 90%;">
@@ -33,7 +43,9 @@
         </a-row>
 
         <div >
-            <p style="margin-left: 20px">库存信息:{{ dataSource.length }}</p>
+            <p style="margin-left: 20px">库存信息:{{ dataSource.length }}
+                <span v-if="hiddenCount > 0" style="color:#fa8c16; font-size:12px;"> (已隐藏 {{ hiddenCount }} 条已下出库任务库存)</span>
+            </p>
             <a-table 
                 ref="tableRef" 
                 :dataSource="dataSource" 
@@ -141,8 +153,13 @@ let fliter = ref<string>('');
 let outCellCode = ref<string>('');
 var goods = ref([]
 );
-var dataSource = ref([]
-);
+var allStocks = ref<any[]>([]);
+let showAllStocks = ref(false);
+var dataSource = computed(() => {
+    if (showAllStocks.value) return allStocks.value;
+    return allStocks.value.filter((s) => !s.hasTask);
+});
+const hiddenCount = computed(() => allStocks.value.length - dataSource.value.length);
 let findtype = ref("barcode")
 let screenHeight = ref(window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight);
 let screenWidth = ref((window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth) - 8)
@@ -230,19 +247,22 @@ const scancellCode = async () => {
     }
     
     await stocksQuery(params).then((res) => {
-        dataSource.value.length = 0;
-        res.forEach((e) => {
-            dataSource.value.push(e);
-        });
-        // 自动选择第一个库存
-        if (res.length > 0) {
-            selectedRowId.value = res[0].id;
-            selectedStock.value = res[0];
-            message.info(`已自动选择库存: ${res[0].materialName}`);
+        allStocks.value = res ? res.slice() : [];
+        const visible = dataSource.value;
+        const hidden = allStocks.value.length - visible.length;
+        if (visible.length > 0) {
+            // 自动选择第一条可见库存
+            selectedRowId.value = visible[0].id;
+            selectedStock.value = visible[0];
+            message.info(`已自动选择库存: ${visible[0].materialName}`);
+            if (hidden > 0) {
+                message.warning(`已隐藏 ${hidden} 条已下出库任务的库存，点击右上角「所有库存信息」可查看`);
+            }
         } else {
             // 重置选中状态
             selectedRowId.value = '';
             selectedStock.value = null;
+            message.warning('符合条件的库存均已下出库任务');
         }
     }).catch((err) => {
         message.error(err.error.message);
@@ -283,7 +303,7 @@ const createOutStockTask = async () => {
                 outCellCode.value = '';
                 selectedRowId.value = '';
                 selectedStock.value = null;
-                dataSource.value.length = 0;
+                allStocks.value = [];
             } else if(res.success == false){
                 message.error(res.message);
             }else{
@@ -296,6 +316,12 @@ const createOutStockTask = async () => {
         message.error("出库任务创建失败");
     }
 };
+
+function toggleShowAll() {
+    showAllStocks.value = !showAllStocks.value;
+    selectedRowId.value = '';
+    selectedStock.value = null;
+}
 
 //软件盘弹出屏蔽
 function focusFn(e) {

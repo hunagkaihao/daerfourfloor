@@ -259,5 +259,10 @@ namespace TuTa.Wms.Stocks.Dtos
         public decimal? FullBoxRate { get; set; }
 
         public string AvaType { get; set; }
+
+        /// <summary>
+        /// 该库存所在容器是否已有未完成的搬运/出库任务
+        /// </summary>
+        public bool HasTask { get; set; }
     }
 }

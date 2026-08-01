@@ -8,6 +8,7 @@
       >
       <template #extra> 
         <a-space style="line-height: 32px;" >
+          <slot name="action"></slot>
           <a-dropdown >
             <a class="ant-dropdown-link" @click.prevent>
               {{getUserInfo.realName}}              

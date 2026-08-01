@@ -1097,6 +1097,17 @@ namespace TuTa.Wms.AgvTasks
             }
         }
 
+        /// <summary>
+        /// 获取所有已有未完成任务（未完成且未取消）的容器编码
+        /// </summary>
+        public async Task<List<string>> GetBoxCodesWithUnfinishedTaskAsync()
+        {
+            var agvTasks = await _agvTaskRepository.GetListAsync(f =>
+                f.AgvTaskStatus != AgvTaskStatus.Complete
+                & f.AgvTaskStatus != AgvTaskStatus.Cancel).ConfigureAwait(false);
+            return agvTasks.Select(t => t.BoxCode).Distinct().ToList();
+        }
+
 
 
         /// <summary>
