@@ -342,6 +342,7 @@ public class WmsDbContext :
             b.Property(e => e.Grade).HasMaxLength(20);
             b.Property(e => e.LabelText).HasMaxLength(200);
             b.Property(e => e.DeliveryOrderNo).HasMaxLength(50);
+            b.Property(e => e.ActualOutboundQuantity).HasColumnType("decimal(18,4)");
             b.HasIndex(e => new { e.DeliveryOrderNo, e.MaterialCode }).IsUnique();
         });
 

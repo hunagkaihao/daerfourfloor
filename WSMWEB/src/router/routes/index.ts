@@ -356,6 +356,18 @@ export const StockQuery: AppRouteRecordRaw = {
   },
 };
 
+//根据单据行条码创建出库任务(移动端)
+export const CreateOutboundTaskFromBarcode: AppRouteRecordRaw = {
+  path: '/createOutboundTaskFromBarcode',
+  name: 'CreateOutboundTaskFromBarcode',
+  component: () => import('/@/views/mobile/views/CreateOutboundTaskFromBarcode.vue'),
+  meta: {
+    title: t('创建出库任务'),
+    ignoreKeepAlive: true,
+    ignoreAuth: true,
+  },
+};
+
 //创建出库任务(汇总)(移动端)
 export const CreateOutStockTaskSummary: AppRouteRecordRaw = {
   path: '/createOutStockTaskSummary',
@@ -398,6 +410,7 @@ export const basicRoutes = [
   TestScanAsn,
   OutStockOrder,
   DeliveryOrderScan,
+  CreateOutboundTaskFromBarcode,
   OutStockSort,
   MaterialOut,
   MaterialPartialOut,

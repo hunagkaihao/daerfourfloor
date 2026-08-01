@@ -221,6 +221,7 @@ namespace TuTa.Wms.Erp
                 Grade = record.Grade,
                 LabelText = record.LabelText,
                 DeliveryOrderNo = record.DeliveryOrderNo,
+                ActualOutboundQuantity = record.ActualOutboundQuantity,
                 CreationTime = record.CreationTime,
             };
         }

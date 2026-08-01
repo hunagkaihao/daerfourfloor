@@ -21767,6 +21767,132 @@ export class StockServiceProxy extends ServiceProxyBase {
         }
         return Promise.resolve<ResponseDto>(null as any);
     }
+
+    /**
+     * 根据单据行条码创建出库任务
+     * @param deliveryOrderNo (optional) 
+     * @param materialCode (optional) 
+     * @param actualOutboundQuantity (optional) 
+     * @param boxCode (optional) 
+     * @param startCellCode (optional) 
+     * @param endCellCode (optional) 
+     * @return OK
+     */
+    createOutboundTaskFromBarcode(deliveryOrderNo: string | undefined, materialCode: string | undefined, actualOutboundQuantity: number | undefined, boxCode: string | undefined, startCellCode: string | undefined, endCellCode: string | undefined , cancelToken?: CancelToken | undefined): Promise<ResponseDto> {
+        let url_ = this.baseUrl + "/wms/stock/createOutboundTaskFromBarcode?";
+        if (deliveryOrderNo === null)
+            throw new Error("The parameter 'deliveryOrderNo' cannot be null.");
+        else if (deliveryOrderNo !== undefined)
+            url_ += "deliveryOrderNo=" + encodeURIComponent("" + deliveryOrderNo) + "&";
+        if (materialCode === null)
+            throw new Error("The parameter 'materialCode' cannot be null.");
+        else if (materialCode !== undefined)
+            url_ += "materialCode=" + encodeURIComponent("" + materialCode) + "&";
+        if (actualOutboundQuantity === null)
+            throw new Error("The parameter 'actualOutboundQuantity' cannot be null.");
+        else if (actualOutboundQuantity !== undefined)
+            url_ += "actualOutboundQuantity=" + encodeURIComponent("" + actualOutboundQuantity) + "&";
+        if (boxCode === null)
+            throw new Error("The parameter 'boxCode' cannot be null.");
+        else if (boxCode !== undefined)
+            url_ += "boxCode=" + encodeURIComponent("" + boxCode) + "&";
+        if (startCellCode === null)
+            throw new Error("The parameter 'startCellCode' cannot be null.");
+        else if (startCellCode !== undefined)
+            url_ += "startCellCode=" + encodeURIComponent("" + startCellCode) + "&";
+        if (endCellCode === null)
+            throw new Error("The parameter 'endCellCode' cannot be null.");
+        else if (endCellCode !== undefined)
+            url_ += "endCellCode=" + encodeURIComponent("" + endCellCode) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = <AxiosRequestConfig>{
+            method: "POST",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.instance.request(transformedOptions_);
+        }).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processCreateOutboundTaskFromBarcode(_response));
+        });
+    }
+
+    protected processCreateOutboundTaskFromBarcode(response: AxiosResponse): Promise<ResponseDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = ResponseDto.fromJS(resultData200);
+            return Promise.resolve<ResponseDto>(result200);
+
+        } else if (status === 403) {
+            const _responseText = response.data;
+            let result403: any = null;
+            let resultData403  = _responseText;
+            result403 = RemoteServiceErrorResponse.fromJS(resultData403);
+            return throwException("Forbidden", status, _responseText, _headers, result403);
+
+        } else if (status === 401) {
+            const _responseText = response.data;
+            let result401: any = null;
+            let resultData401  = _responseText;
+            result401 = RemoteServiceErrorResponse.fromJS(resultData401);
+            return throwException("Unauthorized", status, _responseText, _headers, result401);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = RemoteServiceErrorResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = RemoteServiceErrorResponse.fromJS(resultData404);
+            return throwException("Not Found", status, _responseText, _headers, result404);
+
+        } else if (status === 501) {
+            const _responseText = response.data;
+            let result501: any = null;
+            let resultData501  = _responseText;
+            result501 = RemoteServiceErrorResponse.fromJS(resultData501);
+            return throwException("Not Implemented", status, _responseText, _headers, result501);
+
+        } else if (status === 500) {
+            const _responseText = response.data;
+            let result500: any = null;
+            let resultData500  = _responseText;
+            result500 = RemoteServiceErrorResponse.fromJS(resultData500);
+            return throwException("Internal Server Error", status, _responseText, _headers, result500);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ResponseDto>(null as any);
+    }
 }
 
 export class StockInHistoryServiceProxy extends ServiceProxyBase {
@@ -29638,6 +29764,7 @@ export class ErpOutboundRecordDto implements IErpOutboundRecordDto {
     grade!: string | undefined;
     labelText!: string | undefined;
     deliveryOrderNo!: string | undefined;
+    actualOutboundQuantity!: number | undefined;
     creationTime!: moment.Moment;
 
     constructor(data?: IErpOutboundRecordDto) {
@@ -29662,6 +29789,7 @@ export class ErpOutboundRecordDto implements IErpOutboundRecordDto {
             this.grade = _data["grade"];
             this.labelText = _data["labelText"];
             this.deliveryOrderNo = _data["deliveryOrderNo"];
+            this.actualOutboundQuantity = _data["actualOutboundQuantity"];
             this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
         }
     }
@@ -29686,6 +29814,7 @@ export class ErpOutboundRecordDto implements IErpOutboundRecordDto {
         data["grade"] = this.grade;
         data["labelText"] = this.labelText;
         data["deliveryOrderNo"] = this.deliveryOrderNo;
+        data["actualOutboundQuantity"] = this.actualOutboundQuantity;
         data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
         return data;
     }
@@ -29703,6 +29832,7 @@ export interface IErpOutboundRecordDto {
     grade: string | undefined;
     labelText: string | undefined;
     deliveryOrderNo: string | undefined;
+    actualOutboundQuantity: number | undefined;
     creationTime: moment.Moment;
 }
 
@@ -33954,6 +34084,7 @@ export class StockDto implements IStockDto {
     fullBoxRate!: number | undefined;
     avaType!: string | undefined;
     inspectionStatus!: number;
+    hasTask!: boolean;
 
     constructor(data?: IStockDto) {
         if (data) {
@@ -34015,6 +34146,7 @@ export class StockDto implements IStockDto {
             this.fullBoxRate = _data["fullBoxRate"];
             this.avaType = _data["avaType"];
             this.inspectionStatus = _data["inspectionStatus"];
+            this.hasTask = _data["hasTask"];
         }
     }
 
@@ -34076,6 +34208,7 @@ export class StockDto implements IStockDto {
         data["fullBoxRate"] = this.fullBoxRate;
         data["avaType"] = this.avaType;
         data["inspectionStatus"] = this.inspectionStatus;
+        data["hasTask"] = this.hasTask;
         return data;
     }
 }
@@ -34130,6 +34263,7 @@ export interface IStockDto {
     fullBoxRate: number | undefined;
     avaType: string | undefined;
     inspectionStatus: number;
+    hasTask: boolean;
 }
 
 export class StockMoveDto implements IStockMoveDto {

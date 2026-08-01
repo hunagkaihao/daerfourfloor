@@ -50,6 +50,7 @@ namespace TuTa.Wms.Erp.Entities
         public virtual string Grade { get; private set; }
         public virtual string LabelText { get; private set; }
         public virtual string DeliveryOrderNo { get; private set; }
+        public virtual decimal? ActualOutboundQuantity { get; set; }
         public virtual DateTime CreationTime { get; private set; }
         public virtual DateTime? CompletedTime { get; set; }
         public virtual DateTime? OutboundDate { get; set; }

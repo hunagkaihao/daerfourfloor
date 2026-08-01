@@ -122,6 +122,7 @@ namespace TuTa.Wms.Erp.Dto
         public string Grade { get; set; }
         public string LabelText { get; set; }
         public string DeliveryOrderNo { get; set; }
+        public decimal? ActualOutboundQuantity { get; set; }
         public DateTime CreationTime { get; set; }
     }
 

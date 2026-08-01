@@ -124,6 +124,14 @@
               <div class="menu-item-text">ASN组盘</div>
             </div>
           </a-col>
+          <a-col :span="8">
+            <div class="menu-item-card" @click="createOutboundTaskFromBarcode">
+              <div class="menu-item-icon-wrapper">
+                <InboxOutlined class="menu-item-icon" />
+              </div>
+              <div class="menu-item-text">创建出库任务</div>
+            </div>
+          </a-col>
         </a-row>
         <a-row justify="center" style="margin-top: 20px; margin-bottom: 20px">
           <a-col :span="8">
@@ -134,6 +142,14 @@
               <div class="menu-item-text">物料抽检</div>
             </div>
           </a-col>
+          <a-col :span="8">
+              <div class="menu-item-card" @click="materialPartialOut">
+                <div class="menu-item-icon-wrapper">
+                  <GiftOutlined class="menu-item-icon" />
+                </div>
+                <div class="menu-item-text">拆箱出库</div>
+              </div>
+            </a-col>
         </a-row> 
         <a-row justify="center" style="margin-top: 20px; margin-bottom: 20px">
           <a-col :span="8">
@@ -144,6 +160,14 @@
               <div class="menu-item-text">物料状态变更</div>
             </div>
           </a-col>
+          <a-col :span="8">
+              <div class="menu-item-card" @click="materialOut">
+                <div class="menu-item-icon-wrapper">
+                  <ExportOutlined class="menu-item-icon" />
+                </div>
+                <div class="menu-item-text">整箱出库</div>
+              </div>
+            </a-col>
         </a-row>
         <a-row justify="center" style="margin-top: 20px; margin-bottom: 20px">
           <a-col :span="8">
@@ -154,8 +178,12 @@
               <div class="menu-item-text">创建入库任务</div>
             </div>
           </a-col>
+          <a-col :span="8">
+            <!-- 暂时没有东西 -->
+          </a-col>
         </a-row> 
       </a-tab-pane>
+
       <a-tab-pane key="3" tab="出库" force-render>
         <div>
           <a-row justify="center" style="margin-top: 20px; margin-bottom: 20px">
@@ -332,6 +360,10 @@ const scanAsn = async () => {
 };
 const scanOutboundOrder = async () => {
   await router.replace('/deliveryOrderScan');
+};
+
+const createOutboundTaskFromBarcode = async () => {
+  await router.replace('/createOutboundTaskFromBarcode');
 };
 const boxIncell = async () => {
   await router.replace('/boxIncell');

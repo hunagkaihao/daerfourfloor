@@ -34,6 +34,17 @@ namespace TuTa.Wms.Stocks
         Task<ResponseDto> CreateStockTaskV2(string boxCode, string startCellCode, string endCellCode);
 
         /// <summary>
+        /// 根据单据行条码创建出库任务：校验erpoutbound记录存在，创建搬运任务，并更新实际出库数量
+        /// </summary>
+        Task<ResponseDto> CreateOutboundTaskFromBarcodeAsync(
+            string deliveryOrderNo,
+            string materialCode,
+            decimal actualOutboundQuantity,
+            string boxCode,
+            string startCellCode,
+            string endCellCode);
+
+        /// <summary>
         /// 直接创建库存并绑定到容器（无需收料条码）
         /// </summary>
         /// <param name="stockInfo">库存信息</param>

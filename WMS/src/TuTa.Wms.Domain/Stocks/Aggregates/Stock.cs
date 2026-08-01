@@ -284,8 +284,15 @@ namespace TuTa.Wms.Stocks.Aggregates
                 throw new ArgumentException("出库数量超过已有数量");
 
             TotalCountInTime -= outCount;
-            if (pagOrBoxCount.HasValue && TotalPagOrBox.HasValue && TotalPagOrBox >= pagOrBoxCount.Value)
-                TotalPagOrBox = TotalPagOrBox - pagOrBoxCount.Value;
+
+            if (ReceiveCount?.CountInOnePkgOrBox > 0)
+            {
+                TotalPagOrBox = (int)Math.Ceiling(TotalCountInTime / ReceiveCount.CountInOnePkgOrBox.Value);
+            }
+            else if (pagOrBoxCount.HasValue && TotalPagOrBox.HasValue && TotalPagOrBox >= pagOrBoxCount.Value)
+            {
+                TotalPagOrBox -= pagOrBoxCount.Value;
+            }
 
             if (TotalCountInTime == 0) //领完了
             {

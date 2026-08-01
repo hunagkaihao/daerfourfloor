@@ -148,6 +148,27 @@ namespace TuTa.Wms.Controllers.Stocks
         }
 
         /// <summary>
+        /// 根据单据行条码创建出库任务（校验erpoutbound记录，创建搬运任务，更新实际出库数量）
+        /// </summary>
+        [HttpPost("createOutboundTaskFromBarcode")]
+        [SwaggerOperation(summary: "根据单据行条码创建出库任务", Tags = new[] { "Stock" })]
+        public async Task<ResponseDto> CreateOutboundTaskFromBarcodeAsync(
+            string deliveryOrderNo,
+            string materialCode,
+            decimal actualOutboundQuantity,
+            string boxCode,
+            string startCellCode,
+            string endCellCode)
+        {
+            await Task.Delay(1);
+            lock (_lock)
+            {
+                return _stockService.CreateOutboundTaskFromBarcodeAsync(
+                    deliveryOrderNo, materialCode, actualOutboundQuantity, boxCode, startCellCode, endCellCode).GetAwaiter().GetResult();
+            }
+        }
+
+        /// <summary>
         /// 直接创建库存并绑定容器（无需收料条码）
         /// </summary>
         /// <param name="stockInfo">库存信息</param>
