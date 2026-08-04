@@ -241,7 +241,12 @@ namespace TuTa.Wms.Stocks
                 }
             }
         }
-
+        /// <summary>
+        /// 容器组盘, 创建库存和容器绑定
+        /// </summary>
+        /// <param name="paras"></param>
+        /// <param name="boxCode"></param>
+        /// <returns></returns>
         private async Task<ResponseDto> CreateStockAndBindBoxCoreAsync(List<StockCreateDto> paras, string boxCode)
         {
             if (string.IsNullOrWhiteSpace(boxCode))
@@ -905,6 +910,7 @@ namespace TuTa.Wms.Stocks
                     // 删除所有库存
                     foreach (Stock stock in stocks)
                     {
+                        _logger.Info($"库存解绑容器：删除库位 {stock.CellData.CellCode} :  库存 {stock.Barcode}, 物料 {stock.Material?.MaterialCode}, 数量 {stock.TotalCountInTime}");
                         await _stockRepository.DeleteAsync(stock);
                     }
 
@@ -2438,9 +2444,6 @@ namespace TuTa.Wms.Stocks
                     false,
                     para.SkipCount, para.MaxResultCount);
 
-                var taskingBoxCodes = await _agvTaskManager.GetBoxCodesWithUnfinishedTaskAsync().ConfigureAwait(false);
-                var taskingBoxCodeSet = new HashSet<string>(taskingBoxCodes);
-
                 List<StockDto> stockDtos = new List<StockDto>();
                 foreach (var stock in stocks)
                 {
@@ -2491,8 +2494,7 @@ namespace TuTa.Wms.Stocks
                         SupplierName = stock.Supplier.SupplierName,
                         FullBoxRate = stock.BoxData.FullRate,
                         InspectionCount = stock.InspectionCount,
-                        InspectionStatus = (int)(stock.InspectionStatus ?? 0),
-                        HasTask = stock.BoxData.BoxCode != null && taskingBoxCodeSet.Contains(stock.BoxData.BoxCode)
+                        InspectionStatus = (int)(stock.InspectionStatus ?? 0)
                     };
                     stockDtos.Add(dto);
                 }
@@ -4196,6 +4198,14 @@ namespace TuTa.Wms.Stocks
             }
         }
 
+        /// <summary>
+        /// 整箱(批量)出库
+        /// </summary>
+        /// <param name="stockId"></param>
+        /// <param name="outBoundCount"></param>
+        /// <param name="pagOrBoxCount"></param>
+        /// <returns></returns>
+        /// <exception cref="UserFriendlyException"></exception>
         public async Task<ResponseDto> OutBountStockDirectAsync(Guid stockId, decimal outBoundCount, int? pagOrBoxCount = null)
         {
             using (var uow = UnitOfWorkManager.Begin(true, true))

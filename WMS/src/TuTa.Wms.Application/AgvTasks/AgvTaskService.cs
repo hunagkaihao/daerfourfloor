@@ -340,10 +340,11 @@ namespace TuTa.Wms.AgvTasks
         public async Task<ResultAgvTaskDto> BindCtnrAndBinAsync(string reqCode, string stgBinCode, string ctnrType = "5", string ctnrCode = null, string indBind = "0")
         {
             //reqCode = Guid.NewGuid().ToString("N");
-
+            
             var bindResult = await _rcsApiManager.BindCtnrAndBinAsync(reqCode, stgBinCode, ctnrType, ctnrCode, indBind).ConfigureAwait(false);
             if (bindResult.Code == "0")
             {
+                _logger.LogInformation($"[容器解绑成功]: 请求编号:{reqCode}, 仓位编号:{stgBinCode}, 容器类型:{ctnrType}, 容器编号:{ctnrCode}");
                 return new ResultAgvTaskDto("0", "成功", bindResult.ReqCode, "");
             }
             else
