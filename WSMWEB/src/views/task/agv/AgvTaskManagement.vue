@@ -247,7 +247,7 @@ function defaultHeader({ filename, bookType }: ExportModalResult) {
       起始位置: task.startPositionCode,
       目标位置: task.endPositionCode,
       任务状态: getStatusText(task.agvTaskStatus),
-      任务类型: task.taskTyp,
+      任务类型: ({ De01: '4楼入库', De02: '4楼出库' } as Record<string, string>)[task.taskTyp] || task.taskTyp,
       容器类型: task.ctnrTyp,
       物料批次: task.materialLot,
       数据: task.data,

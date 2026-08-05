@@ -131,6 +131,13 @@ export const tableColumns: BasicColumn[] = [
     title: '任务类型',
     dataIndex: 'taskTyp',
     width: 100,
+    customRender: ({ text }) => {
+      const taskTypMap = {
+        De01: '4楼入库',
+        De02: '4楼出库',
+      };
+      return taskTypMap[text] || text;
+    },
   },
   {
     title: '搬运开始时间',
