@@ -3,7 +3,6 @@ using TuTa.Wms.Departments.Aggregates;
 using TuTa.Wms.Departments.Dtos;
 using TuTa.Wms.Erp.Dtos;
 using TuTa.Wms.Erp.Entities;
-using TuTa.Wms.Log;
 using TuTa.Wms.Materials.Aggregates;
 using TuTa.Wms.Materials.Dtos;
 using TuTa.Wms.Users.Dtos;
@@ -21,7 +20,6 @@ public class WmsApplicationAutoMapperProfile : Profile
         /* You can configure your AutoMapper mapping configuration here.
          * Alternatively, you can split your mapping configurations
          * into multiple profile classes for a better organization. */
-        CreateMap<SqliteLogItem, LogDto>();
         CreateMap<Material, MaterialDto>(MemberList.None);
         CreateMap<ErpStockAftChk, ErpGoodsAftChkDto>(MemberList.None);
         CreateMap<Warehouse, WarehouseDto>(MemberList.None);

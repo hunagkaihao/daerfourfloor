@@ -148,6 +148,19 @@ namespace TuTa.Wms.Controllers.Stocks
         }
 
         /// <summary>
+        /// 实现IStockService中的库存整理专用任务创建契约。
+        /// 库存整理只能由StockConsolidationWorker内部调用，因此使用显式接口实现，
+        /// 不在普通库存Controller上额外公开一个可由前端绕过整理线程直接调用的HTTP接口。
+        /// </summary>
+        Task<ResponseDto> IStockService.CreateStockConsolidationTask(
+            string boxCode,
+            string startCellCode,
+            string endCellCode)
+        {
+            return _stockService.CreateStockConsolidationTask(boxCode, startCellCode, endCellCode);
+        }
+
+        /// <summary>
         /// 根据单据行条码创建出库任务（校验erpoutbound记录，创建搬运任务，更新实际出库数量）
         /// </summary>
         [HttpPost("createOutboundTaskFromBarcode")]

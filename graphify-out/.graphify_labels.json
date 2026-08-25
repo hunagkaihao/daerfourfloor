@@ -587,5 +587,19 @@
   "585": "styleMock.ts",
   "586": "workerMock.ts",
   "587": "test.spec.ts",
-  "588": "excel.js"
+  "588": "excel.js",
+  "589": "WarehouseAreaAddDto",
+  "590": "WarehouseAreaUpdateDto",
+  "591": "package.json",
+  "592": "WmsHttpApiClientModule",
+  "593": "WmsHttpApiModule",
+  "594": "ExtensionPropertyApiGetDto",
+  "595": "FeatureProviderDto",
+  "596": "[2.0.0](https://github.com/anncwb/vue-vben-admin/compare/v2.0.0-rc.18...v2.0.0) (2021-02-17)",
+  "597": "(Breaking changes) Breaking changes",
+  "598": "2.0.0-beta.1(2020-09-30)",
+  "599": "2.0.0-beta.1(2020-09-30)",
+  "600": "(破坏性更新) Breaking changes",
+  "601": "tsconfig-paths",
+  "602": "tsconfig.json"
 }

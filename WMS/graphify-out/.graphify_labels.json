@@ -187,6 +187,7 @@
   "185": "Guid",
   "186": "IEnumerable",
   "187": "ILogger",
+  "188": "ErpModule",
   "189": "AssemblyInfo.cs",
   "192": "AssemblyInfo.cs",
   "193": "AssemblyInfo.cs"
