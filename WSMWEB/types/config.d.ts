@@ -146,6 +146,14 @@ export interface GlobConfig {
   urlPrefix?: string;
   // Project abbreviation
   shortName: string;
+  // Whether the warehouse consolidation entry is visible
+  consolidationEnabled?: string;
+  // Warehouse consolidation tab title
+  consolidationTitle?: string;
+  // External warehouse consolidation application url
+  consolidationUrl?: string;
+  // redirect | new-window
+  consolidationOpenMode?: string;
 }
 export interface GlobEnvConfig {
   // Site title
@@ -158,4 +166,8 @@ export interface GlobEnvConfig {
   VITE_GLOB_APP_SHORT_NAME: string;
   // Upload url
   VITE_GLOB_UPLOAD_URL?: string;
+  VITE_GLOB_CONSOLIDATION_ENABLED?: string;
+  VITE_GLOB_CONSOLIDATION_TITLE?: string;
+  VITE_GLOB_CONSOLIDATION_URL?: string;
+  VITE_GLOB_CONSOLIDATION_OPEN_MODE?: string;
 }

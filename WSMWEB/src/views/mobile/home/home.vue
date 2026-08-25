@@ -259,6 +259,23 @@
           </a-row>
         </div>
       </a-tab-pane>
+      <a-tab-pane
+        v-if="consolidationEnabled"
+        key="5"
+        :tab="consolidationTitle"
+        force-render
+      >
+        <a-row justify="center" style="margin-top: 20px; margin-bottom: 20px">
+          <a-col :span="12">
+            <div class="menu-item-card" @click="openConsolidation">
+              <div class="menu-item-icon-wrapper">
+                <SwapOutlined class="menu-item-icon" />
+              </div>
+              <div class="menu-item-text">进入{{ consolidationTitle }}</div>
+            </div>
+          </a-col>
+        </a-row>
+      </a-tab-pane>
      
     </a-tabs>
 
@@ -307,19 +324,41 @@ import { router } from '/@/router';
 // import { pickItemsCnt, recheckItemsCount } from './home';
 import { useUserStore } from '/@/store/modules/user';
 import { useViewStore } from '/@/store/modules/view';
+import { useGlobSetting } from '/@/hooks/setting';
 const userStore = useUserStore();
 const viewStore = useViewStore();
+const globSetting = useGlobSetting();
 const getUserInfo = computed(() => {
   const { realName = '', avatar, desc } = userStore.getUserInfo || {};
   return { realName, avatar: avatar || desc };
 });
 const activeKey = ref('1');
+const consolidationEnabled = computed(() =>
+  String(globSetting.consolidationEnabled ?? 'false').toLowerCase() === 'true'
+);
+const consolidationTitle = computed(() => globSetting.consolidationTitle || '货物整理');
 console.log(viewStore.getTab)
 // 确保tab值有效
-activeKey.value = ['1', '2', '3', '4'].includes(viewStore.getTab) ? viewStore.getTab : '1'
+const validTabs = consolidationEnabled.value ? ['1', '2', '3', '4', '5'] : ['1', '2', '3', '4'];
+activeKey.value = validTabs.includes(viewStore.getTab) ? viewStore.getTab : '1'
 function tabclick(key) {
   viewStore.setTab(key)
   console.log(viewStore.getTab)
+}
+
+function openConsolidation() {
+  const url = globSetting.consolidationUrl;
+  if (!url) {
+    console.error('未配置 VITE_GLOB_CONSOLIDATION_URL');
+    return;
+  }
+
+  if (globSetting.consolidationOpenMode === 'new-window') {
+    window.open(url, '_blank', 'noopener,noreferrer');
+    return;
+  }
+
+  window.location.assign(url);
 }
 
 const handleLoginOut = async () => {

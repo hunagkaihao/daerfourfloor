@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>四楼货物整理</title>
+  <style>
+    :root { color-scheme: light; font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:#f4f7fb; color:#172033; }
+    header { padding:18px 16px; color:#fff; background:linear-gradient(135deg,#1677ff,#40a9ff); }
+    header h1 { margin:0; font-size:21px; }
+    header p { margin:6px 0 0; opacity:.88; font-size:13px; }
+    main { max-width:860px; margin:0 auto; padding:14px; }
+    .card { background:#fff; border-radius:14px; padding:15px; margin-bottom:12px; box-shadow:0 4px 18px rgba(23,32,51,.07); }
+    .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .row > * { flex:1; min-width:110px; }
+    button { border:0; border-radius:10px; padding:11px 13px; font-weight:600; color:#fff; background:#1677ff; }
+    button.secondary { background:#64748b; }
+    button.danger { background:#dc2626; }
+    button:disabled { opacity:.45; }
+    input { width:100%; border:1px solid #d7deea; border-radius:9px; padding:10px; }
+    .badge { display:inline-block; padding:4px 9px; border-radius:999px; background:#e8f2ff; color:#1668dc; font-size:12px; }
+    .metric { margin:5px 0; font-size:14px; }
+    .error { color:#b42318; white-space:pre-wrap; }
+    .warning { color:#a15c00; }
+    table { width:100%; border-collapse:collapse; font-size:12px; }
+    th,td { text-align:left; border-bottom:1px solid #edf0f5; padding:8px 4px; }
+    .scroll { overflow:auto; max-height:46vh; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>四楼货物整理</h1>
+    <p>按 S 型顺序逐物料串行整理，原 WMS 负责真实搬运和库存更新</p>
+  </header>
+  <main>
+    <section class="card">
+      <div class="row">
+        <div><span id="featureState" class="badge">读取配置中</span></div>
+        <div><span id="executionState" class="badge">读取执行模式中</span></div>
+      </div>
+      <div style="margin-top:12px">
+        <input id="operatorKey" type="password" placeholder="操作密钥（如已配置）" autocomplete="off" />
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="row">
+        <button id="createPlan">计算新方案</button>
+        <button id="refresh" class="secondary">刷新状态</button>
+        <button id="execute">开始/继续</button>
+        <button id="pause" class="secondary">暂停</button>
+        <button id="cancel" class="danger">取消</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3 style="margin-top:0">当前方案</h3>
+      <div id="summary" class="metric">暂无方案</div>
+      <div id="warnings" class="warning"></div>
+      <div id="error" class="error"></div>
+    </section>
+
+    <section class="card">
+      <h3 style="margin-top:0">搬运明细</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>序号</th><th>类型</th><th>物料</th><th>起点</th><th>终点</th><th>状态</th></tr></thead>
+          <tbody id="moves"><tr><td colspan="6">暂无数据</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <script>
+    let currentPlanId = localStorage.getItem('fourFloorConsolidationPlanId') || '';
+    const keyInput = document.getElementById('operatorKey');
+    keyInput.value = sessionStorage.getItem('fourFloorConsolidationKey') || '';
+    keyInput.addEventListener('change', () => sessionStorage.setItem('fourFloorConsolidationKey', keyInput.value));
+
+    async function api(path, options = {}) {
+      const headers = { ...(options.headers || {}) };
+      if (keyInput.value) headers['X-Consolidation-Key'] = keyInput.value;
+      const response = await fetch(path, { ...options, headers });
+      if (!response.ok) {
+        const body = await response.text();
+        throw new Error(body || `HTTP ${response.status}`);
+      }
+      if (response.status === 204) return null;
+      return response.json();
+    }
+
+    async function loadConfig() {
+      const config = await api('api/consolidation/config');
+      document.getElementById('featureState').textContent = config.enabled ? '功能已启用' : '功能已关闭';
+      document.getElementById('executionState').textContent = config.executionEnabled ? '允许真实执行' : '仅计算预览';
+      document.getElementById('execute').disabled = !config.executionEnabled;
+      document.getElementById('createPlan').disabled = !config.enabled;
+    }
+
+    async function loadPlan() {
+      clearMessage();
+      if (!currentPlanId) {
+        const plans = await api('api/consolidation/plans');
+        if (plans.length) currentPlanId = plans[0].id;
+      }
+      if (!currentPlanId) return;
+      const plan = await api(`api/consolidation/plans/${currentPlanId}`);
+      localStorage.setItem('fourFloorConsolidationPlanId', plan.id);
+      const completed = plan.moves.filter(x => x.status === 'Completed').length;
+      document.getElementById('summary').innerHTML =
+        `状态：<b>${plan.status}</b><br>进度：${completed}/${plan.moves.length}<br>` +
+        `物料组：${plan.groups.length}<br>当前空位：${plan.currentHole || '-'}<br>游标：${plan.cursorIndex}`;
+      document.getElementById('warnings').textContent = (plan.warnings || []).join('；');
+      document.getElementById('error').textContent = plan.failureReason || '';
+      document.getElementById('moves').innerHTML = plan.moves.map(move =>
+        `<tr><td>${move.sequence}</td><td>${move.moveType}</td><td>${escapeHtml(move.groupBarcode)}</td>` +
+        `<td>${escapeHtml(move.fromCell)}</td><td>${escapeHtml(move.toCell)}</td><td>${move.status}</td></tr>`
+      ).join('') || '<tr><td colspan="6">方案无需搬运</td></tr>';
+    }
+
+    function clearMessage() { document.getElementById('error').textContent = ''; }
+    function showError(error) { document.getElementById('error').textContent = error.message || String(error); }
+    function escapeHtml(value) { return String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+    async function run(action) { try { clearMessage(); await action(); await loadPlan(); } catch (error) { showError(error); } }
+
+    document.getElementById('createPlan').onclick = () => run(async () => {
+      const plan = await api('api/consolidation/plans', { method:'POST' });
+      currentPlanId = plan.id;
+      localStorage.setItem('fourFloorConsolidationPlanId', plan.id);
+    });
+    document.getElementById('refresh').onclick = () => run(loadPlan);
+    document.getElementById('execute').onclick = () => run(() => api(`api/consolidation/plans/${currentPlanId}/resume`, { method:'POST' }));
+    document.getElementById('pause').onclick = () => run(() => api(`api/consolidation/plans/${currentPlanId}/pause`, { method:'POST' }));
+    document.getElementById('cancel').onclick = () => run(() => api(`api/consolidation/plans/${currentPlanId}/cancel`, { method:'POST' }));
+
+    Promise.all([loadConfig(), loadPlan()]).catch(showError);
+    setInterval(() => { if (currentPlanId) loadPlan().catch(showError); }, 5000);
+  </script>
+</body>
+</html>
