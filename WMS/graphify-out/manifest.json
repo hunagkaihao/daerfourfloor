@@ -2600,9 +2600,9 @@
     "semantic_hash": "6df933b858bc9539c830a36423bd61c8"
   },
   "src/TuTa.Wms.Application/StockConsolidations/StockConsolidationModels.cs": {
-    "mtime": 1787622338.8864515,
-    "ast_hash": "8cc22d00a0deddbec77443667934434c",
-    "semantic_hash": "8cc22d00a0deddbec77443667934434c"
+    "mtime": 1787636147.03686,
+    "ast_hash": "f9fde6d468c3aeff8bfd584e0e31a38e",
+    "semantic_hash": "f9fde6d468c3aeff8bfd584e0e31a38e"
   },
   "src/TuTa.Wms.Application/StockConsolidations/StockConsolidationOptions.cs": {
     "mtime": 1787622337.0119934,
@@ -2615,14 +2615,14 @@
     "semantic_hash": "db5947579d5f3a862b25b4b8bff5e851"
   },
   "src/TuTa.Wms.Application/StockConsolidations/StockConsolidationService.cs": {
-    "mtime": 1787622856.9535036,
-    "ast_hash": "9e60c3d5e872da3c337559d80b1f9d91",
-    "semantic_hash": "9e60c3d5e872da3c337559d80b1f9d91"
+    "mtime": 1787636212.3008208,
+    "ast_hash": "a9b22425a80a9d36807b191930e7c3bb",
+    "semantic_hash": "a9b22425a80a9d36807b191930e7c3bb"
   },
   "src/TuTa.Wms.Application/StockConsolidations/StockConsolidationWorker.cs": {
-    "mtime": 1787622897.6135023,
-    "ast_hash": "2e8acb717458baf5db9190be2bb7df72",
-    "semantic_hash": "2e8acb717458baf5db9190be2bb7df72"
+    "mtime": 1787636148.958929,
+    "ast_hash": "1bebc840b27361050201a2c1fcb370d1",
+    "semantic_hash": "1bebc840b27361050201a2c1fcb370d1"
   },
   "src/TuTa.Wms.HttpApi/Controllers/StockConsolidations/StockConsolidationController.cs": {
     "mtime": 1787622779.8830717,
