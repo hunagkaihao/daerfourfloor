@@ -13655,127 +13655,6 @@
       "id": "src_views_mobile_home_home_createoutstocktasksummary"
     },
     {
-      "label": "StockConsolidation.vue",
-      "file_type": "code",
-      "source_file": "src/views/mobile/views/StockConsolidation.vue",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 36,
-      "norm_label": "stockconsolidation.vue",
-      "community_name": "StockConsolidation.vue",
-      "id": "src_views_mobile_views_stockconsolidation"
-    },
-    {
-      "label": "status",
-      "file_type": "code",
-      "source_file": "src/views/mobile/views/StockConsolidation.vue",
-      "source_location": "L97",
-      "_origin": "ast",
-      "community": 36,
-      "norm_label": "status",
-      "community_name": "StockConsolidation.vue",
-      "id": "src_views_mobile_views_stockconsolidation_status"
-    },
-    {
-      "label": "starting",
-      "file_type": "code",
-      "source_file": "src/views/mobile/views/StockConsolidation.vue",
-      "source_location": "L106",
-      "_origin": "ast",
-      "community": 36,
-      "norm_label": "starting",
-      "community_name": "StockConsolidation.vue",
-      "id": "src_views_mobile_views_stockconsolidation_starting"
-    },
-    {
-      "label": "stopping",
-      "file_type": "code",
-      "source_file": "src/views/mobile/views/StockConsolidation.vue",
-      "source_location": "L107",
-      "_origin": "ast",
-      "community": 36,
-      "norm_label": "stopping",
-      "community_name": "StockConsolidation.vue",
-      "id": "src_views_mobile_views_stockconsolidation_stopping"
-    },
-    {
-      "label": "refreshing",
-      "file_type": "code",
-      "source_file": "src/views/mobile/views/StockConsolidation.vue",
-      "source_location": "L108",
-      "_origin": "ast",
-      "community": 36,
-      "norm_label": "refreshing",
-      "community_name": "StockConsolidation.vue",
-      "id": "src_views_mobile_views_stockconsolidation_refreshing"
-    },
-    {
-      "label": "statusText",
-      "file_type": "code",
-      "source_file": "src/views/mobile/views/StockConsolidation.vue",
-      "source_location": "L111",
-      "_origin": "ast",
-      "community": 36,
-      "norm_label": "statustext",
-      "community_name": "StockConsolidation.vue",
-      "id": "src_views_mobile_views_stockconsolidation_statustext"
-    },
-    {
-      "label": "statusColor",
-      "file_type": "code",
-      "source_file": "src/views/mobile/views/StockConsolidation.vue",
-      "source_location": "L112",
-      "_origin": "ast",
-      "community": 36,
-      "norm_label": "statuscolor",
-      "community_name": "StockConsolidation.vue",
-      "id": "src_views_mobile_views_stockconsolidation_statuscolor"
-    },
-    {
-      "label": "unwrapResponse()",
-      "file_type": "code",
-      "source_file": "src/views/mobile/views/StockConsolidation.vue",
-      "source_location": "L120",
-      "_origin": "ast",
-      "community": 36,
-      "norm_label": "unwrapresponse()",
-      "community_name": "StockConsolidation.vue",
-      "id": "src_views_mobile_views_stockconsolidation_unwrapresponse"
-    },
-    {
-      "label": "refreshStatus()",
-      "file_type": "code",
-      "source_file": "src/views/mobile/views/StockConsolidation.vue",
-      "source_location": "L125",
-      "_origin": "ast",
-      "community": 36,
-      "norm_label": "refreshstatus()",
-      "community_name": "StockConsolidation.vue",
-      "id": "src_views_mobile_views_stockconsolidation_refreshstatus"
-    },
-    {
-      "label": "handleStart()",
-      "file_type": "code",
-      "source_file": "src/views/mobile/views/StockConsolidation.vue",
-      "source_location": "L138",
-      "_origin": "ast",
-      "community": 36,
-      "norm_label": "handlestart()",
-      "community_name": "StockConsolidation.vue",
-      "id": "src_views_mobile_views_stockconsolidation_handlestart"
-    },
-    {
-      "label": "handleStop()",
-      "file_type": "code",
-      "source_file": "src/views/mobile/views/StockConsolidation.vue",
-      "source_location": "L160",
-      "_origin": "ast",
-      "community": 36,
-      "norm_label": "handlestop()",
-      "community_name": "StockConsolidation.vue",
-      "id": "src_views_mobile_views_stockconsolidation_handlestop"
-    },
-    {
       "label": "getStockConsolidationRequestOptions()",
       "file_type": "code",
       "source_file": "src/views/mobile/views/StockConsolidation.ts",
@@ -13783,8 +13662,8 @@
       "_origin": "ast",
       "community": 36,
       "norm_label": "getstockconsolidationrequestoptions()",
-      "id": "src_views_mobile_views_stockconsolidation_getstockconsolidationrequestoptions",
-      "community_name": "StockConsolidation.vue"
+      "community_name": "StockConsolidation.vue",
+      "id": "src_views_mobile_views_stockconsolidation_getstockconsolidationrequestoptions"
     },
     {
       "label": "startStockConsolidation()",
@@ -13794,8 +13673,8 @@
       "_origin": "ast",
       "community": 36,
       "norm_label": "startstockconsolidation()",
-      "id": "src_views_mobile_views_stockconsolidation_startstockconsolidation",
-      "community_name": "StockConsolidation.vue"
+      "community_name": "StockConsolidation.vue",
+      "id": "src_views_mobile_views_stockconsolidation_startstockconsolidation"
     },
     {
       "label": "stopStockConsolidation()",
@@ -13805,8 +13684,8 @@
       "_origin": "ast",
       "community": 36,
       "norm_label": "stopstockconsolidation()",
-      "id": "src_views_mobile_views_stockconsolidation_stopstockconsolidation",
-      "community_name": "StockConsolidation.vue"
+      "community_name": "StockConsolidation.vue",
+      "id": "src_views_mobile_views_stockconsolidation_stopstockconsolidation"
     },
     {
       "label": "getStockConsolidationStatus()",
@@ -13816,7 +13695,128 @@
       "_origin": "ast",
       "community": 36,
       "norm_label": "getstockconsolidationstatus()",
-      "id": "src_views_mobile_views_stockconsolidation_getstockconsolidationstatus",
+      "community_name": "StockConsolidation.vue",
+      "id": "src_views_mobile_views_stockconsolidation_getstockconsolidationstatus"
+    },
+    {
+      "label": "StockConsolidation.vue",
+      "file_type": "code",
+      "source_file": "src/views/mobile/views/StockConsolidation.vue",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 36,
+      "norm_label": "stockconsolidation.vue",
+      "id": "src_views_mobile_views_stockconsolidation",
+      "community_name": "StockConsolidation.vue"
+    },
+    {
+      "label": "status",
+      "file_type": "code",
+      "source_file": "src/views/mobile/views/StockConsolidation.vue",
+      "source_location": "L97",
+      "_origin": "ast",
+      "community": 36,
+      "norm_label": "status",
+      "id": "src_views_mobile_views_stockconsolidation_status",
+      "community_name": "StockConsolidation.vue"
+    },
+    {
+      "label": "starting",
+      "file_type": "code",
+      "source_file": "src/views/mobile/views/StockConsolidation.vue",
+      "source_location": "L106",
+      "_origin": "ast",
+      "community": 36,
+      "norm_label": "starting",
+      "id": "src_views_mobile_views_stockconsolidation_starting",
+      "community_name": "StockConsolidation.vue"
+    },
+    {
+      "label": "stopping",
+      "file_type": "code",
+      "source_file": "src/views/mobile/views/StockConsolidation.vue",
+      "source_location": "L107",
+      "_origin": "ast",
+      "community": 36,
+      "norm_label": "stopping",
+      "id": "src_views_mobile_views_stockconsolidation_stopping",
+      "community_name": "StockConsolidation.vue"
+    },
+    {
+      "label": "refreshing",
+      "file_type": "code",
+      "source_file": "src/views/mobile/views/StockConsolidation.vue",
+      "source_location": "L108",
+      "_origin": "ast",
+      "community": 36,
+      "norm_label": "refreshing",
+      "id": "src_views_mobile_views_stockconsolidation_refreshing",
+      "community_name": "StockConsolidation.vue"
+    },
+    {
+      "label": "statusText",
+      "file_type": "code",
+      "source_file": "src/views/mobile/views/StockConsolidation.vue",
+      "source_location": "L111",
+      "_origin": "ast",
+      "community": 36,
+      "norm_label": "statustext",
+      "id": "src_views_mobile_views_stockconsolidation_statustext",
+      "community_name": "StockConsolidation.vue"
+    },
+    {
+      "label": "statusColor",
+      "file_type": "code",
+      "source_file": "src/views/mobile/views/StockConsolidation.vue",
+      "source_location": "L112",
+      "_origin": "ast",
+      "community": 36,
+      "norm_label": "statuscolor",
+      "id": "src_views_mobile_views_stockconsolidation_statuscolor",
+      "community_name": "StockConsolidation.vue"
+    },
+    {
+      "label": "unwrapResponse()",
+      "file_type": "code",
+      "source_file": "src/views/mobile/views/StockConsolidation.vue",
+      "source_location": "L120",
+      "_origin": "ast",
+      "community": 36,
+      "norm_label": "unwrapresponse()",
+      "id": "src_views_mobile_views_stockconsolidation_unwrapresponse",
+      "community_name": "StockConsolidation.vue"
+    },
+    {
+      "label": "refreshStatus()",
+      "file_type": "code",
+      "source_file": "src/views/mobile/views/StockConsolidation.vue",
+      "source_location": "L125",
+      "_origin": "ast",
+      "community": 36,
+      "norm_label": "refreshstatus()",
+      "id": "src_views_mobile_views_stockconsolidation_refreshstatus",
+      "community_name": "StockConsolidation.vue"
+    },
+    {
+      "label": "handleStart()",
+      "file_type": "code",
+      "source_file": "src/views/mobile/views/StockConsolidation.vue",
+      "source_location": "L138",
+      "_origin": "ast",
+      "community": 36,
+      "norm_label": "handlestart()",
+      "id": "src_views_mobile_views_stockconsolidation_handlestart",
+      "community_name": "StockConsolidation.vue"
+    },
+    {
+      "label": "handleStop()",
+      "file_type": "code",
+      "source_file": "src/views/mobile/views/StockConsolidation.vue",
+      "source_location": "L160",
+      "_origin": "ast",
+      "community": 36,
+      "norm_label": "handlestop()",
+      "id": "src_views_mobile_views_stockconsolidation_handlestop",
       "community_name": "StockConsolidation.vue"
     }
   ],
@@ -27089,6 +27089,59 @@
       "target": "src_views_mobile_views_stockconsolidation_getstockconsolidationrequestoptions"
     },
     {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/views/mobile/views/StockConsolidation.ts",
+      "source_location": "L48",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_views_mobile_views_stockconsolidation_getstockconsolidationstatus",
+      "target": "src_views_mobile_views_stockconsolidation_getstockconsolidationrequestoptions"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/views/mobile/views/StockConsolidation.ts",
+      "source_location": "L25",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_views_mobile_views_stockconsolidation_startstockconsolidation",
+      "target": "src_views_mobile_views_stockconsolidation_getstockconsolidationrequestoptions"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/views/mobile/views/StockConsolidation.ts",
+      "source_location": "L37",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_views_mobile_views_stockconsolidation_stopstockconsolidation",
+      "target": "src_views_mobile_views_stockconsolidation_getstockconsolidationrequestoptions"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/views/mobile/views/StockConsolidation.ts",
+      "source_location": "L24",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_views_mobile_views_stockconsolidation",
+      "target": "src_views_mobile_views_stockconsolidation_startstockconsolidation"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/views/mobile/views/StockConsolidation.ts",
+      "source_location": "L36",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_views_mobile_views_stockconsolidation",
+      "target": "src_views_mobile_views_stockconsolidation_stopstockconsolidation"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/views/mobile/views/StockConsolidation.ts",
@@ -27151,16 +27204,6 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "src/views/mobile/views/StockConsolidation.ts",
-      "source_location": "L24",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_views_mobile_views_stockconsolidation",
-      "target": "src_views_mobile_views_stockconsolidation_startstockconsolidation"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
       "source_file": "src/views/mobile/views/StockConsolidation.vue",
       "source_location": "L97",
       "weight": 1.0,
@@ -27201,16 +27244,6 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "src/views/mobile/views/StockConsolidation.ts",
-      "source_location": "L36",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_views_mobile_views_stockconsolidation",
-      "target": "src_views_mobile_views_stockconsolidation_stopstockconsolidation"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
       "source_file": "src/views/mobile/views/StockConsolidation.vue",
       "source_location": "L120",
       "weight": 1.0,
@@ -27228,41 +27261,8 @@
       "confidence_score": 1.0,
       "source": "src_views_mobile_views_stockconsolidation_refreshstatus",
       "target": "src_views_mobile_views_stockconsolidation_unwrapresponse"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/views/mobile/views/StockConsolidation.ts",
-      "source_location": "L48",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_views_mobile_views_stockconsolidation_getstockconsolidationstatus",
-      "target": "src_views_mobile_views_stockconsolidation_getstockconsolidationrequestoptions"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/views/mobile/views/StockConsolidation.ts",
-      "source_location": "L25",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_views_mobile_views_stockconsolidation_startstockconsolidation",
-      "target": "src_views_mobile_views_stockconsolidation_getstockconsolidationrequestoptions"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/views/mobile/views/StockConsolidation.ts",
-      "source_location": "L37",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_views_mobile_views_stockconsolidation_stopstockconsolidation",
-      "target": "src_views_mobile_views_stockconsolidation_getstockconsolidationrequestoptions"
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "7a925901c0eb098f359a0ea03d83fa5b06e85568"
+  "built_at_commit": "810fc49ed4fdea865974fd715e83734b6e0e54d3"
 }
