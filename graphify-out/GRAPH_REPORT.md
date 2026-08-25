@@ -1,16 +1,16 @@
 # Graph Report - daerfourfloor  (2026-08-25)
 
 ## Corpus Check
-- 1435 files · ~859,690 words
+- 1435 files · ~859,394 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 10772 nodes · 24131 edges · 603 communities (466 shown, 137 thin omitted)
-- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 988 edges (avg confidence: 0.79)
+- 10769 nodes · 24119 edges · 596 communities (450 shown, 146 thin omitted)
+- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 987 edges (avg confidence: 0.79)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `75de6d4d`
+- Built from commit: `4e5372ce`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -333,6 +333,7 @@
 - [[_COMMUNITY_AbpTenantServiceProxy|AbpTenantServiceProxy]]
 - [[_COMMUNITY_BoxBindCellEvent.cs|BoxBindCellEvent.cs]]
 - [[_COMMUNITY_WmsTestDataSeedContributor|WmsTestDataSeedContributor]]
+- [[_COMMUNITY_.WritePlcTag|.WritePlcTag]]
 - [[_COMMUNITY_.PushCGRKDAddAsync|.PushCGRKDAddAsync]]
 - [[_COMMUNITY_package.json|package.json]]
 - [[_COMMUNITY_WmsAuthServerModule|WmsAuthServerModule]]
@@ -553,15 +554,8 @@
 - [[_COMMUNITY_WarehouseAreaAddDto|WarehouseAreaAddDto]]
 - [[_COMMUNITY_WarehouseAreaUpdateDto|WarehouseAreaUpdateDto]]
 - [[_COMMUNITY_package.json|package.json]]
-- [[_COMMUNITY_WmsHttpApiClientModule|WmsHttpApiClientModule]]
-- [[_COMMUNITY_WmsHttpApiModule|WmsHttpApiModule]]
-- [[_COMMUNITY_ExtensionPropertyApiGetDto|ExtensionPropertyApiGetDto]]
 - [[_COMMUNITY_FeatureProviderDto|FeatureProviderDto]]
 - [[_COMMUNITY_2.0.0(httpsgithub.comanncwbvue-vben-admincomparev2.0.0-rc.18...v2.0.0) (2021-02-17)|[2.0.0](https://github.com/anncwb/vue-vben-admin/compare/v2.0.0-rc.18...v2.0.0) (2021-02-17)]]
-- [[_COMMUNITY_(Breaking changes) Breaking changes|(Breaking changes) Breaking changes]]
-- [[_COMMUNITY_2.0.0-beta.1(2020-09-30)|2.0.0-beta.1(2020-09-30)]]
-- [[_COMMUNITY_2.0.0-beta.1(2020-09-30)|2.0.0-beta.1(2020-09-30)]]
-- [[_COMMUNITY_(破坏性更新) Breaking changes|(破坏性更新) Breaking changes]]
 - [[_COMMUNITY_tsconfig-paths|tsconfig-paths]]
 - [[_COMMUNITY_tsconfig.json|tsconfig.json]]
 
@@ -586,8 +580,8 @@
   WMS/src/TuTa.Wms.AuthServer/Pages/Index.cshtml.cs → WMSWeb/src/services/ServiceProxies.ts
 - `UpdateRolePermissionsInput` --references--> `UpdatePermissionsDto`  [EXTRACTED]
   WMS/src/TuTa.Wms.Application.Contracts/Roles/Dtos/UpdateRolePermissionsInput.cs → WMSWeb/src/services/ServiceProxies.ts
-- `useMenuSearch()` --indirect_call--> `handleClose()`  [INFERRED]
-  WMSWeb/src/components/Application/src/search/useMenuSearch.ts → WMSWeb/src/components/Application/src/search/AppSearchModal.vue
+- `setup()` --calls--> `handleClose()`  [INFERRED]
+  WMSWeb/src/components/Preview/src/Functional.vue → WMSWeb/src/components/Application/src/search/AppSearchModal.vue
 
 ## Import Cycles
 - 1-file cycle: `WMSWeb/src/views/admin/roles/AbpRole.vue -> WMSWeb/src/views/admin/roles/AbpRole.vue`
@@ -611,87 +605,83 @@
 - 1-file cycle: `WMSWeb/src/views/task/statistics/MaterialStockStatistics.vue -> WMSWeb/src/views/task/statistics/MaterialStockStatistics.vue`
 - 1-file cycle: `WMSWeb/src/views/task/statistics/WorkshopReceiptStatistics.vue -> WMSWeb/src/views/task/statistics/WorkshopReceiptStatistics.vue`
 
-## Communities (603 total, 137 thin omitted)
+## Communities (596 total, 146 thin omitted)
 
 ### Community 0 - "ErpWorkstationMaterialRequest"
-Cohesion: 0.06
-Nodes (19): TuTa.Wms.EntityFrameworkCore.Repositories, TuTa.Wms.Erp.Repositories, TuTa.Wms.Erp.Dto, TuTa.Wms.Erp.Aggregates, TuTa.Wms.Erp.IDto, TuTa.Wms.HttpApi.Controllers.Erp, TuTa.Wms.Erp, ErpLoginData (+11 more)
+Cohesion: 0.02
+Nodes (43): TuTa.Wms.EntityFrameworkCore, TuTa.Wms.Application.Erp, TuTa.Wms.Repositories.StockInHistories, TuTa.Wms.EntityFrameworkCore.Repositories, TuTa.Wms.Repositories.Erp, TuTa.Wms.Erp.Repositories, TuTa.Wms.Repositories.Boxes, TuTa.Wms.Erp.Dto (+35 more)
 
 ### Community 1 - "IRepository"
-Cohesion: 0.06
-Nodes (39): props, setup(), AppProviderContextProps, createAppProviderContext(), key, props, setup(), createModalContext() (+31 more)
+Cohesion: 0.13
+Nodes (18): setup(), setup(), setup(), Props, SubMenuProvider, useMenuItem(), createSimpleRootMenuContext(), key (+10 more)
 
 ### Community 2 - "CellDto"
-Cohesion: 0.04
-Nodes (52): TuTa.Wms.StockInHistories.Aggregates, TuTa.Wms.Repositories.Cells, TuTa.Wms.Warehouses.Aggregates, TuTa.Wms.StockInHistories, TuTa.Wms.Stocks.Aggregates, TuTa.Wms.RecheckLists, TuTa.Wms.BarcodeChecks.Aggregates, TuTa.Wms.Repositories.StockInHistories (+44 more)
+Cohesion: 0.05
+Nodes (54): TuTa.Wms.Repositories.Cells, TuTa.Wms.Warehouses.Aggregates, TuTa.Wms.ChkResultLists.Events, TuTa.Wms.Stocks.Aggregates, TuTa.Wms.BarcodeChecks.Aggregates, TuTa.Wms.Repositories.PickLists, TuTa.Wms.Materials, TuTa.Wms.Cells.Entities (+46 more)
 
 ### Community 3 - "ErpWorkshopMaterialTransfer"
 Cohesion: 0.05
-Nodes (28): Guid, CellWithMaterialDto, PagedStockMoveQueryDto, DateTime, StockInType, StockStatus, PagedStockQueryDto, List (+20 more)
+Nodes (29): SkipInDto, Guid, CellWithMaterialDto, PagedStockMoveQueryDto, DateTime, StockInType, StockStatus, PagedStockQueryDto (+21 more)
 
 ### Community 4 - "Cell"
-Cohesion: 0.13
+Cohesion: 0.12
 Nodes (17): Guid, BoxBindCellEvent, Guid, BoxDisBindCellEvent, CellManager, ICellRepository, ILogger, object (+9 more)
 
 ### Community 5 - "ErpWorkstationMaterialReceiptDto"
-Cohesion: 0.04
-Nodes (29): AbpApplicationCreationOptions, AbpControllerBase, AbpIntegratedTest, TuTa.Wms.StockConsolidations, TuTa.Wms.Localization, Wms, TuTa.Wms, TuTa.Wms.MultiTenancy (+21 more)
+Cohesion: 0.07
+Nodes (20): AbpApplicationCreationOptions, AbpIntegratedTest, TuTa.Wms.Localization, Wms, TuTa.Wms, TuTa.Wms.MultiTenancy, TuTa.Wms.Web.Menus, WmsResource (+12 more)
 
 ### Community 6 - "ErpMaterial"
 Cohesion: 0.02
-Nodes (49): ApiException, ApplicationLocalizationResourceDto, CGRKDAddRequestDto, CGRKDParams, EnumCheckResult, EnumCheckType, ExtensionPropertyApiCreateDto, ExtensionPropertyApiUpdateDto (+41 more)
+Nodes (53): AgvTaskPagedQueryDto, ApiException, ApplicationLocalizationResourceDto, DepartmentDto, EnumCheckResult, EnumCheckType, ErpInboundItemRequestDto, ErpMaterialResponseDto (+45 more)
 
 ### Community 7 - "IPickListService"
 Cohesion: 0.02
-Nodes (56): CGRKDAddResponseDto, ErpAsnListResponseDto, ErpDeliveryOrderCreateDto, ErpDeliveryOrderDto, ErpInboundOrderDto, ErpInboundOrderRequestDto, ErpOutboundOrderRequestDto, GetByBarcodeBoxDto (+48 more)
+Nodes (52): CGRKDAddResponseDto, ErpAsnListResponseDto, ErpDeliveryOrderCreateDto, ErpDeliveryOrderDto, ErpInboundOrderDto, ErpInboundOrderRequestDto, ErpOutboundOrderRequestDto, GetByBarcodeBoxDto (+44 more)
 
 ### Community 8 - "StockService"
-Cohesion: 0.05
-Nodes (73): getAppLogoClass, { getCollapsedShowTitle }, getTitleClass, go, goHome(), { prefixCls }, props, { title } (+65 more)
+Cohesion: 0.03
+Nodes (112): GetUserInfoByUserIdModel, GetUserInfoByUserIdParams, GetUserInfoModel, LoginParams, LoginResultModel, RoleInfo, Api, getAbpApplicationConfiguration() (+104 more)
 
 ### Community 9 - "AgvTaskManager"
-Cohesion: 0.08
-Nodes (19): ResponseDto, DateTime, StockCreateDto, Dictionary, Guid, IdentityUserManager, IEnumerable, ILogger (+11 more)
+Cohesion: 0.09
+Nodes (20): ResponseDto, DateTime, StockCreateDto, Dictionary, Guid, IdentityUserManager, IEnumerable, ILogger (+12 more)
 
 ### Community 11 - "SelectCall.vue"
-Cohesion: 0.07
-Nodes (51): setup(), setup(), setup(), setup(), DEFAULT_FILTER_FN, DEFAULT_SORT_FN, FETCH_SETTING, PAGE_SIZE (+43 more)
+Cohesion: 0.04
+Nodes (87): Props, ValidateFields, UseFormReturnType, setup(), setup(), createPlaceholderMessage(), EditRecordRow, Params (+79 more)
 
 ### Community 12 - "CreateOutboundTaskFromBarcode.vue"
-Cohesion: 0.03
-Nodes (90): props, setup(), ExpExcelModal, /@/components/Excel/src/Export2Excel, aoaToSheetXlsx(), jsonToSheetXlsx(), AoAToSheet, ExportModalResult (+82 more)
+Cohesion: 0.07
+Nodes (38): ExpExcelModal, aoaToSheetXlsx(), jsonToSheetXlsx(), allStockInHistoriesGet(), cellStatusSelectItem, { createConfirm }, defaultHeader(), gettable() (+30 more)
 
 ### Community 13 - "Erp_StockEventHandler"
 Cohesion: 0.05
 Nodes (45): DateTime, Guid, ErpWorkstationMaterialRequestDto, ErpWorkstationMaterialRequestQueryDto, ErpWorkstationMaterialRequestRequestDto, ErpWorkstationMaterialRequestResponseDto, ErpWorkstationMaterialRequestStatusUpdateDto, Guid (+37 more)
 
 ### Community 14 - "BoxService"
-Cohesion: 0.13
-Nodes (14): { createConfirm }, createOutStockTask(), getStocks(), [registerOutstockModal, { openModal: openOutstockModal }], [registerTable, { getDataSource, reload, getSelectRows, clearSelectedRowKeys }], searchFormSchema, tableColumns, { t } (+6 more)
-
-### Community 15 - "ResponseDto"
-Cohesion: 0.04
-Nodes (16): ErpWorkstationMaterialRequestResponseDto, IErpWorkstationMaterialRequestResponseDto, IMaterialUpdateDto, IPickOutDto, IRegisterDto, IRemoteServiceErrorResponse, ISendPasswordResetCodeDto, IStockDto (+8 more)
+Cohesion: 0.12
+Nodes (17): { createConfirm }, createOutStockTask(), getStocks(), [openFullLoading, closeFullLoading], [registerOutstockModal, { openModal: openOutstockModal }], [registerTable, { getDataSource, reload, getSelectRows, clearSelectedRowKeys }], searchFormSchema, _StockServiceProxy (+9 more)
 
 ### Community 16 - "ValueObject"
 Cohesion: 0.08
-Nodes (57): setup(), apiFunParams, props, setup(), CropendResult, schemas, setup(), { t } (+49 more)
+Nodes (45): schemas, setup(), { t }, ExcelData, ExportModalResult, useForm(), BasicModal, useModalInner() (+37 more)
 
 ### Community 17 - "IdInput"
-Cohesion: 0.05
-Nodes (35): PickOrderStatus, Guid, ILogger, List, LocalEventBus, PagedResultDto, Task, PickListService (+27 more)
+Cohesion: 0.04
+Nodes (54): IRepository, ILogger, List, Task, DepartmentService, ILogger, ErpMidTableService, Guid (+46 more)
 
 ### Community 18 - "SkipService"
 Cohesion: 0.03
-Nodes (22): AgvCallBackRequest, AgvTaskDto, ApplicationApiDescriptionModel, ApplicationLocalizationConfigurationDto, ApplicationLocalizationDto, ControllerApiDescriptionModel, ExtensionPropertyApiDto, ExtensionPropertyUiDto (+14 more)
+Nodes (20): ApplicationApiDescriptionModel, ApplicationLocalizationConfigurationDto, ApplicationLocalizationDto, ErpDeliveryStationResponseDto, ExtensionPropertyApiDto, ExtensionPropertyUiDto, IApplicationApiDescriptionModel, IApplicationLocalizationConfigurationDto (+12 more)
 
 ### Community 19 - "StockService.cs"
 Cohesion: 0.03
-Nodes (59): CellAddDto, ICellAddDto, emit, [registerCellForm, { getFieldsValue, validate, resetFields, }], [registerModal, { changeOkLoading, closeModal }], submit(), { t }, emit (+51 more)
+Nodes (60): CellAddDto, ICellAddDto, emit, [registerCellForm, { getFieldsValue, validate, resetFields, }], [registerModal, { changeOkLoading, closeModal }], submit(), { t }, emit (+52 more)
 
 ### Community 20 - "MaterialSampling.vue"
 Cohesion: 0.06
-Nodes (34): List, GetByBarcodeBoxDto, Guid, NoPlanPickListDelDto, Guid, NoPlanPickListEditDto, Guid, NoPlanPickOutCreateDto (+26 more)
+Nodes (33): List, GetByBarcodeBoxDto, Guid, NoPlanPickListDelDto, Guid, NoPlanPickListEditDto, Guid, NoPlanPickOutCreateDto (+25 more)
 
 ### Community 21 - "ISkipService"
 Cohesion: 0.05
@@ -702,191 +692,195 @@ Cohesion: 0.12
 Nodes (16): QrCode, formData, formRef, { getFormRules }, getShow, { handleBackLogin, getLoginState }, loading, { t } (+8 more)
 
 ### Community 23 - "TuTa.Wms.Application.Contracts.Shared"
-Cohesion: 0.04
-Nodes (67): EXCEPTION_COMPONENT(), getParentLayout(), LAYOUT(), addToChildren(), asyncImportRoute(), dynamicImport(), flatMultiLevelRoutes(), IFRAME() (+59 more)
+Cohesion: 0.05
+Nodes (39): AcceptanceCall, AcceptanceCall2, AcceptanceCalltest, AGVIncell, asyncRoutes, basicRoutes, BoxBind, BoxDisk (+31 more)
 
 ### Community 24 - "TuTa.Wms.Erp.Entities"
-Cohesion: 0.06
-Nodes (35): SkipInDto, PagedResultDto, BoxManager, IBoxRepository, ILogger, object, UnitOfWorkManager, CellEventHandler (+27 more)
+Cohesion: 0.07
+Nodes (25): PagedResultDto, CellRunStatus, CellStatus, CellType, Guid, List, Cell, Guid (+17 more)
 
 ### Community 25 - "BoxBind.vue"
-Cohesion: 0.08
-Nodes (30): CanCreate, DispatchToRcs, FullAuditedAggregateRoot, ILogger, IRepository, IServiceProvider, Task, UnitOfWork (+22 more)
+Cohesion: 0.06
+Nodes (35): CanCreate, DispatchToRcs, FullAuditedAggregateRoot, ILogger, IRepository, IServiceProvider, Task, UnitOfWork (+27 more)
 
 ### Community 26 - "Autos.vue"
-Cohesion: 0.09
-Nodes (22): Guid, ILogger, Task, ErpDeliveryOrderAppService, DateTime, Guid, string, DeliveryOrderStatus (+14 more)
+Cohesion: 0.06
+Nodes (40): ControllerBase, DateTime, Guid, List, ErpDeliveryOrderCreateDto, ErpDeliveryOrderDto, ErpDeliveryOrderItemCreateDto, ErpDeliveryOrderItemDto (+32 more)
 
 ### Community 27 - "TuTa.Wms.Erp"
-Cohesion: 0.07
-Nodes (51): ButtonProps, setup(), ButtonOptions, setup(), setup(), createPlaceholderMessage(), DATE_TYPE, dateItemType (+43 more)
+Cohesion: 0.06
+Nodes (42): ButtonProps, setup(), createPlaceholderMessage(), setComponentRuleType(), UseAdvancedContext, UseAutoFocusContext, UseFormActionContext, UseFormValuesContext (+34 more)
 
 ### Community 28 - "PickList"
 Cohesion: 0.03
 Nodes (71): devDependencies, autoprefixer, commitizen, @commitlint/cli, @commitlint/config-conventional, conventional-changelog-cli, cross-env, dotenv (+63 more)
 
 ### Community 29 - "AgvTaskPagedQueryDto"
-Cohesion: 0.09
-Nodes (31): createPageContext(), useWindowSizeFn(), WindowSizeOptions, useMultipleTabSetting(), useRootSetting(), useTransitionSetting(), CompensationHeight, useContentHeight() (+23 more)
+Cohesion: 0.04
+Nodes (59): AppProviderContextProps, key, appStore, debounceRefresh, el, emit, init(), props (+51 more)
 
 ### Community 30 - "Department"
 Cohesion: 0.05
-Nodes (5): RolesServiceProxy, throwException(), UserServiceProxy, UsersServiceProxy, getTableListAsync()
+Nodes (4): RoleServiceProxy, RolesServiceProxy, UserServiceProxy, UsersServiceProxy
 
 ### Community 31 - "CreateOutStockTaskSummary.vue"
-Cohesion: 0.06
+Cohesion: 0.07
 Nodes (35): Guid, ErpMaterialDto, ErpMaterialRequestDto, ErpMaterialResponseDto, Guid, List, Task, IErpMaterialAppService (+27 more)
 
 ### Community 32 - "ErpDeliveryStation"
-Cohesion: 0.04
-Nodes (34): TuTa.Wms.EntityFrameworkCore, TuTa.Wms.Repositories.Erp, TuTa.Wms.Repositories.PickLists, TuTa.Wms.Repositories.Moves, TuTa.Wms.RecheckLists.Aggregates, TuTa.Wms.Repositories.InBoundLists, Wms.EntityFrameworkCore, TuTa.Wms.RecheckLists.ValueObjects (+26 more)
+Cohesion: 0.09
+Nodes (10): TuTa.Wms.Migrations, ModelSnapshot, ModelBuilder, AddStockFields, ModelBuilder, AddErpAsn, ModelBuilder, UpdateErpAsnFields (+2 more)
 
 ### Community 33 - "ErpDbContext"
-Cohesion: 0.08
-Nodes (27): Guid, CellDto, CellLaneStatusDto, Guid, List, CellsBindAreaDto, Guid, List (+19 more)
+Cohesion: 0.07
+Nodes (27): TuTa.Wms.Cells.Dtos, CellAddDto, CellLaneStatusDto, Guid, List, CellsBindAreaDto, Guid, List (+19 more)
 
 ### Community 34 - "RolePermissionAppService"
 Cohesion: 0.05
-Nodes (11): AbpApiDefinitionServiceProxy, AbpApplicationLocalizationServiceProxy, AbpTenantServiceProxy, BarcodeListServiceProxy, DepartmentServiceProxy, DynamicClaimsServiceProxy, ErpMidTableServiceProxy, ProfileServiceProxy (+3 more)
+Nodes (12): AbpApiDefinitionServiceProxy, AbpApplicationConfigurationServiceProxy, AbpApplicationLocalizationServiceProxy, AbpTenantServiceProxy, AgvTaskServiceProxy, BarcodeListServiceProxy, DepartmentServiceProxy, DynamicClaimsServiceProxy (+4 more)
 
 ### Community 35 - "WmsDbContext.cs"
-Cohesion: 0.15
-Nodes (17): { changeLocale, getLocale }, getLocaleText, handleMenuEvent(), props, selectedKeys, toggleLocale(), Dropdown, setup() (+9 more)
+Cohesion: 0.14
+Nodes (14): Guid, ErpWorkshopMaterialTransfer, MaterialTransferStatus, Guid, Task, ErpWorkshopMaterialTransferManager, Guid, List (+6 more)
 
 ### Community 36 - "TuTa.Wms.AgvTasks"
-Cohesion: 0.05
-Nodes (76): AppLocalePicker, AppLogo, AppSearch, useAppProviderContext(), getClass, { prefixCls }, props, ScrollContainer (+68 more)
+Cohesion: 0.04
+Nodes (108): AppDarkModeToggle, AppLocalePicker, AppLogo, AppSearch, { prefixCls }, { t }, useAppProviderContext(), getClass (+100 more)
 
 ### Community 37 - "IRoleAppService"
-Cohesion: 0.12
+Cohesion: 0.11
 Nodes (11): PickItemStatus, Guid, List, PickItem, DateTime, Guid, PickStock, CancellationToken (+3 more)
 
 ### Community 38 - "IApplicationService"
-Cohesion: 0.09
-Nodes (40): ContentEnum, PermissionModeEnum, RouterTransitionEnum, SessionTimeoutProcessingEnum, SettingButtonPositionEnum, ThemeEnum, CacheTypeEnum, MenuTypeEnum (+32 more)
+Cohesion: 0.06
+Nodes (69): getClass, { getDarkMode, setDarkMode, getShowDarkModeToggle }, isDark, { prefixCls }, toggleDarkMode(), ContentEnum, PermissionModeEnum, RouterTransitionEnum (+61 more)
+
+### Community 39 - "ErpOutboundOrderDto"
+Cohesion: 0.06
+Nodes (4): ErpMaterialServiceProxy, ErpOutboundOrderServiceProxy, ErpWorkstationMaterialRequestServiceProxy, isAxiosError()
 
 ### Community 40 - "ErpAsnAppService"
-Cohesion: 0.02
-Nodes (86): AbpDbContext, TuTa.Wms.Erp.Entities, Entity, IDesignTimeDbContextFactory, Guid, CellBox, DateTime, object (+78 more)
+Cohesion: 0.04
+Nodes (39): Entity, Guid, CellBox, object, ErpDeptType, ErpDeptTypeDetail, DateTime, object (+31 more)
 
 ### Community 41 - "StockConsolidationPlanner"
-Cohesion: 0.11
-Nodes (22): ILocalEventBus, ILogger, PagedResultDto, Task, UnitOfWork, SkipService, SkipStatus, Guid (+14 more)
+Cohesion: 0.08
+Nodes (27): ILocalEventBus, ILogger, PagedResultDto, Task, UnitOfWork, SkipService, CancellationToken, Guid (+19 more)
 
 ### Community 42 - "ErpPickOrderSyncJob"
-Cohesion: 0.07
-Nodes (55): createSearchReg(), SearchResult, transform(), useMenuSearch(), setup(), setup(), setup(), setup() (+47 more)
+Cohesion: 0.05
+Nodes (63): emit, getClass, { getIsMobile }, getIsNotData, handleClose(), { handleSearch, searchResult, keyword, activeIndex, handleEnter, handleMouseenter }, inputRef, { prefixCls } (+55 more)
 
 ### Community 43 - "ErpAsn"
-Cohesion: 0.04
-Nodes (19): ApplicationAuthConfigurationDto, ApplicationConfigurationDto, ApplicationFeatureConfigurationDto, ApplicationGlobalFeatureConfigurationDto, ApplicationSettingConfigurationDto, ClockDto, CurrentTenantDto, CurrentUserDto (+11 more)
+Cohesion: 0.03
+Nodes (21): ApplicationAuthConfigurationDto, ApplicationConfigurationDto, ApplicationFeatureConfigurationDto, ApplicationGlobalFeatureConfigurationDto, ApplicationSettingConfigurationDto, ClockDto, CurrentTenantDto, CurrentUserDto (+13 more)
 
 ### Community 44 - "MaterialService"
 Cohesion: 0.05
 Nodes (26): cacheCipher, createLocalStorage(), createOptions(), createSessionStorage(), createStorage(), Options, WebStorage, Cache (+18 more)
 
 ### Community 45 - "EnumCheckType"
-Cohesion: 0.18
-Nodes (15): Options, setup(), State, setup(), setup(), setup(), setup(), setup() (+7 more)
+Cohesion: 0.08
+Nodes (33): setup(), setup(), setup(), setup(), MenuInfo, setup(), ToolbarEnum, setup() (+25 more)
 
 ### Community 46 - "PagedStockQueryDto"
-Cohesion: 0.05
-Nodes (47): axios, Api, Api, getMenuList(), getMenuListResultModel, RouteItem, { uploadUrl = '' }, emit (+39 more)
+Cohesion: 0.04
+Nodes (73): Api, Api, getMenuList(), getMenuListResultModel, RouteItem, { uploadUrl = '' }, { getAntdLocale }, AppProvider (+65 more)
 
 ### Community 47 - "WarehouseAreaDto"
-Cohesion: 0.04
-Nodes (65): InspectionStatus, RunStatus, ValueObject, StockDirectCreateDto, DateTime, StockInType, StockStatus, StockQueryDto (+57 more)
+Cohesion: 0.06
+Nodes (35): InspectionStatus, RunStatus, StockDirectCreateDto, DateTime, StockInType, StockStatus, StockQueryDto, List (+27 more)
 
 ### Community 48 - "ErpPickMan"
-Cohesion: 0.07
-Nodes (32): BoxStatus, Guid, ILogger, List, PagedResultDto, Task, BoxService, BoxAddDto (+24 more)
+Cohesion: 0.11
+Nodes (19): BoxStatus, List, Box, Task, BoxManager, Guid, BoxStock, CancellationToken (+11 more)
 
 ### Community 49 - "StockConsolidationWorker"
 Cohesion: 0.05
 Nodes (38): boxbindcell(), boxCode, cellCode, goodheight, GoodsDetail, Ref1, Ref2, [registerGoodsDetailModal, { openModal: openGoodsDetailModal }] (+30 more)
 
 ### Community 50 - "WmsController"
-Cohesion: 0.22
-Nodes (10): ILogger, IRepository, LocalEventBus, object, Task, UnitOfWorkManager, Erp_StockEventHandler, StockCheckEvent (+2 more)
+Cohesion: 0.06
+Nodes (33): ILogger, IRepository, LocalEventBus, object, Task, UnitOfWorkManager, Erp_StockEventHandler, ILogger (+25 more)
 
 ### Community 51 - "IRecheckListService"
-Cohesion: 0.11
-Nodes (34): getClass, { getDarkMode, setDarkMode, getShowDarkModeToggle }, isDark, { prefixCls }, toggleDarkMode(), setup(), setup(), setup() (+26 more)
+Cohesion: 0.14
+Nodes (13): PickOrderStatus, DateTime, Guid, List, PickList, GoodsInfoOfPickList, IEnumerable, PickerInfoOfPickList (+5 more)
 
 ### Community 52 - "index.vue"
 Cohesion: 0.15
 Nodes (16): setup(), dataTransfer, visibleData, useFullScreen(), UseFullScreenContext, basicProps, modalProps, { t } (+8 more)
 
 ### Community 53 - "IWarehouseService"
-Cohesion: 0.13
-Nodes (21): ScrollContainerOptions, basicProps, footerProps, { t }, DrawerActionType, DrawerFooterProps, DrawerInstance, DrawerProps (+13 more)
+Cohesion: 0.14
+Nodes (20): ScrollContainerOptions, BasicDrawer, basicProps, footerProps, { t }, DrawerActionType, DrawerFooterProps, DrawerInstance (+12 more)
 
 ### Community 54 - "OpenIddictDataSeedContributor"
-Cohesion: 0.13
-Nodes (16): Guid, BoxDto, BoxUpdateDto, PagedBoxesQueryDto, Guid, List, PagedResultDto, Task (+8 more)
+Cohesion: 0.09
+Nodes (24): EntityDto, Guid, ILogger, List, PagedResultDto, Task, BoxService, BoxAddDto (+16 more)
 
 ### Community 55 - "RecheckItem"
 Cohesion: 0.07
 Nodes (34): emit, [registerForm, { getFieldsValue, validate, resetFields }], [registerModal, { changeOkLoading, closeModal }], submit(), { t }, emit, [registerForm, { getFieldsValue, validate, setFieldsValue, resetFields }], [registerModal, { changeOkLoading, closeModal }] (+26 more)
 
 ### Community 56 - "IStockRepository"
-Cohesion: 0.18
-Nodes (8): EventId, Exception, IDisposable, LogLevel, Func, string, EmptyScope, SqliteLogger
+Cohesion: 0.09
+Nodes (18): add(), detailcolumns, ordercolumns, cancel(), dataSource, emit, good, goodlist (+10 more)
 
 ### Community 57 - "ErpInboundOrder"
-Cohesion: 0.07
-Nodes (32): props, State, useModalDragMove(), UseModalDragMoveContext, BasicDragVerify, RotateDragVerify, setup(), basicProps (+24 more)
+Cohesion: 0.03
+Nodes (72): props, setup(), createAppProviderContext(), props, setup(), CollapseContainer, LazyContainer, handleExpand() (+64 more)
 
 ### Community 58 - "SessionTimeoutLogin.vue"
 Cohesion: 0.09
-Nodes (21): EfCoreRepository, RecheckListStatus, CancellationToken, ILogger, Task, UnitOfWorkManager, ErpRecheckNotifierSyncJob, DateTime (+13 more)
+Nodes (20): RecheckListStatus, CancellationToken, ILogger, Task, UnitOfWorkManager, ErpRecheckNotifierSyncJob, DateTime, Guid (+12 more)
 
 ### Community 59 - "StockConsolidationService"
-Cohesion: 0.10
-Nodes (16): { createConfirm }, deleteStock(), findtype, fliter, focus1, goodheight, goodsCode, GoodsDetail (+8 more)
+Cohesion: 0.08
+Nodes (18): IStockCreateDto, StockCreateDto, { createConfirm }, deleteStock(), findtype, fliter, focus1, goodheight (+10 more)
 
 ### Community 60 - "BoxEventHandler"
-Cohesion: 0.07
-Nodes (26): IRepository, ILogger, List, Task, ErpMidTableService, ILogger, Task, RecheckListService (+18 more)
+Cohesion: 0.23
+Nodes (9): ILogger, List, Task, RecheckListService, CancellationToken, Guid, List, Task (+1 more)
 
 ### Community 61 - "AgvTaskService"
-Cohesion: 0.11
-Nodes (26): RoleInfo, registerGlobComp(), setupGlobDirectives(), loadingDirective, setupLoadingDirective(), authDirective, isAuth(), mounted() (+18 more)
+Cohesion: 0.09
+Nodes (29): Button, PopConfirmButton, attrs, getBindValue, getButtonClass, props, buttonProps, compList (+21 more)
 
 ### Community 62 - "ErpOutboundOrder"
-Cohesion: 0.06
-Nodes (3): ErpInboundOrderServiceProxy, ErpOutboundOrderServiceProxy, PickListServiceProxy
+Cohesion: 0.07
+Nodes (3): ERP_ASNServiceProxy, PickListServiceProxy, throwException()
 
 ### Community 63 - "NewAccountController"
 Cohesion: 0.05
 Nodes (9): useViewStore, useViewStoreWithOut(), ViewState, activeKey, getUserInfo, recheckcount, userStore, validTabs (+1 more)
 
 ### Community 64 - "IMaterialService"
-Cohesion: 0.08
-Nodes (21): { createConfirm }, getUserInfo, handleLoginOut(), userStore, handleUnbind(), inputRef, loading, resolveCellCode() (+13 more)
+Cohesion: 0.22
+Nodes (9): handleUnbind(), inputRef, loading, resolveCellCode(), resolvedCode, resultMessage, resultSuccess, stgBinCode (+1 more)
 
 ### Community 65 - "PagingBase"
 Cohesion: 0.14
 Nodes (11): columns, data, dataSource, date, emit, getdata(), hiscolumns, innerColumns (+3 more)
 
 ### Community 66 - "WmsDbContext"
-Cohesion: 0.22
-Nodes (12): Guid, Department, CancellationToken, Guid, List, Task, IDepartmentRepository, CancellationToken (+4 more)
+Cohesion: 0.11
+Nodes (16): CancellationToken, ILogger, Task, UnitOfWorkManager, ErpBarcodeSyncJob, DateTime, object, ErpBarcode (+8 more)
 
 ### Community 67 - "Header.vue"
 Cohesion: 0.06
 Nodes (27): AbpUnitOfWorkOptions, TuTa.Wms.EntityFrameworkCore.Domains, TuTa.Wms.Samples, TuTa.Wms.EntityFrameworkCore.Applications, TuTa.Wms.EntityFrameworkCore.Samples, Fact, IIdentityUserAppService, Task (+19 more)
 
 ### Community 68 - "StockInHistory_StockEventHandler"
-Cohesion: 0.36
-Nodes (7): List, ConfigOptions, Jwt, MjjAvoidPos, PickTypeMap, PlcHeartBeatSet, Settings
+Cohesion: 0.10
+Nodes (17): cellStatusSelectItem, { createConfirm }, createFormSchema, _DepartmentServiceProxy, editFormSchema, _ErpMidTableServiceProxy, [openFullLoading, closeFullLoading], _PickNotifierServiceProxy (+9 more)
 
 ### Community 69 - "RecheckList"
-Cohesion: 0.06
-Nodes (41): PagedAndSortedResultRequestDto, DateTime, Guid, ErpWorkshopMaterialTransferDto, ErpWorkshopMaterialTransferQueryDto, ErpWorkshopMaterialTransferRequestDto, ErpWorkshopMaterialTransferResponseDto, ErpWorkshopMaterialTransferStatusUpdateDto (+33 more)
+Cohesion: 0.13
+Nodes (18): Guid, ErpWorkshopMaterialTransferDto, ErpWorkshopMaterialTransferRequestDto, ErpWorkshopMaterialTransferResponseDto, ErpWorkshopMaterialTransferStatusUpdateDto, Guid, List, PagedResultDto (+10 more)
 
 ### Community 70 - "IErpAsnAppService"
-Cohesion: 0.15
+Cohesion: 0.13
 Nodes (14): PagedSkipDto, SkipAddDto, SkipDto, SkipOutDto, PagedResultDto, Task, ISkipService, HttpGet (+6 more)
 
 ### Community 71 - "ErpRecheckNotifierSyncJob"
@@ -894,64 +888,64 @@ Cohesion: 0.13
 Nodes (24): props, createContextMenu(), destroyContextMenu(), menuManager, Axis, ContextMenuItem, ContextMenuProps, CreateContextOptions (+16 more)
 
 ### Community 72 - "ErpPickOrder"
-Cohesion: 0.07
-Nodes (30): allCellsAndMaterialAreaGet(), cellChartFormSchema, _CellServiceProxy, cellStatusSelectItem, cellTypeSelectItem, { createConfirm }, createFormSchema, defaultHeader() (+22 more)
+Cohesion: 0.08
+Nodes (28): allCellsAndMaterialAreaGet(), cellChartFormSchema, _CellServiceProxy, cellStatusSelectItem, cellTypeSelectItem, { createConfirm }, defaultHeader(), deleteCellAsync() (+20 more)
 
 ### Community 73 - "IWarehouseRepository"
-Cohesion: 0.18
-Nodes (12): Guid, LockUserInput, ListResultDto, PagedResultDto, Task, IUserAppService, HttpPost, ListResultDto (+4 more)
+Cohesion: 0.11
+Nodes (18): Guid, IdInput, Guid, LockUserInput, Guid, UpdateUserInput, ListResultDto, PagedResultDto (+10 more)
 
 ### Community 74 - "TuTa.Wms.Materials.Aggregates"
 Cohesion: 0.06
 Nodes (25): baoshu, barcodeGet(), boxCode, cell, cellCode, CellSelectModal, columns, createLiftIn() (+17 more)
 
 ### Community 75 - "TuTa.Wms.AgvTasks.Dto"
-Cohesion: 0.08
-Nodes (30): allBoxesGet(), boxTypeSelectItem, { createConfirm }, createFormSchema, defaultHeader(), deleteStorageBoxAsync(), deleteStorageBoxDetailAsync(), editFormSchema (+22 more)
+Cohesion: 0.06
+Nodes (38): emit, [registerModal, { changeOkLoading, closeModal }], [registerStorageBoxForm, { getFieldsValue, validate, resetFields }], submit(), { t }, allBoxesGet(), boxTypeSelectItem, { createConfirm } (+30 more)
 
 ### Community 76 - "ErpOutboundOrderAppService"
-Cohesion: 0.40
-Nodes (4): EntityDto, ErpGoodsAftChkDto, Guid, PickListDto
+Cohesion: 0.09
+Nodes (10): cellcolumns, celldataSource, _CellServiceProxy, _DepartmentServiceProxy, hiscolumns, _OutboundListServiceProxy, outcolumns, _PickListServiceProxy (+2 more)
 
 ### Community 77 - "WarehouseService"
 Cohesion: 0.06
 Nodes (12): ActionApiDescriptionModel, ControllerInterfaceApiDescriptionModel, IActionApiDescriptionModel, IControllerInterfaceApiDescriptionModel, IInterfaceMethodApiDescriptionModel, IMethodParameterApiDescriptionModel, InterfaceMethodApiDescriptionModel, IParameterApiDescriptionModel (+4 more)
 
 ### Community 78 - "ErpRecheckNotifier"
-Cohesion: 0.08
-Nodes (26): IdentityClaimType, IdentityLinkUser, IdentityRole, IdentitySecurityLog, IdentityUserDelegation, IIdentityDbContext, ITenantManagementDbContext, OrganizationUnit (+18 more)
+Cohesion: 0.09
+Nodes (25): AbpDbContext, IdentityClaimType, IdentityLinkUser, IdentityRole, IdentitySecurityLog, IdentityUserDelegation, IDesignTimeDbContextFactory, IIdentityDbContext (+17 more)
 
 ### Community 79 - "ErpStockAftChk"
 Cohesion: 0.11
 Nodes (8): FileController, UserController, router, filePath, UserService, fakeUserInfo, UserService, Result
 
 ### Community 81 - "EfCoreBoxRepository"
-Cohesion: 0.09
-Nodes (26): asnCode, asnDataList, asnInputRef, boxCode, confirmNotQualified(), confirmQualified(), { createConfirm }, deleteStock() (+18 more)
+Cohesion: 0.08
+Nodes (29): loadAsnData(), validateAsn(), asnCode, asnDataList, asnInputRef, boxCode, confirmNotQualified(), confirmQualified() (+21 more)
 
 ### Community 82 - "TuTa.Wms.Stocks"
-Cohesion: 0.02
-Nodes (31): TuTa.Wms.Controllers.Stocks, TuTa.Wms.Controllers.PickLists, TuTa.Wms.ChkResultLists.Events, TuTa.Wms.Controllers.Skips, TuTa.Wms.Stocks.Dtos, Wms.ConfigTool, TuTa.Wms.ChkResultLists.Entities, TuTa.Wms.Cells.Dtos (+23 more)
+Cohesion: 0.04
+Nodes (22): TuTa.Wms.Controllers.Stocks, TuTa.Wms.Controllers.PickLists, TuTa.Wms.Controllers.Skips, TuTa.Wms.Stocks.Dtos, TuTa.Wms.Departments.Aggregates, TuTa.Wms.StockConsolidations, TuTa.Wms.Application.Contracts.Shared, TuTa.Wms.Skips.Dtos (+14 more)
 
 ### Community 83 - "TuTa.Wms.Users.Dtos"
-Cohesion: 0.16
-Nodes (10): TuTa.Wms.Erp.Dtos, TuTa.Wms.Controllers.Erp, ErpPickManDto, List, Task, IErpMidTableService, HttpGet, List (+2 more)
+Cohesion: 0.13
+Nodes (12): TuTa.Wms.Erp.Dtos, ErpGoodsAftChkDto, ErpPickManDto, List, Task, IErpMidTableService, List, Task (+4 more)
 
 ### Community 84 - "TuTa.Wms.StockInHistories.ValueObjects"
-Cohesion: 0.07
-Nodes (16): TuTa.Wms.Migrations, Migration, MigrationBuilder, AddStockFields, MigrationBuilder, AddErpAsn, MigrationBuilder, UpdateErpAsnFields (+8 more)
+Cohesion: 0.08
+Nodes (15): Migration, MigrationBuilder, AddStockFields, MigrationBuilder, AddErpAsn, MigrationBuilder, UpdateErpAsnFields, MigrationBuilder (+7 more)
 
 ### Community 85 - "EfCoreRepository"
-Cohesion: 0.12
-Nodes (25): UploadApiResult, useModalContext(), setup(), createActionColumn(), createPreviewActionColumn(), createPreviewColumns(), createTableColumns(), { t } (+17 more)
+Cohesion: 0.15
+Nodes (21): UploadApiResult, createActionColumn(), createPreviewActionColumn(), createPreviewColumns(), createTableColumns(), { t }, checkFileType(), checkImgType() (+13 more)
 
 ### Community 86 - "UserAppService"
-Cohesion: 0.08
-Nodes (29): setup(), props, setup(), Button, PopConfirmButton, attrs, getBindValue, getButtonClass (+21 more)
+Cohesion: 0.11
+Nodes (16): batchAutoAllocateStockDetailWithTotal(), columns4, DataItem, dataSource, editableData, emit, getdata(), good (+8 more)
 
 ### Community 87 - "ErpBarcode"
-Cohesion: 0.07
-Nodes (14): MaterialServiceProxy, DataItem, diskcolumns, _erpAsnServiceProxy, GoodsInBox, incompleteAsnColumns, incompleteAsnDetailColumns, IncompleteAsnGroup (+6 more)
+Cohesion: 0.05
+Nodes (38): createLoading(), LoadingProps, Fn, useLoading(), UseLoadingOptions, BasicColumn, SizeEnum, sizeMap (+30 more)
 
 ### Community 88 - "Ware.vue"
 Cohesion: 0.15
@@ -966,140 +960,140 @@ Cohesion: 0.07
 Nodes (24): boxCode, BoxModal, { createConfirm }, getByBarcodeBoxCode(), getUserInfo, goodheight, goodsCode, GoodsDetail (+16 more)
 
 ### Community 91 - "TuTa.Wms.StockConsolidations"
-Cohesion: 0.12
-Nodes (15): canBatchOut, cellCode, cellInputRef, displayCellCode, executeBatchOut(), executing, loading, removeStock() (+7 more)
+Cohesion: 0.07
+Nodes (28): addStock(), canBatchOut, cellCode, cellInputRef, displayCellCode, executeBatchOut(), executing, loading (+20 more)
 
 ### Community 92 - "WmsDbMigrationService"
-Cohesion: 0.02
-Nodes (87): add(), allDepartmentsGet(), batchAutoAllocateStockDetail(), batchAutoAllocateStockDetailWithTotal(), cellcolumns, celldataSource, _CellServiceProxy, columns (+79 more)
+Cohesion: 0.07
+Nodes (28): allDepartmentsGet(), columns, pagedPickItemsGet(), batchNo, count, dapdata, data(), dataSource (+20 more)
 
 ### Community 93 - ".GetPagedMaterialsAsync"
 Cohesion: 0.09
 Nodes (20): Consumes, IFormFile, NonAction, MaterialCreateDto, List, MaterialImportResultDto, MaterialUpdateDto, PagedMaterialsQueryDto (+12 more)
 
 ### Community 94 - "ErpBarcodeSyncJob"
-Cohesion: 0.09
-Nodes (20): TuTa.Wms.StockOutHistories.Aggregates, TuTa.Wms.StockOutHistories.EventHandlers, TuTa.Wms.StockOutHistories, TuTa.Wms.StockOutHistories.Dtos, TuTa.Wms.Controllers.StockOutHistories, DateTime, PagedStockOutHistoryQueryDto, DateTime (+12 more)
+Cohesion: 0.06
+Nodes (31): AuditedEntityDto, TuTa.Wms.StockOutHistories.Aggregates, TuTa.Wms.StockOutHistories.EventHandlers, TuTa.Wms.StockOutHistories, TuTa.Wms.StockOutHistories.Dtos, TuTa.Wms.Controllers.StockOutHistories, DateTime, PagedStockOutHistoryQueryDto (+23 more)
 
 ### Community 95 - "ErpMove"
 Cohesion: 0.07
-Nodes (30): asnCode, asnCodeValidated, asnInputRef, asnOrderColumns, AsnOrderGroup, asnOrderGroups, AsnOrderItem, boxCode (+22 more)
+Nodes (27): asnCode, asnCodeValidated, asnInputRef, asnOrderColumns, AsnOrderGroup, asnOrderGroups, AsnOrderItem, boxCode (+19 more)
 
 ### Community 96 - "AuditedEntityDto"
-Cohesion: 0.07
-Nodes (28): 2.0.0 (2021-02-18), 2.0.0-beta.2 (2020-10-07), 2.0.0-beta.3 (2020-10-07), 2.0.0-beta.4 (2020-10-08), 2.0.0-rc.12 (2020-11-30), 2.0.0-rc.13 (2020-12-10), 2.0.3 (2021-03-07), 2.3.0 (2021-04-10) (+20 more)
+Cohesion: 0.06
+Nodes (30): 2.0.0 (2021-02-18), 2.0.0-beta.1(2020-09-30), 2.0.0-beta.2 (2020-10-07), 2.0.0-beta.3 (2020-10-07), 2.0.0-beta.4 (2020-10-08), 2.0.0-rc.12 (2020-11-30), 2.0.0-rc.13 (2020-12-10), 2.3.0 (2021-04-10) (+22 more)
 
 ### Community 97 - "ITransientDependency"
-Cohesion: 0.05
-Nodes (38): Guid, ILocalEventBus, ILogger, List, PagedResultDto, Task, CellService, CellAddDto (+30 more)
+Cohesion: 0.03
+Nodes (53): TuTa.Wms.StockInHistories.ValueObjects, TuTa.Wms.BarcodeLists.ValueObjects, TuTa.Wms.ChkResultLists.ValueObjects, ValueObject, DateTime, Guid, BarcodeList, DateTime (+45 more)
 
 ### Community 98 - "Stock"
-Cohesion: 0.20
-Nodes (6): Guid, List, WarehouseType, Warehouse, Guid, WarehouseArea
+Cohesion: 0.16
+Nodes (7): Guid, Guid, List, WarehouseType, Warehouse, Guid, WarehouseArea
 
 ### Community 99 - "ErpInboundOrderDto"
-Cohesion: 0.07
-Nodes (29): dependencies, ali-oss, ant-design-vue, crypto-js, echarts, @iconify/iconify, jwt-decode, @kjgl77/datav-vue3 (+21 more)
+Cohesion: 0.06
+Nodes (30): dependencies, ali-oss, ant-design-vue, axios, crypto-js, echarts, @iconify/iconify, jwt-decode (+22 more)
 
 ### Community 100 - "ErpInboundOrderAppService"
 Cohesion: 0.04
-Nodes (55): { getAntdLocale }, AppDarkModeToggle, AppProvider, Lang, setup(), setup(), tinymceProps, bindHandlers() (+47 more)
+Nodes (53): { changeLocale, getLocale }, getLocaleText, handleMenuEvent(), props, selectedKeys, toggleLocale(), Dropdown, setup() (+45 more)
 
 ### Community 101 - "AGVIncell.vue"
 Cohesion: 0.07
 Nodes (14): ErpAsnDto, ErpAsnSaveResponseDto, ErpAsnValidateResponseDto, IErpAsnDto, IErpAsnSaveResponseDto, IErpAsnValidateResponseDto, AsnGroupRow, asnCode (+6 more)
 
 ### Community 102 - "Box"
-Cohesion: 0.06
-Nodes (10): AbpLoginResult, ErpInboundItemRequestDto, ErpInboundOrderResponseDto, IAbpLoginResult, IErpInboundItemRequestDto, IErpInboundOrderResponseDto, ILockUserInput, IPuArrVouchDetailRequestDto (+2 more)
+Cohesion: 0.05
+Nodes (12): ErpInboundOrderResponseDto, IErpInboundOrderResponseDto, ILoginOutput, IPagedMaterialsQueryDto, IPriorityStock, IPuArrVouchDetailRequestDto, ISkipInDto, LoginOutput (+4 more)
 
 ### Community 103 - "Material"
-Cohesion: 0.15
-Nodes (20): ControllerBase, DateTime, Guid, List, ErpDeliveryOrderCreateDto, ErpDeliveryOrderDto, ErpDeliveryOrderItemCreateDto, ErpDeliveryOrderItemDto (+12 more)
+Cohesion: 0.12
+Nodes (15): batchAutoAllocateStockDetail(), DataItem, dataSource, editableData, emit, getdata(), good, handleTableChange() (+7 more)
 
 ### Community 104 - "EfCoreSkipRepository"
-Cohesion: 0.18
-Nodes (9): Guid, List, ErpAsnListResponseDto, ErpAsnSaveResponseDto, ErpAsnValidateResponseDto, ErpLoginRequestDto, ErpLoginResponseDto, Task (+1 more)
+Cohesion: 0.17
+Nodes (14): IActionResult, Guid, List, ErpAsnListResponseDto, ErpAsnSaveResponseDto, ErpAsnValidateResponseDto, PuArrVouchAddResponseDto, Task (+6 more)
 
 ### Community 105 - "ChkResultListEventHandler"
-Cohesion: 0.19
-Nodes (12): Guid, UpdateRoleInput, ListResultDto, PagedResultDto, Task, IRoleAppService, HttpPost, ListResultDto (+4 more)
+Cohesion: 0.15
+Nodes (14): Guid, UpdateRoleInput, ListResultDto, PagedResultDto, Task, IRoleAppService, HttpPost, ListResultDto (+6 more)
 
 ### Community 106 - "IStockConsolidationService"
 Cohesion: 0.08
 Nodes (21): barcodeGet(), boxCode, cellCode, columns, { createConfirm }, getUserInfo, goodheight, goodsCode (+13 more)
 
 ### Community 107 - "RoleAppService"
-Cohesion: 0.08
-Nodes (26): AuditedEntityDto, DateTime, PagedStockInHistoryQueryDto, DateTime, StockInHistoryDto, PagedResultDto, Task, IStockInHistoryService (+18 more)
+Cohesion: 0.07
+Nodes (30): TuTa.Wms.StockInHistories.Aggregates, TuTa.Wms.StockInHistories, TuTa.Wms.Controllers.StockInHistories, TuTa.Wms.StockInHistories.EventHandlers, TuTa.Wms.StockInHistories.Dtos, DateTime, PagedStockInHistoryQueryDto, DateTime (+22 more)
 
 ### Community 108 - ".GetPagedStockInHistoriesAsync"
 Cohesion: 0.10
 Nodes (6): ConnectionMultiplexer, Action, int, KeyValuePair, Task, RedisClientByStaEx
 
 ### Community 109 - "ErpDeptType"
-Cohesion: 0.12
-Nodes (19): AgvCallBackRequest, DateTime, Guid, AgvTaskDto, DateTime, AgvTaskPagedQueryDto, List, AgvTaskPagedResultDto (+11 more)
+Cohesion: 0.19
+Nodes (10): AgvCallBackRequest, List, AgvTaskPagedResultDto, ResultAgvTaskDto, Task, IAgvTaskService, HttpPost, SwaggerOperation (+2 more)
 
 ### Community 110 - "AuditedAggregateRoot"
-Cohesion: 0.03
-Nodes (55): Authority, BasicArrow, BasicHelp, BasicTitle, getClass, { prefixCls }, props, slots (+47 more)
+Cohesion: 0.04
+Nodes (45): Authority, BasicArrow, BasicHelp, BasicTitle, getClass, { prefixCls }, props, slots (+37 more)
 
 ### Community 111 - "PuArrVouchAddRequestDto"
 Cohesion: 0.08
 Nodes (25): actualOutboundQuantity, allStocks, barcode, barcodeInputRef, canCreate, createOutboundTask(), customRow(), executing (+17 more)
 
 ### Community 112 - "StockEventHandler"
-Cohesion: 0.23
-Nodes (10): Guid, ErpWorkstationMaterialReceiptDto, DateTime, Guid, HttpDelete, HttpGet, List, PagedResultDto (+2 more)
+Cohesion: 0.15
+Nodes (17): AbpController, Guid, ErpWorkstationMaterialReceiptDto, DateTime, Guid, List, PagedResultDto, Task (+9 more)
 
 ### Community 113 - "home.vue"
-Cohesion: 0.13
-Nodes (16): CancellationToken, ILogger, Task, UnitOfWorkManager, ErpMoveSyncJob, DateTime, Guid, Move (+8 more)
+Cohesion: 0.11
+Nodes (18): AuditedAggregateRoot, EfCoreRepository, Guid, BarcodeCheck, DateTime, Guid, Move, CancellationToken (+10 more)
 
 ### Community 114 - "ErpNoPlanPickType"
 Cohesion: 0.13
 Nodes (16): IPermissionAppService, GetPermissionInput, List, PermissionOutput, PermissionTreeDto, UpdateRolePermissionsInput, Task, IRolePermissionAppService (+8 more)
 
 ### Community 115 - "Stock_RecheckListEventHandler"
-Cohesion: 0.16
-Nodes (11): JToken, ErpAsnDto, List, PuArrVouchAddRequestDto, PuArrVouchAddResponseDto, PuArrVouchDetailRequestDto, ILogger, List (+3 more)
+Cohesion: 0.13
+Nodes (10): JToken, ErpAsnDto, ErpLoginResponseDto, ILogger, List, Task, ErpAsnAppService, ErpSettings (+2 more)
 
 ### Community 116 - "ApplicationService"
-Cohesion: 0.19
-Nodes (10): Method, RestResponse, Dictionary, Task, HttpApiHelper, AGVOptions, ResultAgvTaskDto, List (+2 more)
+Cohesion: 0.21
+Nodes (9): Method, RestResponse, Dictionary, Task, HttpApiHelper, ResultAgvTaskDto, List, Task (+1 more)
 
 ### Community 117 - "BoxDiskWithAsn.vue"
-Cohesion: 0.07
-Nodes (26): Task, scripts, bootstrap, build, build:no-cache, build:test, clean:cache, clean:lib (+18 more)
+Cohesion: 0.08
+Nodes (24): scripts, bootstrap, build, build:no-cache, build:test, clean:cache, clean:lib, dev (+16 more)
 
 ### Community 118 - "StockOutHistory"
-Cohesion: 0.08
-Nodes (26): scancellCode(), createOutStockTask(), findtype, fliter, focus1, generateSummary(), outCellCode, rowSelection (+18 more)
+Cohesion: 0.11
+Nodes (17): scancellCode(), createOutStockTask(), findtype, fliter, focus1, generateSummary(), outCellCode, rowSelection (+9 more)
 
 ### Community 119 - "ErpInboundOrderController"
-Cohesion: 0.27
-Nodes (4): BoxAftChkStatus, Guid, ChkResultBox, WmsDomainHelper
+Cohesion: 0.13
+Nodes (13): BoxAftChkStatus, ChkResultListStatus, Guid, List, ChkResultList, Guid, ChkResultBox, WmsDomainHelper (+5 more)
 
 ### Community 120 - "StockConsolidationModels.cs"
 Cohesion: 0.12
-Nodes (15): DateTime, Guid, ErpWorkstationMaterialReceipt, DateTime, Task, DateTime, Guid, List (+7 more)
+Nodes (17): DomainService, DateTime, Guid, ErpWorkstationMaterialReceipt, DateTime, Task, ErpWorkstationMaterialReceiptManager, DateTime (+9 more)
 
 ### Community 121 - "TuTa.Wms"
-Cohesion: 0.05
-Nodes (41): ILogger, PagedResultDto, Task, ChkResultListService, CancellationToken, ILogger, Task, UnitOfWorkManager (+33 more)
+Cohesion: 0.07
+Nodes (28): ILogger, Task, BarcodeListService, ILogger, PagedResultDto, Task, ChkResultListService, DateTime (+20 more)
 
 ### Community 122 - "ILocalEventHandler"
-Cohesion: 0.11
-Nodes (17): TuTa.Wms.Controllers.RecheckLists, TuTa.Wms.RecheckLists.Dtos, DateTime, RecheckItemDto, RecheckItemQueryDto, RecheckPickOutDto, RecheckStockDto, List (+9 more)
+Cohesion: 0.12
+Nodes (16): TuTa.Wms.Controllers.RecheckLists, TuTa.Wms.RecheckLists.Dtos, DateTime, RecheckItemDto, RecheckItemQueryDto, RecheckPickOutDto, RecheckStockDto, List (+8 more)
 
 ### Community 123 - "BarcodeDto"
 Cohesion: 0.13
 Nodes (16): userInfo, demoList, authRoute, backRoute, dashboardRoute, levelRoute, linkRoute, sysRoute (+8 more)
 
 ### Community 125 - "TuTa.Wms.Application"
-Cohesion: 0.08
-Nodes (20): createOutStockTask(), findtype, fliter, focus1, goodheight, goodsCode, hiddenCount, outCellCode (+12 more)
+Cohesion: 0.06
+Nodes (22): IPagedStockQueryDto, PagedStockQueryDto, createOutStockTask(), findtype, fliter, focus1, goodheight, goodsCode (+14 more)
 
 ### Community 126 - "TuTa.Wms.EntityFrameworkCore"
 Cohesion: 0.13
@@ -1110,16 +1104,16 @@ Cohesion: 0.10
 Nodes (24): AgvTaskStatus, ManageType, handleLogin(), _AgvTaskServiceProxy, agvTaskStatusSelectItem, cancelAgvTask(), { createMessage }, defaultHeader() (+16 more)
 
 ### Community 128 - "GoodsBind.vue"
-Cohesion: 0.08
-Nodes (6): ImgState, props, setup(), StatueEnum, NotifyApi, VAxios
+Cohesion: 0.11
+Nodes (3): NotifyApi, VAxios, getPendingUrl()
 
 ### Community 129 - "IErpAsnRepository"
-Cohesion: 0.07
-Nodes (33): addStock(), scanCellCode(), canOut, cellCode, cellInputRef, customRow(), displayCellCode, executeOut() (+25 more)
+Cohesion: 0.10
+Nodes (23): canOut, cellCode, cellInputRef, customRow(), displayCellCode, executeOut(), executing, finishCheck() (+15 more)
 
 ### Community 130 - "IErpInboundOrderRepository"
-Cohesion: 0.15
-Nodes (18): BasicDrawer, useDrawer(), useDrawerInner(), setup(), RoleServiceProxy, error(), createFormSchema, deleleRoleAsync() (+10 more)
+Cohesion: 0.10
+Nodes (33): useDrawer(), useTable(), ConfirmOptions, createConfirm(), createErrorModal(), createInfoModal(), createModalOptions(), createSuccessModal() (+25 more)
 
 ### Community 131 - "IErpOutboundOrderRepository"
 Cohesion: 0.10
@@ -1130,20 +1124,20 @@ Cohesion: 0.09
 Nodes (22): compilerOptions, allowJs, allowSyntheticDefaultImports, baseUrl, esModuleInterop, experimentalDecorators, forceConsistentCasingInFileNames, jsx (+14 more)
 
 ### Community 133 - "ErpWarehouseAreaPrdt"
-Cohesion: 0.07
-Nodes (33): DataFormatter, ICell, IRow, MaterialBasicImportRow, ILogger, Task, BarcodeListService, DateTime (+25 more)
+Cohesion: 0.08
+Nodes (27): DataFormatter, ICell, IRow, MaterialBasicImportRow, Guid, MaterialDto, Dictionary, Guid (+19 more)
 
 ### Community 134 - ".Configure"
-Cohesion: 0.17
-Nodes (14): Guid, ChkResultListDto, List, GetChkByBarcodeDto, PagedCheckItemQueryDto, PagedResultDto, Task, IChkResultListService (+6 more)
+Cohesion: 0.16
+Nodes (13): Guid, ChkResultListDto, List, GetChkByBarcodeDto, PagedResultDto, Task, IChkResultListService, HttpGet (+5 more)
 
 ### Community 135 - "TuTa.Wms.HttpApi"
 Cohesion: 0.11
 Nodes (10): ServiceConfigurationContext, WmsDomainSharedModule, OneTimeRunner, WmsGlobalFeatureConfigurator, OneTimeRunner, WmsModuleExtensionConfigurator, OneTimeRunner, WmsEfCoreEntityExtensionMappings (+2 more)
 
 ### Community 136 - "PickListEventHandler"
-Cohesion: 0.17
-Nodes (10): IHostApplicationLifetime, IHostedService, CancellationToken, ILogger, Task, UnitOfWorkManager, ErpStateChgSyncJob, CancellationToken (+2 more)
+Cohesion: 0.11
+Nodes (16): CancellationToken, ILogger, Task, UnitOfWorkManager, ErpStateChgSyncJob, DateTime, object, ErpStateChgNotifier (+8 more)
 
 ### Community 137 - "EfCoreWarehouseRepository"
 Cohesion: 0.08
@@ -1154,20 +1148,20 @@ Cohesion: 0.09
 Nodes (19): columns, count, dapdata, data(), dataSource, date1, date2, findtype (+11 more)
 
 ### Community 139 - "StockOutHistoryService"
-Cohesion: 0.07
-Nodes (16): TuTa.Wms.Users.Dtos, TuTa.Wms.Permissions, TuTa.Wms.Shared, TuTa.Wms.Roles.Dtos, TuTa.Wms.Controllers.Systems, TuTa.Wms.Users, TuTa.Wms.Roles, IPermissionDefinitionContext (+8 more)
+Cohesion: 0.15
+Nodes (10): TuTa.Wms.Shared, TuTa.Wms.Roles.Dtos, TuTa.Wms.Controllers.Systems, TuTa.Wms.Roles, IEnumerable, int, ValidationContext, ValidationResult (+2 more)
 
 ### Community 140 - "TuTa.Wms.Domain"
 Cohesion: 0.07
 Nodes (33): Guid, ErpDeliveryStationDto, ErpDeliveryStationRequestDto, ErpDeliveryStationResponseDto, Guid, List, Task, IErpDeliveryStationAppService (+25 more)
 
 ### Community 141 - "TuTa.Wms.Application.Contracts"
-Cohesion: 0.13
-Nodes (11): DateTime, object, ErpMove, CancellationToken, List, Task, IErpMoveRepository, CancellationToken (+3 more)
+Cohesion: 0.06
+Nodes (28): IDisposable, IHostApplicationLifetime, IHostedService, EmptyScope, CancellationToken, ILogger, Task, UnitOfWorkManager (+20 more)
 
 ### Community 142 - "RecheckListService"
 Cohesion: 0.09
-Nodes (22): 2.0.0 (2021-02-18), 2.0.0-beta.2 (2020-10-07), 2.0.0-rc.12 (2020-11-30), 2.0.0-rc.13 (2020-12-10), 2.1.0 (2021-03-15), 2.3.0 (2021-04-10), 2.5.0(2021-06-20), 2.5.2(2021-06-27) (+14 more)
+Nodes (22): 2.0.0 (2021-02-18), 2.0.0-beta.1(2020-09-30), 2.0.0-beta.2 (2020-10-07), 2.0.0-rc.12 (2020-11-30), 2.0.0-rc.13 (2020-12-10), 2.3.0 (2021-04-10), 2.5.0(2021-06-20), 2.5.2(2021-06-27) (+14 more)
 
 ### Community 143 - "WmsModuleExtensionConfigurator"
 Cohesion: 0.09
@@ -1178,7 +1172,7 @@ Cohesion: 0.14
 Nodes (18): asnService, getAsnList(), pushReceipt(), { createConfirm }, detailTableColumns, getAsnListAsync(), getStatusName(), groupAsnListItems() (+10 more)
 
 ### Community 145 - "HandOutCell.vue"
-Cohesion: 0.09
+Cohesion: 0.08
 Nodes (8): GetPermissionListResultDto, IGetPermissionListResultDto, IPermissionGrantInfoDto, IPermissionGroupDto, IProviderInfoDto, PermissionGrantInfoDto, PermissionGroupDto, ProviderInfoDto
 
 ### Community 146 - "CellEventHandler"
@@ -1190,64 +1184,64 @@ Cohesion: 0.13
 Nodes (15): AbpApplicationDescriptor, TuTa.Wms.OpenIddict, IAbpApplicationManager, IOpenIddictScopeManager, IOpenIddictScopeRepository, IPermissionDataSeeder, IStringLocalizer, DataSeedContext (+7 more)
 
 ### Community 148 - "IncellByPeople.vue"
-Cohesion: 0.10
-Nodes (12): Wms.HttpApiTool, TuTa.Wms.AgvTasks.Dto, BindCtnrAndBinDto, BindPodAndBerthDto, CancelAgvTaskDto, GenAgvTaskDto, GenPreTaskDto, List (+4 more)
+Cohesion: 0.06
+Nodes (21): TuTa.Wms.AgvTasks, Wms.HttpApiTool, TuTa.Wms.AgvTasks.Dto, TuTa.Wms.Controllers.AgvTasks, TuTa.Wms.AgvTasks.Dtos, TuTa.Wms.BarcodeLists.Dtos, TuTa.Wms.Repositories.AgvTasks, DateTime (+13 more)
 
 ### Community 149 - "WmsDomainModule.cs"
-Cohesion: 0.09
-Nodes (23): IApplicationService, IHttpClientFactory, IHttpContextAccessor, IValidatableObject, IEnumerable, ValidationContext, ValidationResult, LoginInput (+15 more)
+Cohesion: 0.03
+Nodes (57): AccountController, TuTa.Wms.Users.Dtos, TuTa.Wms.Permissions, Wms.ConfigTool, Wms.RedisTool, TuTa.Wms.Users, TuTa.Wms.Controllers.Accounts, IdentityDynamicClaimsPrincipalContributorCache (+49 more)
 
 ### Community 150 - "IBarcodeListRepository"
-Cohesion: 0.17
-Nodes (10): Guid, IdInput, PagingUserListInput, IdentityUserManager, IIdentityUserAppService, IIdentityUserRepository, ListResultDto, PagedResultDto (+2 more)
+Cohesion: 0.10
+Nodes (11): IdentityUserManager, IIdentityUserAppService, IIdentityUserRepository, ListResultDto, PagedResultDto, Task, UserAppService, ChangePasswordInput (+3 more)
 
 ### Community 151 - "ErpInboundOrderRequestDto"
-Cohesion: 0.18
-Nodes (9): WarehouseAreaAddDto, Guid, WarehouseAreaDto, Guid, ILogger, List, PagedResultDto, Task (+1 more)
+Cohesion: 0.13
+Nodes (12): Guid, ILogger, List, PagedResultDto, Task, WarehouseService, WarehouseType, CancellationToken (+4 more)
 
 ### Community 153 - "CheckInfoOfChkRsltList"
 Cohesion: 0.11
 Nodes (17): boxCode, cell, cellCode, cellInputRef, createTask(), fetchLaneCellStatus(), goodsCode, laneCellStatusList (+9 more)
 
 ### Community 154 - "IMaterialRepository"
-Cohesion: 0.04
-Nodes (57): createLoading(), LoadingProps, Fn, useLoading(), UseLoadingOptions, SizeEnum, sizeMap, SizeNumberEnum (+49 more)
+Cohesion: 0.05
+Nodes (29): SelectItem, barcodeListService, _BarcodeListServiceProxy, { createMessage }, modifyLoading, [openFullLoading, closeFullLoading], [registerEditForm, { getFieldsValue, setFieldsValue, validate }], [registerEditModal, { openModal: openEditModal, closeModal: closeEditModal }] (+21 more)
 
 ### Community 155 - "AbpModule"
-Cohesion: 0.10
-Nodes (13): AbpModule, ServiceConfigurationContext, ToolsModule, ServiceConfigurationContext, WmsApplicationModule, ServiceConfigurationContext, WmsDbMigratorModule, ServiceConfigurationContext (+5 more)
+Cohesion: 0.09
+Nodes (14): AbpModule, ServiceConfigurationContext, WmsApplicationModule, ServiceConfigurationContext, WmsDbMigratorModule, ServiceConfigurationContext, ErpModule, ServiceConfigurationContext (+6 more)
 
 ### Community 156 - "TuTa.Wms.sln"
-Cohesion: 0.12
-Nodes (9): TuTa.Wms.DbMigrator, TuTa.Wms.Data, Task, IWmsDbSchemaMigrator, Task, NullWmsDbSchemaMigrator, IServiceProvider, Task (+1 more)
+Cohesion: 0.17
+Nodes (7): Task, IWmsDbSchemaMigrator, Task, NullWmsDbSchemaMigrator, IServiceProvider, Task, EntityFrameworkCoreWmsDbSchemaMigrator
 
 ### Community 157 - "WmsPermissionDefinitionProvider"
-Cohesion: 0.20
-Nodes (12): HashSet, StockConsolidationMoveResult, StockConsolidationProgress, Action, CancellationToken, DateTime, IConfiguration, ILogger (+4 more)
+Cohesion: 0.17
+Nodes (13): HashSet, StockConsolidationMoveResult, StockConsolidationProgress, StockConsolidationOptions, Action, CancellationToken, DateTime, IConfiguration (+5 more)
 
 ### Community 158 - "ErpOutboundOrderRequestDto"
-Cohesion: 0.17
-Nodes (10): ICurrentTenant, IDataSeeder, ITenantRepository, IEnumerable, ILogger, Task, Tenant, WmsDbMigrationService (+2 more)
+Cohesion: 0.21
+Nodes (8): ICurrentTenant, IDataSeeder, ITenantRepository, IEnumerable, ILogger, Task, Tenant, WmsDbMigrationService
 
 ### Community 159 - "StorageBox.vue"
 Cohesion: 0.10
 Nodes (20): Microsoft.IdentityModel.Protocols.OpenIdConnect (7.0.3), Volo.Abp.AspNetCore.Authentication.OpenIdConnect (8.1.3), Volo.Abp.AspNetCore.Mvc.Client (8.1.3), Volo.Abp.Http.Client.IdentityModel.Web (8.1.3), Volo.Abp.Http.Client.Web (8.1.3), Volo.Abp.Identity.Web (8.1.3), Volo.Abp.SettingManagement.Web (8.1.3), Volo.Abp.TenantManagement.Web (8.1.3) (+12 more)
 
 ### Community 160 - "ErpOutboundItem"
-Cohesion: 0.16
-Nodes (4): Action, KeyValuePair, Task, IRedisClient
+Cohesion: 0.17
+Nodes (3): KeyValuePair, Task, IRedisClient
 
 ### Community 161 - "ChkResultList"
-Cohesion: 0.14
-Nodes (9): PagedWarehouseQueryDto, WarehouseAddDto, WarehouseAreaUpdateDto, WarehouseUpdateDto, Guid, List, PagedResultDto, Task (+1 more)
+Cohesion: 0.21
+Nodes (7): Guid, WarehouseAreaDto, Guid, List, PagedResultDto, Task, IWarehouseService
 
 ### Community 162 - "TuTa.Wms.Events"
 Cohesion: 0.26
 Nodes (7): Guid, HttpGet, HttpPost, List, PagedResultDto, Task, WarehouseController
 
 ### Community 163 - "WmsDomainService"
-Cohesion: 0.11
-Nodes (16): { prefixCls }, { t }, emit, getClass, { getIsMobile }, getIsNotData, handleClose(), { handleSearch, searchResult, keyword, activeIndex, handleEnter, handleMouseenter } (+8 more)
+Cohesion: 0.15
+Nodes (16): adjustmentTypeSelectItem, { createConfirm }, getStockAdjustmentsAllAsync(), getStockAdjustmentsAsync(), getTableData(), handleRestore(), handleStockRestoreEvent(), [openFullLoading, closeFullLoading] (+8 more)
 
 ### Community 164 - "HttpPost"
 Cohesion: 0.10
@@ -1266,12 +1260,12 @@ Cohesion: 0.20
 Nodes (11): ICollection, IDictionary, IReadOnlyDictionary, Guid, List, StockConsolidationContainerSnapshot, StockConsolidationGroupPlan, StockConsolidationMovePlan (+3 more)
 
 ### Community 168 - ".CreateContainer"
-Cohesion: 0.15
-Nodes (11): ILogger, List, Task, DepartmentService, CancellationToken, ILogger, Task, UnitOfWorkManager (+3 more)
+Cohesion: 0.13
+Nodes (14): CancellationToken, ILogger, Task, UnitOfWorkManager, ErpDepartmentSyncJob, ErpDepartment, CancellationToken, List (+6 more)
 
 ### Community 169 - ".TrackIf"
-Cohesion: 0.12
-Nodes (15): formData, formRef, { getFormRules }, getShow, loading, { notification, createErrorModal }, { prefixCls }, rememberMe (+7 more)
+Cohesion: 0.11
+Nodes (21): formData, formRef, { getFormRules }, getShow, loading, { notification, createErrorModal }, { prefixCls }, rememberMe (+13 more)
 
 ### Community 170 - "CellInfo"
 Cohesion: 0.21
@@ -1290,36 +1284,36 @@ Cohesion: 0.13
 Nodes (14): formData, formRef, { getFormRules }, getShow, handleLogin(), loading, { notification, createErrorModal }, { prefixCls } (+6 more)
 
 ### Community 174 - "CreateOutStockTask.vue"
-Cohesion: 0.20
-Nodes (8): barcodeListService, { createMessage }, modifyLoading, [registerEditForm, { getFieldsValue, setFieldsValue, validate }], [registerEditModal, { openModal: openEditModal, closeModal: closeEditModal }], [registerTable, {getDataSource, reload,getSelectRows,clearSelectedRowKeys, getForm}], { t }, Window
+Cohesion: 0.15
+Nodes (7): TuTa.Wms.RecheckLists, TuTa.Wms.RecheckLists.Aggregates, TuTa.Wms.RecheckLists.ValueObjects, TuTa.Wms.RecheckLists.Events, TuTa.Wms.Repositories.RecheckLists, RecheckItemStatus, RecheckListStatus
 
 ### Community 175 - "AcceptanceCalltest.vue"
 Cohesion: 0.11
 Nodes (13): AbpPageModel, TuTa.Wms.Web.Pages, TuTa.Wms.Pages, ILanguageProvider, IOpenIddictApplicationRepository, IReadOnlyList, List, OpenIddictApplication (+5 more)
 
 ### Community 176 - ".MoveStockAsync"
-Cohesion: 0.23
+Cohesion: 0.27
 Nodes (7): ApplicationService, ILogger, Task, UnitOfWork, ErpAsnStockInService, IErpAsnStockInService, WmsAppService
 
 ### Community 177 - "BoxIncell.vue"
-Cohesion: 0.19
+Cohesion: 0.18
 Nodes (10): CancellationTokenSource, IServiceScopeFactory, DateTime, StockConsolidationStatusDto, CancellationToken, IConfiguration, ILogger, object (+2 more)
 
 ### Community 178 - "CountInfoOfStock"
-Cohesion: 0.16
-Nodes (10): { createConfirm }, _ErpOutboundOrderServiceProxy, getOutboundOrders(), itemColumns, [openFullLoading, closeFullLoading], [registerTable, { getDataSource, reload, getSelectRows, clearSelectedRowKeys }], searchFormSchema, tableColumns (+2 more)
+Cohesion: 0.18
+Nodes (11): DateTime, object, ErpStockAftChk, CancellationToken, List, Task, IErpStockAftChkRepository, CancellationToken (+3 more)
 
 ### Community 179 - "WmsHttpApiModule"
-Cohesion: 0.11
-Nodes (16): DefaultBrandingProvider, IBrandingProvider, IndexModel, ITheme, Microsoft.AspNetCore.Http.Extensions, TuTa.Wms.Pages, Volo.Abp.AspNetCore.Mvc.UI.Theming, Volo.Abp.Ui.Branding (+8 more)
+Cohesion: 0.10
+Nodes (18): TuTa.Wms.Web, DefaultBrandingProvider, IBrandingProvider, IndexModel, ITheme, Microsoft.AspNetCore.Http.Extensions, TuTa.Wms.Pages, Volo.Abp.AspNetCore.Mvc.UI.Theming (+10 more)
 
 ### Community 180 - "StockController"
 Cohesion: 0.17
 Nodes (11): DateTime, Guid, List, ErpInboundOrder, InboundOrderStatus, DateTime, Guid, List (+3 more)
 
 ### Community 181 - "linliaoNodeModal.vue"
-Cohesion: 0.18
-Nodes (11): WarehouseType, CancellationToken, Guid, List, Task, IWarehouseRepository, DataSeedContext, Task (+3 more)
+Cohesion: 0.08
+Nodes (24): Guid, ILocalEventBus, ILogger, List, PagedResultDto, Task, CellService, Guid (+16 more)
 
 ### Community 182 - "MaterialBasic.vue"
 Cohesion: 0.11
@@ -1329,21 +1323,17 @@ Nodes (18): Git 贡献提交规范, License, 交流, 使用 Gitpod, 准备, 后�
 Cohesion: 0.12
 Nodes (16): columns, count, dapdata, data(), dataSource, findtype, fliter, handleTableChange() (+8 more)
 
-### Community 184 - "DateTime"
-Cohesion: 0.21
-Nodes (9): props, setup(), props, setup(), useCountdown(), OptionsItem, setup(), useRuleFormItem() (+1 more)
-
 ### Community 185 - "Guid"
-Cohesion: 0.14
-Nodes (15): AccountController, IdentityDynamicClaimsPrincipalContributorCache, IdentityOptions, IdentitySecurityLogManager, ISettingProvider, Guid, HttpPost, IdentityUser (+7 more)
+Cohesion: 0.29
+Nodes (6): Guid, ILogger, List, PagedResultDto, Task, ErpWorkshopMaterialTransferAppService
 
 ### Community 186 - "IEnumerable"
-Cohesion: 0.11
-Nodes (10): TuTa.Wms.StockInHistories.ValueObjects, DateTime, IEnumerable, CheckInfoOfStockInHistory, IEnumerable, MaterialInfoOfStockInHistory, IEnumerable, StockPlaceOfStockInHistory (+2 more)
+Cohesion: 0.19
+Nodes (9): ErpNoPlanPickType, CancellationToken, List, Task, IErpNoPlanPickTypeRepository, CancellationToken, List, Task (+1 more)
 
 ### Community 187 - "ILogger"
-Cohesion: 0.17
-Nodes (10): IIdentityRoleAppService, IIdentityRoleRepository, PagingRoleListInput, Authorize, ListResultDto, PagedResultDto, Task, RoleAppService (+2 more)
+Cohesion: 0.23
+Nodes (8): IIdentityRoleAppService, IIdentityRoleRepository, PagingRoleListInput, Authorize, ListResultDto, PagedResultDto, Task, RoleAppService
 
 ### Community 188 - "List"
 Cohesion: 0.11
@@ -1358,12 +1348,12 @@ Cohesion: 0.22
 Nodes (9): Guid, ILogger, IRepository, Task, UnitOfWork, ErpOutboundOrderAppService, DateTime, Task (+1 more)
 
 ### Community 191 - "ServiceConfigurationContext"
-Cohesion: 0.18
+Cohesion: 0.19
 Nodes (10): DateTime, Guid, List, ErpOutboundOrder, OutboundOrderStatus, DateTime, Guid, List (+2 more)
 
 ### Community 192 - "AssemblyInfo.cs"
-Cohesion: 0.16
-Nodes (11): DateTime, object, ErpPickOrder, CancellationToken, List, Task, IErpPickOrderRepository, CancellationToken (+3 more)
+Cohesion: 0.12
+Nodes (16): CancellationToken, ILogger, Task, UnitOfWorkManager, ErpPickOrderSyncJob, DateTime, object, ErpPickOrder (+8 more)
 
 ### Community 193 - "AssemblyInfo.cs"
 Cohesion: 0.12
@@ -1374,40 +1364,36 @@ Cohesion: 0.11
 Nodes (6): IUpdatePermissionDto, IUpdatePermissionsDto, IUpdateRolePermissionsInput, UpdatePermissionDto, UpdatePermissionsDto, UpdateRolePermissionsInput
 
 ### Community 196 - "StockConsolidationMoveResult"
-Cohesion: 0.16
-Nodes (7): PlcTagValueChanged, bool, ILogger, IOptions, string, Task, PlcHelper
+Cohesion: 0.17
+Nodes (5): bool, ILogger, IOptions, string, PlcHelper
 
 ### Community 197 - "StockConsolidationOptions"
-Cohesion: 0.17
+Cohesion: 0.20
 Nodes (11): DateTime, object, ErpRecheckNotifier, CancellationToken, List, Task, IErpRecheckNotifierRepository, CancellationToken (+3 more)
 
 ### Community 198 - "StockConsolidationPalletSnapshot"
-Cohesion: 0.17
-Nodes (10): CountButton, CountdownInput, formData, formRef, { getFormRules }, getShow, { handleBackLogin, getLoginState }, loading (+2 more)
+Cohesion: 0.18
+Nodes (9): StrengthMeter, formData, formRef, { getFormRules }, getShow, { handleBackLogin, getLoginState }, loading, { t } (+1 more)
 
 ### Community 199 - "StockConsolidationPlanner"
-Cohesion: 0.28
-Nodes (5): ApplicationInitializationContext, IConfiguration, IWebHostEnvironment, ServiceConfigurationContext, WmsHttpApiHostModule
+Cohesion: 0.19
+Nodes (8): Task, Program, ApplicationInitializationContext, IConfiguration, IWebHostEnvironment, ServiceConfigurationContext, WmsHttpApiHostModule, path
 
 ### Community 200 - "StockConsolidationProgress"
-Cohesion: 0.10
-Nodes (26): componentMap, CellComponent(), ComponentProps, setup(), createPlaceholderMessage(), { t }, EditRecordRow, Params (+18 more)
-
-### Community 201 - "StockConsolidationSnapshot"
-Cohesion: 0.07
-Nodes (14): GetUserInfoByUserIdModel, GetUserInfoByUserIdParams, GetUserInfoModel, LoginParams, LoginResultModel, Api, getAbpApplicationConfiguration(), getPermCodeByUserId() (+6 more)
+Cohesion: 0.29
+Nodes (5): componentMap, CellComponent(), ComponentProps, { t }, ComponentType
 
 ### Community 203 - "StockConsolidationStatusDto"
-Cohesion: 0.15
-Nodes (7): columns, executing, items, loading, orderCode, orderData, outboundOrderService
+Cohesion: 0.07
+Nodes (16): { createConfirm }, getUserInfo, handleLoginOut(), userStore, columns, executing, items, loading (+8 more)
 
 ### Community 204 - "Task"
 Cohesion: 0.21
 Nodes (10): DateTime, Guid, List, ErpInboundItemDto, ErpInboundOrderDto, DateTime, Guid, List (+2 more)
 
 ### Community 205 - "IChkResultListRepository"
-Cohesion: 0.23
-Nodes (8): Guid, ILogger, Task, UnitOfWork, ErpInboundOrderAppService, DateTime, Task, ErpInboundOrderManager
+Cohesion: 0.21
+Nodes (10): Guid, ILogger, Task, UnitOfWork, ErpInboundOrderAppService, DateTime, Task, ErpInboundOrderManager (+2 more)
 
 ### Community 206 - "SelectOrderDetail.vue"
 Cohesion: 0.20
@@ -1418,16 +1404,16 @@ Cohesion: 0.12
 Nodes (6): EntityExtensionDto, ExtensionPropertyDto, IEntityExtensionDto, IExtensionPropertyDto, IModuleExtensionDto, ModuleExtensionDto
 
 ### Community 208 - "Stock.vue"
-Cohesion: 0.24
-Nodes (4): Guid, List, Task, IErpAsnRepository
+Cohesion: 0.27
+Nodes (9): getIcons(), getSvgIcons(), setup(), copyTextToClipboard(), Options, useCopyToClipboard(), pagination(), usePagination() (+1 more)
 
 ### Community 209 - "CreateOrder.vue"
 Cohesion: 0.12
 Nodes (6): FeatureDto, FeatureGroupDto, GetFeatureListResultDto, IFeatureDto, IFeatureGroupDto, IGetFeatureListResultDto
 
 ### Community 210 - "Good.vue"
-Cohesion: 0.21
-Nodes (14): getToken(), getStockConsolidationRequestOptions(), getStockConsolidationStatus(), handleStop(), refreshing, refreshStatus(), starting, startStockConsolidation() (+6 more)
+Cohesion: 0.15
+Nodes (18): props, setup(), useCountdown(), getToken(), getStockConsolidationRequestOptions(), getStockConsolidationStatus(), handleStart(), handleStop() (+10 more)
 
 ### Community 211 - "AcceptanceCall.vue"
 Cohesion: 0.13
@@ -1446,16 +1432,16 @@ Cohesion: 0.23
 Nodes (8): TuTa.Wms.Controllers.StockConsolidations, Task, IStockConsolidationService, HttpGet, HttpPost, SwaggerOperation, Task, StockConsolidationController
 
 ### Community 215 - "CreateStockTask.vue"
-Cohesion: 0.29
-Nodes (5): IEnumerable, int, ValidationContext, ValidationResult, PagingBase
+Cohesion: 0.26
+Nodes (11): getParentLayout(), addToChildren(), asyncImportRoute(), dynamicImport(), flatMultiLevelRoutes(), IFRAME(), isMultipleRoute(), LayoutMap (+3 more)
 
 ### Community 216 - "MaterialOut.vue"
 Cohesion: 0.13
 Nodes (13): Microsoft.Extensions.Http.Polly (8.0.0), Volo.Abp.Account.HttpApi.Client (8.1.3), Volo.Abp.Http.Client.IdentityModel (8.1.3), Volo.Abp.Identity.HttpApi.Client (8.1.3), Volo.Abp.PermissionManagement.HttpApi.Client (8.1.3), net8.0, netstandard2.0, netstandard2.1 (+5 more)
 
 ### Community 217 - "Auto.vue"
-Cohesion: 0.29
-Nodes (7): DateTime, List, DateTime, Guid, List, Task, IErpInboundOrderRepository
+Cohesion: 0.33
+Nodes (5): DateTime, List, DateTime, List, Task
 
 ### Community 218 - "LockPage.vue"
 Cohesion: 0.29
@@ -1466,19 +1452,19 @@ Cohesion: 0.13
 Nodes (14): net8.0, DistributedLock.Redis (1.0.2), Microsoft.AspNetCore.DataProtection.StackExchangeRedis (8.0.0), Serilog.AspNetCore (8.0.0), Serilog.Sinks.Async (1.5.0), Volo.Abp.Account.Application (8.1.3), Volo.Abp.Account.HttpApi (8.1.3), Volo.Abp.Account.Web.OpenIddict (8.1.3) (+6 more)
 
 ### Community 220 - "Cell.vue"
-Cohesion: 0.20
+Cohesion: 0.16
 Nodes (11): BoxManager, IBoxRepository, ILogger, object, Task, UnitOfWorkManager, StockEventHandler, Guid (+3 more)
 
 ### Community 221 - "MobileBrowser.vue"
-Cohesion: 0.23
-Nodes (9): AbpController, DateTime, Guid, HttpDelete, HttpGet, HttpPut, List, Task (+1 more)
+Cohesion: 0.24
+Nodes (8): DateTime, Guid, HttpDelete, HttpGet, HttpPut, List, Task, ErpOutboundOrderController
 
 ### Community 222 - "LoginForm.vue"
 Cohesion: 0.13
 Nodes (15): [2.0.1](https://github.com/anncwb/vue-vben-admin/compare/v2.0.0...v2.0.1) (2021-02-21), [2.0.2](https://github.com/anncwb/vue-vben-admin/compare/v2.0.0...v2.0.2) (2021-03-03), [2.0.3](https://github.com/anncwb/vue-vben-admin/compare/v2.0.2...v2.0.3) (2021-03-07), [2.1.0](https://github.com/anncwb/vue-vben-admin/compare/v2.0.3...v2.1.0) (2021-03-15), Bug Fixes, Bug Fixes, Bug Fixes, Bug Fixes (+7 more)
 
 ### Community 224 - "StockConsolidation.vue"
-Cohesion: 0.18
+Cohesion: 0.17
 Nodes (11): DateTime, EnumCheckResult, EnumCheckType, RecheckResultGettedEvent, ILogger, IStockRepository, object, StocksManager (+3 more)
 
 ### Community 225 - "ErpOutboundOrderController"
@@ -1498,12 +1484,12 @@ Cohesion: 0.14
 Nodes (13): NSubstitute (5.1.0), NSubstitute.Analyzers.CSharp (1.0.16), Shouldly (4.2.1), Volo.Abp.Authorization (8.1.3), Volo.Abp.BackgroundJobs.Abstractions (8.1.3), Volo.Abp.TestBase (8.1.3), xunit (2.6.1), xunit.extensibility.execution (2.6.1) (+5 more)
 
 ### Community 229 - "Outstock.vue"
-Cohesion: 0.22
-Nodes (10): Guid, DepartmentDto, List, Task, IDepartmentService, HttpGet, HttpPost, List (+2 more)
+Cohesion: 0.17
+Nodes (12): IApplicationService, Guid, DepartmentDto, List, Task, IDepartmentService, HttpGet, HttpPost (+4 more)
 
 ### Community 230 - "TuTa.Wms.Warehouses.Dtos"
-Cohesion: 0.25
-Nodes (4): ILoggerProvider, ILogger, SqliteLoggerExtension, SqliteLoggerProvider
+Cohesion: 0.09
+Nodes (15): EventId, Exception, ILoggerProvider, LogLevel, Func, ILogger, string, SqliteLogger (+7 more)
 
 ### Community 231 - "OutStockOrder.vue"
 Cohesion: 0.38
@@ -1520,10 +1506,6 @@ Nodes (14): [2.5.1](https://github.com/anncwb/vue-vben-admin/compare/v2.4.0...v2
 ### Community 234 - "TestScanAsn.vue"
 Cohesion: 0.29
 Nodes (7): addClass(), getBoundingClientRect(), getViewportOffset(), hasClass(), removeClass(), trim(), ViewportOffsetResult
-
-### Community 235 - "ScanAsn.vue"
-Cohesion: 0.15
-Nodes (4): BoxServiceProxy, createManyStorageBoxAsync(), gettable(), getTableListAsync()
 
 ### Community 237 - "BarcodeList.vue"
 Cohesion: 0.19
@@ -1550,24 +1532,20 @@ Cohesion: 0.15
 Nodes (10): Volo.Abp.EntityFrameworkCore.Sqlite (8.1.3), net8.0, Microsoft.NET.Test.Sdk (17.8.0), Microsoft.NET.Sdk, net8.0, Microsoft.NET.Test.Sdk (17.8.0), Microsoft.NET.Sdk, net8.0 (+2 more)
 
 ### Community 243 - "MobileForm.vue"
-Cohesion: 0.18
-Nodes (9): formData, formRef, { getFormRules }, getShow, { handleBackLogin, getLoginState }, loading, { t }, { validForm } (+1 more)
+Cohesion: 0.17
+Nodes (10): CountButton, CountdownInput, formData, formRef, { getFormRules }, getShow, { handleBackLogin, getLoginState }, loading (+2 more)
 
 ### Community 244 - "RegisterForm.vue"
-Cohesion: 0.33
-Nodes (8): AuditedAggregateRoot, Guid, BarcodeCheck, CancellationToken, Guid, List, Task, EfCoreBarcodeCheckRepository
-
-### Community 245 - ".ImportMaterialBasicDataFromFileAsync"
-Cohesion: 0.29
-Nodes (5): SqliteLogItem, List, object, SqliteConnection, SqliteLogHelper
+Cohesion: 0.31
+Nodes (5): DateTime, Guid, List, Task, IErpOutboundOrderAppService
 
 ### Community 246 - "EfCoreBarcodeListRepository"
 Cohesion: 0.26
 Nodes (8): DateTime, Guid, HttpDelete, HttpGet, HttpPut, List, Task, ErpInboundOrderController
 
 ### Community 247 - "ForgetPasswordForm.vue"
-Cohesion: 0.33
-Nodes (5): easeInOutQuad(), move(), position(), ScrollToParams, useScrollTo()
+Cohesion: 0.20
+Nodes (4): ControllerApiDescriptionModel, IControllerApiDescriptionModel, IModuleApiDescriptionModel, ModuleApiDescriptionModel
 
 ### Community 248 - "AbpRole.vue"
 Cohesion: 0.27
@@ -1582,8 +1560,8 @@ Cohesion: 0.17
 Nodes (8): AbpViewComponent, TuTa.Wms.Web.Components.Toolbar.LoginLink, IToolbarConfigurationContext, IToolbarContributor, IViewComponentResult, LoginLinkViewComponent, Task, WmsToolbarContributor
 
 ### Community 251 - "MaterialInfoOfRechkList"
-Cohesion: 0.29
-Nodes (6): DateTime, Guid, List, PagedResultDto, Task, IErpWorkstationMaterialReceiptAppService
+Cohesion: 0.28
+Nodes (3): PlcTagValueChanged, Task, Action
 
 ### Community 252 - "IncellHis copy 2.vue"
 Cohesion: 0.17
@@ -1598,19 +1576,15 @@ Cohesion: 0.17
 Nodes (11): Microsoft.Extensions.FileProviders.Embedded (8.0.0), Volo.Abp.AuditLogging.Domain.Shared (8.1.3), Volo.Abp.BackgroundJobs.Domain.Shared (8.1.3), Volo.Abp.Identity.Domain.Shared (8.1.3), Volo.Abp.OpenIddict.Domain.Shared (8.1.3), Volo.Abp.PermissionManagement.Domain.Shared (8.1.3), Volo.Abp.TenantManagement.Domain.Shared (8.1.3), net8.0 (+3 more)
 
 ### Community 255 - "AsnList.vue"
-Cohesion: 0.36
-Nodes (5): DateTime, ErpWorkstationMaterialReceiptQueryDto, ErpWorkstationMaterialReceiptRequestDto, ErpWorkstationMaterialReceiptResponseDto, HttpPost
+Cohesion: 0.24
+Nodes (8): PagedAndSortedResultRequestDto, DateTime, ErpWorkshopMaterialTransferQueryDto, DateTime, ErpWorkstationMaterialReceiptQueryDto, ErpWorkstationMaterialReceiptRequestDto, ErpWorkstationMaterialReceiptResponseDto, HttpPost
 
 ### Community 256 - "Login.vue"
 Cohesion: 0.24
 Nodes (7): DateTime, Guid, ILogger, List, PagedResultDto, Task, ErpWorkstationMaterialReceiptAppService
 
-### Community 257 - "Login.vue"
-Cohesion: 0.23
-Nodes (6): StockConsolidationCellParser, StockConsolidationCellPosition, List, StockConsolidationCellRange, StockConsolidationOptions, List
-
 ### Community 258 - "IncellHis.vue"
-Cohesion: 0.22
+Cohesion: 0.20
 Nodes (9): Guid, PickListStockOutEvent, ILogger, IStockRepository, LocalEventBus, object, Task, UnitOfWorkManager (+1 more)
 
 ### Community 259 - "OutboundOrder.vue"
@@ -1618,12 +1592,12 @@ Cohesion: 0.17
 Nodes (12): [2.4.1](https://github.com/anncwb/vue-vben-admin/compare/v2.4.0...v2.4.1) (2021-06-01), [2.4.2](https://github.com/anncwb/vue-vben-admin/compare/v2.4.0...v2.4.2) (2021-06-09), [2.5.0](https://github.com/anncwb/vue-vben-admin/compare/v2.4.0...v2.5.0) (2021-06-20), Bug Fixes, Bug Fixes, Bug Fixes, Features, Features (+4 more)
 
 ### Community 260 - "WorkshopReceiptStatistics.vue"
-Cohesion: 0.09
-Nodes (22): CodeEditor, JsonPreview, appStore, debounceRefresh, el, emit, init(), props (+14 more)
+Cohesion: 0.60
+Nodes (4): convertFlowElementToEdge(), convertFlowElementToNode(), toLogicFlowData(), TurboType
 
 ### Community 261 - "createStockTask"
-Cohesion: 0.20
-Nodes (8): FreezeStockEvent, UnFreezeStockEvent, ILogger, IStockRepository, LocalEventBus, object, UnitOfWorkManager, Stock_RecheckListEventHandler
+Cohesion: 0.18
+Nodes (11): FreezeStockEvent, Guid, ReCheckStockOutEvent, UnFreezeStockEvent, ILogger, IStockRepository, LocalEventBus, object (+3 more)
 
 ### Community 262 - "Exception.vue"
 Cohesion: 0.17
@@ -1646,16 +1620,16 @@ Cohesion: 0.18
 Nodes (10): Swashbuckle.AspNetCore.Annotations (6.6.2), Volo.Abp.Identity.AspNetCore (8.1.3), Volo.Abp.Identity.HttpApi (8.1.3), Volo.Abp.PermissionManagement.HttpApi (8.1.3), net8.0, Volo.Abp.Account.HttpApi (8.1.3), Volo.Abp.Account.Web.OpenIddict (8.1.3), Volo.Abp.AspNetCore.Mvc (8.1.3) (+2 more)
 
 ### Community 268 - "OidcSignIn.vue"
-Cohesion: 0.17
-Nodes (13): DateTime, Guid, List, CreateFromBarcodeDto, ErpOutboundItemDto, ErpOutboundOrderDto, ErpOutboundRecordDto, DateTime (+5 more)
+Cohesion: 0.29
+Nodes (8): DateTime, Guid, List, CreateFromBarcodeDto, ErpOutboundItemDto, ErpOutboundOrderDto, ErpOutboundRecordDto, HttpPost
 
 ### Community 269 - "OidcSignOut.vue"
-Cohesion: 0.09
-Nodes (10): TuTa.Wms.Departments.Aggregates, TuTa.Wms.Controllers.Warehouses, TuTa.Wms.Boxes.Dtos, TuTa.Wms.Materials.Dtos, TuTa.Wms.Controllers.Boxes, TuTa.Wms.Departments.Dtos, TuTa.Wms.Departments, TuTa.Wms.Controllers.Materials (+2 more)
+Cohesion: 0.33
+Nodes (4): IPermissionDefinitionContext, LocalizableString, PermissionDefinitionProvider, WmsPermissionDefinitionProvider
 
 ### Community 270 - "EditCell.vue"
-Cohesion: 0.24
-Nodes (8): Dictionary, StockConsolidationAgvQueryResult, StockConsolidationAgvTaskSnapshot, StockConsolidationCellSnapshot, StockConsolidationSnapshot, StockConsolidationSnapshotResult, Guid, IEnumerable
+Cohesion: 0.15
+Nodes (11): StockConsolidationCellParser, Dictionary, StockConsolidationAgvQueryResult, StockConsolidationAgvTaskSnapshot, StockConsolidationCellPosition, StockConsolidationCellSnapshot, StockConsolidationSnapshot, StockConsolidationSnapshotResult (+3 more)
 
 ### Community 271 - "ExcelOut.vue"
 Cohesion: 0.31
@@ -1674,7 +1648,7 @@ Cohesion: 0.18
 Nodes (4): IIStringValueType, IIValueValidator, IStringValueType, IValueValidator
 
 ### Community 276 - "ListResultDto_1OfOfUserDataAndAbstractionsAnd_0AndCulture_neutralAndPublicKeyToken_null"
-Cohesion: 0.18
+Cohesion: 0.17
 Nodes (4): IListResultDto_1OfOfUserDataAndAbstractionsAnd_0AndCulture_neutralAndPublicKeyToken_null, IUserData, ListResultDto_1OfOfUserDataAndAbstractionsAnd_0AndCulture_neutralAndPublicKeyToken_null, UserData
 
 ### Community 277 - "PropertyApiDescriptionModel"
@@ -1682,12 +1656,12 @@ Cohesion: 0.18
 Nodes (4): IPropertyApiDescriptionModel, ITypeApiDescriptionModel, PropertyApiDescriptionModel, TypeApiDescriptionModel
 
 ### Community 278 - "TimeZone"
-Cohesion: 0.08
-Nodes (8): IanaTimeZone, IIanaTimeZone, ITimeZone, ITimingDto, IWindowsTimeZone, TimeZone, TimingDto, WindowsTimeZone
-
-### Community 280 - "index.vue"
 Cohesion: 0.18
-Nodes (7): confirmLoading, data, emit, options, props, [registerModal, { changeOkLoading, closeModal }], textarea01
+Nodes (4): ITimeZone, ITimingDto, TimeZone, TimingDto
+
+### Community 279 - "ContainerUnbind.vue"
+Cohesion: 0.38
+Nodes (3): List, PuArrVouchAddRequestDto, PuArrVouchDetailRequestDto
 
 ### Community 281 - "TuTa.Wms.Domain.csproj"
 Cohesion: 0.20
@@ -1705,10 +1679,6 @@ Nodes (9): Volo.Abp.Account.Application.Contracts (8.1.3), Volo.Abp.Identity.App
 Cohesion: 0.40
 Nodes (7): setup(), domSymbol, useWatermark(), useRafThrottle(), addResizeListener(), removeResizeListener(), resizeHandler()
 
-### Community 287 - "PermissionsServiceProxy"
-Cohesion: 0.20
-Nodes (5): columns, items, loading, sortCode, sortData
-
 ### Community 288 - "index.d.ts"
 Cohesion: 0.20
 Nodes (9): ComponentElRef, ComponentRef, ElRef, EmitType, Fn, LabelValueOptions, PromiseFn, RefType (+1 more)
@@ -1722,8 +1692,8 @@ Cohesion: 0.25
 Nodes (6): Wms.SignalRTool, ISingletonDependency, Queue, object, HubMessage, HubMsgQHelper
 
 ### Community 291 - "CellEventHandler"
-Cohesion: 0.20
-Nodes (6): formData, record, [registerModal, { closeModal }], StockRecord, stockService, { t }
+Cohesion: 0.07
+Nodes (24): /@/components/Excel/src/Export2Excel, AoAToSheet, JsonToSheet, cellStatusSelectItem, { createConfirm }, defaultHeader(), gettable(), MoveWall() (+16 more)
 
 ### Community 292 - "[2.7.0](https://github.com/anncwb/vue-vben-admin/compare/v2.5.9...v2.7.0) (2021-08-03)"
 Cohesion: 0.22
@@ -1750,8 +1720,8 @@ Cohesion: 0.46
 Nodes (5): List, LLBJDAddRequestDto, LLBJDAddResponseDto, LLBJDDataItem, LLBJDDetail
 
 ### Community 298 - "IMaterialRepository"
-Cohesion: 0.36
-Nodes (5): Task, IBarcodeListService, HttpGet, Task, BarcodeListController
+Cohesion: 0.27
+Nodes (6): TuTa.Wms.Controllers.BarcodeLists, Task, IBarcodeListService, HttpGet, Task, BarcodeListController
 
 ### Community 299 - "dongfangdianzi"
 Cohesion: 0.25
@@ -1766,12 +1736,8 @@ Cohesion: 0.29
 Nodes (3): afterLeave(), HTMLExpandElement, resetStyles()
 
 ### Community 302 - "index.ts"
-Cohesion: 0.22
-Nodes (7): EventType, options, RippleDirective, RippleOptions, RippleProto, setProps(), Recordable
-
-### Community 303 - "ProfileServiceProxy"
-Cohesion: 0.28
-Nodes (4): Guid, UpdateUserInput, IdentityUserDto, IIdentityUserDto
+Cohesion: 0.29
+Nodes (5): EventType, options, RippleDirective, RippleOptions, RippleProto
 
 ### Community 304 - "download.ts"
 Cohesion: 0.57
@@ -1785,12 +1751,8 @@ Nodes (4): ClaimsPrincipal, TuTa.Wms.Security, ThreadCurrentPrincipalAccessor, F
 Cohesion: 0.48
 Nodes (4): List, ErpOutboundItemRequestDto, ErpOutboundOrderRequestDto, ErpOutboundOrderResponseDto
 
-### Community 307 - "PuArrVouchAddRequestDto"
-Cohesion: 0.36
-Nodes (6): IActionResult, HttpGet, HttpPost, SwaggerOperation, Task, ErpAsnController
-
 ### Community 309 - "ErpInboundItem"
-Cohesion: 0.38
+Cohesion: 0.40
 Nodes (3): Guid, ErpInboundItem, InboundItemStatus
 
 ### Community 310 - "[2.2.0](https://github.com/anncwb/vue-vben-admin/compare/v2.1.1...v2.2.0) (2021-04-07)"
@@ -1813,20 +1775,16 @@ Nodes (7): setup(), scripts, build, prod, restart, start, stop
 Cohesion: 0.29
 Nodes (6): ColumnFilterItem, ColumnProps, CustomRenderFunction, FilterDropdownProps, RecordProps, SortOrder
 
-### Community 315 - "AbpTenantServiceProxy"
-Cohesion: 0.44
-Nodes (5): CancellationToken, Guid, List, Task, EfCoreBarcodeListRepository
-
 ### Community 316 - "BoxBindCellEvent.cs"
 Cohesion: 0.33
 Nodes (4): TuTa.Wms.Events, Guid, BoxBindCellEvent, StockOutHistoryDelEvent
 
 ### Community 317 - "WmsTestDataSeedContributor"
-Cohesion: 0.18
-Nodes (8): IDataSeedContributor, IProfileAppService, ITransientDependency, Task, ClientDemoService, DataSeedContext, Task, WmsTestDataSeedContributor
+Cohesion: 0.14
+Nodes (11): IDataSeedContributor, IProfileAppService, ITransientDependency, DataSeedContext, Task, WarehouseDataSeedContributor, Task, ClientDemoService (+3 more)
 
 ### Community 319 - ".PushCGRKDAddAsync"
-Cohesion: 0.60
+Cohesion: 0.52
 Nodes (3): CGRKDAddRequestDto, CGRKDAddResponseDto, CGRKDParams
 
 ### Community 320 - "package.json"
@@ -1918,64 +1876,60 @@ Cohesion: 0.33
 Nodes (6): 🐛 Bug Fixes, 🎫 Chores, ✨ Features, ⚡ Performance Improvements, ✨ Refactor, (破坏性更新) Breaking changes
 
 ### Community 342 - "clickOutside.ts"
-Cohesion: 0.36
+Cohesion: 0.43
 Nodes (5): add(), componentMap, del(), useComponentRegister(), BasicUpload
-
-### Community 344 - "AgvCallBackRequest"
-Cohesion: 0.28
-Nodes (7): { createError }, modifiedSearchFormSchema, [registerTable, { reload, getForm }], searchFormSchema, tableColumns, { t }, { t }
-
-### Community 345 - "AgvTaskDto"
-Cohesion: 0.31
-Nodes (7): getYdStockTableListAsync(), [registerTable], _StockServiceProxy, { t }, { t }, ydStockSearchFormSchema, ydStockTableColumns
-
-### Community 353 - "CGRKDAddRequestDto"
-Cohesion: 0.25
-Nodes (3): TuTa.Wms.Cells.Entities, TuTa.Wms.Cells.EventHandlers, TuTa.Wms.Boxes.Events
 
 ### Community 354 - "CGRKDParams"
 Cohesion: 0.25
 Nodes (4): ServiceConfigurationContext, WmsApplicationContractsModule, OneTimeRunner, WmsDtoExtensions
 
-### Community 356 - "ErpDeliveryOrderCreateDto"
-Cohesion: 0.32
-Nodes (5): CancellationToken, ILogger, Task, UnitOfWorkManager, ErpPickOrderSyncJob
-
-### Community 357 - "ErpDeliveryOrderDto"
-Cohesion: 0.32
-Nodes (5): CancellationToken, ILogger, Task, UnitOfWorkManager, PickListBackGroundService
-
 ### Community 365 - "ErpInboundOrderResponseDto"
-Cohesion: 0.38
-Nodes (3): Guid, ErpOutboundItem, OutboundItemStatus
+Cohesion: 0.24
+Nodes (4): ErpOutboundOrderAutoMapperProfile, Guid, ErpOutboundItem, OutboundItemStatus
 
 ### Community 371 - "ErpOutboundOrderRequestDto"
 Cohesion: 0.38
 Nodes (3): ApplicationInitializationContext, ServiceConfigurationContext, WmsTestBaseModule
 
-### Community 386 - "GetBySkipDto"
-Cohesion: 0.43
-Nodes (6): createRule(), currentState, getOidcSettings(), useFormRules(), useOidcLogin(), useOidcLogout()
-
-### Community 391 - "LoginInput"
-Cohesion: 0.38
-Nodes (5): [registerTable, { reload }], searchFormSchema, tableColumns, { t }, { t }
-
-### Community 396 - "MaterialUpdateDto"
-Cohesion: 0.47
-Nodes (3): TuTa.Wms.Application.Erp, TuTa.Wms.Application.Contracts.Erp, TuTa.Wms.Application.Contracts.Erp.IDto
+### Community 373 - "ErpOutboundRecordDto"
+Cohesion: 0.09
+Nodes (12): CreateFromBarcodeDto, ErpOutboundRecordDto, ICreateFromBarcodeDto, IErpOutboundRecordDto, barcode, errorMsg, loading, outboundService (+4 more)
 
 ### Community 403 - "PagedMaterialsQueryDto"
 Cohesion: 0.33
 Nodes (5): dependencies, @abp/aspnetcore.mvc.ui.theme.leptonxlite, name, private, version
 
-### Community 451 - "WmsDomainService"
-Cohesion: 0.25
-Nodes (7): DomainService, IDistributedEventBus, IObjectMapper, Type, ErpWorkstationMaterialReceiptManager, IUnitOfWorkManager, WmsDomainService
+### Community 419 - "PickItemDto"
+Cohesion: 0.50
+Nodes (3): TuTa.Wms.Repositories.Moves, TuTa.Wms.Moves.Aggregates, TuTa.Wms.Moves
 
-### Community 452 - "AgvTaskDto"
-Cohesion: 0.14
-Nodes (6): TuTa.Wms.AgvTasks, TuTa.Wms.Controllers.AgvTasks, TuTa.Wms.AgvTasks.Dtos, TuTa.Wms.BarcodeLists.Dtos, TuTa.Wms.Repositories.AgvTasks, TuTa.Wms.Controllers.BarcodeLists
+### Community 420 - "PickItemQueryDto"
+Cohesion: 0.40
+Nodes (3): IQueryable, DbSet, EfCoreQueryableExtensions
+
+### Community 421 - "PickStockAllocateDto"
+Cohesion: 0.40
+Nodes (3): Task, Program, log
+
+### Community 424 - "PuArrVouchDetailRequestDto"
+Cohesion: 0.50
+Nodes (3): AbpControllerBase, TuTa.Wms.Controllers, WmsController
+
+### Community 433 - "SkipInDto"
+Cohesion: 0.50
+Nodes (4): 2.1.0 (2021-03-15), 🐛 Bug Fixes, ✨ Features, ✨ Refactor
+
+### Community 436 - "StockCreateDto"
+Cohesion: 0.50
+Nodes (4): 2.0.3 (2021-03-07), 🐛 Bug Fixes, ✨ Features, ⚡ Performance Improvements
+
+### Community 438 - "StockDto"
+Cohesion: 0.67
+Nodes (3): (Breaking changes) Breaking changes, 🐛 Bug Fixes, ✨ Features
+
+### Community 451 - "WmsDomainService"
+Cohesion: 0.33
+Nodes (5): IDistributedEventBus, IObjectMapper, Type, IUnitOfWorkManager, WmsDomainService
 
 ### Community 455 - "[2.0.0-rc.14](https://github.com/anncwb/vue-vben-admin/compare/2.0.0-beta.3...v2.0.0-rc.14) (2020-12-15)"
 Cohesion: 0.40
@@ -2233,29 +2187,9 @@ Nodes (3): 2.6.0(2021-07-04), 🐛 Bug Fixes, ✨ Features
 Cohesion: 0.40
 Nodes (4): { name }, license, name, version
 
-### Community 592 - "WmsHttpApiClientModule"
-Cohesion: 0.40
-Nodes (3): ServiceConfigurationContext, string, WmsHttpApiClientModule
-
 ### Community 596 - "[2.0.0](https://github.com/anncwb/vue-vben-admin/compare/v2.0.0-rc.18...v2.0.0) (2021-02-17)"
 Cohesion: 0.50
 Nodes (4): [2.0.0](https://github.com/anncwb/vue-vben-admin/compare/v2.0.0-rc.18...v2.0.0) (2021-02-17), Bug Fixes, Features, Performance Improvements
-
-### Community 597 - "(Breaking changes) Breaking changes"
-Cohesion: 0.50
-Nodes (4): (Breaking changes) Breaking changes, 🐛 Bug Fixes, ✨ Features, ✨ Refactor
-
-### Community 598 - "2.0.0-beta.1(2020-09-30)"
-Cohesion: 0.67
-Nodes (3): 2.0.0-beta.1(2020-09-30), 🐛 Bug Fixes, 🎫 Chores
-
-### Community 599 - "2.0.0-beta.1(2020-09-30)"
-Cohesion: 0.67
-Nodes (3): 2.0.0-beta.1(2020-09-30), 🐛 Bug Fixes, 🎫 Chores
-
-### Community 600 - "(破坏性更新) Breaking changes"
-Cohesion: 0.67
-Nodes (3): 🐛 Bug Fixes, ✨ Features, (破坏性更新) Breaking changes
 
 ### Community 601 - "tsconfig-paths"
 Cohesion: 0.67
@@ -2264,22 +2198,22 @@ Nodes (3): tsconfig-paths, paths, /@/*
 ## Knowledge Gaps
 - **2163 isolated node(s):** `{ defineConfig }`, `modules`, `mockModules`, `userInfo`, `accountList` (+2158 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **137 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **146 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `UpdateRoleInput` connect `ChkResultListEventHandler` to `StockOutHistoryService`, `ILogger`, `Exception.vue`?**
-  _High betweenness centrality (0.119) - this node is a cross-community bridge._
-- **Why does `IdentityUserUpdateDto` connect `index.vue` to `ValueObject`, `ErpMaterial`, `ProfileServiceProxy`?**
-  _High betweenness centrality (0.118) - this node is a cross-community bridge._
-- **Why does `UpdateUserInput` connect `ProfileServiceProxy` to `StockOutHistoryService`, `IBarcodeListRepository`, `index.vue`?**
-  _High betweenness centrality (0.117) - this node is a cross-community bridge._
+- **Why does `UpdateRoleInput` connect `ChkResultListEventHandler` to `ILogger`, `Exception.vue`?**
+  _High betweenness centrality (0.113) - this node is a cross-community bridge._
+- **Why does `IdentityUserUpdateDto` connect `index.vue` to `ValueObject`, `IWarehouseRepository`, `ErpMaterial`?**
+  _High betweenness centrality (0.111) - this node is a cross-community bridge._
+- **Why does `UpdateUserInput` connect `IWarehouseRepository` to `IBarcodeListRepository`, `index.vue`?**
+  _High betweenness centrality (0.111) - this node is a cross-community bridge._
 - **What connects `{ defineConfig }`, `modules`, `mockModules` to the rest of the system?**
   _2163 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `ErpWorkstationMaterialRequest` be split into smaller, more focused modules?**
-  _Cohesion score 0.06377151799687011 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.022116903633491312 - nodes in this community are weakly interconnected._
 - **Should `IRepository` be split into smaller, more focused modules?**
-  _Cohesion score 0.06265664160401002 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.12561576354679804 - nodes in this community are weakly interconnected._
 - **Should `CellDto` be split into smaller, more focused modules?**
-  _Cohesion score 0.04401030485186776 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.04724497811693413 - nodes in this community are weakly interconnected._

@@ -13,35 +13,27 @@ namespace TuTa.Wms.StockConsolidations
         private readonly StockConsolidationCellParser _cellParser = new StockConsolidationCellParser();
 
         /// <summary>
-        /// 按偶数排倒序、奇数排正序、同列二层后的一层生成S型顺序。
+        /// 根据数据库中真实存在且处于Enable状态的4F库位生成S型顺序。
+        /// 排号按倒序推进；偶数排列倒序、奇数排列正序；同一列固定先二层再一层。
+        /// Disable和Selected库位不会进入目标序列，不再依赖配置文件维护排号、层级或排除范围。
         /// </summary>
-        public List<string> BuildOrderedCells(
-            StockConsolidationSnapshot snapshot,
-            StockConsolidationOptions options)
+        public List<string> BuildOrderedCells(StockConsolidationSnapshot snapshot)
         {
-            var rowSet = new HashSet<int>(options.Rows);
-            var layerPriority = options.LayerOrder
-                .Select((layer, index) => new { layer, index })
-                .ToDictionary(item => item.layer, item => item.index);
-
             var positions = snapshot.Cells.Values
                 .Where(cell => string.Equals(cell.RunStatus, "Enable", StringComparison.OrdinalIgnoreCase))
                 .Select(cell => _cellParser.TryParse(cell.CellCode, out var position) ? position : null)
                 .Where(position => position != null)
-                .Where(position => rowSet.Contains(position.Row))
-                .Where(position => layerPriority.ContainsKey(position.Layer))
-                .Where(position => !IsExcluded(position, options.ExcludedRanges))
                 .ToList();
 
             var result = new List<string>();
-            foreach (var row in options.Rows)
+            foreach (var row in positions.Select(position => position.Row).Distinct().OrderByDescending(row => row))
             {
                 var rowPositions = positions.Where(position => position.Row == row);
                 rowPositions = row % 2 == 0
                     ? rowPositions.OrderByDescending(position => position.Column)
-                        .ThenBy(position => layerPriority[position.Layer])
+                        .ThenByDescending(position => position.Layer)
                     : rowPositions.OrderBy(position => position.Column)
-                        .ThenBy(position => layerPriority[position.Layer]);
+                        .ThenByDescending(position => position.Layer);
 
                 result.AddRange(rowPositions.Select(position => position.CellCode));
             }
@@ -57,21 +49,19 @@ namespace TuTa.Wms.StockConsolidations
             StockConsolidationSnapshot snapshot,
             IReadOnlyList<string> orderedCells,
             int cursorIndex,
-            string currentHole,
-            StockConsolidationOptions options)
+            string currentHole)
         {
             if (cursorIndex >= orderedCells.Count)
             {
                 return null;
             }
 
-            // 只使用WMS中真实存在的4B配置库位，避免把配置错误的库位当成空位。
-            var validBufferCells = options.BufferCells
-                .Where(snapshot.Cells.ContainsKey)
-                .Where(cellCode => string.Equals(
-                    snapshot.Cells[cellCode].RunStatus,
-                    "Enable",
-                    StringComparison.OrdinalIgnoreCase))
+            // 4B周转位直接来自数据库快照。只有RunStatus为Enable的真实4B库位
+            // 才能作为空洞或暂存位，Disable和Selected点位全部跳过。
+            var validBufferCells = snapshot.Cells.Values
+                .Where(cell => cell.CellCode.StartsWith("4B", StringComparison.OrdinalIgnoreCase))
+                .Where(cell => string.Equals(cell.RunStatus, "Enable", StringComparison.OrdinalIgnoreCase))
+                .Select(cell => cell.CellCode)
                 .ToList();
             var managedCells = new HashSet<string>(orderedCells, StringComparer.OrdinalIgnoreCase);
             managedCells.UnionWith(validBufferCells);
@@ -221,29 +211,6 @@ namespace TuTa.Wms.StockConsolidations
                 NextCursorIndex = cursorIndex + groupContainers.Count,
                 NextHoleCell = currentHole
             };
-        }
-
-        private bool IsExcluded(
-            StockConsolidationCellPosition position,
-            IEnumerable<StockConsolidationCellRange> ranges)
-        {
-            foreach (var range in ranges)
-            {
-                if (!_cellParser.TryParse(range.From, out var from) ||
-                    !_cellParser.TryParse(range.To, out var to) ||
-                    position.Row != from.Row || from.Row != to.Row)
-                {
-                    continue;
-                }
-
-                if (position.Column >= Math.Min(from.Column, to.Column) &&
-                    position.Column <= Math.Max(from.Column, to.Column))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private static StockConsolidationContainerSnapshot FindSource(

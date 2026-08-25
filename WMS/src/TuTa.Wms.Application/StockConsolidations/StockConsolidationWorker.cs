@@ -83,7 +83,7 @@ namespace TuTa.Wms.StockConsolidations
             // 第一步：读取整理配置并建立启动时仓库快照。
             // 快照只保存业务需要的标量，不把EF实体带出UnitOfWork。
             var options = LoadOptions();
-            var initialResult = await BuildSnapshotAsync(options, cancellationToken).ConfigureAwait(false);
+            var initialResult = await BuildSnapshotAsync(cancellationToken).ConfigureAwait(false);
             if (!initialResult.IsSuccess)
             {
                 LogAndReportStop(reportProgress, initialResult.ErrorMessage);
@@ -97,7 +97,7 @@ namespace TuTa.Wms.StockConsolidations
             var activeManagedContainer = initialSnapshot.Containers.Values.FirstOrDefault(container =>
                 container.HasActiveTask &&
                 (container.CellCode.StartsWith("4F", StringComparison.OrdinalIgnoreCase) ||
-                 options.BufferCells.Contains(container.CellCode, StringComparer.OrdinalIgnoreCase)));
+                 container.CellCode.StartsWith("4B", StringComparison.OrdinalIgnoreCase)));
             if (activeManagedContainer != null)
             {
                 LogAndReportStop(
@@ -108,7 +108,7 @@ namespace TuTa.Wms.StockConsolidations
 
             // 第三步：根据真实可用库位生成固定S型顺序。
             // 偶数排由大列到小列、奇数排由小列到大列，同列先二层再一层。
-            var orderedCells = _planner.BuildOrderedCells(initialSnapshot, options);
+            var orderedCells = _planner.BuildOrderedCells(initialSnapshot);
             if (orderedCells.Count == 0)
             {
                 LogAndReportStop(reportProgress, "没有查询到可参与库存整理的4F库位。");
@@ -116,10 +116,13 @@ namespace TuTa.Wms.StockConsolidations
             }
 
             // 第四步：校验4B至少存在一个启用空位，用作一个空洞轮转的启动周转位。
-            var emptyBufferCells = options.BufferCells.Where(cellCode =>
-                initialSnapshot.Cells.TryGetValue(cellCode, out var cell) &&
-                cell.IsEmpty &&
-                string.Equals(cell.RunStatus, "Enable", StringComparison.OrdinalIgnoreCase)).ToList();
+            var emptyBufferCells = initialSnapshot.Cells.Values
+                .Where(cell => cell.CellCode.StartsWith("4B", StringComparison.OrdinalIgnoreCase))
+                .Where(cell => cell.IsEmpty)
+                .Where(cell => string.Equals(cell.RunStatus, "Enable", StringComparison.OrdinalIgnoreCase))
+                .Select(cell => cell.CellCode)
+                .OrderBy(cellCode => cellCode, StringComparer.OrdinalIgnoreCase)
+                .ToList();
             if (emptyBufferCells.Count < options.MinimumEmptyBufferCells)
             {
                 LogAndReportStop(
@@ -143,7 +146,7 @@ namespace TuTa.Wms.StockConsolidations
                     return;
                 }
 
-                var snapshotResult = await BuildSnapshotAsync(options, cancellationToken).ConfigureAwait(false);
+                var snapshotResult = await BuildSnapshotAsync(cancellationToken).ConfigureAwait(false);
                 if (!snapshotResult.IsSuccess)
                 {
                     LogAndReportStop(reportProgress, snapshotResult.ErrorMessage);
@@ -151,7 +154,7 @@ namespace TuTa.Wms.StockConsolidations
                 }
 
                 var snapshot = snapshotResult.Snapshot;
-                var currentOrderedCells = _planner.BuildOrderedCells(snapshot, options);
+                var currentOrderedCells = _planner.BuildOrderedCells(snapshot);
                 if (!orderedCells.SequenceEqual(currentOrderedCells, StringComparer.OrdinalIgnoreCase))
                 {
                     LogAndReportStop(reportProgress, "整理期间可用库位集合发生变化，流程已停止，请重新启动整理。");
@@ -164,8 +167,7 @@ namespace TuTa.Wms.StockConsolidations
                     snapshot,
                     orderedCells,
                     cursorIndex,
-                    currentHole,
-                    options);
+                    currentHole);
                 if (groupPlan == null)
                 {
                     return;
@@ -251,7 +253,7 @@ namespace TuTa.Wms.StockConsolidations
         {
             try
             {
-                var beforeResult = await BuildSnapshotAsync(options, CancellationToken.None).ConfigureAwait(false);
+                var beforeResult = await BuildSnapshotAsync(CancellationToken.None).ConfigureAwait(false);
                 if (!beforeResult.IsSuccess)
                 {
                     return FailedMove(beforeResult.ErrorMessage);
@@ -314,7 +316,7 @@ namespace TuTa.Wms.StockConsolidations
                     var agvTask = queryResult.Task;
                     if (agvTask.Status == AgvTaskStatus.Complete)
                     {
-                        var afterResult = await BuildSnapshotAsync(options, CancellationToken.None).ConfigureAwait(false);
+                        var afterResult = await BuildSnapshotAsync(CancellationToken.None).ConfigureAwait(false);
                         if (!afterResult.IsSuccess)
                         {
                             return FailedMove(afterResult.ErrorMessage);
@@ -357,14 +359,20 @@ namespace TuTa.Wms.StockConsolidations
         /// 查询库存、库位和活动AGV任务，形成当前仓库快照。
         /// </summary>
         private async Task<StockConsolidationSnapshotResult> BuildSnapshotAsync(
-            StockConsolidationOptions options,
             CancellationToken cancellationToken)
         {
             try
             {
                 using var unitOfWork = _unitOfWorkManager.Begin(true, false);
                 var stocks = await _stockRepository.GetListAsync(true, cancellationToken).ConfigureAwait(false);
-                var cells = await _cellRepository.GetListAsync(true, cancellationToken).ConfigureAwait(false);
+                // 直接由数据库筛选整理范围，禁止把Disable库位加载进整理快照后再参与任何判断。
+                // Selected库位仍需查询，用来检测整理与其他AGV任务的并发冲突。
+                var managedCells = await _cellRepository.GetListAsync(
+                    cell => !string.IsNullOrWhiteSpace(cell.CellCode) &&
+                            (cell.CellCode.StartsWith("4F") || cell.CellCode.StartsWith("4B")) &&
+                            cell.RunStatus != CellRunStatus.Disable,
+                    true,
+                    cancellationToken).ConfigureAwait(false);
                 var activeTasks = await _agvTaskRepository.GetListAsync(task =>
                     task.AgvTaskStatus != AgvTaskStatus.Complete &&
                     task.AgvTaskStatus != AgvTaskStatus.Cancel &&
@@ -377,13 +385,9 @@ namespace TuTa.Wms.StockConsolidations
 
                 var snapshot = new StockConsolidationSnapshot();
                 // 库位占用的唯一判断依据是是否绑定容器：有容器即有货，无容器即为空。
-                // 这里只查询4F整理区和配置的4B周转区，不使用CellStatus和库存条数推断占用。
-                var managedCells = cells
-                    .Where(cell => !string.IsNullOrWhiteSpace(cell.CellCode))
-                    .Where(cell =>
-                        cell.CellCode.StartsWith("4F", StringComparison.OrdinalIgnoreCase) ||
-                        options.BufferCells.Contains(cell.CellCode, StringComparer.OrdinalIgnoreCase))
-                    .ToList();
+                // 整理范围直接来自数据库中的4F正式库位和4B周转位，不再读取库位白名单。
+                // RunStatus为Disable的点位从快照入口彻底排除：其容器、库存、空位状态和
+                // 活动任务均不参与任何整理判断；Selected点位仍保留，用于识别并发任务。
                 var managedCellIds = managedCells.Select(cell => cell.Id).Distinct().ToList();
                 var boundBoxes = managedCellIds.Count == 0
                     ? new List<Box>()
@@ -459,7 +463,8 @@ namespace TuTa.Wms.StockConsolidations
                     containerKeyByCell.Add(container.CellCode, container.ContainerKey);
                 }
 
-                foreach (var cell in cells.Where(cell => !string.IsNullOrWhiteSpace(cell.CellCode)))
+                // 快照只暴露未禁用的4F/4B点位，防止规划器或执行前校验通过字典再次访问禁用库位。
+                foreach (var cell in managedCells)
                 {
                     containerKeyByCell.TryGetValue(cell.CellCode, out var containerKey);
                     snapshot.Cells[cell.CellCode] = new StockConsolidationCellSnapshot
