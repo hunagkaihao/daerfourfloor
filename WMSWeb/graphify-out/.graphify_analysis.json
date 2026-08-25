@@ -94,25 +94,6 @@
       "src_views_warehouse_goods_selectorderdetail_visiblechange"
     ],
     "2": [
-      "src_views_warehouse_goods_autos",
-      "src_views_warehouse_goods_autos_cancel",
-      "src_views_warehouse_goods_autos_dataitem",
-      "src_views_warehouse_goods_autos_datasource",
-      "src_views_warehouse_goods_autos_edit",
-      "src_views_warehouse_goods_autos_editabledata",
-      "src_views_warehouse_goods_autos_emit",
-      "src_views_warehouse_goods_autos_getdata",
-      "src_views_warehouse_goods_autos_good",
-      "src_views_warehouse_goods_autos_handletablechange",
-      "src_views_warehouse_goods_autos_materialcode",
-      "src_views_warehouse_goods_autos_pagination",
-      "src_views_warehouse_goods_autos_quantity",
-      "src_views_warehouse_goods_autos_registermodal_changeokloading_closemodal",
-      "src_views_warehouse_goods_autos_save",
-      "src_views_warehouse_goods_autos_state",
-      "src_views_warehouse_goods_autos_submit",
-      "src_views_warehouse_goods_autos_t",
-      "src_views_warehouse_goods_autos_visiblechange",
       "src_views_warehouse_goods_createorder",
       "src_views_warehouse_goods_createorder_adddetail",
       "src_views_warehouse_goods_createorder_adddetails",
@@ -134,7 +115,26 @@
       "src_views_warehouse_goods_createorder_showtable",
       "src_views_warehouse_goods_createorder_submit",
       "src_views_warehouse_goods_createorder_t",
-      "src_views_warehouse_goods_createorder_visiblechange"
+      "src_views_warehouse_goods_createorder_visiblechange",
+      "src_views_warehouse_goods_peoples",
+      "src_views_warehouse_goods_peoples_cancel",
+      "src_views_warehouse_goods_peoples_dataitem",
+      "src_views_warehouse_goods_peoples_datasource",
+      "src_views_warehouse_goods_peoples_edit",
+      "src_views_warehouse_goods_peoples_editabledata",
+      "src_views_warehouse_goods_peoples_emit",
+      "src_views_warehouse_goods_peoples_getdata",
+      "src_views_warehouse_goods_peoples_good",
+      "src_views_warehouse_goods_peoples_handletablechange",
+      "src_views_warehouse_goods_peoples_materialcode",
+      "src_views_warehouse_goods_peoples_pagination",
+      "src_views_warehouse_goods_peoples_quantity",
+      "src_views_warehouse_goods_peoples_registermodal_changeokloading_closemodal",
+      "src_views_warehouse_goods_peoples_save",
+      "src_views_warehouse_goods_peoples_state",
+      "src_views_warehouse_goods_peoples_submit",
+      "src_views_warehouse_goods_peoples_t",
+      "src_views_warehouse_goods_peoples_visiblechange"
     ],
     "3": [
       "src_views_mobile_views_agvincell",
@@ -803,25 +803,25 @@
       "src_views_mobile_views_boxbind_yhone"
     ],
     "26": [
-      "src_views_warehouse_goods_peoples",
-      "src_views_warehouse_goods_peoples_cancel",
-      "src_views_warehouse_goods_peoples_dataitem",
-      "src_views_warehouse_goods_peoples_datasource",
-      "src_views_warehouse_goods_peoples_edit",
-      "src_views_warehouse_goods_peoples_editabledata",
-      "src_views_warehouse_goods_peoples_emit",
-      "src_views_warehouse_goods_peoples_getdata",
-      "src_views_warehouse_goods_peoples_good",
-      "src_views_warehouse_goods_peoples_handletablechange",
-      "src_views_warehouse_goods_peoples_materialcode",
-      "src_views_warehouse_goods_peoples_pagination",
-      "src_views_warehouse_goods_peoples_quantity",
-      "src_views_warehouse_goods_peoples_registermodal_changeokloading_closemodal",
-      "src_views_warehouse_goods_peoples_save",
-      "src_views_warehouse_goods_peoples_state",
-      "src_views_warehouse_goods_peoples_submit",
-      "src_views_warehouse_goods_peoples_t",
-      "src_views_warehouse_goods_peoples_visiblechange"
+      "src_views_warehouse_goods_autos",
+      "src_views_warehouse_goods_autos_cancel",
+      "src_views_warehouse_goods_autos_dataitem",
+      "src_views_warehouse_goods_autos_datasource",
+      "src_views_warehouse_goods_autos_edit",
+      "src_views_warehouse_goods_autos_editabledata",
+      "src_views_warehouse_goods_autos_emit",
+      "src_views_warehouse_goods_autos_getdata",
+      "src_views_warehouse_goods_autos_good",
+      "src_views_warehouse_goods_autos_handletablechange",
+      "src_views_warehouse_goods_autos_materialcode",
+      "src_views_warehouse_goods_autos_pagination",
+      "src_views_warehouse_goods_autos_quantity",
+      "src_views_warehouse_goods_autos_registermodal_changeokloading_closemodal",
+      "src_views_warehouse_goods_autos_save",
+      "src_views_warehouse_goods_autos_state",
+      "src_views_warehouse_goods_autos_submit",
+      "src_views_warehouse_goods_autos_t",
+      "src_views_warehouse_goods_autos_visiblechange"
     ],
     "27": [
       "src_views_mobile_views_materialout",
@@ -990,6 +990,23 @@
       "src_views_mobile_views_checknoget_userstore"
     ],
     "36": [
+      "src_views_mobile_views_stockconsolidation",
+      "src_views_mobile_views_stockconsolidation_getstockconsolidationrequestoptions",
+      "src_views_mobile_views_stockconsolidation_getstockconsolidationstatus",
+      "src_views_mobile_views_stockconsolidation_handlestart",
+      "src_views_mobile_views_stockconsolidation_handlestop",
+      "src_views_mobile_views_stockconsolidation_refreshing",
+      "src_views_mobile_views_stockconsolidation_refreshstatus",
+      "src_views_mobile_views_stockconsolidation_starting",
+      "src_views_mobile_views_stockconsolidation_startstockconsolidation",
+      "src_views_mobile_views_stockconsolidation_status",
+      "src_views_mobile_views_stockconsolidation_statuscolor",
+      "src_views_mobile_views_stockconsolidation_statustext",
+      "src_views_mobile_views_stockconsolidation_stopping",
+      "src_views_mobile_views_stockconsolidation_stopstockconsolidation",
+      "src_views_mobile_views_stockconsolidation_unwrapresponse"
+    ],
+    "37": [
       "src_views_mobile_views_acceptancecall2",
       "src_views_mobile_views_acceptancecall2_columns2",
       "src_views_mobile_views_acceptancecall2_count",
@@ -1005,7 +1022,7 @@
       "src_views_mobile_views_acceptancecall2_tableref",
       "src_views_mobile_views_acceptancecall2_yhone"
     ],
-    "37": [
+    "38": [
       "src_views_task_tasks_createnoplan",
       "src_views_task_tasks_createnoplan_setup",
       "src_views_task_tasks_editnoplan",
@@ -1021,7 +1038,7 @@
       "src_views_task_tasks_task_registertable_reload",
       "src_views_task_tasks_task_t"
     ],
-    "38": [
+    "39": [
       "src_views_warehouse_outstock_outstock",
       "src_views_warehouse_outstock_outstock_beforeopenoutstockmodal",
       "src_views_warehouse_outstock_outstock_createconfirm",
@@ -1037,7 +1054,7 @@
       "src_views_warehouse_outstock_outstockmodal_registerform_setfieldsvalue_getfieldsvalue_validate",
       "src_views_warehouse_outstock_outstockmodal_selectedstocks"
     ],
-    "39": [
+    "40": [
       "src_views_mobile_views_outstockorder",
       "src_views_mobile_views_outstockorder_columns",
       "src_views_mobile_views_outstockorder_executeout",
@@ -1052,7 +1069,7 @@
       "src_views_mobile_views_outstockorder_printorder",
       "src_views_mobile_views_outstockorder_scanorder"
     ],
-    "40": [
+    "41": [
       "src_views_task_agv_agvtaskmanagement",
       "src_views_task_agv_agvtaskmanagement_createmessage",
       "src_views_task_agv_agvtaskmanagement_defaultheader",
@@ -1067,7 +1084,7 @@
       "src_views_task_agv_agvtaskmanagement_route",
       "src_views_task_agv_agvtaskmanagement_t"
     ],
-    "41": [
+    "42": [
       "src_views_mobile_views_asn_testscanasn",
       "src_views_mobile_views_asn_testscanasn_asncode",
       "src_views_mobile_views_asn_testscanasn_asndatalist",
@@ -1081,7 +1098,7 @@
       "src_views_mobile_views_asn_testscanasn_scanasn",
       "src_views_mobile_views_asn_testscanasn_showsavesuccess"
     ],
-    "42": [
+    "43": [
       "src_views_mobile_views_asn_scanasn",
       "src_views_mobile_views_asn_scanasn_asncode",
       "src_views_mobile_views_asn_scanasn_asndatalist",
@@ -1093,19 +1110,6 @@
       "src_views_mobile_views_asn_scanasn_saving",
       "src_views_mobile_views_asn_scanasn_scanasn",
       "src_views_mobile_views_asn_scanasn_showsavesuccess"
-    ],
-    "43": [
-      "src_views_mobile_views_stockconsolidation",
-      "src_views_mobile_views_stockconsolidation_handlestart",
-      "src_views_mobile_views_stockconsolidation_handlestop",
-      "src_views_mobile_views_stockconsolidation_refreshing",
-      "src_views_mobile_views_stockconsolidation_refreshstatus",
-      "src_views_mobile_views_stockconsolidation_starting",
-      "src_views_mobile_views_stockconsolidation_status",
-      "src_views_mobile_views_stockconsolidation_statuscolor",
-      "src_views_mobile_views_stockconsolidation_statustext",
-      "src_views_mobile_views_stockconsolidation_stopping",
-      "src_views_mobile_views_stockconsolidation_unwrapresponse"
     ],
     "44": [
       "src_views_mobile_views_stockquery",
@@ -1452,14 +1456,14 @@
     "33": 0.13333333333333333,
     "34": 0.13333333333333333,
     "35": 0.1523809523809524,
-    "36": 0.16483516483516483,
-    "37": 0.14285714285714285,
-    "38": 0.15384615384615385,
+    "36": 0.17142857142857143,
+    "37": 0.16483516483516483,
+    "38": 0.14285714285714285,
     "39": 0.15384615384615385,
-    "40": 0.16666666666666666,
+    "40": 0.15384615384615385,
     "41": 0.16666666666666666,
-    "42": 0.18181818181818182,
-    "43": 0.2,
+    "42": 0.16666666666666666,
+    "43": 0.18181818181818182,
     "44": 0.23636363636363636,
     "45": 0.18181818181818182,
     "46": 0.2,
@@ -1525,6 +1529,11 @@
       "degree": 4
     },
     {
+      "id": "src_views_mobile_views_stockconsolidation_getstockconsolidationrequestoptions",
+      "label": "getStockConsolidationRequestOptions()",
+      "degree": 4
+    },
+    {
       "id": "src_views_mobile_components_lanecellchips_normalizerunstatus",
       "label": "normalizeRunStatus()",
       "degree": 3
@@ -1542,11 +1551,6 @@
     {
       "id": "src_views_mobile_views_acceptancecalltest_data",
       "label": "data()",
-      "degree": 3
-    },
-    {
-      "id": "src_views_mobile_views_boxdiskwithasn_scanboxcode",
-      "label": "scanboxCode()",
       "degree": 3
     }
   ],
@@ -1589,7 +1593,7 @@
     {
       "type": "bridge_node",
       "question": "Why does `createStockTask()` connect `createStockTask` to `Community 4`, `home.vue`?",
-      "why": "High betweenness centrality (0.034) - this node is a cross-community bridge."
+      "why": "High betweenness centrality (0.033) - this node is a cross-community bridge."
     },
     {
       "type": "bridge_node",
@@ -1618,7 +1622,7 @@
     },
     {
       "type": "low_cohesion",
-      "question": "Should `Community 2` be split into smaller, more focused modules?",
+      "question": "Should `CreateOrder.vue` be split into smaller, more focused modules?",
       "why": "Cohesion score 0.054878048780487805 - nodes in this community are weakly interconnected."
     }
   ]

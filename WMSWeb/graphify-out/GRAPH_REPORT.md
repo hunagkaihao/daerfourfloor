@@ -4,19 +4,19 @@
 - cluster-only mode — file stats not available
 
 ## Summary
-- 1252 nodes · 1319 edges · 81 communities (74 shown, 7 thin omitted)
+- 1256 nodes · 1326 edges · 81 communities (74 shown, 7 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 11 edges (avg confidence: 0.58)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `72907257`
+- Built from commit: `7a925901`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - [[_COMMUNITY_Community 0|Community 0]]
 - [[_COMMUNITY_Community 1|Community 1]]
-- [[_COMMUNITY_Community 2|Community 2]]
+- [[_COMMUNITY_CreateOrder.vue|CreateOrder.vue]]
 - [[_COMMUNITY_Community 3|Community 3]]
 - [[_COMMUNITY_Community 4|Community 4]]
 - [[_COMMUNITY_home.vue|home.vue]]
@@ -40,7 +40,7 @@
 - [[_COMMUNITY_Community 23|Community 23]]
 - [[_COMMUNITY_Community 24|Community 24]]
 - [[_COMMUNITY_Community 25|Community 25]]
-- [[_COMMUNITY_Community 26|Community 26]]
+- [[_COMMUNITY_Autos.vue|Autos.vue]]
 - [[_COMMUNITY_Community 27|Community 27]]
 - [[_COMMUNITY_Community 28|Community 28]]
 - [[_COMMUNITY_Community 29|Community 29]]
@@ -50,14 +50,14 @@
 - [[_COMMUNITY_Community 33|Community 33]]
 - [[_COMMUNITY_Community 34|Community 34]]
 - [[_COMMUNITY_Community 35|Community 35]]
-- [[_COMMUNITY_Community 36|Community 36]]
-- [[_COMMUNITY_Community 37|Community 37]]
-- [[_COMMUNITY_Community 38|Community 38]]
-- [[_COMMUNITY_Community 39|Community 39]]
-- [[_COMMUNITY_Community 40|Community 40]]
-- [[_COMMUNITY_Community 41|Community 41]]
-- [[_COMMUNITY_Community 42|Community 42]]
 - [[_COMMUNITY_StockConsolidation.vue|StockConsolidation.vue]]
+- [[_COMMUNITY_AcceptanceCall2.vue|AcceptanceCall2.vue]]
+- [[_COMMUNITY_task.vue|task.vue]]
+- [[_COMMUNITY_Outstock.vue|Outstock.vue]]
+- [[_COMMUNITY_OutStockOrder.vue|OutStockOrder.vue]]
+- [[_COMMUNITY_AgvTaskManagement.vue|AgvTaskManagement.vue]]
+- [[_COMMUNITY_TestScanAsn.vue|TestScanAsn.vue]]
+- [[_COMMUNITY_ScanAsn.vue|ScanAsn.vue]]
 - [[_COMMUNITY_StockQuery.vue|StockQuery.vue]]
 - [[_COMMUNITY_BarcodeList.vue|BarcodeList.vue]]
 - [[_COMMUNITY_StockAdjustment.vue|StockAdjustment.vue]]
@@ -95,11 +95,11 @@
 3. `scanboxCode()` - 4 edges
 4. `scanboxCode()` - 4 edges
 5. `queryStocks()` - 4 edges
-6. `normalizeRunStatus()` - 3 edges
-7. `scangoodsCode()` - 3 edges
-8. `data()` - 3 edges
+6. `getStockConsolidationRequestOptions()` - 4 edges
+7. `normalizeRunStatus()` - 3 edges
+8. `scangoodsCode()` - 3 edges
 9. `data()` - 3 edges
-10. `scanboxCode()` - 3 edges
+10. `data()` - 3 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `createTask()` --calls--> `createStockTask()`  [INFERRED]
@@ -122,9 +122,9 @@ Nodes (28): emit, [registerCellForm, { getFieldsValue, validate, resetFields, }]
 Cohesion: 0.05
 Nodes (31): DataItem, dataSource, editableData, emit, getdata(), good, handleTableChange(), materialCode (+23 more)
 
-### Community 2 - "Community 2"
+### Community 2 - "CreateOrder.vue"
 Cohesion: 0.05
-Nodes (29): DataItem, dataSource, editableData, emit, getdata(), good, handleTableChange(), materialCode (+21 more)
+Nodes (29): cancel(), dataSource, emit, good, goodlist, [registerAutoModal, { openModal: openAutoModal }], [registerCreateOrderModal, { openModal: openCreateOrderModal }], [registerModal, { changeOkLoading, closeModal }] (+21 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.06
@@ -218,7 +218,7 @@ Nodes (16): columns, count, dapdata, data(), dataSource, findtype, fliter, handl
 Cohesion: 0.11
 Nodes (12): boxCode, cellCode, goodheight, GoodsDetail, Ref1, Ref2, [registerGoodsDetailModal, { openModal: openGoodsDetailModal }], screenHeight (+4 more)
 
-### Community 26 - "Community 26"
+### Community 26 - "Autos.vue"
 Cohesion: 0.12
 Nodes (14): DataItem, dataSource, editableData, emit, getdata(), good, handleTableChange(), materialCode (+6 more)
 
@@ -258,37 +258,37 @@ Nodes (13): formData, formRef, { getFormRules }, getShow, loading, { notificatio
 Cohesion: 0.15
 Nodes (13): barcodeGet(), boxCode, CellSelectModal, clear(), createAgv(), { createConfirm }, goods, newBoxCode (+5 more)
 
-### Community 36 - "Community 36"
+### Community 36 - "StockConsolidation.vue"
+Cohesion: 0.17
+Nodes (12): getStockConsolidationRequestOptions(), getStockConsolidationStatus(), refreshing, refreshStatus(), starting, startStockConsolidation(), status, statusColor (+4 more)
+
+### Community 37 - "AcceptanceCall2.vue"
 Cohesion: 0.16
 Nodes (12): columns2, count, data(), dataSource, findtype, fliter, getPagedCheckInItems(), good (+4 more)
 
-### Community 37 - "Community 37"
+### Community 38 - "task.vue"
 Cohesion: 0.14
 Nodes (6): { createConfirm }, [register, { openModal }], [registerCreateCellModal, { openModal: openCreateCellModal }], [registerEditnoplanModal, { openModal: openEditnoplanModal }], [registerTable, { reload }], { t }
 
-### Community 38 - "Community 38"
+### Community 39 - "Outstock.vue"
 Cohesion: 0.15
 Nodes (10): { createConfirm }, [registerOutstockModal, { openModal: openOutstockModal }], [registerTable, { getDataSource, reload, getSelectRows, clearSelectedRowKeys }], { t }, emit, formState, handleSubmit(), [register, { closeModal }] (+2 more)
 
-### Community 39 - "Community 39"
+### Community 40 - "OutStockOrder.vue"
 Cohesion: 0.15
 Nodes (7): columns, executing, items, loading, orderCode, orderData, outboundOrderService
 
-### Community 40 - "Community 40"
+### Community 41 - "AgvTaskManagement.vue"
 Cohesion: 0.17
 Nodes (7): { createMessage }, defaultHeader(), getStatusText(), [register, { openModal: openExportModal }], [registerTable, { reload, getForm, setFieldsValue }], route, { t }
 
-### Community 41 - "Community 41"
+### Community 42 - "TestScanAsn.vue"
 Cohesion: 0.17
 Nodes (8): asnCode, asnDataList, asnInput, asnService, loading, MockAsnItem, saving, showSaveSuccess
 
-### Community 42 - "Community 42"
+### Community 43 - "ScanAsn.vue"
 Cohesion: 0.18
 Nodes (7): asnCode, asnDataList, asnInput, asnService, loading, saving, showSaveSuccess
-
-### Community 43 - "StockConsolidation.vue"
-Cohesion: 0.20
-Nodes (8): refreshing, refreshStatus(), starting, status, statusColor, statusText, stopping, unwrapResponse()
 
 ### Community 44 - "StockQuery.vue"
 Cohesion: 0.24
@@ -391,7 +391,7 @@ Nodes (4): { createError }, modifiedSearchFormSchema, [registerTable, { reload, 
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `createStockTask()` connect `createStockTask` to `Community 4`, `home.vue`?**
-  _High betweenness centrality (0.034) - this node is a cross-community bridge._
+  _High betweenness centrality (0.033) - this node is a cross-community bridge._
 - **Why does `createTask()` connect `Community 4` to `createStockTask`?**
   _High betweenness centrality (0.018) - this node is a cross-community bridge._
 - **Why does `createOutStockTask()` connect `createStockTask` to `Community 31`?**
@@ -402,5 +402,5 @@ _Questions this graph is uniquely positioned to answer:_
   _Cohesion score 0.04625346901017576 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.0545876887340302 - nodes in this community are weakly interconnected._
-- **Should `Community 2` be split into smaller, more focused modules?**
+- **Should `CreateOrder.vue` be split into smaller, more focused modules?**
   _Cohesion score 0.054878048780487805 - nodes in this community are weakly interconnected._

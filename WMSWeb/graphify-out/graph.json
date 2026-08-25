@@ -1307,9 +1307,9 @@
       "source_file": "src/views/mobile/views/AcceptanceCall2.vue",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 36,
+      "community": 37,
       "norm_label": "acceptancecall2.vue",
-      "community_name": "Community 36",
+      "community_name": "AcceptanceCall2.vue",
       "id": "src_views_mobile_views_acceptancecall2"
     },
     {
@@ -1318,9 +1318,9 @@
       "source_file": "src/views/mobile/views/AcceptanceCall2.vue",
       "source_location": "L59",
       "_origin": "ast",
-      "community": 36,
+      "community": 37,
       "norm_label": "columns2",
-      "community_name": "Community 36",
+      "community_name": "AcceptanceCall2.vue",
       "id": "src_views_mobile_views_acceptancecall2_columns2"
     },
     {
@@ -1329,9 +1329,9 @@
       "source_file": "src/views/mobile/views/AcceptanceCall2.vue",
       "source_location": "L60",
       "_origin": "ast",
-      "community": 36,
+      "community": 37,
       "norm_label": "getpagedcheckinitems()",
-      "community_name": "Community 36",
+      "community_name": "AcceptanceCall2.vue",
       "id": "src_views_mobile_views_acceptancecall2_getpagedcheckinitems"
     },
     {
@@ -1340,9 +1340,9 @@
       "source_file": "src/views/mobile/views/AcceptanceCall2.vue",
       "source_location": "L69",
       "_origin": "ast",
-      "community": 36,
+      "community": 37,
       "norm_label": "good",
-      "community_name": "Community 36",
+      "community_name": "AcceptanceCall2.vue",
       "id": "src_views_mobile_views_acceptancecall2_good"
     },
     {
@@ -1351,9 +1351,9 @@
       "source_file": "src/views/mobile/views/AcceptanceCall2.vue",
       "source_location": "L72",
       "_origin": "ast",
-      "community": 36,
+      "community": 37,
       "norm_label": "findtype",
-      "community_name": "Community 36",
+      "community_name": "AcceptanceCall2.vue",
       "id": "src_views_mobile_views_acceptancecall2_findtype"
     },
     {
@@ -1362,9 +1362,9 @@
       "source_file": "src/views/mobile/views/AcceptanceCall2.vue",
       "source_location": "L73",
       "_origin": "ast",
-      "community": 36,
+      "community": 37,
       "norm_label": "fliter",
-      "community_name": "Community 36",
+      "community_name": "AcceptanceCall2.vue",
       "id": "src_views_mobile_views_acceptancecall2_fliter"
     },
     {
@@ -1373,9 +1373,9 @@
       "source_file": "src/views/mobile/views/AcceptanceCall2.vue",
       "source_location": "L74",
       "_origin": "ast",
-      "community": 36,
+      "community": 37,
       "norm_label": "datasource",
-      "community_name": "Community 36",
+      "community_name": "AcceptanceCall2.vue",
       "id": "src_views_mobile_views_acceptancecall2_datasource"
     },
     {
@@ -1384,9 +1384,9 @@
       "source_file": "src/views/mobile/views/AcceptanceCall2.vue",
       "source_location": "L75",
       "_origin": "ast",
-      "community": 36,
+      "community": 37,
       "norm_label": "count",
-      "community_name": "Community 36",
+      "community_name": "AcceptanceCall2.vue",
       "id": "src_views_mobile_views_acceptancecall2_count"
     },
     {
@@ -1395,9 +1395,9 @@
       "source_file": "src/views/mobile/views/AcceptanceCall2.vue",
       "source_location": "L76",
       "_origin": "ast",
-      "community": 36,
+      "community": 37,
       "norm_label": "data()",
-      "community_name": "Community 36",
+      "community_name": "AcceptanceCall2.vue",
       "id": "src_views_mobile_views_acceptancecall2_data"
     },
     {
@@ -1406,9 +1406,9 @@
       "source_file": "src/views/mobile/views/AcceptanceCall2.vue",
       "source_location": "L97",
       "_origin": "ast",
-      "community": 36,
+      "community": 37,
       "norm_label": "reflash()",
-      "community_name": "Community 36",
+      "community_name": "AcceptanceCall2.vue",
       "id": "src_views_mobile_views_acceptancecall2_reflash"
     },
     {
@@ -1417,9 +1417,9 @@
       "source_file": "src/views/mobile/views/AcceptanceCall2.vue",
       "source_location": "L102",
       "_origin": "ast",
-      "community": 36,
+      "community": 37,
       "norm_label": "openout()",
-      "community_name": "Community 36",
+      "community_name": "AcceptanceCall2.vue",
       "id": "src_views_mobile_views_acceptancecall2_openout"
     },
     {
@@ -1428,9 +1428,9 @@
       "source_file": "src/views/mobile/views/AcceptanceCall2.vue",
       "source_location": "L107",
       "_origin": "ast",
-      "community": 36,
+      "community": 37,
       "norm_label": "screenheight",
-      "community_name": "Community 36",
+      "community_name": "AcceptanceCall2.vue",
       "id": "src_views_mobile_views_acceptancecall2_screenheight"
     },
     {
@@ -1439,9 +1439,9 @@
       "source_file": "src/views/mobile/views/AcceptanceCall2.vue",
       "source_location": "L108",
       "_origin": "ast",
-      "community": 36,
+      "community": 37,
       "norm_label": "yhone",
-      "community_name": "Community 36",
+      "community_name": "AcceptanceCall2.vue",
       "id": "src_views_mobile_views_acceptancecall2_yhone"
     },
     {
@@ -1450,9 +1450,9 @@
       "source_file": "src/views/mobile/views/AcceptanceCall2.vue",
       "source_location": "L109",
       "_origin": "ast",
-      "community": 36,
+      "community": 37,
       "norm_label": "tableref",
-      "community_name": "Community 36",
+      "community_name": "AcceptanceCall2.vue",
       "id": "src_views_mobile_views_acceptancecall2_tableref"
     },
     {
@@ -6301,9 +6301,9 @@
       "source_file": "src/views/mobile/views/OutStockOrder.vue",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 39,
+      "community": 40,
       "norm_label": "outstockorder.vue",
-      "community_name": "Community 39",
+      "community_name": "OutStockOrder.vue",
       "id": "src_views_mobile_views_outstockorder"
     },
     {
@@ -6312,9 +6312,9 @@
       "source_file": "src/views/mobile/views/OutStockOrder.vue",
       "source_location": "L50",
       "_origin": "ast",
-      "community": 39,
+      "community": 40,
       "norm_label": "ordercode",
-      "community_name": "Community 39",
+      "community_name": "OutStockOrder.vue",
       "id": "src_views_mobile_views_outstockorder_ordercode"
     },
     {
@@ -6323,9 +6323,9 @@
       "source_file": "src/views/mobile/views/OutStockOrder.vue",
       "source_location": "L51",
       "_origin": "ast",
-      "community": 39,
+      "community": 40,
       "norm_label": "loading",
-      "community_name": "Community 39",
+      "community_name": "OutStockOrder.vue",
       "id": "src_views_mobile_views_outstockorder_loading"
     },
     {
@@ -6334,9 +6334,9 @@
       "source_file": "src/views/mobile/views/OutStockOrder.vue",
       "source_location": "L52",
       "_origin": "ast",
-      "community": 39,
+      "community": 40,
       "norm_label": "executing",
-      "community_name": "Community 39",
+      "community_name": "OutStockOrder.vue",
       "id": "src_views_mobile_views_outstockorder_executing"
     },
     {
@@ -6345,9 +6345,9 @@
       "source_file": "src/views/mobile/views/OutStockOrder.vue",
       "source_location": "L53",
       "_origin": "ast",
-      "community": 39,
+      "community": 40,
       "norm_label": "orderdata",
-      "community_name": "Community 39",
+      "community_name": "OutStockOrder.vue",
       "id": "src_views_mobile_views_outstockorder_orderdata"
     },
     {
@@ -6356,9 +6356,9 @@
       "source_file": "src/views/mobile/views/OutStockOrder.vue",
       "source_location": "L55",
       "_origin": "ast",
-      "community": 39,
+      "community": 40,
       "norm_label": "outboundorderservice",
-      "community_name": "Community 39",
+      "community_name": "OutStockOrder.vue",
       "id": "src_views_mobile_views_outstockorder_outboundorderservice"
     },
     {
@@ -6367,9 +6367,9 @@
       "source_file": "src/views/mobile/views/OutStockOrder.vue",
       "source_location": "L57",
       "_origin": "ast",
-      "community": 39,
+      "community": 40,
       "norm_label": "columns",
-      "community_name": "Community 39",
+      "community_name": "OutStockOrder.vue",
       "id": "src_views_mobile_views_outstockorder_columns"
     },
     {
@@ -6378,9 +6378,9 @@
       "source_file": "src/views/mobile/views/OutStockOrder.vue",
       "source_location": "L65",
       "_origin": "ast",
-      "community": 39,
+      "community": 40,
       "norm_label": "items",
-      "community_name": "Community 39",
+      "community_name": "OutStockOrder.vue",
       "id": "src_views_mobile_views_outstockorder_items"
     },
     {
@@ -6389,9 +6389,9 @@
       "source_file": "src/views/mobile/views/OutStockOrder.vue",
       "source_location": "L67",
       "_origin": "ast",
-      "community": 39,
+      "community": 40,
       "norm_label": "getstatustext()",
-      "community_name": "Community 39",
+      "community_name": "OutStockOrder.vue",
       "id": "src_views_mobile_views_outstockorder_getstatustext"
     },
     {
@@ -6400,9 +6400,9 @@
       "source_file": "src/views/mobile/views/OutStockOrder.vue",
       "source_location": "L76",
       "_origin": "ast",
-      "community": 39,
+      "community": 40,
       "norm_label": "getordertype()",
-      "community_name": "Community 39",
+      "community_name": "OutStockOrder.vue",
       "id": "src_views_mobile_views_outstockorder_getordertype"
     },
     {
@@ -6411,9 +6411,9 @@
       "source_file": "src/views/mobile/views/OutStockOrder.vue",
       "source_location": "L81",
       "_origin": "ast",
-      "community": 39,
+      "community": 40,
       "norm_label": "scanorder()",
-      "community_name": "Community 39",
+      "community_name": "OutStockOrder.vue",
       "id": "src_views_mobile_views_outstockorder_scanorder"
     },
     {
@@ -6422,9 +6422,9 @@
       "source_file": "src/views/mobile/views/OutStockOrder.vue",
       "source_location": "L110",
       "_origin": "ast",
-      "community": 39,
+      "community": 40,
       "norm_label": "executeout()",
-      "community_name": "Community 39",
+      "community_name": "OutStockOrder.vue",
       "id": "src_views_mobile_views_outstockorder_executeout"
     },
     {
@@ -6433,9 +6433,9 @@
       "source_file": "src/views/mobile/views/OutStockOrder.vue",
       "source_location": "L131",
       "_origin": "ast",
-      "community": 39,
+      "community": 40,
       "norm_label": "printorder()",
-      "community_name": "Community 39",
+      "community_name": "OutStockOrder.vue",
       "id": "src_views_mobile_views_outstockorder_printorder"
     },
     {
@@ -6917,9 +6917,9 @@
       "source_file": "src/views/mobile/views/asn/ScanAsn.vue",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 42,
+      "community": 43,
       "norm_label": "scanasn.vue",
-      "community_name": "Community 42",
+      "community_name": "ScanAsn.vue",
       "id": "src_views_mobile_views_asn_scanasn"
     },
     {
@@ -6928,9 +6928,9 @@
       "source_file": "src/views/mobile/views/asn/ScanAsn.vue",
       "source_location": "L93",
       "_origin": "ast",
-      "community": 42,
+      "community": 43,
       "norm_label": "asninput",
-      "community_name": "Community 42",
+      "community_name": "ScanAsn.vue",
       "id": "src_views_mobile_views_asn_scanasn_asninput"
     },
     {
@@ -6939,9 +6939,9 @@
       "source_file": "src/views/mobile/views/asn/ScanAsn.vue",
       "source_location": "L94",
       "_origin": "ast",
-      "community": 42,
+      "community": 43,
       "norm_label": "asncode",
-      "community_name": "Community 42",
+      "community_name": "ScanAsn.vue",
       "id": "src_views_mobile_views_asn_scanasn_asncode"
     },
     {
@@ -6950,9 +6950,9 @@
       "source_file": "src/views/mobile/views/asn/ScanAsn.vue",
       "source_location": "L95",
       "_origin": "ast",
-      "community": 42,
+      "community": 43,
       "norm_label": "asndatalist",
-      "community_name": "Community 42",
+      "community_name": "ScanAsn.vue",
       "id": "src_views_mobile_views_asn_scanasn_asndatalist"
     },
     {
@@ -6961,9 +6961,9 @@
       "source_file": "src/views/mobile/views/asn/ScanAsn.vue",
       "source_location": "L96",
       "_origin": "ast",
-      "community": 42,
+      "community": 43,
       "norm_label": "loading",
-      "community_name": "Community 42",
+      "community_name": "ScanAsn.vue",
       "id": "src_views_mobile_views_asn_scanasn_loading"
     },
     {
@@ -6972,9 +6972,9 @@
       "source_file": "src/views/mobile/views/asn/ScanAsn.vue",
       "source_location": "L97",
       "_origin": "ast",
-      "community": 42,
+      "community": 43,
       "norm_label": "saving",
-      "community_name": "Community 42",
+      "community_name": "ScanAsn.vue",
       "id": "src_views_mobile_views_asn_scanasn_saving"
     },
     {
@@ -6983,9 +6983,9 @@
       "source_file": "src/views/mobile/views/asn/ScanAsn.vue",
       "source_location": "L98",
       "_origin": "ast",
-      "community": 42,
+      "community": 43,
       "norm_label": "showsavesuccess",
-      "community_name": "Community 42",
+      "community_name": "ScanAsn.vue",
       "id": "src_views_mobile_views_asn_scanasn_showsavesuccess"
     },
     {
@@ -6994,9 +6994,9 @@
       "source_file": "src/views/mobile/views/asn/ScanAsn.vue",
       "source_location": "L100",
       "_origin": "ast",
-      "community": 42,
+      "community": 43,
       "norm_label": "asnservice",
-      "community_name": "Community 42",
+      "community_name": "ScanAsn.vue",
       "id": "src_views_mobile_views_asn_scanasn_asnservice"
     },
     {
@@ -7005,9 +7005,9 @@
       "source_file": "src/views/mobile/views/asn/ScanAsn.vue",
       "source_location": "L110",
       "_origin": "ast",
-      "community": 42,
+      "community": 43,
       "norm_label": "focusfn()",
-      "community_name": "Community 42",
+      "community_name": "ScanAsn.vue",
       "id": "src_views_mobile_views_asn_scanasn_focusfn"
     },
     {
@@ -7016,9 +7016,9 @@
       "source_file": "src/views/mobile/views/asn/ScanAsn.vue",
       "source_location": "L117",
       "_origin": "ast",
-      "community": 42,
+      "community": 43,
       "norm_label": "scanasn()",
-      "community_name": "Community 42",
+      "community_name": "ScanAsn.vue",
       "id": "src_views_mobile_views_asn_scanasn_scanasn"
     },
     {
@@ -7027,9 +7027,9 @@
       "source_file": "src/views/mobile/views/asn/ScanAsn.vue",
       "source_location": "L144",
       "_origin": "ast",
-      "community": 42,
+      "community": 43,
       "norm_label": "saveasninfo()",
-      "community_name": "Community 42",
+      "community_name": "ScanAsn.vue",
       "id": "src_views_mobile_views_asn_scanasn_saveasninfo"
     },
     {
@@ -7038,9 +7038,9 @@
       "source_file": "src/views/mobile/views/asn/TestScanAsn.vue",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 41,
+      "community": 42,
       "norm_label": "testscanasn.vue",
-      "community_name": "Community 41",
+      "community_name": "TestScanAsn.vue",
       "id": "src_views_mobile_views_asn_testscanasn"
     },
     {
@@ -7049,9 +7049,9 @@
       "source_file": "src/views/mobile/views/asn/TestScanAsn.vue",
       "source_location": "L110",
       "_origin": "ast",
-      "community": 41,
+      "community": 42,
       "norm_label": "mockasnitem",
-      "community_name": "Community 41",
+      "community_name": "TestScanAsn.vue",
       "id": "src_views_mobile_views_asn_testscanasn_mockasnitem"
     },
     {
@@ -7060,9 +7060,9 @@
       "source_file": "src/views/mobile/views/asn/TestScanAsn.vue",
       "source_location": "L123",
       "_origin": "ast",
-      "community": 41,
+      "community": 42,
       "norm_label": "asninput",
-      "community_name": "Community 41",
+      "community_name": "TestScanAsn.vue",
       "id": "src_views_mobile_views_asn_testscanasn_asninput"
     },
     {
@@ -7071,9 +7071,9 @@
       "source_file": "src/views/mobile/views/asn/TestScanAsn.vue",
       "source_location": "L124",
       "_origin": "ast",
-      "community": 41,
+      "community": 42,
       "norm_label": "asncode",
-      "community_name": "Community 41",
+      "community_name": "TestScanAsn.vue",
       "id": "src_views_mobile_views_asn_testscanasn_asncode"
     },
     {
@@ -7082,9 +7082,9 @@
       "source_file": "src/views/mobile/views/asn/TestScanAsn.vue",
       "source_location": "L125",
       "_origin": "ast",
-      "community": 41,
+      "community": 42,
       "norm_label": "asndatalist",
-      "community_name": "Community 41",
+      "community_name": "TestScanAsn.vue",
       "id": "src_views_mobile_views_asn_testscanasn_asndatalist"
     },
     {
@@ -7093,9 +7093,9 @@
       "source_file": "src/views/mobile/views/asn/TestScanAsn.vue",
       "source_location": "L126",
       "_origin": "ast",
-      "community": 41,
+      "community": 42,
       "norm_label": "loading",
-      "community_name": "Community 41",
+      "community_name": "TestScanAsn.vue",
       "id": "src_views_mobile_views_asn_testscanasn_loading"
     },
     {
@@ -7104,9 +7104,9 @@
       "source_file": "src/views/mobile/views/asn/TestScanAsn.vue",
       "source_location": "L127",
       "_origin": "ast",
-      "community": 41,
+      "community": 42,
       "norm_label": "saving",
-      "community_name": "Community 41",
+      "community_name": "TestScanAsn.vue",
       "id": "src_views_mobile_views_asn_testscanasn_saving"
     },
     {
@@ -7115,9 +7115,9 @@
       "source_file": "src/views/mobile/views/asn/TestScanAsn.vue",
       "source_location": "L128",
       "_origin": "ast",
-      "community": 41,
+      "community": 42,
       "norm_label": "showsavesuccess",
-      "community_name": "Community 41",
+      "community_name": "TestScanAsn.vue",
       "id": "src_views_mobile_views_asn_testscanasn_showsavesuccess"
     },
     {
@@ -7126,9 +7126,9 @@
       "source_file": "src/views/mobile/views/asn/TestScanAsn.vue",
       "source_location": "L130",
       "_origin": "ast",
-      "community": 41,
+      "community": 42,
       "norm_label": "asnservice",
-      "community_name": "Community 41",
+      "community_name": "TestScanAsn.vue",
       "id": "src_views_mobile_views_asn_testscanasn_asnservice"
     },
     {
@@ -7137,9 +7137,9 @@
       "source_file": "src/views/mobile/views/asn/TestScanAsn.vue",
       "source_location": "L140",
       "_origin": "ast",
-      "community": 41,
+      "community": 42,
       "norm_label": "focusfn()",
-      "community_name": "Community 41",
+      "community_name": "TestScanAsn.vue",
       "id": "src_views_mobile_views_asn_testscanasn_focusfn"
     },
     {
@@ -7148,9 +7148,9 @@
       "source_file": "src/views/mobile/views/asn/TestScanAsn.vue",
       "source_location": "L147",
       "_origin": "ast",
-      "community": 41,
+      "community": 42,
       "norm_label": "scanasn()",
-      "community_name": "Community 41",
+      "community_name": "TestScanAsn.vue",
       "id": "src_views_mobile_views_asn_testscanasn_scanasn"
     },
     {
@@ -7159,9 +7159,9 @@
       "source_file": "src/views/mobile/views/asn/TestScanAsn.vue",
       "source_location": "L169",
       "_origin": "ast",
-      "community": 41,
+      "community": 42,
       "norm_label": "saveasninfo()",
-      "community_name": "Community 41",
+      "community_name": "TestScanAsn.vue",
       "id": "src_views_mobile_views_asn_testscanasn_saveasninfo"
     },
     {
@@ -8435,9 +8435,9 @@
       "source_file": "src/views/task/agv/AgvTaskManagement.vue",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 40,
+      "community": 41,
       "norm_label": "agvtaskmanagement.vue",
-      "community_name": "Community 40",
+      "community_name": "AgvTaskManagement.vue",
       "id": "src_views_task_agv_agvtaskmanagement"
     },
     {
@@ -8446,9 +8446,9 @@
       "source_file": "src/views/task/agv/AgvTaskManagement.vue",
       "source_location": "L51",
       "_origin": "ast",
-      "community": 40,
+      "community": 41,
       "norm_label": "[register, { openmodal: openexportmodal }]",
-      "community_name": "Community 40",
+      "community_name": "AgvTaskManagement.vue",
       "id": "src_views_task_agv_agvtaskmanagement_register_openmodal_openexportmodal"
     },
     {
@@ -8457,9 +8457,9 @@
       "source_file": "src/views/task/agv/AgvTaskManagement.vue",
       "source_location": "L52",
       "_origin": "ast",
-      "community": 40,
+      "community": 41,
       "norm_label": "{ createmessage }",
-      "community_name": "Community 40",
+      "community_name": "AgvTaskManagement.vue",
       "id": "src_views_task_agv_agvtaskmanagement_createmessage"
     },
     {
@@ -8468,9 +8468,9 @@
       "source_file": "src/views/task/agv/AgvTaskManagement.vue",
       "source_location": "L53",
       "_origin": "ast",
-      "community": 40,
+      "community": 41,
       "norm_label": "{ t }",
-      "community_name": "Community 40",
+      "community_name": "AgvTaskManagement.vue",
       "id": "src_views_task_agv_agvtaskmanagement_t"
     },
     {
@@ -8479,9 +8479,9 @@
       "source_file": "src/views/task/agv/AgvTaskManagement.vue",
       "source_location": "L54",
       "_origin": "ast",
-      "community": 40,
+      "community": 41,
       "norm_label": "route",
-      "community_name": "Community 40",
+      "community_name": "AgvTaskManagement.vue",
       "id": "src_views_task_agv_agvtaskmanagement_route"
     },
     {
@@ -8490,9 +8490,9 @@
       "source_file": "src/views/task/agv/AgvTaskManagement.vue",
       "source_location": "L57",
       "_origin": "ast",
-      "community": 40,
+      "community": 41,
       "norm_label": "[registertable, { reload, getform, setfieldsvalue }]",
-      "community_name": "Community 40",
+      "community_name": "AgvTaskManagement.vue",
       "id": "src_views_task_agv_agvtaskmanagement_registertable_reload_getform_setfieldsvalue"
     },
     {
@@ -8501,9 +8501,9 @@
       "source_file": "src/views/task/agv/AgvTaskManagement.vue",
       "source_location": "L73",
       "_origin": "ast",
-      "community": 40,
+      "community": 41,
       "norm_label": "gettabledata()",
-      "community_name": "Community 40",
+      "community_name": "AgvTaskManagement.vue",
       "id": "src_views_task_agv_agvtaskmanagement_gettabledata"
     },
     {
@@ -8512,9 +8512,9 @@
       "source_file": "src/views/task/agv/AgvTaskManagement.vue",
       "source_location": "L118",
       "_origin": "ast",
-      "community": 40,
+      "community": 41,
       "norm_label": "getstatuscolor()",
-      "community_name": "Community 40",
+      "community_name": "AgvTaskManagement.vue",
       "id": "src_views_task_agv_agvtaskmanagement_getstatuscolor"
     },
     {
@@ -8523,9 +8523,9 @@
       "source_file": "src/views/task/agv/AgvTaskManagement.vue",
       "source_location": "L138",
       "_origin": "ast",
-      "community": 40,
+      "community": 41,
       "norm_label": "getstatustext()",
-      "community_name": "Community 40",
+      "community_name": "AgvTaskManagement.vue",
       "id": "src_views_task_agv_agvtaskmanagement_getstatustext"
     },
     {
@@ -8534,9 +8534,9 @@
       "source_file": "src/views/task/agv/AgvTaskManagement.vue",
       "source_location": "L158",
       "_origin": "ast",
-      "community": 40,
+      "community": 41,
       "norm_label": "getmanagetypetext()",
-      "community_name": "Community 40",
+      "community_name": "AgvTaskManagement.vue",
       "id": "src_views_task_agv_agvtaskmanagement_getmanagetypetext"
     },
     {
@@ -8545,9 +8545,9 @@
       "source_file": "src/views/task/agv/AgvTaskManagement.vue",
       "source_location": "L168",
       "_origin": "ast",
-      "community": 40,
+      "community": 41,
       "norm_label": "handlecancel()",
-      "community_name": "Community 40",
+      "community_name": "AgvTaskManagement.vue",
       "id": "src_views_task_agv_agvtaskmanagement_handlecancel"
     },
     {
@@ -8556,9 +8556,9 @@
       "source_file": "src/views/task/agv/AgvTaskManagement.vue",
       "source_location": "L238",
       "_origin": "ast",
-      "community": 40,
+      "community": 41,
       "norm_label": "defaultheader()",
-      "community_name": "Community 40",
+      "community_name": "AgvTaskManagement.vue",
       "id": "src_views_task_agv_agvtaskmanagement_defaultheader"
     },
     {
@@ -8567,9 +8567,9 @@
       "source_file": "src/views/task/agv/AgvTaskManagement.vue",
       "source_location": "L269",
       "_origin": "ast",
-      "community": 40,
+      "community": 41,
       "norm_label": "openmodal()",
-      "community_name": "Community 40",
+      "community_name": "AgvTaskManagement.vue",
       "id": "src_views_task_agv_agvtaskmanagement_openmodal"
     },
     {
@@ -8886,9 +8886,9 @@
       "source_file": "src/views/task/tasks/Createnoplan.vue",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 37,
+      "community": 38,
       "norm_label": "createnoplan.vue",
-      "community_name": "Community 37",
+      "community_name": "task.vue",
       "id": "src_views_task_tasks_createnoplan"
     },
     {
@@ -8897,9 +8897,9 @@
       "source_file": "src/views/task/tasks/Createnoplan.vue",
       "source_location": "L23",
       "_origin": "ast",
-      "community": 37,
+      "community": 38,
       "norm_label": "setup()",
-      "community_name": "Community 37",
+      "community_name": "task.vue",
       "id": "src_views_task_tasks_createnoplan_setup"
     },
     {
@@ -8908,9 +8908,9 @@
       "source_file": "src/views/task/tasks/Editnoplan.vue",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 37,
+      "community": 38,
       "norm_label": "editnoplan.vue",
-      "community_name": "Community 37",
+      "community_name": "task.vue",
       "id": "src_views_task_tasks_editnoplan"
     },
     {
@@ -8919,9 +8919,9 @@
       "source_file": "src/views/task/tasks/Editnoplan.vue",
       "source_location": "L32",
       "_origin": "ast",
-      "community": 37,
+      "community": 38,
       "norm_label": "setup()",
-      "community_name": "Community 37",
+      "community_name": "task.vue",
       "id": "src_views_task_tasks_editnoplan_setup"
     },
     {
@@ -8930,9 +8930,9 @@
       "source_file": "src/views/task/tasks/task.vue",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 37,
+      "community": 38,
       "norm_label": "task.vue",
-      "community_name": "Community 37",
+      "community_name": "task.vue",
       "id": "src_views_task_tasks_task"
     },
     {
@@ -8941,9 +8941,9 @@
       "source_file": "src/views/task/tasks/task.vue",
       "source_location": "L56",
       "_origin": "ast",
-      "community": 37,
+      "community": 38,
       "norm_label": "[register, { openmodal }]",
-      "community_name": "Community 37",
+      "community_name": "task.vue",
       "id": "src_views_task_tasks_task_register_openmodal"
     },
     {
@@ -8952,9 +8952,9 @@
       "source_file": "src/views/task/tasks/task.vue",
       "source_location": "L57",
       "_origin": "ast",
-      "community": 37,
+      "community": 38,
       "norm_label": "[registercreatecellmodal, { openmodal: opencreatecellmodal }]",
-      "community_name": "Community 37",
+      "community_name": "task.vue",
       "id": "src_views_task_tasks_task_registercreatecellmodal_openmodal_opencreatecellmodal"
     },
     {
@@ -8963,9 +8963,9 @@
       "source_file": "src/views/task/tasks/task.vue",
       "source_location": "L58",
       "_origin": "ast",
-      "community": 37,
+      "community": 38,
       "norm_label": "[registereditnoplanmodal, { openmodal: openeditnoplanmodal }]",
-      "community_name": "Community 37",
+      "community_name": "task.vue",
       "id": "src_views_task_tasks_task_registereditnoplanmodal_openmodal_openeditnoplanmodal"
     },
     {
@@ -8974,9 +8974,9 @@
       "source_file": "src/views/task/tasks/task.vue",
       "source_location": "L59",
       "_origin": "ast",
-      "community": 37,
+      "community": 38,
       "norm_label": "{ createconfirm }",
-      "community_name": "Community 37",
+      "community_name": "task.vue",
       "id": "src_views_task_tasks_task_createconfirm"
     },
     {
@@ -8985,9 +8985,9 @@
       "source_file": "src/views/task/tasks/task.vue",
       "source_location": "L60",
       "_origin": "ast",
-      "community": 37,
+      "community": 38,
       "norm_label": "{ t }",
-      "community_name": "Community 37",
+      "community_name": "task.vue",
       "id": "src_views_task_tasks_task_t"
     },
     {
@@ -8996,9 +8996,9 @@
       "source_file": "src/views/task/tasks/task.vue",
       "source_location": "L62",
       "_origin": "ast",
-      "community": 37,
+      "community": 38,
       "norm_label": "[registertable, { reload }]",
-      "community_name": "Community 37",
+      "community_name": "task.vue",
       "id": "src_views_task_tasks_task_registertable_reload"
     },
     {
@@ -9007,9 +9007,9 @@
       "source_file": "src/views/task/tasks/task.vue",
       "source_location": "L85",
       "_origin": "ast",
-      "community": 37,
+      "community": 38,
       "norm_label": "handleedit()",
-      "community_name": "Community 37",
+      "community_name": "task.vue",
       "id": "src_views_task_tasks_task_handleedit"
     },
     {
@@ -9018,9 +9018,9 @@
       "source_file": "src/views/task/tasks/task.vue",
       "source_location": "L92",
       "_origin": "ast",
-      "community": 37,
+      "community": 38,
       "norm_label": "handledelete()",
-      "community_name": "Community 37",
+      "community_name": "task.vue",
       "id": "src_views_task_tasks_task_handledelete"
     },
     {
@@ -9029,9 +9029,9 @@
       "source_file": "src/views/task/tasks/task.vue",
       "source_location": "L100",
       "_origin": "ast",
-      "community": 37,
+      "community": 38,
       "norm_label": "defaultheader()",
-      "community_name": "Community 37",
+      "community_name": "task.vue",
       "id": "src_views_task_tasks_task_defaultheader"
     },
     {
@@ -9744,9 +9744,9 @@
       "source_file": "src/views/warehouse/goods/Autos.vue",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 2,
+      "community": 26,
       "norm_label": "autos.vue",
-      "community_name": "Community 2",
+      "community_name": "Autos.vue",
       "id": "src_views_warehouse_goods_autos"
     },
     {
@@ -9755,9 +9755,9 @@
       "source_file": "src/views/warehouse/goods/Autos.vue",
       "source_location": "L38",
       "_origin": "ast",
-      "community": 2,
+      "community": 26,
       "norm_label": "emit",
-      "community_name": "Community 2",
+      "community_name": "Autos.vue",
       "id": "src_views_warehouse_goods_autos_emit"
     },
     {
@@ -9766,9 +9766,9 @@
       "source_file": "src/views/warehouse/goods/Autos.vue",
       "source_location": "L39",
       "_origin": "ast",
-      "community": 2,
+      "community": 26,
       "norm_label": "materialcode",
-      "community_name": "Community 2",
+      "community_name": "Autos.vue",
       "id": "src_views_warehouse_goods_autos_materialcode"
     },
     {
@@ -9777,9 +9777,9 @@
       "source_file": "src/views/warehouse/goods/Autos.vue",
       "source_location": "L40",
       "_origin": "ast",
-      "community": 2,
+      "community": 26,
       "norm_label": "datasource",
-      "community_name": "Community 2",
+      "community_name": "Autos.vue",
       "id": "src_views_warehouse_goods_autos_datasource"
     },
     {
@@ -9788,9 +9788,9 @@
       "source_file": "src/views/warehouse/goods/Autos.vue",
       "source_location": "L41",
       "_origin": "ast",
-      "community": 2,
+      "community": 26,
       "norm_label": "quantity",
-      "community_name": "Community 2",
+      "community_name": "Autos.vue",
       "id": "src_views_warehouse_goods_autos_quantity"
     },
     {
@@ -9799,9 +9799,9 @@
       "source_file": "src/views/warehouse/goods/Autos.vue",
       "source_location": "L42",
       "_origin": "ast",
-      "community": 2,
+      "community": 26,
       "norm_label": "good",
-      "community_name": "Community 2",
+      "community_name": "Autos.vue",
       "id": "src_views_warehouse_goods_autos_good"
     },
     {
@@ -9810,9 +9810,9 @@
       "source_file": "src/views/warehouse/goods/Autos.vue",
       "source_location": "L43",
       "_origin": "ast",
-      "community": 2,
+      "community": 26,
       "norm_label": "{ t }",
-      "community_name": "Community 2",
+      "community_name": "Autos.vue",
       "id": "src_views_warehouse_goods_autos_t"
     },
     {
@@ -9821,9 +9821,9 @@
       "source_file": "src/views/warehouse/goods/Autos.vue",
       "source_location": "L44",
       "_origin": "ast",
-      "community": 2,
+      "community": 26,
       "norm_label": "[registermodal, { changeokloading, closemodal }]",
-      "community_name": "Community 2",
+      "community_name": "Autos.vue",
       "id": "src_views_warehouse_goods_autos_registermodal_changeokloading_closemodal"
     },
     {
@@ -9832,9 +9832,9 @@
       "source_file": "src/views/warehouse/goods/Autos.vue",
       "source_location": "L51",
       "_origin": "ast",
-      "community": 2,
+      "community": 26,
       "norm_label": "visiblechange()",
-      "community_name": "Community 2",
+      "community_name": "Autos.vue",
       "id": "src_views_warehouse_goods_autos_visiblechange"
     },
     {
@@ -9843,9 +9843,9 @@
       "source_file": "src/views/warehouse/goods/Autos.vue",
       "source_location": "L58",
       "_origin": "ast",
-      "community": 2,
+      "community": 26,
       "norm_label": "state",
-      "community_name": "Community 2",
+      "community_name": "Autos.vue",
       "id": "src_views_warehouse_goods_autos_state"
     },
     {
@@ -9854,9 +9854,9 @@
       "source_file": "src/views/warehouse/goods/Autos.vue",
       "source_location": "L70",
       "_origin": "ast",
-      "community": 2,
+      "community": 26,
       "norm_label": "submit()",
-      "community_name": "Community 2",
+      "community_name": "Autos.vue",
       "id": "src_views_warehouse_goods_autos_submit"
     },
     {
@@ -9865,9 +9865,9 @@
       "source_file": "src/views/warehouse/goods/Autos.vue",
       "source_location": "L81",
       "_origin": "ast",
-      "community": 2,
+      "community": 26,
       "norm_label": "cancel()",
-      "community_name": "Community 2",
+      "community_name": "Autos.vue",
       "id": "src_views_warehouse_goods_autos_cancel"
     },
     {
@@ -9876,9 +9876,9 @@
       "source_file": "src/views/warehouse/goods/Autos.vue",
       "source_location": "L85",
       "_origin": "ast",
-      "community": 2,
+      "community": 26,
       "norm_label": "pagination",
-      "community_name": "Community 2",
+      "community_name": "Autos.vue",
       "id": "src_views_warehouse_goods_autos_pagination"
     },
     {
@@ -9887,9 +9887,9 @@
       "source_file": "src/views/warehouse/goods/Autos.vue",
       "source_location": "L92",
       "_origin": "ast",
-      "community": 2,
+      "community": 26,
       "norm_label": "handletablechange()",
-      "community_name": "Community 2",
+      "community_name": "Autos.vue",
       "id": "src_views_warehouse_goods_autos_handletablechange"
     },
     {
@@ -9898,9 +9898,9 @@
       "source_file": "src/views/warehouse/goods/Autos.vue",
       "source_location": "L97",
       "_origin": "ast",
-      "community": 2,
+      "community": 26,
       "norm_label": "getdata()",
-      "community_name": "Community 2",
+      "community_name": "Autos.vue",
       "id": "src_views_warehouse_goods_autos_getdata"
     },
     {
@@ -9909,9 +9909,9 @@
       "source_file": "src/views/warehouse/goods/Autos.vue",
       "source_location": "L117",
       "_origin": "ast",
-      "community": 2,
+      "community": 26,
       "norm_label": "dataitem",
-      "community_name": "Community 2",
+      "community_name": "Autos.vue",
       "id": "src_views_warehouse_goods_autos_dataitem"
     },
     {
@@ -9920,9 +9920,9 @@
       "source_file": "src/views/warehouse/goods/Autos.vue",
       "source_location": "L122",
       "_origin": "ast",
-      "community": 2,
+      "community": 26,
       "norm_label": "editabledata",
-      "community_name": "Community 2",
+      "community_name": "Autos.vue",
       "id": "src_views_warehouse_goods_autos_editabledata"
     },
     {
@@ -9931,9 +9931,9 @@
       "source_file": "src/views/warehouse/goods/Autos.vue",
       "source_location": "L124",
       "_origin": "ast",
-      "community": 2,
+      "community": 26,
       "norm_label": "edit()",
-      "community_name": "Community 2",
+      "community_name": "Autos.vue",
       "id": "src_views_warehouse_goods_autos_edit"
     },
     {
@@ -9942,9 +9942,9 @@
       "source_file": "src/views/warehouse/goods/Autos.vue",
       "source_location": "L127",
       "_origin": "ast",
-      "community": 2,
+      "community": 26,
       "norm_label": "save()",
-      "community_name": "Community 2",
+      "community_name": "Autos.vue",
       "id": "src_views_warehouse_goods_autos_save"
     },
     {
@@ -10076,7 +10076,7 @@
       "_origin": "ast",
       "community": 2,
       "norm_label": "createorder.vue",
-      "community_name": "Community 2",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_createorder"
     },
     {
@@ -10087,7 +10087,7 @@
       "_origin": "ast",
       "community": 2,
       "norm_label": "emit",
-      "community_name": "Community 2",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_createorder_emit"
     },
     {
@@ -10098,7 +10098,7 @@
       "_origin": "ast",
       "community": 2,
       "norm_label": "{ t }",
-      "community_name": "Community 2",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_createorder_t"
     },
     {
@@ -10109,7 +10109,7 @@
       "_origin": "ast",
       "community": 2,
       "norm_label": "[registercreateordermodal, { openmodal: opencreateordermodal }]",
-      "community_name": "Community 2",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_createorder_registercreateordermodal_openmodal_opencreateordermodal"
     },
     {
@@ -10120,7 +10120,7 @@
       "_origin": "ast",
       "community": 2,
       "norm_label": "[registerorderdetailmodal, { openmodal: openorderdetailmodal }]",
-      "community_name": "Community 2",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_createorder_registerorderdetailmodal_openmodal_openorderdetailmodal"
     },
     {
@@ -10131,7 +10131,7 @@
       "_origin": "ast",
       "community": 2,
       "norm_label": "[registerpeoplesmodal, { openmodal: openpeoplesmodal }]",
-      "community_name": "Community 2",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_createorder_registerpeoplesmodal_openmodal_openpeoplesmodal"
     },
     {
@@ -10142,7 +10142,7 @@
       "_origin": "ast",
       "community": 2,
       "norm_label": "[registerautomodal, { openmodal: openautomodal }]",
-      "community_name": "Community 2",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_createorder_registerautomodal_openmodal_openautomodal"
     },
     {
@@ -10153,7 +10153,7 @@
       "_origin": "ast",
       "community": 2,
       "norm_label": "[registermodal, { changeokloading, closemodal }]",
-      "community_name": "Community 2",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_createorder_registermodal_changeokloading_closemodal"
     },
     {
@@ -10164,7 +10164,7 @@
       "_origin": "ast",
       "community": 2,
       "norm_label": "good",
-      "community_name": "Community 2",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_createorder_good"
     },
     {
@@ -10175,7 +10175,7 @@
       "_origin": "ast",
       "community": 2,
       "norm_label": "goodlist",
-      "community_name": "Community 2",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_createorder_goodlist"
     },
     {
@@ -10186,7 +10186,7 @@
       "_origin": "ast",
       "community": 2,
       "norm_label": "datasource",
-      "community_name": "Community 2",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_createorder_datasource"
     },
     {
@@ -10197,7 +10197,7 @@
       "_origin": "ast",
       "community": 2,
       "norm_label": "showtable",
-      "community_name": "Community 2",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_createorder_showtable"
     },
     {
@@ -10208,7 +10208,7 @@
       "_origin": "ast",
       "community": 2,
       "norm_label": "visiblechange()",
-      "community_name": "Community 2",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_createorder_visiblechange"
     },
     {
@@ -10219,7 +10219,7 @@
       "_origin": "ast",
       "community": 2,
       "norm_label": "submit()",
-      "community_name": "Community 2",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_createorder_submit"
     },
     {
@@ -10230,7 +10230,7 @@
       "_origin": "ast",
       "community": 2,
       "norm_label": "cancel()",
-      "community_name": "Community 2",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_createorder_cancel"
     },
     {
@@ -10241,7 +10241,7 @@
       "_origin": "ast",
       "community": 2,
       "norm_label": "reset()",
-      "community_name": "Community 2",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_createorder_reset"
     },
     {
@@ -10252,7 +10252,7 @@
       "_origin": "ast",
       "community": 2,
       "norm_label": "eventfnboxselect()",
-      "community_name": "Community 2",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_createorder_eventfnboxselect"
     },
     {
@@ -10263,7 +10263,7 @@
       "_origin": "ast",
       "community": 2,
       "norm_label": "eventfnboxselect2()",
-      "community_name": "Community 2",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_createorder_eventfnboxselect2"
     },
     {
@@ -10274,7 +10274,7 @@
       "_origin": "ast",
       "community": 2,
       "norm_label": "adddetail()",
-      "community_name": "Community 2",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_createorder_adddetail"
     },
     {
@@ -10285,7 +10285,7 @@
       "_origin": "ast",
       "community": 2,
       "norm_label": "adddetails()",
-      "community_name": "Community 2",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_createorder_adddetails"
     },
     {
@@ -10296,7 +10296,7 @@
       "_origin": "ast",
       "community": 2,
       "norm_label": "autodetails()",
-      "community_name": "Community 2",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_createorder_autodetails"
     },
     {
@@ -10307,7 +10307,7 @@
       "_origin": "ast",
       "community": 2,
       "norm_label": "deletedetail()",
-      "community_name": "Community 2",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_createorder_deletedetail"
     },
     {
@@ -10668,9 +10668,9 @@
       "source_file": "src/views/warehouse/goods/Peoples.vue",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 26,
+      "community": 2,
       "norm_label": "peoples.vue",
-      "community_name": "Community 26",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_peoples"
     },
     {
@@ -10679,9 +10679,9 @@
       "source_file": "src/views/warehouse/goods/Peoples.vue",
       "source_location": "L48",
       "_origin": "ast",
-      "community": 26,
+      "community": 2,
       "norm_label": "emit",
-      "community_name": "Community 26",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_peoples_emit"
     },
     {
@@ -10690,9 +10690,9 @@
       "source_file": "src/views/warehouse/goods/Peoples.vue",
       "source_location": "L49",
       "_origin": "ast",
-      "community": 26,
+      "community": 2,
       "norm_label": "materialcode",
-      "community_name": "Community 26",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_peoples_materialcode"
     },
     {
@@ -10701,9 +10701,9 @@
       "source_file": "src/views/warehouse/goods/Peoples.vue",
       "source_location": "L50",
       "_origin": "ast",
-      "community": 26,
+      "community": 2,
       "norm_label": "datasource",
-      "community_name": "Community 26",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_peoples_datasource"
     },
     {
@@ -10712,9 +10712,9 @@
       "source_file": "src/views/warehouse/goods/Peoples.vue",
       "source_location": "L51",
       "_origin": "ast",
-      "community": 26,
+      "community": 2,
       "norm_label": "quantity",
-      "community_name": "Community 26",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_peoples_quantity"
     },
     {
@@ -10723,9 +10723,9 @@
       "source_file": "src/views/warehouse/goods/Peoples.vue",
       "source_location": "L52",
       "_origin": "ast",
-      "community": 26,
+      "community": 2,
       "norm_label": "good",
-      "community_name": "Community 26",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_peoples_good"
     },
     {
@@ -10734,9 +10734,9 @@
       "source_file": "src/views/warehouse/goods/Peoples.vue",
       "source_location": "L53",
       "_origin": "ast",
-      "community": 26,
+      "community": 2,
       "norm_label": "{ t }",
-      "community_name": "Community 26",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_peoples_t"
     },
     {
@@ -10745,9 +10745,9 @@
       "source_file": "src/views/warehouse/goods/Peoples.vue",
       "source_location": "L54",
       "_origin": "ast",
-      "community": 26,
+      "community": 2,
       "norm_label": "[registermodal, { changeokloading, closemodal }]",
-      "community_name": "Community 26",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_peoples_registermodal_changeokloading_closemodal"
     },
     {
@@ -10756,9 +10756,9 @@
       "source_file": "src/views/warehouse/goods/Peoples.vue",
       "source_location": "L61",
       "_origin": "ast",
-      "community": 26,
+      "community": 2,
       "norm_label": "visiblechange()",
-      "community_name": "Community 26",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_peoples_visiblechange"
     },
     {
@@ -10767,9 +10767,9 @@
       "source_file": "src/views/warehouse/goods/Peoples.vue",
       "source_location": "L68",
       "_origin": "ast",
-      "community": 26,
+      "community": 2,
       "norm_label": "state",
-      "community_name": "Community 26",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_peoples_state"
     },
     {
@@ -10778,9 +10778,9 @@
       "source_file": "src/views/warehouse/goods/Peoples.vue",
       "source_location": "L80",
       "_origin": "ast",
-      "community": 26,
+      "community": 2,
       "norm_label": "submit()",
-      "community_name": "Community 26",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_peoples_submit"
     },
     {
@@ -10789,9 +10789,9 @@
       "source_file": "src/views/warehouse/goods/Peoples.vue",
       "source_location": "L91",
       "_origin": "ast",
-      "community": 26,
+      "community": 2,
       "norm_label": "cancel()",
-      "community_name": "Community 26",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_peoples_cancel"
     },
     {
@@ -10800,9 +10800,9 @@
       "source_file": "src/views/warehouse/goods/Peoples.vue",
       "source_location": "L95",
       "_origin": "ast",
-      "community": 26,
+      "community": 2,
       "norm_label": "pagination",
-      "community_name": "Community 26",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_peoples_pagination"
     },
     {
@@ -10811,9 +10811,9 @@
       "source_file": "src/views/warehouse/goods/Peoples.vue",
       "source_location": "L102",
       "_origin": "ast",
-      "community": 26,
+      "community": 2,
       "norm_label": "handletablechange()",
-      "community_name": "Community 26",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_peoples_handletablechange"
     },
     {
@@ -10822,9 +10822,9 @@
       "source_file": "src/views/warehouse/goods/Peoples.vue",
       "source_location": "L107",
       "_origin": "ast",
-      "community": 26,
+      "community": 2,
       "norm_label": "getdata()",
-      "community_name": "Community 26",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_peoples_getdata"
     },
     {
@@ -10833,9 +10833,9 @@
       "source_file": "src/views/warehouse/goods/Peoples.vue",
       "source_location": "L127",
       "_origin": "ast",
-      "community": 26,
+      "community": 2,
       "norm_label": "dataitem",
-      "community_name": "Community 26",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_peoples_dataitem"
     },
     {
@@ -10844,9 +10844,9 @@
       "source_file": "src/views/warehouse/goods/Peoples.vue",
       "source_location": "L132",
       "_origin": "ast",
-      "community": 26,
+      "community": 2,
       "norm_label": "editabledata",
-      "community_name": "Community 26",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_peoples_editabledata"
     },
     {
@@ -10855,9 +10855,9 @@
       "source_file": "src/views/warehouse/goods/Peoples.vue",
       "source_location": "L134",
       "_origin": "ast",
-      "community": 26,
+      "community": 2,
       "norm_label": "edit()",
-      "community_name": "Community 26",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_peoples_edit"
     },
     {
@@ -10866,9 +10866,9 @@
       "source_file": "src/views/warehouse/goods/Peoples.vue",
       "source_location": "L137",
       "_origin": "ast",
-      "community": 26,
+      "community": 2,
       "norm_label": "save()",
-      "community_name": "Community 26",
+      "community_name": "CreateOrder.vue",
       "id": "src_views_warehouse_goods_peoples_save"
     },
     {
@@ -12307,9 +12307,9 @@
       "source_file": "src/views/warehouse/outstock/Outstock.vue",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 38,
+      "community": 39,
       "norm_label": "outstock.vue",
-      "community_name": "Community 38",
+      "community_name": "Outstock.vue",
       "id": "src_views_warehouse_outstock_outstock"
     },
     {
@@ -12318,9 +12318,9 @@
       "source_file": "src/views/warehouse/outstock/Outstock.vue",
       "source_location": "L33",
       "_origin": "ast",
-      "community": 38,
+      "community": 39,
       "norm_label": "[registeroutstockmodal, { openmodal: openoutstockmodal }]",
-      "community_name": "Community 38",
+      "community_name": "Outstock.vue",
       "id": "src_views_warehouse_outstock_outstock_registeroutstockmodal_openmodal_openoutstockmodal"
     },
     {
@@ -12329,9 +12329,9 @@
       "source_file": "src/views/warehouse/outstock/Outstock.vue",
       "source_location": "L34",
       "_origin": "ast",
-      "community": 38,
+      "community": 39,
       "norm_label": "{ createconfirm }",
-      "community_name": "Community 38",
+      "community_name": "Outstock.vue",
       "id": "src_views_warehouse_outstock_outstock_createconfirm"
     },
     {
@@ -12340,9 +12340,9 @@
       "source_file": "src/views/warehouse/outstock/Outstock.vue",
       "source_location": "L35",
       "_origin": "ast",
-      "community": 38,
+      "community": 39,
       "norm_label": "{ t }",
-      "community_name": "Community 38",
+      "community_name": "Outstock.vue",
       "id": "src_views_warehouse_outstock_outstock_t"
     },
     {
@@ -12351,9 +12351,9 @@
       "source_file": "src/views/warehouse/outstock/Outstock.vue",
       "source_location": "L38",
       "_origin": "ast",
-      "community": 38,
+      "community": 39,
       "norm_label": "beforeopenoutstockmodal()",
-      "community_name": "Community 38",
+      "community_name": "Outstock.vue",
       "id": "src_views_warehouse_outstock_outstock_beforeopenoutstockmodal"
     },
     {
@@ -12362,9 +12362,9 @@
       "source_file": "src/views/warehouse/outstock/Outstock.vue",
       "source_location": "L50",
       "_origin": "ast",
-      "community": 38,
+      "community": 39,
       "norm_label": "[registertable, { getdatasource, reload, getselectrows, clearselectedrowkeys }]",
-      "community_name": "Community 38",
+      "community_name": "Outstock.vue",
       "id": "src_views_warehouse_outstock_outstock_registertable_getdatasource_reload_getselectrows_clearselectedrowkeys"
     },
     {
@@ -12373,9 +12373,9 @@
       "source_file": "src/views/warehouse/outstock/Outstock.vue",
       "source_location": "L76",
       "_origin": "ast",
-      "community": 38,
+      "community": 39,
       "norm_label": "handleoutstocksuccess()",
-      "community_name": "Community 38",
+      "community_name": "Outstock.vue",
       "id": "src_views_warehouse_outstock_outstock_handleoutstocksuccess"
     },
     {
@@ -12384,9 +12384,9 @@
       "source_file": "src/views/warehouse/outstock/OutstockModal.vue",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 38,
+      "community": 39,
       "norm_label": "outstockmodal.vue",
-      "community_name": "Community 38",
+      "community_name": "Outstock.vue",
       "id": "src_views_warehouse_outstock_outstockmodal"
     },
     {
@@ -12395,9 +12395,9 @@
       "source_file": "src/views/warehouse/outstock/OutstockModal.vue",
       "source_location": "L52",
       "_origin": "ast",
-      "community": 38,
+      "community": 39,
       "norm_label": "[registerform, { setfieldsvalue, getfieldsvalue, validate }]",
-      "community_name": "Community 38",
+      "community_name": "Outstock.vue",
       "id": "src_views_warehouse_outstock_outstockmodal_registerform_setfieldsvalue_getfieldsvalue_validate"
     },
     {
@@ -12406,9 +12406,9 @@
       "source_file": "src/views/warehouse/outstock/OutstockModal.vue",
       "source_location": "L77",
       "_origin": "ast",
-      "community": 38,
+      "community": 39,
       "norm_label": "formstate",
-      "community_name": "Community 38",
+      "community_name": "Outstock.vue",
       "id": "src_views_warehouse_outstock_outstockmodal_formstate"
     },
     {
@@ -12417,9 +12417,9 @@
       "source_file": "src/views/warehouse/outstock/OutstockModal.vue",
       "source_location": "L83",
       "_origin": "ast",
-      "community": 38,
+      "community": 39,
       "norm_label": "[register, { closemodal }]",
-      "community_name": "Community 38",
+      "community_name": "Outstock.vue",
       "id": "src_views_warehouse_outstock_outstockmodal_register_closemodal"
     },
     {
@@ -12428,9 +12428,9 @@
       "source_file": "src/views/warehouse/outstock/OutstockModal.vue",
       "source_location": "L95",
       "_origin": "ast",
-      "community": 38,
+      "community": 39,
       "norm_label": "selectedstocks",
-      "community_name": "Community 38",
+      "community_name": "Outstock.vue",
       "id": "src_views_warehouse_outstock_outstockmodal_selectedstocks"
     },
     {
@@ -12439,9 +12439,9 @@
       "source_file": "src/views/warehouse/outstock/OutstockModal.vue",
       "source_location": "L97",
       "_origin": "ast",
-      "community": 38,
+      "community": 39,
       "norm_label": "emit",
-      "community_name": "Community 38",
+      "community_name": "Outstock.vue",
       "id": "src_views_warehouse_outstock_outstockmodal_emit"
     },
     {
@@ -12450,9 +12450,9 @@
       "source_file": "src/views/warehouse/outstock/OutstockModal.vue",
       "source_location": "L99",
       "_origin": "ast",
-      "community": 38,
+      "community": 39,
       "norm_label": "handlesubmit()",
-      "community_name": "Community 38",
+      "community_name": "Outstock.vue",
       "id": "src_views_warehouse_outstock_outstockmodal_handlesubmit"
     },
     {
@@ -13277,8 +13277,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "home.vue",
-      "id": "src_views_mobile_home_home",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home"
     },
     {
       "label": "userStore",
@@ -13288,8 +13288,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "userstore",
-      "id": "src_views_mobile_home_home_userstore",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_userstore"
     },
     {
       "label": "viewStore",
@@ -13299,8 +13299,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "viewstore",
-      "id": "src_views_mobile_home_home_viewstore",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_viewstore"
     },
     {
       "label": "getUserInfo",
@@ -13310,8 +13310,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "getuserinfo",
-      "id": "src_views_mobile_home_home_getuserinfo",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_getuserinfo"
     },
     {
       "label": "activeKey",
@@ -13321,8 +13321,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "activekey",
-      "id": "src_views_mobile_home_home_activekey",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_activekey"
     },
     {
       "label": "validTabs",
@@ -13332,8 +13332,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "validtabs",
-      "id": "src_views_mobile_home_home_validtabs",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_validtabs"
     },
     {
       "label": "tabclick()",
@@ -13343,8 +13343,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "tabclick()",
-      "id": "src_views_mobile_home_home_tabclick",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_tabclick"
     },
     {
       "label": "stockConsolidation()",
@@ -13354,8 +13354,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "stockconsolidation()",
-      "id": "src_views_mobile_home_home_stockconsolidation",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_stockconsolidation"
     },
     {
       "label": "handleLoginOut()",
@@ -13365,8 +13365,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "handleloginout()",
-      "id": "src_views_mobile_home_home_handleloginout",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_handleloginout"
     },
     {
       "label": "recheckcount",
@@ -13376,8 +13376,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "recheckcount",
-      "id": "src_views_mobile_home_home_recheckcount",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_recheckcount"
     },
     {
       "label": "incellByPeople()",
@@ -13387,8 +13387,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "incellbypeople()",
-      "id": "src_views_mobile_home_home_incellbypeople",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_incellbypeople"
     },
     {
       "label": "acceptanceCall()",
@@ -13398,8 +13398,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "acceptancecall()",
-      "id": "src_views_mobile_home_home_acceptancecall",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_acceptancecall"
     },
     {
       "label": "acceptanceCall2()",
@@ -13409,8 +13409,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "acceptancecall2()",
-      "id": "src_views_mobile_home_home_acceptancecall2",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_acceptancecall2"
     },
     {
       "label": "boxbind()",
@@ -13420,8 +13420,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "boxbind()",
-      "id": "src_views_mobile_home_home_boxbind",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_boxbind"
     },
     {
       "label": "containerUnbind()",
@@ -13431,8 +13431,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "containerunbind()",
-      "id": "src_views_mobile_home_home_containerunbind",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_containerunbind"
     },
     {
       "label": "boxdisk()",
@@ -13442,8 +13442,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "boxdisk()",
-      "id": "src_views_mobile_home_home_boxdisk",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_boxdisk"
     },
     {
       "label": "boxdiskWithAsn()",
@@ -13453,8 +13453,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "boxdiskwithasn()",
-      "id": "src_views_mobile_home_home_boxdiskwithasn",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_boxdiskwithasn"
     },
     {
       "label": "scanAsn()",
@@ -13464,8 +13464,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "scanasn()",
-      "id": "src_views_mobile_home_home_scanasn",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_scanasn"
     },
     {
       "label": "scanOutboundOrder()",
@@ -13475,8 +13475,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "scanoutboundorder()",
-      "id": "src_views_mobile_home_home_scanoutboundorder",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_scanoutboundorder"
     },
     {
       "label": "createOutboundTaskFromBarcode()",
@@ -13486,8 +13486,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "createoutboundtaskfrombarcode()",
-      "id": "src_views_mobile_home_home_createoutboundtaskfrombarcode",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_createoutboundtaskfrombarcode"
     },
     {
       "label": "boxIncell()",
@@ -13497,8 +13497,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "boxincell()",
-      "id": "src_views_mobile_home_home_boxincell",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_boxincell"
     },
     {
       "label": "createStockTask()",
@@ -13508,8 +13508,8 @@
       "_origin": "ast",
       "community": 75,
       "norm_label": "createstocktask()",
-      "id": "src_views_mobile_home_home_createstocktask",
-      "community_name": "createStockTask"
+      "community_name": "createStockTask",
+      "id": "src_views_mobile_home_home_createstocktask"
     },
     {
       "label": "createOutStockTask()",
@@ -13519,8 +13519,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "createoutstocktask()",
-      "id": "src_views_mobile_home_home_createoutstocktask",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_createoutstocktask"
     },
     {
       "label": "outStockOrder()",
@@ -13530,8 +13530,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "outstockorder()",
-      "id": "src_views_mobile_home_home_outstockorder",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_outstockorder"
     },
     {
       "label": "outStockSort()",
@@ -13541,8 +13541,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "outstocksort()",
-      "id": "src_views_mobile_home_home_outstocksort",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_outstocksort"
     },
     {
       "label": "materialOut()",
@@ -13552,8 +13552,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "materialout()",
-      "id": "src_views_mobile_home_home_materialout",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_materialout"
     },
     {
       "label": "materialPartialOut()",
@@ -13563,8 +13563,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "materialpartialout()",
-      "id": "src_views_mobile_home_home_materialpartialout",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_materialpartialout"
     },
     {
       "label": "materialSampling()",
@@ -13574,8 +13574,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "materialsampling()",
-      "id": "src_views_mobile_home_home_materialsampling",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_materialsampling"
     },
     {
       "label": "materialStatusChange()",
@@ -13585,8 +13585,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "materialstatuschange()",
-      "id": "src_views_mobile_home_home_materialstatuschange",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_materialstatuschange"
     },
     {
       "label": "agvIncell()",
@@ -13596,8 +13596,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "agvincell()",
-      "id": "src_views_mobile_home_home_agvincell",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_agvincell"
     },
     {
       "label": "handoutcell()",
@@ -13607,8 +13607,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "handoutcell()",
-      "id": "src_views_mobile_home_home_handoutcell",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_handoutcell"
     },
     {
       "label": "checkNoGet()",
@@ -13618,8 +13618,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "checknoget()",
-      "id": "src_views_mobile_home_home_checknoget",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_checknoget"
     },
     {
       "label": "goodsbind()",
@@ -13629,8 +13629,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "goodsbind()",
-      "id": "src_views_mobile_home_home_goodsbind",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_goodsbind"
     },
     {
       "label": "stockQuery()",
@@ -13640,8 +13640,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "stockquery()",
-      "id": "src_views_mobile_home_home_stockquery",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_stockquery"
     },
     {
       "label": "createOutStockTaskSummary()",
@@ -13651,8 +13651,8 @@
       "_origin": "ast",
       "community": 5,
       "norm_label": "createoutstocktasksummary()",
-      "id": "src_views_mobile_home_home_createoutstocktasksummary",
-      "community_name": "home.vue"
+      "community_name": "home.vue",
+      "id": "src_views_mobile_home_home_createoutstocktasksummary"
     },
     {
       "label": "StockConsolidation.vue",
@@ -13660,10 +13660,10 @@
       "source_file": "src/views/mobile/views/StockConsolidation.vue",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 43,
+      "community": 36,
       "norm_label": "stockconsolidation.vue",
-      "id": "src_views_mobile_views_stockconsolidation",
-      "community_name": "StockConsolidation.vue"
+      "community_name": "StockConsolidation.vue",
+      "id": "src_views_mobile_views_stockconsolidation"
     },
     {
       "label": "status",
@@ -13671,10 +13671,10 @@
       "source_file": "src/views/mobile/views/StockConsolidation.vue",
       "source_location": "L97",
       "_origin": "ast",
-      "community": 43,
+      "community": 36,
       "norm_label": "status",
-      "id": "src_views_mobile_views_stockconsolidation_status",
-      "community_name": "StockConsolidation.vue"
+      "community_name": "StockConsolidation.vue",
+      "id": "src_views_mobile_views_stockconsolidation_status"
     },
     {
       "label": "starting",
@@ -13682,10 +13682,10 @@
       "source_file": "src/views/mobile/views/StockConsolidation.vue",
       "source_location": "L106",
       "_origin": "ast",
-      "community": 43,
+      "community": 36,
       "norm_label": "starting",
-      "id": "src_views_mobile_views_stockconsolidation_starting",
-      "community_name": "StockConsolidation.vue"
+      "community_name": "StockConsolidation.vue",
+      "id": "src_views_mobile_views_stockconsolidation_starting"
     },
     {
       "label": "stopping",
@@ -13693,10 +13693,10 @@
       "source_file": "src/views/mobile/views/StockConsolidation.vue",
       "source_location": "L107",
       "_origin": "ast",
-      "community": 43,
+      "community": 36,
       "norm_label": "stopping",
-      "id": "src_views_mobile_views_stockconsolidation_stopping",
-      "community_name": "StockConsolidation.vue"
+      "community_name": "StockConsolidation.vue",
+      "id": "src_views_mobile_views_stockconsolidation_stopping"
     },
     {
       "label": "refreshing",
@@ -13704,10 +13704,10 @@
       "source_file": "src/views/mobile/views/StockConsolidation.vue",
       "source_location": "L108",
       "_origin": "ast",
-      "community": 43,
+      "community": 36,
       "norm_label": "refreshing",
-      "id": "src_views_mobile_views_stockconsolidation_refreshing",
-      "community_name": "StockConsolidation.vue"
+      "community_name": "StockConsolidation.vue",
+      "id": "src_views_mobile_views_stockconsolidation_refreshing"
     },
     {
       "label": "statusText",
@@ -13715,10 +13715,10 @@
       "source_file": "src/views/mobile/views/StockConsolidation.vue",
       "source_location": "L111",
       "_origin": "ast",
-      "community": 43,
+      "community": 36,
       "norm_label": "statustext",
-      "id": "src_views_mobile_views_stockconsolidation_statustext",
-      "community_name": "StockConsolidation.vue"
+      "community_name": "StockConsolidation.vue",
+      "id": "src_views_mobile_views_stockconsolidation_statustext"
     },
     {
       "label": "statusColor",
@@ -13726,10 +13726,10 @@
       "source_file": "src/views/mobile/views/StockConsolidation.vue",
       "source_location": "L112",
       "_origin": "ast",
-      "community": 43,
+      "community": 36,
       "norm_label": "statuscolor",
-      "id": "src_views_mobile_views_stockconsolidation_statuscolor",
-      "community_name": "StockConsolidation.vue"
+      "community_name": "StockConsolidation.vue",
+      "id": "src_views_mobile_views_stockconsolidation_statuscolor"
     },
     {
       "label": "unwrapResponse()",
@@ -13737,10 +13737,10 @@
       "source_file": "src/views/mobile/views/StockConsolidation.vue",
       "source_location": "L120",
       "_origin": "ast",
-      "community": 43,
+      "community": 36,
       "norm_label": "unwrapresponse()",
-      "id": "src_views_mobile_views_stockconsolidation_unwrapresponse",
-      "community_name": "StockConsolidation.vue"
+      "community_name": "StockConsolidation.vue",
+      "id": "src_views_mobile_views_stockconsolidation_unwrapresponse"
     },
     {
       "label": "refreshStatus()",
@@ -13748,10 +13748,10 @@
       "source_file": "src/views/mobile/views/StockConsolidation.vue",
       "source_location": "L125",
       "_origin": "ast",
-      "community": 43,
+      "community": 36,
       "norm_label": "refreshstatus()",
-      "id": "src_views_mobile_views_stockconsolidation_refreshstatus",
-      "community_name": "StockConsolidation.vue"
+      "community_name": "StockConsolidation.vue",
+      "id": "src_views_mobile_views_stockconsolidation_refreshstatus"
     },
     {
       "label": "handleStart()",
@@ -13759,10 +13759,10 @@
       "source_file": "src/views/mobile/views/StockConsolidation.vue",
       "source_location": "L138",
       "_origin": "ast",
-      "community": 43,
+      "community": 36,
       "norm_label": "handlestart()",
-      "id": "src_views_mobile_views_stockconsolidation_handlestart",
-      "community_name": "StockConsolidation.vue"
+      "community_name": "StockConsolidation.vue",
+      "id": "src_views_mobile_views_stockconsolidation_handlestart"
     },
     {
       "label": "handleStop()",
@@ -13770,9 +13770,53 @@
       "source_file": "src/views/mobile/views/StockConsolidation.vue",
       "source_location": "L160",
       "_origin": "ast",
-      "community": 43,
+      "community": 36,
       "norm_label": "handlestop()",
-      "id": "src_views_mobile_views_stockconsolidation_handlestop",
+      "community_name": "StockConsolidation.vue",
+      "id": "src_views_mobile_views_stockconsolidation_handlestop"
+    },
+    {
+      "label": "getStockConsolidationRequestOptions()",
+      "file_type": "code",
+      "source_file": "src/views/mobile/views/StockConsolidation.ts",
+      "source_location": "L8",
+      "_origin": "ast",
+      "community": 36,
+      "norm_label": "getstockconsolidationrequestoptions()",
+      "id": "src_views_mobile_views_stockconsolidation_getstockconsolidationrequestoptions",
+      "community_name": "StockConsolidation.vue"
+    },
+    {
+      "label": "startStockConsolidation()",
+      "file_type": "code",
+      "source_file": "src/views/mobile/views/StockConsolidation.ts",
+      "source_location": "L24",
+      "_origin": "ast",
+      "community": 36,
+      "norm_label": "startstockconsolidation()",
+      "id": "src_views_mobile_views_stockconsolidation_startstockconsolidation",
+      "community_name": "StockConsolidation.vue"
+    },
+    {
+      "label": "stopStockConsolidation()",
+      "file_type": "code",
+      "source_file": "src/views/mobile/views/StockConsolidation.ts",
+      "source_location": "L36",
+      "_origin": "ast",
+      "community": 36,
+      "norm_label": "stopstockconsolidation()",
+      "id": "src_views_mobile_views_stockconsolidation_stopstockconsolidation",
+      "community_name": "StockConsolidation.vue"
+    },
+    {
+      "label": "getStockConsolidationStatus()",
+      "file_type": "code",
+      "source_file": "src/views/mobile/views/StockConsolidation.ts",
+      "source_location": "L47",
+      "_origin": "ast",
+      "community": 36,
+      "norm_label": "getstockconsolidationstatus()",
+      "id": "src_views_mobile_views_stockconsolidation_getstockconsolidationstatus",
       "community_name": "StockConsolidation.vue"
     }
   ],
@@ -27037,6 +27081,26 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "src/views/mobile/views/StockConsolidation.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_views_mobile_views_stockconsolidation",
+      "target": "src_views_mobile_views_stockconsolidation_getstockconsolidationrequestoptions"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/views/mobile/views/StockConsolidation.ts",
+      "source_location": "L47",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_views_mobile_views_stockconsolidation",
+      "target": "src_views_mobile_views_stockconsolidation_getstockconsolidationstatus"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "src/views/mobile/views/StockConsolidation.vue",
       "source_location": "L138",
       "weight": 1.0,
@@ -27087,6 +27151,16 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "src/views/mobile/views/StockConsolidation.ts",
+      "source_location": "L24",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_views_mobile_views_stockconsolidation",
+      "target": "src_views_mobile_views_stockconsolidation_startstockconsolidation"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "src/views/mobile/views/StockConsolidation.vue",
       "source_location": "L97",
       "weight": 1.0,
@@ -27127,6 +27201,16 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "src/views/mobile/views/StockConsolidation.ts",
+      "source_location": "L36",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_views_mobile_views_stockconsolidation",
+      "target": "src_views_mobile_views_stockconsolidation_stopstockconsolidation"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "src/views/mobile/views/StockConsolidation.vue",
       "source_location": "L120",
       "weight": 1.0,
@@ -27144,8 +27228,41 @@
       "confidence_score": 1.0,
       "source": "src_views_mobile_views_stockconsolidation_refreshstatus",
       "target": "src_views_mobile_views_stockconsolidation_unwrapresponse"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/views/mobile/views/StockConsolidation.ts",
+      "source_location": "L48",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_views_mobile_views_stockconsolidation_getstockconsolidationstatus",
+      "target": "src_views_mobile_views_stockconsolidation_getstockconsolidationrequestoptions"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/views/mobile/views/StockConsolidation.ts",
+      "source_location": "L25",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_views_mobile_views_stockconsolidation_startstockconsolidation",
+      "target": "src_views_mobile_views_stockconsolidation_getstockconsolidationrequestoptions"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/views/mobile/views/StockConsolidation.ts",
+      "source_location": "L37",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_views_mobile_views_stockconsolidation_stopstockconsolidation",
+      "target": "src_views_mobile_views_stockconsolidation_getstockconsolidationrequestoptions"
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "72907257e507fdc8304c1471154e15ae77ae6629"
+  "built_at_commit": "7a925901c0eb098f359a0ea03d83fa5b06e85568"
 }

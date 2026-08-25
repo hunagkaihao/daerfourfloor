@@ -26,6 +26,7 @@
 /*.js
 /*.mjs
 /*.ts
+!/src/views/mobile/views/StockConsolidation.ts
 /*.html
 /*.zip
 /*.lock
