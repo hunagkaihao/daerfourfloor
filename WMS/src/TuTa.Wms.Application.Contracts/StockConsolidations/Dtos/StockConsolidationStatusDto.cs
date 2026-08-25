@@ -44,9 +44,8 @@ namespace TuTa.Wms.StockConsolidations.Dtos
 
         /// <summary>
         /// 当前正在整理的主物料编码。
-        /// 字段名为兼容既有前端保留，值不再表示首个Barcode。
         /// </summary>
-        public string CurrentGroupBarcode { get; set; }
+        public string CurrentMaterialCode { get; set; }
 
         /// <summary>
         /// 当前动作，例如腾位、归拢或暂存物料回收。

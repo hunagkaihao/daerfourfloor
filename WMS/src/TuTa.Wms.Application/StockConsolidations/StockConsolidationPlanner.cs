@@ -68,75 +68,79 @@ namespace TuTa.Wms.StockConsolidations
             // 只使用WMS中真实存在的4B配置库位，避免把配置错误的库位当成空位。
             var validBufferCells = options.BufferCells
                 .Where(snapshot.Cells.ContainsKey)
+                .Where(cellCode => string.Equals(
+                    snapshot.Cells[cellCode].RunStatus,
+                    "Enable",
+                    StringComparison.OrdinalIgnoreCase))
                 .ToList();
             var managedCells = new HashSet<string>(orderedCells, StringComparer.OrdinalIgnoreCase);
             managedCells.UnionWith(validBufferCells);
             var finalizedCells = new HashSet<string>(
                 orderedCells.Take(cursorIndex),
                 StringComparer.OrdinalIgnoreCase);
-            var pallets = snapshot.Pallets.Values
-                .Where(pallet => managedCells.Contains(pallet.CellCode))
-                .ToDictionary(pallet => pallet.PalletKey, ClonePallet, StringComparer.OrdinalIgnoreCase);
-            if (pallets.Count == 0)
+            var containers = snapshot.Containers.Values
+                .Where(container => managedCells.Contains(container.CellCode))
+                .ToDictionary(container => container.ContainerKey, CloneContainer, StringComparer.OrdinalIgnoreCase);
+            if (containers.Count == 0)
             {
                 return null;
             }
 
             var occupancy = managedCells.ToDictionary(
                 cellCode => cellCode,
-                cellCode => snapshot.Cells.TryGetValue(cellCode, out var cell) ? cell.PalletKey : null,
+                cellCode => snapshot.Cells.TryGetValue(cellCode, out var cell) ? cell.ContainerKey : null,
                 StringComparer.OrdinalIgnoreCase);
 
             var cursorCell = orderedCells[cursorIndex];
-            StockConsolidationPalletSnapshot seedPallet = null;
-            if (occupancy.TryGetValue(cursorCell, out var cursorPalletKey) &&
-                !string.IsNullOrWhiteSpace(cursorPalletKey))
+            StockConsolidationContainerSnapshot seedContainer = null;
+            if (occupancy.TryGetValue(cursorCell, out var cursorContainerKey) &&
+                !string.IsNullOrWhiteSpace(cursorContainerKey))
             {
-                seedPallet = pallets[cursorPalletKey];
+                seedContainer = containers[cursorContainerKey];
             }
 
-            // 当前游标为空时，从后续S型库位寻找第一托货物填补空位。
-            seedPallet ??= pallets.Values
-                .Where(pallet => orderedCells.Skip(cursorIndex).Contains(pallet.CellCode, StringComparer.OrdinalIgnoreCase))
-                .OrderBy(pallet => IndexOf(orderedCells, pallet.CellCode))
+            // 当前游标为空时，从后续S型库位寻找第一个有货容器填补空位。
+            seedContainer ??= containers.Values
+                .Where(container => orderedCells.Skip(cursorIndex).Contains(container.CellCode, StringComparer.OrdinalIgnoreCase))
+                .OrderBy(container => IndexOf(orderedCells, container.CellCode))
                 .FirstOrDefault();
-            seedPallet ??= pallets.Values
-                .Where(pallet => validBufferCells.Contains(pallet.CellCode, StringComparer.OrdinalIgnoreCase))
+            seedContainer ??= containers.Values
+                .Where(container => validBufferCells.Contains(container.CellCode, StringComparer.OrdinalIgnoreCase))
                 .FirstOrDefault();
-            if (seedPallet == null)
+            if (seedContainer == null)
             {
                 return null;
             }
 
-            var groupPallets = pallets.Values
-                // 已整理前缀中的托盘不再进入任何物料组，混料托盘因此不会被重复搬运。
-                .Where(pallet => !finalizedCells.Contains(pallet.CellCode))
-                .Where(pallet => string.Equals(
-                    pallet.GroupMaterialCode,
-                    seedPallet.GroupMaterialCode,
+            var groupContainers = containers.Values
+                // 已整理前缀中的容器不再进入任何物料组，混料容器因此不会被重复搬运。
+                .Where(container => !finalizedCells.Contains(container.CellCode))
+                .Where(container => string.Equals(
+                    container.GroupMaterialCode,
+                    seedContainer.GroupMaterialCode,
                     StringComparison.OrdinalIgnoreCase))
                 .ToList();
-            if (groupPallets.Any(pallet => pallet.HasActiveTask))
+            if (groupContainers.Any(container => container.HasActiveTask))
             {
-                return FailedPlan($"物料组{seedPallet.GroupMaterialCode}存在活动任务，无法整理。");
+                return FailedPlan($"物料组{seedContainer.GroupMaterialCode}存在活动任务，无法整理。");
             }
 
-            if (cursorIndex + groupPallets.Count > orderedCells.Count)
+            if (cursorIndex + groupContainers.Count > orderedCells.Count)
             {
-                return FailedPlan($"物料组{seedPallet.GroupMaterialCode}所需库位超过剩余可用容量。");
+                return FailedPlan($"物料组{seedContainer.GroupMaterialCode}所需库位超过剩余可用容量。");
             }
 
-            var targetCells = orderedCells.Skip(cursorIndex).Take(groupPallets.Count).ToList();
+            var targetCells = orderedCells.Skip(cursorIndex).Take(groupContainers.Count).ToList();
             var moves = new List<StockConsolidationMovePlan>();
             var moveSequence = 1;
 
             // 先填充目标块中已经存在的空位，以产生后续腾位所需的新空洞。
             foreach (var targetCell in targetCells.Where(cellCode => string.IsNullOrWhiteSpace(occupancy[cellCode])).ToList())
             {
-                var source = FindSource(groupPallets, targetCells, validBufferCells);
+                var source = FindSource(groupContainers, targetCells, validBufferCells);
                 if (source == null)
                 {
-                    return FailedPlan($"目标位{targetCell}为空，但找不到物料组{seedPallet.GroupMaterialCode}的来源托盘。");
+                    return FailedPlan($"目标位{targetCell}为空，但找不到物料组{seedContainer.GroupMaterialCode}的来源容器。");
                 }
 
                 var sourceCell = source.CellCode;
@@ -154,21 +158,21 @@ namespace TuTa.Wms.StockConsolidations
             // 对目标块中的异物执行“异物到空洞、目标物料到异物原位”的交替搬运。
             foreach (var targetCell in targetCells)
             {
-                var targetPalletKey = occupancy[targetCell];
-                if (string.IsNullOrWhiteSpace(targetPalletKey))
+                var targetContainerKey = occupancy[targetCell];
+                if (string.IsNullOrWhiteSpace(targetContainerKey))
                 {
                     continue;
                 }
 
-                var blocker = pallets[targetPalletKey];
-                if (string.Equals(blocker.GroupMaterialCode, seedPallet.GroupMaterialCode, StringComparison.OrdinalIgnoreCase))
+                var blocker = containers[targetContainerKey];
+                if (string.Equals(blocker.GroupMaterialCode, seedContainer.GroupMaterialCode, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
 
                 if (blocker.HasActiveTask)
                 {
-                    return FailedPlan($"目标位{targetCell}的阻挡托盘存在活动任务。");
+                    return FailedPlan($"目标位{targetCell}的阻挡容器存在活动任务。");
                 }
 
                 if (!IsUsableHole(currentHole, occupancy, targetCells, orderedCells.Take(cursorIndex)))
@@ -192,7 +196,7 @@ namespace TuTa.Wms.StockConsolidations
                     return FailedPlan(blockerError);
                 }
 
-                var source = FindSource(groupPallets, targetCells, validBufferCells);
+                var source = FindSource(groupContainers, targetCells, validBufferCells);
                 if (source == null)
                 {
                     return FailedPlan($"目标位{targetCell}已腾空，但找不到对应目标物料。");
@@ -211,10 +215,10 @@ namespace TuTa.Wms.StockConsolidations
 
             return new StockConsolidationGroupPlan
             {
-                GroupMaterialCode = seedPallet.GroupMaterialCode,
+                GroupMaterialCode = seedContainer.GroupMaterialCode,
                 TargetCells = targetCells,
                 Moves = moves,
-                NextCursorIndex = cursorIndex + groupPallets.Count,
+                NextCursorIndex = cursorIndex + groupContainers.Count,
                 NextHoleCell = currentHole
             };
         }
@@ -242,23 +246,23 @@ namespace TuTa.Wms.StockConsolidations
             return false;
         }
 
-        private static StockConsolidationPalletSnapshot FindSource(
-            IEnumerable<StockConsolidationPalletSnapshot> groupPallets,
+        private static StockConsolidationContainerSnapshot FindSource(
+            IEnumerable<StockConsolidationContainerSnapshot> groupContainers,
             IEnumerable<string> targetCells,
             IEnumerable<string> bufferCells)
         {
             var targetSet = new HashSet<string>(targetCells, StringComparer.OrdinalIgnoreCase);
             var bufferSet = new HashSet<string>(bufferCells, StringComparer.OrdinalIgnoreCase);
-            return groupPallets
-                .Where(pallet => !targetSet.Contains(pallet.CellCode))
-                .OrderByDescending(pallet => bufferSet.Contains(pallet.CellCode))
-                .ThenBy(pallet => pallet.CellCode)
+            return groupContainers
+                .Where(container => !targetSet.Contains(container.CellCode))
+                .OrderByDescending(container => bufferSet.Contains(container.CellCode))
+                .ThenBy(container => container.CellCode)
                 .FirstOrDefault();
         }
 
         private static void AddMove(
             ICollection<StockConsolidationMovePlan> moves,
-            StockConsolidationPalletSnapshot pallet,
+            StockConsolidationContainerSnapshot container,
             string fromCell,
             string toCell,
             string moveType,
@@ -267,9 +271,9 @@ namespace TuTa.Wms.StockConsolidations
             moves.Add(new StockConsolidationMovePlan
             {
                 Sequence = sequence,
-                PalletKey = pallet.PalletKey,
-                StockIds = pallet.StockIds.ToList(),
-                GroupMaterialCode = pallet.GroupMaterialCode,
+                ContainerKey = container.ContainerKey,
+                StockIds = container.StockIds.ToList(),
+                GroupMaterialCode = container.GroupMaterialCode,
                 FromCell = fromCell,
                 ToCell = toCell,
                 MoveType = moveType
@@ -277,25 +281,25 @@ namespace TuTa.Wms.StockConsolidations
         }
 
         private static string ApplyMove(
-            StockConsolidationPalletSnapshot pallet,
+            StockConsolidationContainerSnapshot container,
             string fromCell,
             string toCell,
             IDictionary<string, string> occupancy)
         {
-            if (!occupancy.TryGetValue(fromCell, out var currentPallet) ||
-                !string.Equals(currentPallet, pallet.PalletKey, StringComparison.OrdinalIgnoreCase))
+            if (!occupancy.TryGetValue(fromCell, out var currentContainer) ||
+                !string.Equals(currentContainer, container.ContainerKey, StringComparison.OrdinalIgnoreCase))
             {
-                return $"托盘{pallet.PalletKey}不在计划起点{fromCell}。";
+                return $"容器{container.BoxCode}不在计划起点{fromCell}。";
             }
 
-            if (occupancy.TryGetValue(toCell, out var targetPallet) && !string.IsNullOrWhiteSpace(targetPallet))
+            if (occupancy.TryGetValue(toCell, out var targetContainer) && !string.IsNullOrWhiteSpace(targetContainer))
             {
                 return $"计划目标位{toCell}不是空位。";
             }
 
             occupancy[fromCell] = null;
-            occupancy[toCell] = pallet.PalletKey;
-            pallet.CellCode = toCell;
+            occupancy[toCell] = container.ContainerKey;
+            container.CellCode = toCell;
             return null;
         }
 
@@ -349,11 +353,11 @@ namespace TuTa.Wms.StockConsolidations
             return int.MaxValue;
         }
 
-        private static StockConsolidationPalletSnapshot ClonePallet(StockConsolidationPalletSnapshot source)
+        private static StockConsolidationContainerSnapshot CloneContainer(StockConsolidationContainerSnapshot source)
         {
-            return new StockConsolidationPalletSnapshot
+            return new StockConsolidationContainerSnapshot
             {
-                PalletKey = source.PalletKey,
+                ContainerKey = source.ContainerKey,
                 BoxCode = source.BoxCode,
                 CellCode = source.CellCode,
                 StockIds = source.StockIds.ToList(),

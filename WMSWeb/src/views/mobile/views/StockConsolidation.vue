@@ -18,7 +18,7 @@
           {{ status.currentCellCode || '-' }}
         </a-descriptions-item>
         <a-descriptions-item label="当前物料">
-          {{ status.currentGroupBarcode || '-' }}
+          {{ status.currentMaterialCode || '-' }}
         </a-descriptions-item>
         <a-descriptions-item label="当前动作">
           {{ status.currentAction || '-' }}

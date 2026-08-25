@@ -192,7 +192,7 @@ namespace TuTa.Wms.StockConsolidations
             {
                 _status.Status = progress.Status ?? _status.Status;
                 _status.CurrentCellCode = progress.CurrentCellCode ?? _status.CurrentCellCode;
-                _status.CurrentGroupBarcode = progress.CurrentGroupBarcode ?? _status.CurrentGroupBarcode;
+                _status.CurrentMaterialCode = progress.CurrentMaterialCode ?? _status.CurrentMaterialCode;
                 _status.CurrentAction = progress.CurrentAction ?? _status.CurrentAction;
                 _status.CurrentFromCell = progress.CurrentFromCell ?? _status.CurrentFromCell;
                 _status.CurrentToCell = progress.CurrentToCell ?? _status.CurrentToCell;
@@ -236,7 +236,7 @@ namespace TuTa.Wms.StockConsolidations
                 StartedAt = status.StartedAt,
                 StoppedAt = status.StoppedAt,
                 CurrentCellCode = status.CurrentCellCode,
-                CurrentGroupBarcode = status.CurrentGroupBarcode,
+                CurrentMaterialCode = status.CurrentMaterialCode,
                 CurrentAction = status.CurrentAction,
                 CurrentFromCell = status.CurrentFromCell,
                 CurrentToCell = status.CurrentToCell,

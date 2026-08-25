@@ -21,29 +21,28 @@ namespace TuTa.Wms.StockConsolidations
     internal class StockConsolidationCellSnapshot
     {
         public string CellCode { get; set; }
-        public string CellStatus { get; set; }
         public string RunStatus { get; set; }
-        public string PalletKey { get; set; }
+        public string ContainerKey { get; set; }
 
         /// <summary>
-        /// 是否为空位。库存与库位状态一致性由Worker在生成快照时校验。
+        /// 是否为空位。业务规则只看库位是否绑定容器，不依据库存条数或CellStatus判断。
         /// </summary>
-        public bool IsEmpty => string.IsNullOrWhiteSpace(PalletKey);
+        public bool IsEmpty => string.IsNullOrWhiteSpace(ContainerKey);
     }
 
     /// <summary>
-    /// 整理算法使用的托盘快照。
-    /// StockId组合用于在搬运后重新定位当前容器。
+    /// 整理算法使用的容器快照。
+    /// 一个库位最多绑定一个容器，一个容器允许包含多条库存和多个物料。
     /// </summary>
-    internal class StockConsolidationPalletSnapshot
+    internal class StockConsolidationContainerSnapshot
     {
-        public string PalletKey { get; set; }
+        public string ContainerKey { get; set; }
         public string BoxCode { get; set; }
         public string CellCode { get; set; }
         public List<Guid> StockIds { get; set; } = new List<Guid>();
         public List<string> Barcodes { get; set; } = new List<string>();
         /// <summary>
-        /// 托盘内数量最多的物料编码；数量相同时取查询顺序最先出现的物料。
+        /// 容器内数量最多的物料编码；数量相同时取查询顺序最先出现的物料。
         /// </summary>
         public string GroupMaterialCode { get; set; }
         public bool IsMixedMaterial { get; set; }
@@ -58,8 +57,8 @@ namespace TuTa.Wms.StockConsolidations
         public Dictionary<string, StockConsolidationCellSnapshot> Cells { get; set; }
             = new Dictionary<string, StockConsolidationCellSnapshot>(StringComparer.OrdinalIgnoreCase);
 
-        public Dictionary<string, StockConsolidationPalletSnapshot> Pallets { get; set; }
-            = new Dictionary<string, StockConsolidationPalletSnapshot>(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, StockConsolidationContainerSnapshot> Containers { get; set; }
+            = new Dictionary<string, StockConsolidationContainerSnapshot>(StringComparer.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -68,7 +67,7 @@ namespace TuTa.Wms.StockConsolidations
     internal class StockConsolidationMovePlan
     {
         public int Sequence { get; set; }
-        public string PalletKey { get; set; }
+        public string ContainerKey { get; set; }
         public List<Guid> StockIds { get; set; } = new List<Guid>();
         public string GroupMaterialCode { get; set; }
         public string FromCell { get; set; }
@@ -100,7 +99,7 @@ namespace TuTa.Wms.StockConsolidations
     {
         public string Status { get; set; }
         public string CurrentCellCode { get; set; }
-        public string CurrentGroupBarcode { get; set; }
+        public string CurrentMaterialCode { get; set; }
         public string CurrentAction { get; set; }
         public string CurrentFromCell { get; set; }
         public string CurrentToCell { get; set; }
