@@ -1,15 +1,15 @@
-# Graph Report - E:\Tuta\project\daer\daerfourfloor\WSMWEB  (2026-08-24)
+# Graph Report - .  (2026-08-25)
 
 ## Corpus Check
 - cluster-only mode — file stats not available
 
 ## Summary
-- 1239 nodes · 1306 edges · 80 communities (73 shown, 7 thin omitted)
+- 1252 nodes · 1319 edges · 81 communities (74 shown, 7 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 11 edges (avg confidence: 0.58)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `86aed88d`
+- Built from commit: `72907257`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -19,8 +19,8 @@
 - [[_COMMUNITY_Community 2|Community 2]]
 - [[_COMMUNITY_Community 3|Community 3]]
 - [[_COMMUNITY_Community 4|Community 4]]
-- [[_COMMUNITY_Community 5|Community 5]]
-- [[_COMMUNITY_Community 6|Community 6]]
+- [[_COMMUNITY_home.vue|home.vue]]
+- [[_COMMUNITY_BoxDiskWithAsn.vue|BoxDiskWithAsn.vue]]
 - [[_COMMUNITY_Community 7|Community 7]]
 - [[_COMMUNITY_Community 8|Community 8]]
 - [[_COMMUNITY_Community 9|Community 9]]
@@ -57,36 +57,37 @@
 - [[_COMMUNITY_Community 40|Community 40]]
 - [[_COMMUNITY_Community 41|Community 41]]
 - [[_COMMUNITY_Community 42|Community 42]]
-- [[_COMMUNITY_Community 43|Community 43]]
-- [[_COMMUNITY_Community 44|Community 44]]
-- [[_COMMUNITY_Community 45|Community 45]]
-- [[_COMMUNITY_Community 46|Community 46]]
-- [[_COMMUNITY_Community 47|Community 47]]
-- [[_COMMUNITY_Community 48|Community 48]]
-- [[_COMMUNITY_Community 49|Community 49]]
-- [[_COMMUNITY_Community 50|Community 50]]
-- [[_COMMUNITY_Community 51|Community 51]]
-- [[_COMMUNITY_Community 52|Community 52]]
-- [[_COMMUNITY_Community 53|Community 53]]
-- [[_COMMUNITY_Community 54|Community 54]]
-- [[_COMMUNITY_Community 56|Community 56]]
-- [[_COMMUNITY_Community 57|Community 57]]
-- [[_COMMUNITY_Community 58|Community 58]]
-- [[_COMMUNITY_Community 59|Community 59]]
-- [[_COMMUNITY_Community 61|Community 61]]
-- [[_COMMUNITY_Community 62|Community 62]]
-- [[_COMMUNITY_Community 63|Community 63]]
-- [[_COMMUNITY_Community 64|Community 64]]
-- [[_COMMUNITY_Community 65|Community 65]]
-- [[_COMMUNITY_Community 66|Community 66]]
-- [[_COMMUNITY_Community 67|Community 67]]
-- [[_COMMUNITY_Community 68|Community 68]]
-- [[_COMMUNITY_Community 69|Community 69]]
-- [[_COMMUNITY_Community 70|Community 70]]
-- [[_COMMUNITY_Community 71|Community 71]]
-- [[_COMMUNITY_Community 72|Community 72]]
-- [[_COMMUNITY_Community 73|Community 73]]
-- [[_COMMUNITY_Community 74|Community 74]]
+- [[_COMMUNITY_StockConsolidation.vue|StockConsolidation.vue]]
+- [[_COMMUNITY_StockQuery.vue|StockQuery.vue]]
+- [[_COMMUNITY_BarcodeList.vue|BarcodeList.vue]]
+- [[_COMMUNITY_StockAdjustment.vue|StockAdjustment.vue]]
+- [[_COMMUNITY_index.vue|index.vue]]
+- [[_COMMUNITY_ContainerUnbind.vue|ContainerUnbind.vue]]
+- [[_COMMUNITY_DeliveryOrderScan.vue|DeliveryOrderScan.vue]]
+- [[_COMMUNITY_OutStockSort.vue|OutStockSort.vue]]
+- [[_COMMUNITY_index.vue|index.vue]]
+- [[_COMMUNITY_index.vue|index.vue]]
+- [[_COMMUNITY_MobileForm.vue|MobileForm.vue]]
+- [[_COMMUNITY_RegisterForm.vue|RegisterForm.vue]]
+- [[_COMMUNITY_ForgetPasswordForm.vue|ForgetPasswordForm.vue]]
+- [[_COMMUNITY_LoginFormTitle.vue|LoginFormTitle.vue]]
+- [[_COMMUNITY_SessionTimeoutLogin.vue|SessionTimeoutLogin.vue]]
+- [[_COMMUNITY_IncellHis copy 2.vue|IncellHis copy 2.vue]]
+- [[_COMMUNITY_OutcellHis.vue|OutcellHis.vue]]
+- [[_COMMUNITY_AsnList.vue|AsnList.vue]]
+- [[_COMMUNITY_Login.vue|Login.vue]]
+- [[_COMMUNITY_Login.vue|Login.vue]]
+- [[_COMMUNITY_IncellHis.vue|IncellHis.vue]]
+- [[_COMMUNITY_OutboundOrder.vue|OutboundOrder.vue]]
+- [[_COMMUNITY_Header.vue|Header.vue]]
+- [[_COMMUNITY_WorkshopReceiptStatistics.vue|WorkshopReceiptStatistics.vue]]
+- [[_COMMUNITY_Exception.vue|Exception.vue]]
+- [[_COMMUNITY_index.vue|index.vue]]
+- [[_COMMUNITY_MaterialStockStatistics.vue|MaterialStockStatistics.vue]]
+- [[_COMMUNITY_YdStockQuery.vue|YdStockQuery.vue]]
+- [[_COMMUNITY_App.vue|App.vue]]
+- [[_COMMUNITY_index.vue|index.vue]]
+- [[_COMMUNITY_createStockTask|createStockTask]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `scanboxCode()` - 5 edges
@@ -95,10 +96,10 @@
 4. `scanboxCode()` - 4 edges
 5. `queryStocks()` - 4 edges
 6. `normalizeRunStatus()` - 3 edges
-7. `createStockTask()` - 3 edges
-8. `scangoodsCode()` - 3 edges
+7. `scangoodsCode()` - 3 edges
+8. `data()` - 3 edges
 9. `data()` - 3 edges
-10. `data()` - 3 edges
+10. `scanboxCode()` - 3 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `createTask()` --calls--> `createStockTask()`  [INFERRED]
@@ -111,7 +112,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (80 total, 7 thin omitted)
+## Communities (81 total, 7 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.05
@@ -133,13 +134,13 @@ Nodes (25): baoshu, barcodeGet(), boxCode, cell, cellCode, CellSelectModal, colu
 Cohesion: 0.07
 Nodes (27): cellStatusLabelMap, getRunStatusLabel(), getRunStatusShort(), getStatusLabel(), normalizeRunStatus(), props, runStatusChipClasses(), runStatusChipTitle() (+19 more)
 
-### Community 5 - "Community 5"
+### Community 5 - "home.vue"
+Cohesion: 0.06
+Nodes (6): activeKey, getUserInfo, recheckcount, userStore, validTabs, viewStore
+
+### Community 6 - "BoxDiskWithAsn.vue"
 Cohesion: 0.07
 Nodes (25): asnCode, asnCodeValidated, asnInputRef, asnOrderColumns, AsnOrderGroup, asnOrderGroups, AsnOrderItem, boxCode (+17 more)
-
-### Community 6 - "Community 6"
-Cohesion: 0.06
-Nodes (5): activeKey, getUserInfo, recheckcount, userStore, viewStore
 
 ### Community 7 - "Community 7"
 Cohesion: 0.07
@@ -285,114 +286,118 @@ Nodes (8): asnCode, asnDataList, asnInput, asnService, loading, MockAsnItem, sav
 Cohesion: 0.18
 Nodes (7): asnCode, asnDataList, asnInput, asnService, loading, saving, showSaveSuccess
 
-### Community 43 - "Community 43"
+### Community 43 - "StockConsolidation.vue"
+Cohesion: 0.20
+Nodes (8): refreshing, refreshStatus(), starting, status, statusColor, statusText, stopping, unwrapResponse()
+
+### Community 44 - "StockQuery.vue"
 Cohesion: 0.24
 Nodes (9): columns, handleSearch(), hasQueried, loading, mapStock(), queryForm, queryStocks(), stockList (+1 more)
 
-### Community 44 - "Community 44"
+### Community 45 - "BarcodeList.vue"
 Cohesion: 0.18
 Nodes (8): barcodeListService, { createMessage }, modifyLoading, [registerEditForm, { getFieldsValue, setFieldsValue, validate }], [registerEditModal, { openModal: openEditModal, closeModal: closeEditModal }], [registerTable, {getDataSource, reload,getSelectRows,clearSelectedRowKeys, getForm}], { t }, Window
 
-### Community 45 - "Community 45"
+### Community 46 - "StockAdjustment.vue"
 Cohesion: 0.20
 Nodes (7): { createConfirm }, handleRestore(), handleStockRestoreEvent(), [register, { openModal }], [registerRestoreModal, { openModal: openRestoreModal }], [registerTable, {getDataSource, reload,getSelectRows,clearSelectedRowKeys}], { t }
 
-### Community 46 - "Community 46"
+### Community 47 - "index.vue"
 Cohesion: 0.18
 Nodes (7): confirmLoading, data, emit, options, props, [registerModal, { changeOkLoading, closeModal }], textarea01
 
-### Community 47 - "Community 47"
+### Community 48 - "ContainerUnbind.vue"
 Cohesion: 0.22
 Nodes (8): handleUnbind(), inputRef, loading, resolveCellCode(), resolvedCode, resultMessage, resultSuccess, stgBinCode
 
-### Community 48 - "Community 48"
+### Community 49 - "DeliveryOrderScan.vue"
 Cohesion: 0.20
 Nodes (8): barcode, errorMsg, loading, outboundService, parsed, ParsedBarcode, record, resultMsg
 
-### Community 49 - "Community 49"
+### Community 50 - "OutStockSort.vue"
 Cohesion: 0.20
 Nodes (5): columns, items, loading, sortCode, sortData
 
-### Community 50 - "Community 50"
+### Community 51 - "index.vue"
 Cohesion: 0.20
 Nodes (7): devSchema, infoData, [infoRegister], infoSchema, [register], [registerDev], schema
 
-### Community 51 - "Community 51"
+### Community 52 - "index.vue"
 Cohesion: 0.22
 Nodes (9): calcHeight(), frameRef, getWrapStyle, { headerHeightRef }, heightRef, hideLoading(), loading, { prefixCls } (+1 more)
 
-### Community 52 - "Community 52"
+### Community 53 - "MobileForm.vue"
 Cohesion: 0.20
 Nodes (8): formData, formRef, { getFormRules }, getShow, { handleBackLogin, getLoginState }, loading, { t }, { validForm }
 
-### Community 53 - "Community 53"
+### Community 54 - "RegisterForm.vue"
 Cohesion: 0.20
 Nodes (8): formData, formRef, { getFormRules }, getShow, { handleBackLogin, getLoginState }, loading, { t }, { validForm }
 
-### Community 54 - "Community 54"
+### Community 55 - "ForgetPasswordForm.vue"
 Cohesion: 0.22
 Nodes (7): formData, formRef, { getFormRules }, getShow, { handleBackLogin, getLoginState }, loading, { t }
 
-### Community 56 - "Community 56"
+### Community 57 - "LoginFormTitle.vue"
 Cohesion: 0.25
 Nodes (6): getFormTitle, { getLoginState }, { t }, getShow, { handleBackLogin, getLoginState }, { t }
 
-### Community 57 - "Community 57"
+### Community 58 - "SessionTimeoutLogin.vue"
 Cohesion: 0.29
 Nodes (5): appStore, permissionStore, { prefixCls }, userId, userStore
 
-### Community 58 - "Community 58"
+### Community 59 - "IncellHis copy 2.vue"
 Cohesion: 0.29
 Nodes (4): { createConfirm }, [register, { openModal }], [registerTable, { reload }], { t }
 
-### Community 59 - "Community 59"
+### Community 60 - "OutcellHis.vue"
 Cohesion: 0.29
 Nodes (4): { createConfirm, message }, [register, { openModal }], [registerTable, { reload, getDataSource }], { t }
 
-### Community 61 - "Community 61"
+### Community 62 - "AsnList.vue"
 Cohesion: 0.33
 Nodes (3): { createConfirm }, [registerTable, { reload }], { t }
 
-### Community 62 - "Community 62"
+### Community 63 - "Login.vue"
 Cohesion: 0.33
 Nodes (5): globSetting, localeStore, { prefixCls }, { t }, title
 
-### Community 63 - "Community 63"
+### Community 64 - "Login.vue"
 Cohesion: 0.33
 Nodes (5): globSetting, localeStore, { prefixCls }, { t }, title
 
-### Community 64 - "Community 64"
+### Community 65 - "IncellHis.vue"
 Cohesion: 0.33
 Nodes (4): { createConfirm, message }, [register, { openModal }], [registerTable, { reload, getSelectRows }], { t }
 
-### Community 65 - "Community 65"
+### Community 66 - "OutboundOrder.vue"
 Cohesion: 0.33
 Nodes (4): { createConfirm }, itemColumns, [registerTable, { getDataSource, reload, getSelectRows, clearSelectedRowKeys }], { t }
 
-### Community 66 - "Community 66"
+### Community 67 - "Header.vue"
 Cohesion: 0.40
 Nodes (3): { createConfirm }, getUserInfo, userStore
 
-### Community 67 - "Community 67"
+### Community 68 - "WorkshopReceiptStatistics.vue"
 Cohesion: 0.40
 Nodes (4): { createError }, modifiedSearchFormSchema, [registerTable, { reload, getForm }], { t }
 
 ## Knowledge Gaps
-- **704 isolated node(s):** `{ getAntdLocale }`, `userStore`, `{ t }`, `{ createConfirm }`, `[registerTable, { reload }]` (+699 more)
+- **711 isolated node(s):** `{ getAntdLocale }`, `userStore`, `{ t }`, `{ createConfirm }`, `[registerTable, { reload }]` (+706 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **7 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `createStockTask()` connect `Community 74` to `Community 4`, `Community 6`?**
-  _High betweenness centrality (0.033) - this node is a cross-community bridge._
-- **Why does `createTask()` connect `Community 4` to `Community 74`?**
+- **Why does `createStockTask()` connect `createStockTask` to `Community 4`, `home.vue`?**
+  _High betweenness centrality (0.034) - this node is a cross-community bridge._
+- **Why does `createTask()` connect `Community 4` to `createStockTask`?**
   _High betweenness centrality (0.018) - this node is a cross-community bridge._
-- **Why does `createOutStockTask()` connect `Community 74` to `Community 31`?**
-  _High betweenness centrality (0.015) - this node is a cross-community bridge._
+- **Why does `createOutStockTask()` connect `createStockTask` to `Community 31`?**
+  _High betweenness centrality (0.016) - this node is a cross-community bridge._
 - **What connects `{ getAntdLocale }`, `userStore`, `{ t }` to the rest of the system?**
-  _704 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _711 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.04625346901017576 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**

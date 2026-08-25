@@ -60,9 +60,9 @@
     "semantic_hash": "33f604eb1302126a28d1c6a4bc73f6bf"
   },
   "src/views/mobile/home/home.vue": {
-    "mtime": 1787552504.0866494,
-    "ast_hash": "9510e218c080cb9fdd21f948c8da67ef",
-    "semantic_hash": "9510e218c080cb9fdd21f948c8da67ef"
+    "mtime": 1787622552.591179,
+    "ast_hash": "6a2305414667992928ed9d63e4562e93",
+    "semantic_hash": "6a2305414667992928ed9d63e4562e93"
   },
   "src/views/mobile/login/Login.vue": {
     "mtime": 1787552504.0876493,
@@ -518,5 +518,10 @@
     "mtime": 1787552504.181272,
     "ast_hash": "4e8b779b6d6558ca7506d65a40c3e170",
     "semantic_hash": "4e8b779b6d6558ca7506d65a40c3e170"
+  },
+  "src/views/mobile/views/StockConsolidation.vue": {
+    "mtime": 1787622858.912786,
+    "ast_hash": "6712f231f005e34dfa573ab3c3064847",
+    "semantic_hash": "6712f231f005e34dfa573ab3c3064847"
   }
 }

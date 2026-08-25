@@ -210,6 +210,42 @@
       "src_views_mobile_views_createstocktask_stockcolumns"
     ],
     "5": [
+      "src_views_mobile_home_home",
+      "src_views_mobile_home_home_acceptancecall",
+      "src_views_mobile_home_home_acceptancecall2",
+      "src_views_mobile_home_home_activekey",
+      "src_views_mobile_home_home_agvincell",
+      "src_views_mobile_home_home_boxbind",
+      "src_views_mobile_home_home_boxdisk",
+      "src_views_mobile_home_home_boxdiskwithasn",
+      "src_views_mobile_home_home_boxincell",
+      "src_views_mobile_home_home_checknoget",
+      "src_views_mobile_home_home_containerunbind",
+      "src_views_mobile_home_home_createoutboundtaskfrombarcode",
+      "src_views_mobile_home_home_createoutstocktask",
+      "src_views_mobile_home_home_createoutstocktasksummary",
+      "src_views_mobile_home_home_getuserinfo",
+      "src_views_mobile_home_home_goodsbind",
+      "src_views_mobile_home_home_handleloginout",
+      "src_views_mobile_home_home_handoutcell",
+      "src_views_mobile_home_home_incellbypeople",
+      "src_views_mobile_home_home_materialout",
+      "src_views_mobile_home_home_materialpartialout",
+      "src_views_mobile_home_home_materialsampling",
+      "src_views_mobile_home_home_materialstatuschange",
+      "src_views_mobile_home_home_outstockorder",
+      "src_views_mobile_home_home_outstocksort",
+      "src_views_mobile_home_home_recheckcount",
+      "src_views_mobile_home_home_scanasn",
+      "src_views_mobile_home_home_scanoutboundorder",
+      "src_views_mobile_home_home_stockconsolidation",
+      "src_views_mobile_home_home_stockquery",
+      "src_views_mobile_home_home_tabclick",
+      "src_views_mobile_home_home_userstore",
+      "src_views_mobile_home_home_validtabs",
+      "src_views_mobile_home_home_viewstore"
+    ],
+    "6": [
       "src_views_mobile_views_boxdiskwithasn",
       "src_views_mobile_views_boxdiskwithasn_asncode",
       "src_views_mobile_views_boxdiskwithasn_asncodevalidated",
@@ -243,40 +279,6 @@
       "src_views_mobile_views_boxdiskwithasn_showtable",
       "src_views_mobile_views_boxdiskwithasn_tableref",
       "src_views_mobile_views_boxdiskwithasn_yhone"
-    ],
-    "6": [
-      "src_views_mobile_home_home",
-      "src_views_mobile_home_home_acceptancecall",
-      "src_views_mobile_home_home_acceptancecall2",
-      "src_views_mobile_home_home_activekey",
-      "src_views_mobile_home_home_agvincell",
-      "src_views_mobile_home_home_boxbind",
-      "src_views_mobile_home_home_boxdisk",
-      "src_views_mobile_home_home_boxdiskwithasn",
-      "src_views_mobile_home_home_boxincell",
-      "src_views_mobile_home_home_checknoget",
-      "src_views_mobile_home_home_containerunbind",
-      "src_views_mobile_home_home_createoutboundtaskfrombarcode",
-      "src_views_mobile_home_home_createoutstocktask",
-      "src_views_mobile_home_home_createoutstocktasksummary",
-      "src_views_mobile_home_home_getuserinfo",
-      "src_views_mobile_home_home_goodsbind",
-      "src_views_mobile_home_home_handleloginout",
-      "src_views_mobile_home_home_handoutcell",
-      "src_views_mobile_home_home_incellbypeople",
-      "src_views_mobile_home_home_materialout",
-      "src_views_mobile_home_home_materialpartialout",
-      "src_views_mobile_home_home_materialsampling",
-      "src_views_mobile_home_home_materialstatuschange",
-      "src_views_mobile_home_home_outstockorder",
-      "src_views_mobile_home_home_outstocksort",
-      "src_views_mobile_home_home_recheckcount",
-      "src_views_mobile_home_home_scanasn",
-      "src_views_mobile_home_home_scanoutboundorder",
-      "src_views_mobile_home_home_stockquery",
-      "src_views_mobile_home_home_tabclick",
-      "src_views_mobile_home_home_userstore",
-      "src_views_mobile_home_home_viewstore"
     ],
     "7": [
       "src_views_mobile_views_goodsbind",
@@ -1093,6 +1095,19 @@
       "src_views_mobile_views_asn_scanasn_showsavesuccess"
     ],
     "43": [
+      "src_views_mobile_views_stockconsolidation",
+      "src_views_mobile_views_stockconsolidation_handlestart",
+      "src_views_mobile_views_stockconsolidation_handlestop",
+      "src_views_mobile_views_stockconsolidation_refreshing",
+      "src_views_mobile_views_stockconsolidation_refreshstatus",
+      "src_views_mobile_views_stockconsolidation_starting",
+      "src_views_mobile_views_stockconsolidation_status",
+      "src_views_mobile_views_stockconsolidation_statuscolor",
+      "src_views_mobile_views_stockconsolidation_statustext",
+      "src_views_mobile_views_stockconsolidation_stopping",
+      "src_views_mobile_views_stockconsolidation_unwrapresponse"
+    ],
+    "44": [
       "src_views_mobile_views_stockquery",
       "src_views_mobile_views_stockquery_columns",
       "src_views_mobile_views_stockquery_handlesearch",
@@ -1105,7 +1120,7 @@
       "src_views_mobile_views_stockquery_stocklist",
       "src_views_mobile_views_stockquery_tolist"
     ],
-    "44": [
+    "45": [
       "src_views_warehouse_goods_barcodelist",
       "src_views_warehouse_goods_barcodelist_barcodelistservice",
       "src_views_warehouse_goods_barcodelist_createmessage",
@@ -1118,7 +1133,7 @@
       "src_views_warehouse_goods_barcodelist_t",
       "src_views_warehouse_goods_barcodelist_window"
     ],
-    "45": [
+    "46": [
       "src_views_warehouse_goods_stockadjustment",
       "src_views_warehouse_goods_stockadjustment_createconfirm",
       "src_views_warehouse_goods_stockadjustment_defaultheader",
@@ -1131,7 +1146,7 @@
       "src_views_warehouse_goods_stockadjustment_registertable_getdatasource_reload_getselectrows_clearselectedrowkeys",
       "src_views_warehouse_goods_stockadjustment_t"
     ],
-    "46": [
+    "47": [
       "src_views_warehouse_print_index",
       "src_views_warehouse_print_index_cancel",
       "src_views_warehouse_print_index_confirmloading",
@@ -1144,7 +1159,7 @@
       "src_views_warehouse_print_index_textarea01",
       "src_views_warehouse_print_index_visiblechange"
     ],
-    "47": [
+    "48": [
       "src_views_mobile_views_containerunbind",
       "src_views_mobile_views_containerunbind_focusfn",
       "src_views_mobile_views_containerunbind_handleunbind",
@@ -1156,7 +1171,7 @@
       "src_views_mobile_views_containerunbind_resultsuccess",
       "src_views_mobile_views_containerunbind_stgbincode"
     ],
-    "48": [
+    "49": [
       "src_views_mobile_views_deliveryorderscan",
       "src_views_mobile_views_deliveryorderscan_barcode",
       "src_views_mobile_views_deliveryorderscan_errormsg",
@@ -1168,7 +1183,7 @@
       "src_views_mobile_views_deliveryorderscan_record",
       "src_views_mobile_views_deliveryorderscan_resultmsg"
     ],
-    "49": [
+    "50": [
       "src_views_mobile_views_outstocksort",
       "src_views_mobile_views_outstocksort_columns",
       "src_views_mobile_views_outstocksort_completesort",
@@ -1180,7 +1195,7 @@
       "src_views_mobile_views_outstocksort_sortcode",
       "src_views_mobile_views_outstocksort_sortdata"
     ],
-    "50": [
+    "51": [
       "src_views_sys_about_index",
       "src_views_sys_about_index_commonlinkrender",
       "src_views_sys_about_index_commontagrender",
@@ -1192,7 +1207,7 @@
       "src_views_sys_about_index_registerdev",
       "src_views_sys_about_index_schema"
     ],
-    "51": [
+    "52": [
       "src_views_sys_iframe_index",
       "src_views_sys_iframe_index_calcheight",
       "src_views_sys_iframe_index_frameref",
@@ -1204,7 +1219,7 @@
       "src_views_sys_iframe_index_prefixcls",
       "src_views_sys_iframe_index_topref"
     ],
-    "52": [
+    "53": [
       "src_views_sys_login_mobileform",
       "src_views_sys_login_mobileform_formdata",
       "src_views_sys_login_mobileform_formref",
@@ -1216,7 +1231,7 @@
       "src_views_sys_login_mobileform_t",
       "src_views_sys_login_mobileform_validform"
     ],
-    "53": [
+    "54": [
       "src_views_sys_login_registerform",
       "src_views_sys_login_registerform_formdata",
       "src_views_sys_login_registerform_formref",
@@ -1228,7 +1243,7 @@
       "src_views_sys_login_registerform_t",
       "src_views_sys_login_registerform_validform"
     ],
-    "54": [
+    "55": [
       "src_views_sys_login_forgetpasswordform",
       "src_views_sys_login_forgetpasswordform_formdata",
       "src_views_sys_login_forgetpasswordform_formref",
@@ -1239,7 +1254,7 @@
       "src_views_sys_login_forgetpasswordform_loading",
       "src_views_sys_login_forgetpasswordform_t"
     ],
-    "55": [
+    "56": [
       "src_views_admin_roles_abprole",
       "src_views_admin_roles_abprole_setup",
       "src_views_admin_roles_createabprole",
@@ -1249,7 +1264,7 @@
       "src_views_admin_roles_permissionabprole",
       "src_views_admin_roles_permissionabprole_setup"
     ],
-    "56": [
+    "57": [
       "src_views_sys_login_loginformtitle",
       "src_views_sys_login_loginformtitle_getformtitle",
       "src_views_sys_login_loginformtitle_getloginstate",
@@ -1259,7 +1274,7 @@
       "src_views_sys_login_qrcodeform_handlebacklogin_getloginstate",
       "src_views_sys_login_qrcodeform_t"
     ],
-    "57": [
+    "58": [
       "src_views_sys_login_sessiontimeoutlogin",
       "src_views_sys_login_sessiontimeoutlogin_appstore",
       "src_views_sys_login_sessiontimeoutlogin_isbackmode",
@@ -1268,7 +1283,7 @@
       "src_views_sys_login_sessiontimeoutlogin_userid",
       "src_views_sys_login_sessiontimeoutlogin_userstore"
     ],
-    "58": [
+    "59": [
       "src_views_task_historys_incellhis_copy_2",
       "src_views_task_historys_incellhis_copy_2_createconfirm",
       "src_views_task_historys_incellhis_copy_2_defaultheader",
@@ -1277,7 +1292,7 @@
       "src_views_task_historys_incellhis_copy_2_registertable_reload",
       "src_views_task_historys_incellhis_copy_2_t"
     ],
-    "59": [
+    "60": [
       "src_views_task_historys_outcellhis",
       "src_views_task_historys_outcellhis_createconfirm_message",
       "src_views_task_historys_outcellhis_exportexcel",
@@ -1286,7 +1301,7 @@
       "src_views_task_historys_outcellhis_registertable_reload_getdatasource",
       "src_views_task_historys_outcellhis_t"
     ],
-    "60": [
+    "61": [
       "src_views_admin_users_abpuser",
       "src_views_admin_users_abpuser_setup",
       "src_views_admin_users_createabpuser",
@@ -1294,7 +1309,7 @@
       "src_views_admin_users_editabpuser",
       "src_views_admin_users_editabpuser_setup"
     ],
-    "61": [
+    "62": [
       "src_views_erp_asnlist",
       "src_views_erp_asnlist_createconfirm",
       "src_views_erp_asnlist_formatquantity",
@@ -1302,7 +1317,7 @@
       "src_views_erp_asnlist_registertable_reload",
       "src_views_erp_asnlist_t"
     ],
-    "62": [
+    "63": [
       "src_views_mobile_login_login",
       "src_views_mobile_login_login_globsetting",
       "src_views_mobile_login_login_localestore",
@@ -1310,7 +1325,7 @@
       "src_views_mobile_login_login_t",
       "src_views_mobile_login_login_title"
     ],
-    "63": [
+    "64": [
       "src_views_sys_login_login",
       "src_views_sys_login_login_globsetting",
       "src_views_sys_login_login_localestore",
@@ -1318,7 +1333,7 @@
       "src_views_sys_login_login_t",
       "src_views_sys_login_login_title"
     ],
-    "64": [
+    "65": [
       "src_views_task_historys_incellhis",
       "src_views_task_historys_incellhis_createconfirm_message",
       "src_views_task_historys_incellhis_handleexport",
@@ -1326,7 +1341,7 @@
       "src_views_task_historys_incellhis_registertable_reload_getselectrows",
       "src_views_task_historys_incellhis_t"
     ],
-    "65": [
+    "66": [
       "src_views_warehouse_outbound_order_outboundorder",
       "src_views_warehouse_outbound_order_outboundorder_createconfirm",
       "src_views_warehouse_outbound_order_outboundorder_handlerefresh",
@@ -1334,69 +1349,69 @@
       "src_views_warehouse_outbound_order_outboundorder_registertable_getdatasource_reload_getselectrows_clearselectedrowkeys",
       "src_views_warehouse_outbound_order_outboundorder_t"
     ],
-    "66": [
+    "67": [
       "src_views_mobile_header_header",
       "src_views_mobile_header_header_createconfirm",
       "src_views_mobile_header_header_getuserinfo",
       "src_views_mobile_header_header_handleloginout",
       "src_views_mobile_header_header_userstore"
     ],
-    "67": [
+    "68": [
       "src_views_task_statistics_workshopreceiptstatistics",
       "src_views_task_statistics_workshopreceiptstatistics_createerror",
       "src_views_task_statistics_workshopreceiptstatistics_modifiedsearchformschema",
       "src_views_task_statistics_workshopreceiptstatistics_registertable_reload_getform",
       "src_views_task_statistics_workshopreceiptstatistics_t"
     ],
-    "68": [
+    "69": [
       "src_views_sys_exception_exception",
       "src_views_sys_exception_exception_mapvalue",
       "src_views_sys_exception_exception_setup"
     ],
-    "69": [
+    "70": [
       "src_views_sys_redirect_index",
       "src_views_sys_redirect_index_currentroute_replace",
       "src_views_sys_redirect_index_params_query"
     ],
-    "70": [
+    "71": [
       "src_views_task_statistics_materialstockstatistics",
       "src_views_task_statistics_materialstockstatistics_registertable_reload",
       "src_views_task_statistics_materialstockstatistics_t"
     ],
-    "71": [
+    "72": [
       "src_views_warehouse_goods_ydstockquery",
       "src_views_warehouse_goods_ydstockquery_registertable",
       "src_views_warehouse_goods_ydstockquery_t"
     ],
-    "72": [
+    "73": [
       "src_app",
       "src_app_getantdlocale"
     ],
-    "73": [
+    "74": [
       "src_views_dashboard_index",
       "src_views_dashboard_index_userstore"
     ],
-    "74": [
+    "75": [
       "src_views_mobile_home_home_createstocktask",
       "src_views_mobile_views_createoutstocktasksummary_createoutstocktask"
     ],
-    "75": [
+    "76": [
       "src_views_sys_login_oidcsignin",
       "src_views_sys_login_oidcsignin_setup"
     ],
-    "76": [
+    "77": [
       "src_views_sys_login_oidcsignout",
       "src_views_sys_login_oidcsignout_setup"
     ],
-    "77": [
+    "78": [
       "src_views_warehouse_cells_editcell",
       "src_views_warehouse_cells_editcell_setup"
     ],
-    "78": [
+    "79": [
       "src_views_warehouse_goods_excelout",
       "src_views_warehouse_goods_excelout_setup"
     ],
-    "79": [
+    "80": [
       "src_views_sys_iframe_frameblank"
     ]
   },
@@ -1406,8 +1421,8 @@
     "2": 0.054878048780487805,
     "3": 0.06386554621848739,
     "4": 0.06951871657754011,
-    "5": 0.06628787878787878,
-    "6": 0.0625,
+    "5": 0.058823529411764705,
+    "6": 0.06628787878787878,
     "7": 0.07056451612903226,
     "8": 0.06653225806451613,
     "9": 0.07816091954022988,
@@ -1444,43 +1459,44 @@
     "40": 0.16666666666666666,
     "41": 0.16666666666666666,
     "42": 0.18181818181818182,
-    "43": 0.23636363636363636,
-    "44": 0.18181818181818182,
-    "45": 0.2,
-    "46": 0.18181818181818182,
-    "47": 0.2222222222222222,
-    "48": 0.2,
+    "43": 0.2,
+    "44": 0.23636363636363636,
+    "45": 0.18181818181818182,
+    "46": 0.2,
+    "47": 0.18181818181818182,
+    "48": 0.2222222222222222,
     "49": 0.2,
     "50": 0.2,
-    "51": 0.2222222222222222,
-    "52": 0.2,
+    "51": 0.2,
+    "52": 0.2222222222222222,
     "53": 0.2,
-    "54": 0.2222222222222222,
-    "55": 0.25,
+    "54": 0.2,
+    "55": 0.2222222222222222,
     "56": 0.25,
-    "57": 0.2857142857142857,
+    "57": 0.25,
     "58": 0.2857142857142857,
     "59": 0.2857142857142857,
-    "60": 0.3333333333333333,
+    "60": 0.2857142857142857,
     "61": 0.3333333333333333,
     "62": 0.3333333333333333,
     "63": 0.3333333333333333,
     "64": 0.3333333333333333,
     "65": 0.3333333333333333,
-    "66": 0.4,
+    "66": 0.3333333333333333,
     "67": 0.4,
-    "68": 0.6666666666666666,
+    "68": 0.4,
     "69": 0.6666666666666666,
     "70": 0.6666666666666666,
     "71": 0.6666666666666666,
-    "72": 1.0,
+    "72": 0.6666666666666666,
     "73": 1.0,
     "74": 1.0,
     "75": 1.0,
     "76": 1.0,
     "77": 1.0,
     "78": 1.0,
-    "79": 1.0
+    "79": 1.0,
+    "80": 1.0
   },
   "gods": [
     {
@@ -1514,11 +1530,6 @@
       "degree": 3
     },
     {
-      "id": "src_views_mobile_home_home_createstocktask",
-      "label": "createStockTask()",
-      "degree": 3
-    },
-    {
       "id": "src_views_mobile_views_agvincell_scangoodscode",
       "label": "scangoodsCode()",
       "degree": 3
@@ -1531,6 +1542,11 @@
     {
       "id": "src_views_mobile_views_acceptancecalltest_data",
       "label": "data()",
+      "degree": 3
+    },
+    {
+      "id": "src_views_mobile_views_boxdiskwithasn_scanboxcode",
+      "label": "scanboxCode()",
       "degree": 3
     }
   ],
@@ -1572,23 +1588,23 @@
   "questions": [
     {
       "type": "bridge_node",
-      "question": "Why does `createStockTask()` connect `Community 74` to `Community 4`, `Community 6`?",
-      "why": "High betweenness centrality (0.033) - this node is a cross-community bridge."
+      "question": "Why does `createStockTask()` connect `createStockTask` to `Community 4`, `home.vue`?",
+      "why": "High betweenness centrality (0.034) - this node is a cross-community bridge."
     },
     {
       "type": "bridge_node",
-      "question": "Why does `createTask()` connect `Community 4` to `Community 74`?",
+      "question": "Why does `createTask()` connect `Community 4` to `createStockTask`?",
       "why": "High betweenness centrality (0.018) - this node is a cross-community bridge."
     },
     {
       "type": "bridge_node",
-      "question": "Why does `createOutStockTask()` connect `Community 74` to `Community 31`?",
-      "why": "High betweenness centrality (0.015) - this node is a cross-community bridge."
+      "question": "Why does `createOutStockTask()` connect `createStockTask` to `Community 31`?",
+      "why": "High betweenness centrality (0.016) - this node is a cross-community bridge."
     },
     {
       "type": "isolated_nodes",
       "question": "What connects `{ getAntdLocale }`, `userStore`, `{ t }` to the rest of the system?",
-      "why": "704 weakly-connected nodes found - possible documentation gaps or missing edges."
+      "why": "711 weakly-connected nodes found - possible documentation gaps or missing edges."
     },
     {
       "type": "low_cohesion",
