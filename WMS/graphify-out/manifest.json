@@ -2620,9 +2620,9 @@
     "semantic_hash": "db8842f9144fa0cbddebd12f0e562db9"
   },
   "src/TuTa.Wms.Application/StockConsolidations/StockConsolidationWorker.cs": {
-    "mtime": 1787637706.0500958,
-    "ast_hash": "411c56d4a0fb9fdb3a8db4a01c358763",
-    "semantic_hash": "411c56d4a0fb9fdb3a8db4a01c358763"
+    "mtime": 1787638760.2069757,
+    "ast_hash": "4074c6d337326fddfb71989a8a58665d",
+    "semantic_hash": "4074c6d337326fddfb71989a8a58665d"
   },
   "src/TuTa.Wms.HttpApi/Controllers/StockConsolidations/StockConsolidationController.cs": {
     "mtime": 1787622779.8830717,
