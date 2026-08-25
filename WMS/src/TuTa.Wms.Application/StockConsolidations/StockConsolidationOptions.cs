@@ -14,6 +14,18 @@ namespace TuTa.Wms.StockConsolidations
         public bool Enabled { get; set; }
 
         /// <summary>
+        /// 是否启用每日自动整理。
+        /// 关闭后只禁止定时触发，移动端的手动启动、停止按钮仍然保留并继续生效。
+        /// </summary>
+        public bool AutoStartEnabled { get; set; }
+
+        /// <summary>
+        /// 每日自动启动时间，使用WMS服务器本地时间和24小时制HH:mm格式。
+        /// 默认晚上22点；服务在当天配置时间之后才启动时不补跑，避免重启后突然下发搬运任务。
+        /// </summary>
+        public string DailyStartTime { get; set; } = "22:00";
+
+        /// <summary>
         /// 参与整理的排号，顺序同时也是遍历顺序。
         /// </summary>
         public List<int> Rows { get; set; } = new List<int> { 12, 11, 10, 9, 8, 7, 6, 5, 4 };

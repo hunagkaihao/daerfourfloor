@@ -281,7 +281,9 @@ namespace TuTa.Wms.StockConsolidations
                 }
 
                 var submittedAt = DateTime.Now;
-                var createResult = await _stockService.CreateStockTaskV2(
+                // 库存整理只调用专用任务入口。RCS模板统一由配置指定为De03，
+                // 不再借用普通入库De01或普通出库De02，避免影响原有业务完成逻辑。
+                var createResult = await _stockService.CreateStockConsolidationTask(
                     container.BoxCode,
                     move.FromCell,
                     move.ToCell).ConfigureAwait(false);

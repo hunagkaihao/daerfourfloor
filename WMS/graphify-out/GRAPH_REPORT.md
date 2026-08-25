@@ -1,15 +1,16 @@
-# Graph Report - .  (2026-08-25)
+# Graph Report - WMS  (2026-08-25)
 
 ## Corpus Check
-- cluster-only mode — file stats not available
+- 527 files · ~134,304 words
+- Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 3900 nodes · 9759 edges · 205 communities (175 shown, 30 thin omitted)
-- Extraction: 90% EXTRACTED · 10% INFERRED · 0% AMBIGUOUS · INFERRED: 935 edges (avg confidence: 0.8)
+- 3885 nodes · 9832 edges · 191 communities (185 shown, 6 thin omitted)
+- Extraction: 90% EXTRACTED · 10% INFERRED · 0% AMBIGUOUS · INFERRED: 950 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `810fc49e`
+- Built from commit: `d59833f0`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -202,49 +203,35 @@
 - [[_COMMUNITY_Guid|Guid]]
 - [[_COMMUNITY_IEnumerable|IEnumerable]]
 - [[_COMMUNITY_ILogger|ILogger]]
-- [[_COMMUNITY_List|List]]
-- [[_COMMUNITY_ResponseDto|ResponseDto]]
-- [[_COMMUNITY_ServiceConfigurationContext|ServiceConfigurationContext]]
-- [[_COMMUNITY_StockConsolidationAgvQueryResult|StockConsolidationAgvQueryResult]]
-- [[_COMMUNITY_StockConsolidationMovePlan|StockConsolidationMovePlan]]
-- [[_COMMUNITY_StockConsolidationMoveResult|StockConsolidationMoveResult]]
-- [[_COMMUNITY_StockConsolidationOptions|StockConsolidationOptions]]
-- [[_COMMUNITY_StockConsolidationPalletSnapshot|StockConsolidationPalletSnapshot]]
-- [[_COMMUNITY_StockConsolidationPlanner|StockConsolidationPlanner]]
-- [[_COMMUNITY_StockConsolidationProgress|StockConsolidationProgress]]
-- [[_COMMUNITY_StockConsolidationSnapshot|StockConsolidationSnapshot]]
-- [[_COMMUNITY_StockConsolidationSnapshotResult|StockConsolidationSnapshotResult]]
-- [[_COMMUNITY_StockConsolidationStatusDto|StockConsolidationStatusDto]]
-- [[_COMMUNITY_Task|Task]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `ResponseDto` - 218 edges
-2. `StockService` - 94 edges
-3. `TuTa.Wms.Erp` - 84 edges
+1. `ResponseDto` - 226 edges
+2. `StockService` - 95 edges
+3. `TuTa.Wms.Erp` - 85 edges
 4. `TuTa.Wms.Erp.Entities` - 70 edges
-5. `Stock` - 67 edges
+5. `Stock` - 68 edges
 6. `WmsDbContext` - 66 edges
-7. `Cell` - 63 edges
-8. `IStockService` - 51 edges
-9. `StockController` - 51 edges
-10. `AgvTaskManager` - 49 edges
+7. `Cell` - 64 edges
+8. `IStockService` - 53 edges
+9. `AgvTaskManager` - 51 edges
+10. `StockController` - 51 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `AgvTaskDto` --references--> `AgvTaskStatus`  [EXTRACTED]
+  WMS/src/TuTa.Wms.Application.Contracts/AgvTasks/Dtos/AgvTaskDto.cs → WMS/src/TuTa.Wms.Domain.Shared/AgvTasks/AgvTaskStatus.cs
 - `AgvTaskDto` --references--> `ManageType`  [EXTRACTED]
-  src/TuTa.Wms.Application.Contracts/AgvTasks/Dtos/AgvTaskDto.cs → src/TuTa.Wms.Domain.Shared/AgvTasks/ManageType.cs
+  WMS/src/TuTa.Wms.Application.Contracts/AgvTasks/Dtos/AgvTaskDto.cs → WMS/src/TuTa.Wms.Domain.Shared/AgvTasks/ManageType.cs
+- `AgvTaskPagedResultDto` --references--> `AgvTaskDto`  [EXTRACTED]
+  WMS/src/TuTa.Wms.Application.Contracts/AgvTasks/Dtos/AgvTaskPagedResultDto.cs → WMS/src/TuTa.Wms.Application.Contracts/AgvTasks/Dtos/AgvTaskDto.cs
+- `AgvTaskPagedQueryDto` --references--> `AgvTaskStatus`  [EXTRACTED]
+  WMS/src/TuTa.Wms.Application.Contracts/AgvTasks/Dtos/AgvTaskPagedQueryDto.cs → WMS/src/TuTa.Wms.Domain.Shared/AgvTasks/AgvTaskStatus.cs
 - `AgvTaskPagedQueryDto` --references--> `ManageType`  [EXTRACTED]
-  src/TuTa.Wms.Application.Contracts/AgvTasks/Dtos/AgvTaskPagedQueryDto.cs → src/TuTa.Wms.Domain.Shared/AgvTasks/ManageType.cs
-- `AgvTaskService` --implements--> `IAgvTaskService`  [EXTRACTED]
-  src/TuTa.Wms.Application/AgvTasks/AgvTaskService.cs → src/TuTa.Wms.Application.Contracts/AgvTasks/IAgvTaskService.cs
-- `BarcodeListService` --implements--> `IBarcodeListService`  [EXTRACTED]
-  src/TuTa.Wms.Application/BarcodeLists/BarcodeListService.cs → src/TuTa.Wms.Application.Contracts/BarcodeLists/IBarcodeListService.cs
-- `GetChkByBarcodeDto` --references--> `StockDto`  [EXTRACTED]
-  src/TuTa.Wms.Application.Contracts/ChkResultLists/Dtos/GetChkByBarcodeDto.cs → src/TuTa.Wms.Application.Contracts/Stocks/Dtos/StockDto.cs
+  WMS/src/TuTa.Wms.Application.Contracts/AgvTasks/Dtos/AgvTaskPagedQueryDto.cs → WMS/src/TuTa.Wms.Domain.Shared/AgvTasks/ManageType.cs
 
 ## Import Cycles
 - None detected.
 
-## Communities (205 total, 30 thin omitted)
+## Communities (191 total, 6 thin omitted)
 
 ### Community 0 - "ErpWorkstationMaterialRequest"
 Cohesion: 0.05
@@ -252,147 +239,147 @@ Nodes (45): DateTime, Guid, ErpWorkstationMaterialRequestDto, ErpWorkstationMate
 
 ### Community 1 - "ErpDeliveryOrderDto"
 Cohesion: 0.06
-Nodes (45): ControllerBase, TuTa.Wms.Application.Erp, TuTa.Wms.Application.Contracts.Erp, TuTa.Wms.Application.Contracts.Erp.IDto, DateTime, Guid, List, ErpDeliveryOrderCreateDto (+37 more)
+Nodes (46): AuditedAggregateRoot, ControllerBase, TuTa.Wms.Application.Contracts.Erp, TuTa.Wms.Application.Contracts.Erp.IDto, IRepository, DateTime, Guid, List (+38 more)
 
 ### Community 2 - "CellService"
 Cohesion: 0.06
-Nodes (35): Guid, ILocalEventBus, ILogger, List, PagedResultDto, Task, CellService, CellAddDto (+27 more)
+Nodes (36): TuTa.Wms.Cells.Dtos, Guid, ILocalEventBus, ILogger, List, PagedResultDto, Task, CellService (+28 more)
 
 ### Community 3 - "ErpWorkshopMaterialTransfer"
 Cohesion: 0.06
-Nodes (41): PagedAndSortedResultRequestDto, DateTime, Guid, ErpWorkshopMaterialTransferDto, ErpWorkshopMaterialTransferQueryDto, ErpWorkshopMaterialTransferRequestDto, ErpWorkshopMaterialTransferResponseDto, ErpWorkshopMaterialTransferStatusUpdateDto (+33 more)
+Nodes (40): DateTime, Guid, ErpWorkshopMaterialTransferDto, ErpWorkshopMaterialTransferQueryDto, ErpWorkshopMaterialTransferRequestDto, ErpWorkshopMaterialTransferResponseDto, ErpWorkshopMaterialTransferStatusUpdateDto, Guid (+32 more)
 
 ### Community 4 - "Cell"
-Cohesion: 0.07
-Nodes (29): TuTa.Wms.Cells.Entities, CellRunStatus, CellStatus, CellType, Guid, List, Cell, Guid (+21 more)
+Cohesion: 0.08
+Nodes (27): PagedResultDto, CellRunStatus, CellStatus, CellType, Guid, List, Cell, Guid (+19 more)
 
 ### Community 5 - "ErpWorkstationMaterialReceiptDto"
 Cohesion: 0.05
-Nodes (45): DomainService, DateTime, Guid, ErpWorkstationMaterialReceiptDto, ErpWorkstationMaterialReceiptQueryDto, ErpWorkstationMaterialReceiptRequestDto, ErpWorkstationMaterialReceiptResponseDto, DateTime (+37 more)
+Nodes (46): DomainService, PagedAndSortedResultRequestDto, DateTime, Guid, ErpWorkstationMaterialReceiptDto, ErpWorkstationMaterialReceiptQueryDto, ErpWorkstationMaterialReceiptRequestDto, ErpWorkstationMaterialReceiptResponseDto (+38 more)
 
 ### Community 6 - "ErpMaterial"
 Cohesion: 0.06
 Nodes (35): Guid, ErpMaterialDto, ErpMaterialRequestDto, ErpMaterialResponseDto, Guid, List, Task, IErpMaterialAppService (+27 more)
 
 ### Community 7 - "IPickListService"
-Cohesion: 0.07
-Nodes (24): List, GetByBarcodeBoxDto, Guid, NoPlanPickListEditDto, Guid, PagedNoPlanPickItemsQueryDto, Guid, PagedPickItemQueryDto (+16 more)
+Cohesion: 0.05
+Nodes (34): List, GetByBarcodeBoxDto, Guid, NoPlanPickListDelDto, Guid, NoPlanPickListEditDto, Guid, NoPlanPickOutCreateDto (+26 more)
 
 ### Community 8 - "StockService"
-Cohesion: 0.09
-Nodes (15): DateTime, StockCreateDto, Dictionary, Guid, IdentityUserManager, IEnumerable, ILogger, IRepository (+7 more)
+Cohesion: 0.08
+Nodes (17): CanCreate, DispatchToRcs, DateTime, StockCreateDto, Dictionary, Guid, IdentityUserManager, IEnumerable (+9 more)
 
 ### Community 9 - "AgvTaskManager"
-Cohesion: 0.11
-Nodes (16): FullAuditedAggregateRoot, AgvTaskStatus, DateTime, ManageType, AgvTask, IdentityUserManager, ILogger, List (+8 more)
+Cohesion: 0.20
+Nodes (8): IdentityUserManager, ILogger, List, LocalEventBus, Task, UnitOfWork, AgvTaskManager, ManageType
 
 ### Community 10 - ".FindByCellCodeAsync"
-Cohesion: 0.14
-Nodes (7): UnitOfWork, Task, CancellationToken, Task, Guid, Task, StocksManager
+Cohesion: 0.13
+Nodes (10): Guid, Guid, ReCheckStockOutEvent, CancellationToken, Task, IRecheckItemRepository, Task, Guid (+2 more)
 
 ### Community 11 - "ChkResultList"
-Cohesion: 0.07
-Nodes (22): BoxAftChkStatus, ChkResultListStatus, Guid, List, ChkResultList, Task, Guid, ChkResultBox (+14 more)
+Cohesion: 0.13
+Nodes (13): BoxAftChkStatus, ChkResultListStatus, Guid, List, ChkResultList, Guid, ChkResultBox, WmsDomainHelper (+5 more)
 
 ### Community 12 - "StockController"
-Cohesion: 0.16
-Nodes (8): Guid, HttpGet, HttpPost, List, object, SwaggerOperation, Task, StockController
+Cohesion: 0.14
+Nodes (10): Guid, StockDto, Guid, HttpGet, HttpPost, List, object, SwaggerOperation (+2 more)
 
 ### Community 13 - "Erp_StockEventHandler"
-Cohesion: 0.06
-Nodes (33): ILogger, IRepository, LocalEventBus, object, Task, UnitOfWorkManager, Erp_StockEventHandler, ILogger (+25 more)
+Cohesion: 0.09
+Nodes (23): ILogger, IStockOutHistoryRepository, LocalEventBus, object, Task, UnitOfWorkManager, StockOutHistory_StockEventHandler, DateTime (+15 more)
 
 ### Community 14 - "BoxService"
-Cohesion: 0.08
-Nodes (22): Guid, ILogger, List, PagedResultDto, Task, BoxService, BoxAddDto, Guid (+14 more)
+Cohesion: 0.17
+Nodes (11): BoxAddDto, BoxUpdateDto, Guid, List, Task, IBoxService, Guid, HttpPost (+3 more)
 
 ### Community 15 - "ResponseDto"
-Cohesion: 0.14
+Cohesion: 0.12
 Nodes (5): ResponseDto, Guid, List, Task, IStockService
 
 ### Community 16 - "ValueObject"
-Cohesion: 0.08
-Nodes (24): TuTa.Wms.BarcodeLists.ValueObjects, StockDirectCreateDto, DateTime, Guid, BarcodeList, DateTime, Task, IEnumerable (+16 more)
+Cohesion: 0.09
+Nodes (19): TuTa.Wms.BarcodeLists.ValueObjects, StockDirectCreateDto, DateTime, Guid, BarcodeList, DateTime, Task, IEnumerable (+11 more)
 
 ### Community 17 - "IdInput"
 Cohesion: 0.09
 Nodes (25): IdentityUserUpdateDto, Guid, IdInput, Guid, LockUserInput, Guid, UpdateUserInput, ChangePasswordInput (+17 more)
 
 ### Community 18 - "SkipService"
-Cohesion: 0.11
-Nodes (14): CanCreate, DispatchToRcs, ILocalEventBus, ILogger, Task, UnitOfWork, SkipService, CancellationToken (+6 more)
+Cohesion: 0.09
+Nodes (15): ILocalEventBus, ILogger, PagedResultDto, Task, UnitOfWork, SkipService, UnitOfWork, Task (+7 more)
 
 ### Community 19 - "StockService.cs"
 Cohesion: 0.14
-Nodes (18): TuTa.Wms.Warehouses.Aggregates, TuTa.Wms.Stocks.Aggregates, TuTa.Wms.Boxes.ValueObjects, TuTa.Wms.Boxes.Aggregates, Wms.Repositories.Warehouses, TuTa.Wms.Boxes.EventHandlers, TuTa.Wms.Skips.Aggregates, TuTa.Wms.Boxes.Entities (+10 more)
+Nodes (15): TuTa.Wms.Repositories.Cells, TuTa.Wms.Stocks.Aggregates, TuTa.Wms.Boxes.ValueObjects, TuTa.Wms.Repositories.Boxes, TuTa.Wms.Boxes.Aggregates, TuTa.Wms.Repositories.Stocks, TuTa.Wms.Skips.Aggregates, TuTa.Wms.Cells.Aggregates (+7 more)
 
 ### Community 20 - "EfCoreStockRepository"
-Cohesion: 0.22
-Nodes (8): InspectionStatus, StockStatus, CancellationToken, DateTime, Guid, List, Task, EfCoreStockRepository
+Cohesion: 0.28
+Nodes (6): CancellationToken, DateTime, Guid, List, Task, EfCoreStockRepository
 
 ### Community 21 - "ISkipService"
-Cohesion: 0.12
-Nodes (15): PagedSkipDto, SkipAddDto, SkipDto, SkipOutDto, PagedResultDto, Task, ISkipService, PagedResultDto (+7 more)
+Cohesion: 0.13
+Nodes (14): PagedSkipDto, SkipAddDto, SkipDto, SkipOutDto, PagedResultDto, Task, ISkipService, HttpGet (+6 more)
 
 ### Community 22 - "PickListService"
 Cohesion: 0.11
-Nodes (16): Guid, ILogger, List, LocalEventBus, PagedResultDto, Task, PickListService, CancellationToken (+8 more)
+Nodes (14): PickTypeMap, ILogger, List, LocalEventBus, PagedResultDto, Task, PickListService, CancellationToken (+6 more)
 
 ### Community 23 - "TuTa.Wms.Application.Contracts.Shared"
-Cohesion: 0.11
-Nodes (12): TuTa.Wms.Controllers.Stocks, TuTa.Wms.Controllers.Skips, TuTa.Wms.Departments.Aggregates, TuTa.Wms.Cells.Dtos, TuTa.Wms.Controllers.Warehouses, TuTa.Wms.Application.Contracts.Shared, TuTa.Wms.Skips.Dtos, TuTa.Wms.Boxes.Dtos (+4 more)
+Cohesion: 0.16
+Nodes (8): TuTa.Wms.Controllers.Stocks, TuTa.Wms.Controllers.RecheckLists, TuTa.Wms.Controllers.Skips, TuTa.Wms.Application.Contracts.Shared, TuTa.Wms.Skips.Dtos, TuTa.Wms.Boxes.Dtos, TuTa.Wms.Controllers.Boxes, TuTa.Wms.RecheckLists.Dtos
 
 ### Community 24 - "TuTa.Wms.Erp.Entities"
-Cohesion: 0.13
-Nodes (11): TuTa.Wms.EntityFrameworkCore, TuTa.Wms.Repositories.StockInHistories, TuTa.Wms.Repositories.Erp, TuTa.Wms.Repositories.Boxes, TuTa.Wms.Repositories.InBoundLists, Wms.EntityFrameworkCore, TuTa.Wms.Erp.Entities, TuTa.Wms.Repositories.BarcodeLists (+3 more)
+Cohesion: 0.22
+Nodes (3): TuTa.Wms.EntityFrameworkCore, TuTa.Wms.Repositories.Erp, TuTa.Wms.EntityFrameworkCore.Repositories.Erp
 
 ### Community 25 - "TuTa.Wms.ChkResultLists"
-Cohesion: 0.09
-Nodes (13): TuTa.Wms.Controllers.PickLists, TuTa.Wms.Stocks.Dtos, TuTa.Wms.Erp.Dtos, TuTa.Wms.ChkResultLists.Entities, TuTa.Wms.ChkResultLists.Aggregates, TuTa.Wms.ChkResultLists, TuTa.Wms.ChkResultLists.Dtos, TuTa.Wms.Controllers.InBoundLists (+5 more)
+Cohesion: 0.13
+Nodes (9): TuTa.Wms.Stocks.Dtos, TuTa.Wms.Repositories.InBoundLists, TuTa.Wms.ChkResultLists.Aggregates, TuTa.Wms.ChkResultLists, TuTa.Wms.ChkResultLists.Dtos, TuTa.Wms.Controllers.InBoundLists, TuTa.Wms.PickLists.Dtos, MaterialToInBoundDto (+1 more)
 
 ### Community 26 - "TuTa.Wms.Erp"
-Cohesion: 0.12
-Nodes (9): TuTa.Wms.Erp.Dto, TuTa.Wms.Erp.IDto, TuTa.Wms.HttpApi.Controllers.Erp, TuTa.Wms.Erp, TuTa.Wms.Controllers.Erp, ErpLoginData, ErpLoginData, ErpLoginResponse (+1 more)
+Cohesion: 0.08
+Nodes (10): TuTa.Wms.EntityFrameworkCore.Repositories, TuTa.Wms.Erp.Repositories, TuTa.Wms.Erp.Dto, TuTa.Wms.Erp.Aggregates, TuTa.Wms.Erp.IDto, TuTa.Wms.HttpApi.Controllers.Erp, TuTa.Wms.Erp, ErpLoginData (+2 more)
 
 ### Community 27 - "TuTa.Wms.Erp.Aggregates"
 Cohesion: 0.12
-Nodes (4): TuTa.Wms.EntityFrameworkCore.Repositories, TuTa.Wms.Erp.Repositories, TuTa.Wms.Erp.Aggregates, TuTa.Wms.EntityFrameworkCore.Repositories.Erp
+Nodes (11): FullAuditedAggregateRoot, AgvTaskStatus, DateTime, ManageType, AgvTask, CancellationToken, Items, List (+3 more)
 
 ### Community 28 - "PickItem"
 Cohesion: 0.09
 Nodes (15): PickItemStatus, Guid, List, PickItem, DateTime, Guid, PickStock, CancellationToken (+7 more)
 
 ### Community 29 - "AgvTaskPagedQueryDto"
-Cohesion: 0.11
-Nodes (19): AgvCallBackRequest, DateTime, Guid, AgvTaskDto, DateTime, AgvTaskPagedQueryDto, List, AgvTaskPagedResultDto (+11 more)
+Cohesion: 0.12
+Nodes (18): ILogger, IRepository, IServiceProvider, Task, UnitOfWork, AgvTaskService, AgvCallBackRequest, DateTime (+10 more)
 
 ### Community 30 - "WmsDomainService"
-Cohesion: 0.12
-Nodes (20): CancellationToken, ILogger, Task, UnitOfWorkManager, ErpDepartmentSyncJob, Guid, Department, Task (+12 more)
+Cohesion: 0.30
+Nodes (9): Guid, Department, Task, DepartmentManager, CancellationToken, Guid, List, Task (+1 more)
 
 ### Community 31 - "PickList"
-Cohesion: 0.13
-Nodes (14): PickOrderStatus, DateTime, Guid, List, PickList, DateTime, GoodsInfoOfPickList, IEnumerable (+6 more)
+Cohesion: 0.25
+Nodes (9): PickOrderStatus, Guid, List, PickList, CancellationToken, Guid, List, Task (+1 more)
 
 ### Community 32 - "ErpDeliveryStationAppService"
-Cohesion: 0.14
-Nodes (15): ErpDeliveryStationRequestDto, ErpDeliveryStationResponseDto, Guid, ILogger, List, Task, UnitOfWork, ErpDeliveryStationAppService (+7 more)
+Cohesion: 0.07
+Nodes (33): Guid, ErpDeliveryStationDto, ErpDeliveryStationRequestDto, ErpDeliveryStationResponseDto, Guid, List, Task, IErpDeliveryStationAppService (+25 more)
 
 ### Community 33 - "Entity"
 Cohesion: 0.07
-Nodes (17): Entity, Guid, ErpInboundItem, InboundItemStatus, DateTime, object, ErpMaterial, DateTime (+9 more)
+Nodes (16): TuTa.Wms.Application.Erp, TuTa.Wms.Erp.Entities, Entity, DateTime, object, ErpMaterial, DateTime, ErpOutboundRecord (+8 more)
 
 ### Community 34 - "RolePermissionAppService"
 Cohesion: 0.11
 Nodes (19): IPermissionAppService, PermissionGrantInfoDto, PermissionGroupDto, GetPermissionInput, List, PermissionOutput, PermissionTreeDto, UpdateRolePermissionsInput (+11 more)
 
 ### Community 35 - "TuTa.Wms.Domain"
-Cohesion: 0.10
-Nodes (12): TuTa.Wms.Repositories.Cells, TuTa.Wms.StockOutHistories.Aggregates, TuTa.Wms.Repositories.PickLists, TuTa.Wms.StockOutHistories.EventHandlers, TuTa.Wms.StockOutHistories, TuTa.Wms.Repositories.Stocks, TuTa.Wms.PickLists.Aggregates, TuTa.Wms.PickLists (+4 more)
+Cohesion: 0.13
+Nodes (9): TuTa.Wms.Controllers.PickLists, TuTa.Wms.Repositories.PickLists, TuTa.Wms.PickLists.Aggregates, TuTa.Wms.PickLists, TuTa.Wms.PickLists.Events, TuTa.Wms.PickLists.Entities, TuTa.Wms.PickLists.ValueObjects, PickItemStatus (+1 more)
 
 ### Community 36 - "TuTa.Wms.Stocks"
-Cohesion: 0.12
-Nodes (11): TuTa.Wms.BarcodeChecks.Aggregates, TuTa.Wms.AgvTasks, TuTa.Wms.Controllers.AgvTasks, TuTa.Wms.AgvTasks.Dtos, TuTa.Wms.BarcodeLists, TuTa.Wms.BarcodeLists.Dtos, TuTa.Wms.BarcodeLists.Aggregates, TuTa.Wms.Repositories.AgvTasks (+3 more)
+Cohesion: 0.19
+Nodes (7): TuTa.Wms.AgvTasks, TuTa.Wms.AgvTasks.Dtos, TuTa.Wms.Repositories.AgvTasks, TuTa.Wms.Stocks, TuTa.Wms.AgvTasks.Aggregaes, RunStatus, InspectionStatus
 
 ### Community 37 - "IRoleAppService"
 Cohesion: 0.15
@@ -403,20 +390,20 @@ Cohesion: 0.08
 Nodes (21): IHttpClientFactory, IHttpContextAccessor, IValidatableObject, IEnumerable, ValidationContext, ValidationResult, LoginInput, Guid (+13 more)
 
 ### Community 39 - "ErpOutboundOrderDto"
-Cohesion: 0.15
-Nodes (16): List, ErpOutboundOrderDto, DateTime, Guid, List, Task, IErpOutboundOrderAppService, DateTime (+8 more)
+Cohesion: 0.22
+Nodes (9): DateTime, Guid, HttpDelete, HttpGet, HttpPost, HttpPut, List, Task (+1 more)
 
 ### Community 40 - "ErpAsnAppService"
-Cohesion: 0.16
-Nodes (11): JToken, ErpAsnDto, List, PuArrVouchAddRequestDto, PuArrVouchAddResponseDto, PuArrVouchDetailRequestDto, ILogger, List (+3 more)
+Cohesion: 0.19
+Nodes (7): JToken, ErpAsnDto, ILogger, List, Task, ErpAsnAppService, ErpSettings
 
 ### Community 41 - "StockConsolidationPlanner"
-Cohesion: 0.14
-Nodes (15): ICollection, IDictionary, IReadOnlyDictionary, IReadOnlyList, Guid, List, StockConsolidationContainerSnapshot, StockConsolidationGroupPlan (+7 more)
+Cohesion: 0.20
+Nodes (11): ICollection, IDictionary, IReadOnlyDictionary, IReadOnlyList, Guid, List, StockConsolidationContainerSnapshot, StockConsolidationGroupPlan (+3 more)
 
 ### Community 42 - "ErpPickOrderSyncJob"
-Cohesion: 0.08
-Nodes (22): IDisposable, IHostedService, CancellationToken, ILogger, Task, UnitOfWorkManager, ErpMoveSyncJob, CancellationToken (+14 more)
+Cohesion: 0.14
+Nodes (12): IDisposable, IHostedService, CancellationToken, ILogger, Task, UnitOfWorkManager, ErpMoveSyncJob, CancellationToken (+4 more)
 
 ### Community 43 - "ErpAsn"
 Cohesion: 0.13
@@ -427,72 +414,72 @@ Cohesion: 0.15
 Nodes (12): DataFormatter, ICell, IRow, MaterialBasicImportRow, Dictionary, Guid, ILogger, List (+4 more)
 
 ### Community 45 - "IChkResultListRepository"
-Cohesion: 0.07
-Nodes (26): ILogger, PagedResultDto, Task, ChkResultListService, DateTime, StockInType, StockStatus, StockQueryDto (+18 more)
+Cohesion: 0.13
+Nodes (11): DateTime, StockInType, StockStatus, StockQueryDto, CheckResultHelper, EnumCheckResult, CheckTypeHelper, EnumCheckType (+3 more)
 
 ### Community 46 - "StockDto"
-Cohesion: 0.13
-Nodes (10): SkipInDto, PagedStockMoveQueryDto, DateTime, StockInType, StockStatus, PagedStockQueryDto, Guid, StockDto (+2 more)
+Cohesion: 0.17
+Nodes (8): SkipInDto, PagedStockMoveQueryDto, DateTime, StockInType, StockStatus, PagedStockQueryDto, PagedResultDto, PagedResultDto
 
 ### Community 47 - "WarehouseController"
-Cohesion: 0.14
-Nodes (11): PagedWarehouseQueryDto, WarehouseAddDto, WarehouseAreaAddDto, WarehouseAreaUpdateDto, WarehouseUpdateDto, Guid, Guid, HttpPost (+3 more)
+Cohesion: 0.26
+Nodes (7): Guid, HttpGet, HttpPost, List, PagedResultDto, Task, WarehouseController
 
 ### Community 48 - "ErpDbContext"
-Cohesion: 0.11
-Nodes (15): AbpDbContext, ErpPickMan, CancellationToken, List, Task, IErpPickManRepository, DbSet, ModelBuilder (+7 more)
+Cohesion: 0.16
+Nodes (9): ErpPickMan, CancellationToken, List, Task, IErpPickManRepository, CancellationToken, List, Task (+1 more)
 
 ### Community 49 - "StockConsolidationWorker"
 Cohesion: 0.17
-Nodes (15): Action, IAgvTaskRepository, IBoxRepository, ICellRepository, IStockRepository, IStockService, StockConsolidationMoveResult, StockConsolidationProgress (+7 more)
+Nodes (13): Action, HashSet, StockConsolidationMoveResult, StockConsolidationProgress, StockConsolidationSnapshotResult, CancellationToken, DateTime, IConfiguration (+5 more)
 
 ### Community 50 - "ChkResultListDto"
 Cohesion: 0.15
 Nodes (14): Guid, ChkResultListDto, List, GetChkByBarcodeDto, PagedCheckItemQueryDto, PagedResultDto, Task, IChkResultListService (+6 more)
 
 ### Community 51 - "IRecheckListService"
-Cohesion: 0.14
-Nodes (13): DateTime, RecheckItemDto, RecheckPickOutDto, RecheckStockDto, List, Task, IRecheckListService, HttpGet (+5 more)
+Cohesion: 0.17
+Nodes (11): RecheckPickOutDto, RecheckStockDto, List, Task, IRecheckListService, HttpGet, HttpPost, List (+3 more)
 
 ### Community 52 - "ErpMoveSyncJob.cs"
-Cohesion: 0.47
-Nodes (3): TuTa.Wms.Repositories.Moves, TuTa.Wms.Moves.Aggregates, TuTa.Wms.Moves
+Cohesion: 0.08
+Nodes (15): TuTa.Wms.StockInHistories.Aggregates, TuTa.Wms.StockInHistories, TuTa.Wms.StockOutHistories.Aggregates, TuTa.Wms.Repositories.StockInHistories, TuTa.Wms.Repositories.Moves, TuTa.Wms.Cells.Entities, TuTa.Wms.ChkResultLists.Entities, TuTa.Wms.Cells.EventHandlers (+7 more)
 
 ### Community 53 - "WarehouseAreaDto"
-Cohesion: 0.19
-Nodes (8): Guid, WarehouseAreaDto, List, PagedResultDto, Task, IWarehouseService, HttpGet, List
+Cohesion: 0.18
+Nodes (7): WarehouseAreaAddDto, WarehouseUpdateDto, Guid, List, PagedResultDto, Task, IWarehouseService
 
 ### Community 54 - "OpenIddictDataSeedContributor"
 Cohesion: 0.13
-Nodes (16): AbpApplicationDescriptor, TuTa.Wms.OpenIddict, IAbpApplicationManager, IConfiguration, IDataSeedContributor, IOpenIddictApplicationRepository, IOpenIddictScopeManager, IOpenIddictScopeRepository (+8 more)
+Nodes (15): AbpApplicationDescriptor, TuTa.Wms.OpenIddict, IAbpApplicationManager, IOpenIddictApplicationRepository, IOpenIddictScopeManager, IOpenIddictScopeRepository, IPermissionDataSeeder, IStringLocalizer (+7 more)
 
 ### Community 55 - "RecheckItem"
-Cohesion: 0.12
-Nodes (13): RecheckItemStatus, DateTime, Guid, List, RecheckItem, Guid, RecheckStock, CancellationToken (+5 more)
+Cohesion: 0.14
+Nodes (10): RecheckItemStatus, DateTime, Guid, List, RecheckItem, Guid, RecheckStock, CancellationToken (+2 more)
 
 ### Community 56 - "Stock"
-Cohesion: 0.13
-Nodes (13): InspectionStatus, RunStatus, DateTime, StockInType, StockStatus, Stock, CancellationToken, DateTime (+5 more)
+Cohesion: 0.10
+Nodes (18): InspectionStatus, RunStatus, ILogger, Task, RecheckListService, StockStatus, DateTime, Guid (+10 more)
 
 ### Community 57 - "ErpInboundOrder"
-Cohesion: 0.17
-Nodes (11): DateTime, Guid, List, ErpInboundOrder, InboundOrderStatus, DateTime, Guid, List (+3 more)
+Cohesion: 0.30
+Nodes (6): DateTime, Guid, List, Task, WmsDbContext, ErpInboundOrderRepository
 
 ### Community 58 - "ErpDeliveryStationDto"
-Cohesion: 0.17
-Nodes (13): AbpController, Guid, ErpDeliveryStationDto, Guid, List, Task, IErpDeliveryStationAppService, Guid (+5 more)
+Cohesion: 0.20
+Nodes (10): ILogger, PagedResultDto, Task, ChkResultListService, ChkResultListManager, CancellationToken, Guid, List (+2 more)
 
 ### Community 59 - "StockConsolidationService"
-Cohesion: 0.15
-Nodes (14): CancellationTokenSource, IServiceScopeFactory, ISingletonDependency, IStockConsolidationService, object, ResponseDto, DateTime, StockConsolidationStatusDto (+6 more)
+Cohesion: 0.18
+Nodes (11): CancellationTokenSource, IServiceScopeFactory, ISingletonDependency, DateTime, StockConsolidationStatusDto, CancellationToken, IConfiguration, ILogger (+3 more)
 
 ### Community 60 - "BoxEventHandler"
-Cohesion: 0.10
-Nodes (18): TuTa.Wms.Cells.EventHandlers, Guid, BoxBindCellEvent, Guid, BoxDisBindCellEvent, CellManager, ICellRepository, ILogger (+10 more)
+Cohesion: 0.12
+Nodes (17): Guid, BoxBindCellEvent, Guid, BoxDisBindCellEvent, CellManager, ICellRepository, ILogger, object (+9 more)
 
 ### Community 61 - "AgvTaskService"
-Cohesion: 0.17
-Nodes (11): ILogger, IRepository, IServiceProvider, Task, UnitOfWork, AgvTaskService, AGVOptions, ResultAgvTaskDto (+3 more)
+Cohesion: 0.29
+Nodes (5): AGVOptions, ResultAgvTaskDto, List, Task, RcsApiManager
 
 ### Community 62 - "ErpOutboundOrder"
 Cohesion: 0.18
@@ -503,8 +490,8 @@ Cohesion: 0.11
 Nodes (17): AccountController, TuTa.Wms.Controllers.Accounts, IdentityDynamicClaimsPrincipalContributorCache, IdentityOptions, IdentitySecurityLogManager, ISettingProvider, Guid, HttpPost (+9 more)
 
 ### Community 64 - "IMaterialService"
-Cohesion: 0.12
-Nodes (16): Consumes, IFormFile, NonAction, MaterialCreateDto, List, MaterialImportResultDto, MaterialUpdateDto, Guid (+8 more)
+Cohesion: 0.16
+Nodes (11): Consumes, IFormFile, NonAction, MaterialCreateDto, List, MaterialImportResultDto, Guid, HttpPost (+3 more)
 
 ### Community 65 - "TuTa.Wms.Shared"
 Cohesion: 0.15
@@ -515,35 +502,35 @@ Cohesion: 0.11
 Nodes (17): IdentityClaimType, IdentityLinkUser, IdentityRole, IdentitySecurityLog, IdentityUserDelegation, IDesignTimeDbContextFactory, IIdentityDbContext, ITenantManagementDbContext (+9 more)
 
 ### Community 67 - "DepartmentDto"
-Cohesion: 0.14
-Nodes (14): Guid, DepartmentDto, List, Task, IDepartmentService, ILogger, List, Task (+6 more)
+Cohesion: 0.20
+Nodes (10): Guid, DepartmentDto, List, Task, IDepartmentService, HttpGet, HttpPost, List (+2 more)
 
 ### Community 68 - "StockInHistory_StockEventHandler"
 Cohesion: 0.11
 Nodes (17): TuTa.Wms.ChkResultLists.EventHandlers, IChkResultListRepository, ILogger, object, Task, UnitOfWorkManager, StockEventHandler, ILogger (+9 more)
 
 ### Community 69 - "RecheckList"
-Cohesion: 0.14
-Nodes (12): RecheckListStatus, DateTime, Guid, List, RecheckList, IEnumerable, MaterialInfoOfRechkList, CancellationToken (+4 more)
+Cohesion: 0.22
+Nodes (9): RecheckListStatus, Guid, List, RecheckList, CancellationToken, Guid, List, Task (+1 more)
 
 ### Community 70 - "IErpAsnAppService"
-Cohesion: 0.18
-Nodes (9): Guid, List, ErpAsnListResponseDto, ErpAsnSaveResponseDto, ErpAsnValidateResponseDto, ErpLoginRequestDto, ErpLoginResponseDto, Task (+1 more)
+Cohesion: 0.15
+Nodes (14): IActionResult, Guid, List, ErpAsnListResponseDto, ErpAsnSaveResponseDto, ErpAsnValidateResponseDto, ErpLoginRequestDto, ErpLoginResponseDto (+6 more)
 
 ### Community 71 - "ErpRecheckNotifierSyncJob"
 Cohesion: 0.16
 Nodes (13): CancellationToken, ILogger, Task, UnitOfWorkManager, ErpRecheckNotifierSyncJob, CancellationToken, Guid, List (+5 more)
 
 ### Community 72 - "ErpPickOrder"
-Cohesion: 0.16
+Cohesion: 0.17
 Nodes (11): DateTime, object, ErpPickOrder, CancellationToken, List, Task, IErpPickOrderRepository, CancellationToken (+3 more)
 
 ### Community 73 - "IWarehouseRepository"
-Cohesion: 0.16
-Nodes (11): WarehouseType, CancellationToken, Guid, List, Task, IWarehouseRepository, DataSeedContext, Task (+3 more)
+Cohesion: 0.15
+Nodes (12): IDataSeedContributor, WarehouseType, CancellationToken, Guid, List, Task, IWarehouseRepository, DataSeedContext (+4 more)
 
 ### Community 74 - "TuTa.Wms.Materials.Aggregates"
-Cohesion: 0.22
+Cohesion: 0.20
 Nodes (6): TuTa.Wms.Materials, Wms.Repositories.Materials, TuTa.Wms.Materials.Dtos, TuTa.Wms.Controllers.Materials, TuTa.Wms.Materials.Aggregates, MaterialBasicImportRow
 
 ### Community 75 - "TuTa.Wms.AgvTasks.Dto"
@@ -555,28 +542,28 @@ Cohesion: 0.22
 Nodes (9): Guid, ILogger, IRepository, Task, UnitOfWork, ErpOutboundOrderAppService, DateTime, Task (+1 more)
 
 ### Community 77 - "WarehouseService"
-Cohesion: 0.22
-Nodes (6): Guid, ILogger, List, PagedResultDto, Task, WarehouseService
+Cohesion: 0.19
+Nodes (8): WarehouseAddDto, Guid, WarehouseAreaDto, Guid, ILogger, List, Task, WarehouseService
 
 ### Community 78 - "ErpRecheckNotifier"
-Cohesion: 0.17
+Cohesion: 0.18
 Nodes (11): DateTime, object, ErpRecheckNotifier, CancellationToken, List, Task, IErpRecheckNotifierRepository, CancellationToken (+3 more)
 
 ### Community 79 - "ErpStockAftChk"
-Cohesion: 0.16
+Cohesion: 0.15
 Nodes (11): DateTime, object, ErpStockAftChk, CancellationToken, List, Task, IErpStockAftChkRepository, CancellationToken (+3 more)
 
 ### Community 80 - "Warehouse"
-Cohesion: 0.18
-Nodes (7): Guid, Guid, List, WarehouseType, Warehouse, Guid, WarehouseArea
+Cohesion: 0.17
+Nodes (7): WarehouseAreaUpdateDto, Guid, List, WarehouseType, Warehouse, Guid, WarehouseArea
 
 ### Community 81 - "Box"
-Cohesion: 0.33
-Nodes (8): BoxStatus, List, Box, CancellationToken, Guid, List, Task, EfCoreBoxRepository
+Cohesion: 0.41
+Nodes (5): CancellationToken, Guid, List, Task, EfCoreBoxRepository
 
 ### Community 82 - "TuTa.Wms.Stocks.Events"
-Cohesion: 0.11
-Nodes (9): TuTa.Wms.StockInHistories.Aggregates, TuTa.Wms.StockInHistories, TuTa.Wms.Erp.EventHandlers, TuTa.Wms.PickLists.Events, TuTa.Wms.Stocks.Events, TuTa.Wms.StockInHistories.EventHandlers, TuTa.Wms.Stocks.ValueObjects, TuTa.Wms.RecheckLists.Events (+1 more)
+Cohesion: 0.12
+Nodes (5): TuTa.Wms.Erp.EventHandlers, TuTa.Wms.Stocks.Events, TuTa.Wms.Stocks.ValueObjects, TuTa.Wms.RecheckLists.Events, TuTa.Wms.Stocks.EventHandlers
 
 ### Community 83 - "IApplicationService"
 Cohesion: 0.15
@@ -595,60 +582,68 @@ Cohesion: 0.16
 Nodes (11): IIdentityUserAppService, IIdentityUserRepository, ChangePasswordInput, IdentityRoleDto, IdentityUserCreateDto, IdentityUserDto, IdentityUserManager, ListResultDto (+3 more)
 
 ### Community 87 - "ErpBarcode"
-Cohesion: 0.14
+Cohesion: 0.13
 Nodes (11): DateTime, object, ErpBarcode, CancellationToken, List, Task, IErpBarcodeRepository, CancellationToken (+3 more)
 
+### Community 88 - "NoPlanPickListDelDto"
+Cohesion: 0.15
+Nodes (10): CancellationToken, ILogger, Task, UnitOfWorkManager, ErpPickOrderSyncJob, DateTime, List, LocalEventBus (+2 more)
+
 ### Community 89 - "ErpStateChgNotifier"
-Cohesion: 0.13
+Cohesion: 0.12
 Nodes (11): DateTime, object, ErpStateChgNotifier, CancellationToken, List, Task, IErpStateChgNotifierRepository, CancellationToken (+3 more)
 
 ### Community 90 - "TuTa.Wms.RecheckLists"
-Cohesion: 0.16
-Nodes (8): TuTa.Wms.Controllers.RecheckLists, TuTa.Wms.RecheckLists, TuTa.Wms.RecheckLists.Aggregates, TuTa.Wms.RecheckLists.ValueObjects, TuTa.Wms.RecheckLists.Entities, TuTa.Wms.RecheckLists.Dtos, RecheckItemStatus, RecheckListStatus
+Cohesion: 0.19
+Nodes (7): TuTa.Wms.RecheckLists, TuTa.Wms.RecheckLists.Aggregates, TuTa.Wms.RecheckLists.ValueObjects, TuTa.Wms.RecheckLists.Entities, TuTa.Wms.Repositories.RecheckLists, RecheckItemStatus, RecheckListStatus
 
 ### Community 91 - "TuTa.Wms.StockConsolidations"
-Cohesion: 0.14
-Nodes (8): TuTa.Wms.StockConsolidations, TuTa.Wms.Controllers.StockConsolidations, TuTa.Wms.StockConsolidations.Dtos, StockConsolidationCellParser, StockConsolidationCellPosition, List, StockConsolidationCellRange, StockConsolidationOptions
+Cohesion: 0.25
+Nodes (3): TuTa.Wms.StockConsolidations, TuTa.Wms.StockConsolidations.Dtos, StockConsolidationCellParser
 
 ### Community 92 - "WmsDbMigrationService"
 Cohesion: 0.21
 Nodes (8): ICurrentTenant, IDataSeeder, ITenantRepository, IEnumerable, ILogger, Task, Tenant, WmsDbMigrationService
 
 ### Community 93 - "MaterialDto"
-Cohesion: 0.18
-Nodes (7): Guid, MaterialDto, PagedMaterialsQueryDto, List, PagedResultDto, HttpGet, List
+Cohesion: 0.15
+Nodes (10): Guid, MaterialDto, MaterialUpdateDto, Guid, List, PagedResultDto, Task, IMaterialService (+2 more)
 
 ### Community 94 - "IBarcodeListRepository"
 Cohesion: 0.18
 Nodes (11): CancellationToken, ILogger, Task, UnitOfWorkManager, ErpBarcodeSyncJob, BarcodeListManager, CancellationToken, Guid (+3 more)
 
 ### Community 95 - "ErpMove"
-Cohesion: 0.14
+Cohesion: 0.13
 Nodes (11): DateTime, object, ErpMove, CancellationToken, List, Task, IErpMoveRepository, CancellationToken (+3 more)
 
 ### Community 96 - ".GetPagedStockOutHistoriesAsync"
-Cohesion: 0.16
-Nodes (11): DateTime, PagedStockOutHistoryQueryDto, DateTime, StockOutHistoryDto, PagedResultDto, Task, PagedResultDto, Task (+3 more)
+Cohesion: 0.11
+Nodes (19): AuditedEntityDto, TuTa.Wms.StockOutHistories, TuTa.Wms.StockOutHistories.Dtos, TuTa.Wms.Controllers.StockOutHistories, DateTime, PagedStockOutHistoryQueryDto, DateTime, StockOutHistoryDto (+11 more)
 
 ### Community 97 - "ITransientDependency"
 Cohesion: 0.15
 Nodes (9): TuTa.Wms.Data, ITransientDependency, Task, IWmsDbSchemaMigrator, Task, NullWmsDbSchemaMigrator, IServiceProvider, Task (+1 more)
 
 ### Community 98 - "WmsAppService"
-Cohesion: 0.14
-Nodes (12): ErpPickManDto, List, Task, IErpMidTableService, ILogger, List, Task, ErpMidTableService (+4 more)
+Cohesion: 0.11
+Nodes (16): TuTa.Wms.Erp.Dtos, TuTa.Wms.Controllers.Erp, ErpGoodsAftChkDto, ErpPickManDto, List, Task, IErpMidTableService, ILogger (+8 more)
 
 ### Community 99 - "ErpInboundOrderDto"
-Cohesion: 0.21
-Nodes (10): DateTime, Guid, List, ErpInboundItemDto, ErpInboundOrderDto, DateTime, Guid, List (+2 more)
+Cohesion: 0.13
+Nodes (19): AbpController, DateTime, Guid, List, ErpInboundItemDto, ErpInboundOrderDto, DateTime, Guid (+11 more)
 
 ### Community 100 - "ErpInboundOrderAppService"
-Cohesion: 0.23
-Nodes (8): Guid, ILogger, Task, UnitOfWork, ErpInboundOrderAppService, DateTime, Task, ErpInboundOrderManager
+Cohesion: 0.21
+Nodes (9): Guid, ILogger, Task, UnitOfWork, ErpInboundOrderAppService, DateTime, Task, ErpInboundOrderManager (+1 more)
+
+### Community 101 - "NoPlanPickOutCreateDto"
+Cohesion: 0.22
+Nodes (9): BackgroundService, CancellationToken, DateTime, IConfiguration, ILogger, string, Task, StockConsolidationScheduleService (+1 more)
 
 ### Community 102 - "IBoxRepository"
-Cohesion: 0.31
-Nodes (6): CancellationToken, Guid, List, Task, IBoxRepository, Task
+Cohesion: 0.45
+Nodes (5): CancellationToken, Guid, List, Task, IBoxRepository
 
 ### Community 103 - "Material"
 Cohesion: 0.22
@@ -663,64 +658,64 @@ Cohesion: 0.15
 Nodes (12): TuTa.Wms.ChkResultLists.Events, DateTime, EnumCheckResult, EnumCheckType, RecheckResultGettedEvent, ILogger, IStockRepository, object (+4 more)
 
 ### Community 106 - "IStockConsolidationService"
-Cohesion: 0.25
-Nodes (9): HttpGet, HttpPost, ResponseDto, Task, IStockConsolidationService, ResponseDto, Task, StockConsolidationController (+1 more)
+Cohesion: 0.23
+Nodes (8): TuTa.Wms.Controllers.StockConsolidations, Task, IStockConsolidationService, HttpGet, HttpPost, SwaggerOperation, Task, StockConsolidationController
 
 ### Community 107 - "RoleAppService"
 Cohesion: 0.22
 Nodes (10): IIdentityRoleAppService, IIdentityRoleRepository, PagingRoleListInput, Authorize, IdentityRoleCreateDto, IdentityRoleDto, ListResultDto, PagedResultDto (+2 more)
 
 ### Community 108 - "AuditedEntityDto"
-Cohesion: 0.15
-Nodes (12): AuditedEntityDto, DateTime, PagedStockInHistoryQueryDto, DateTime, StockInHistoryDto, PagedResultDto, Task, PagedResultDto (+4 more)
+Cohesion: 0.11
+Nodes (17): TuTa.Wms.Controllers.StockInHistories, TuTa.Wms.StockInHistories.Dtos, DateTime, PagedStockInHistoryQueryDto, DateTime, StockInHistoryDto, PagedResultDto, Task (+9 more)
 
 ### Community 109 - "ErpDeptType"
-Cohesion: 0.14
+Cohesion: 0.13
 Nodes (8): object, ErpDeptType, CancellationToken, Task, IErpDeptTypeRepository, CancellationToken, Task, EfCoreErpDeptTypeRepository
 
 ### Community 110 - "AuditedAggregateRoot"
-Cohesion: 0.18
-Nodes (11): AuditedAggregateRoot, DateTime, StockInHistory, CancellationToken, DateTime, Task, IStockInHistoryRepository, CancellationToken (+3 more)
+Cohesion: 0.19
+Nodes (10): DateTime, StockInHistory, CancellationToken, DateTime, Task, IStockInHistoryRepository, CancellationToken, DateTime (+2 more)
 
 ### Community 111 - "ErpAsnController"
-Cohesion: 0.36
-Nodes (6): IActionResult, HttpGet, HttpPost, SwaggerOperation, Task, ErpAsnController
+Cohesion: 0.48
+Nodes (4): List, PuArrVouchAddRequestDto, PuArrVouchAddResponseDto, PuArrVouchDetailRequestDto
 
 ### Community 112 - "StockEventHandler"
 Cohesion: 0.16
 Nodes (11): BoxManager, IBoxRepository, ILogger, object, Task, UnitOfWorkManager, StockEventHandler, Guid (+3 more)
 
 ### Community 113 - "ErpDepartment"
-Cohesion: 0.18
+Cohesion: 0.16
 Nodes (9): ErpDepartment, CancellationToken, List, Task, IErpDepartmentRepository, CancellationToken, List, Task (+1 more)
 
 ### Community 114 - "ErpNoPlanPickType"
-Cohesion: 0.18
+Cohesion: 0.16
 Nodes (9): ErpNoPlanPickType, CancellationToken, List, Task, IErpNoPlanPickTypeRepository, CancellationToken, List, Task (+1 more)
 
 ### Community 115 - "Stock_RecheckListEventHandler"
-Cohesion: 0.18
-Nodes (11): FreezeStockEvent, Guid, ReCheckStockOutEvent, UnFreezeStockEvent, ILogger, IStockRepository, LocalEventBus, object (+3 more)
+Cohesion: 0.20
+Nodes (8): FreezeStockEvent, UnFreezeStockEvent, ILogger, IStockRepository, LocalEventBus, object, UnitOfWorkManager, Stock_RecheckListEventHandler
 
 ### Community 116 - "ApplicationService"
-Cohesion: 0.23
-Nodes (7): ApplicationService, ILogger, Task, UnitOfWork, ErpAsnStockInService, IErpAsnStockInService, WmsAppService
+Cohesion: 0.14
+Nodes (11): ApplicationService, ILogger, Task, UnitOfWork, ErpAsnStockInService, IErpAsnStockInService, WmsAppService, Guid (+3 more)
 
 ### Community 117 - "ErpDeliveryStation"
-Cohesion: 0.23
-Nodes (6): Guid, ErpDeliveryStation, Guid, List, Task, ErpDeliveryStationRepository
+Cohesion: 0.19
+Nodes (6): TuTa.Wms.Warehouses.Aggregates, TuTa.Wms.Controllers.Warehouses, Wms.Repositories.Warehouses, TuTa.Wms.Warehouses, TuTa.Wms.Warehouses.Dtos, WarehouseAreaType
 
 ### Community 118 - "StockOutHistory"
-Cohesion: 0.19
-Nodes (10): DateTime, StockOutHistory, CancellationToken, DateTime, Task, IStockOutHistoryRepository, CancellationToken, DateTime (+2 more)
+Cohesion: 0.17
+Nodes (12): List, QueryDataInPage, DateTime, StockOutHistory, CancellationToken, DateTime, Task, IStockOutHistoryRepository (+4 more)
 
 ### Community 119 - "ErpInboundOrderController"
-Cohesion: 0.26
-Nodes (8): DateTime, Guid, HttpDelete, HttpGet, HttpPut, List, Task, ErpInboundOrderController
+Cohesion: 0.16
+Nodes (10): ILogger, IRepository, LocalEventBus, object, Task, UnitOfWorkManager, Erp_StockEventHandler, StockCheckEvent (+2 more)
 
 ### Community 120 - "StockConsolidationModels.cs"
-Cohesion: 0.21
-Nodes (9): AgvTaskStatus, Dictionary, StockConsolidationAgvQueryResult, StockConsolidationAgvTaskSnapshot, StockConsolidationCellSnapshot, StockConsolidationSnapshot, StockConsolidationSnapshotResult, Guid (+1 more)
+Cohesion: 0.22
+Nodes (8): Dictionary, StockConsolidationAgvQueryResult, StockConsolidationAgvTaskSnapshot, StockConsolidationCellSnapshot, StockConsolidationSnapshot, Guid, IEnumerable, AgvTaskStatus
 
 ### Community 121 - "TuTa.Wms"
 Cohesion: 0.20
@@ -731,47 +726,47 @@ Cohesion: 0.20
 Nodes (8): TuTa.Wms.Erp.Events, ILocalEventHandler, DateTime, StockInCompletedEvent, IErpAsnStockInService, ILogger, Task, StockInCompletedEventHandler
 
 ### Community 123 - "WmsController"
-Cohesion: 0.24
-Nodes (7): TuTa.Wms.Controllers.BarcodeLists, Task, IBarcodeListService, HttpGet, Task, BarcodeListController, WmsController
+Cohesion: 0.18
+Nodes (11): ILogger, Task, BarcodeListService, DateTime, BarcodeDto, Task, IBarcodeListService, HttpGet (+3 more)
 
 ### Community 124 - "EntityDto"
 Cohesion: 0.21
-Nodes (8): EntityDto, DateTime, Guid, CreateFromBarcodeDto, ErpOutboundItemDto, ErpOutboundRecordDto, Guid, PickListDto
+Nodes (10): EntityDto, DateTime, Guid, List, CreateFromBarcodeDto, ErpOutboundItemDto, ErpOutboundOrderDto, ErpOutboundRecordDto (+2 more)
 
 ### Community 125 - "TuTa.Wms.Application"
 Cohesion: 0.17
-Nodes (12): Abp (9.2.2), Microsoft.EntityFrameworkCore.Design (8.0.6), NPOI (2.7.2), Volo.Abp.Account.Application (8.1.3), Volo.Abp.Identity.Application (8.1.3), Volo.Abp.PermissionManagement.Application (8.1.3), Volo.Abp.TenantManagement.Application (8.1.3), TuTa.Wms.Application (+4 more)
+Nodes (11): Abp (9.2.2), Microsoft.EntityFrameworkCore.Design (8.0.6), NPOI (2.7.2), Volo.Abp.Account.Application (8.1.3), Volo.Abp.Identity.Application (8.1.3), Volo.Abp.PermissionManagement.Application (8.1.3), Volo.Abp.TenantManagement.Application (8.1.3), net8.0 (+3 more)
 
 ### Community 126 - "TuTa.Wms.EntityFrameworkCore"
 Cohesion: 0.17
-Nodes (12): Microsoft.EntityFrameworkCore.Tools (8.0.0), Volo.Abp.AuditLogging.EntityFrameworkCore (8.1.3), Volo.Abp.BackgroundJobs.EntityFrameworkCore (8.1.3), Volo.Abp.EntityFrameworkCore.MySQL (8.1.3), Volo.Abp.EntityFrameworkCore.SqlServer (8.1.3), Volo.Abp.Identity.EntityFrameworkCore (8.1.3), Volo.Abp.OpenIddict.EntityFrameworkCore (8.1.3), Volo.Abp.PermissionManagement.EntityFrameworkCore (8.1.3) (+4 more)
+Nodes (11): Microsoft.EntityFrameworkCore.Tools (8.0.0), Volo.Abp.AuditLogging.EntityFrameworkCore (8.1.3), Volo.Abp.BackgroundJobs.EntityFrameworkCore (8.1.3), Volo.Abp.EntityFrameworkCore.MySQL (8.1.3), Volo.Abp.EntityFrameworkCore.SqlServer (8.1.3), Volo.Abp.Identity.EntityFrameworkCore (8.1.3), Volo.Abp.OpenIddict.EntityFrameworkCore (8.1.3), Volo.Abp.PermissionManagement.EntityFrameworkCore (8.1.3) (+3 more)
 
 ### Community 127 - "TuTa.Wms.Domain.Shared"
 Cohesion: 0.17
-Nodes (12): Microsoft.Extensions.FileProviders.Embedded (8.0.0), Volo.Abp.AuditLogging.Domain.Shared (8.1.3), Volo.Abp.BackgroundJobs.Domain.Shared (8.1.3), Volo.Abp.Identity.Domain.Shared (8.1.3), Volo.Abp.OpenIddict.Domain.Shared (8.1.3), Volo.Abp.PermissionManagement.Domain.Shared (8.1.3), Volo.Abp.TenantManagement.Domain.Shared (8.1.3), TuTa.Wms.Domain.Shared (+4 more)
+Nodes (11): Microsoft.Extensions.FileProviders.Embedded (8.0.0), Volo.Abp.AuditLogging.Domain.Shared (8.1.3), Volo.Abp.BackgroundJobs.Domain.Shared (8.1.3), Volo.Abp.Identity.Domain.Shared (8.1.3), Volo.Abp.OpenIddict.Domain.Shared (8.1.3), Volo.Abp.PermissionManagement.Domain.Shared (8.1.3), Volo.Abp.TenantManagement.Domain.Shared (8.1.3), net8.0 (+3 more)
 
 ### Community 128 - "Profile"
-Cohesion: 0.17
-Nodes (9): Profile, ErpDeliveryStationAutoMapperProfile, ErpInboundOrderAutoMapperProfile, ErpMaterialAutoMapperProfile, ErpOutboundOrderAutoMapperProfile, ErpWorkshopMaterialTransferAutoMapperProfile, ErpWorkstationMaterialReceiptAutoMapperProfile, ErpWorkstationMaterialRequestAutoMapperProfile (+1 more)
+Cohesion: 0.12
+Nodes (12): Profile, ErpDeliveryStationAutoMapperProfile, ErpInboundOrderAutoMapperProfile, ErpMaterialAutoMapperProfile, ErpOutboundOrderAutoMapperProfile, ErpWorkshopMaterialTransferAutoMapperProfile, ErpWorkstationMaterialReceiptAutoMapperProfile, ErpWorkstationMaterialRequestAutoMapperProfile (+4 more)
 
 ### Community 129 - "IErpAsnRepository"
 Cohesion: 0.24
-Nodes (4): Guid, List, Task, IErpAsnRepository
+Nodes (6): Guid, ILogger, List, PagedResultDto, Task, BoxService
 
 ### Community 130 - "IErpInboundOrderRepository"
-Cohesion: 0.29
-Nodes (7): DateTime, List, DateTime, Guid, List, Task, IErpInboundOrderRepository
+Cohesion: 0.17
+Nodes (12): DateTime, List, DateTime, Guid, List, ErpInboundOrder, InboundOrderStatus, DateTime (+4 more)
 
 ### Community 131 - "IErpOutboundOrderRepository"
 Cohesion: 0.29
 Nodes (7): DateTime, List, DateTime, Guid, List, Task, IErpOutboundOrderRepository
 
 ### Community 132 - ".GetByBoxAsync"
-Cohesion: 0.26
-Nodes (7): Guid, BarcodeCheck, CancellationToken, Guid, List, Task, IBarcodeCheckRepository
+Cohesion: 0.33
+Nodes (5): CancellationToken, Guid, List, Task, IBarcodeCheckRepository
 
 ### Community 133 - "ErpWarehouseAreaPrdt"
-Cohesion: 0.18
+Cohesion: 0.17
 Nodes (7): ErpWarehouseAreaPrdt, CancellationToken, Task, IErpWarehouseAreaPrdtRepository, CancellationToken, Task, EfCoreErpWarehouseAreaPrdtRepository
 
 ### Community 134 - ".Configure"
@@ -780,7 +775,7 @@ Nodes (6): OneTimeRunner, WmsGlobalFeatureConfigurator, OneTimeRunner, WmsEfCore
 
 ### Community 135 - "TuTa.Wms.HttpApi"
 Cohesion: 0.18
-Nodes (11): Swashbuckle.AspNetCore.Annotations (6.6.2), Volo.Abp.Account.HttpApi (8.1.3), Volo.Abp.Account.Web.OpenIddict (8.1.3), Volo.Abp.Identity.AspNetCore (8.1.3), Volo.Abp.Identity.HttpApi (8.1.3), Volo.Abp.PermissionManagement.HttpApi (8.1.3), TuTa.Wms.HttpApi, net8.0 (+3 more)
+Nodes (10): Swashbuckle.AspNetCore.Annotations (6.6.2), Volo.Abp.Account.HttpApi (8.1.3), Volo.Abp.Account.Web.OpenIddict (8.1.3), Volo.Abp.Identity.AspNetCore (8.1.3), Volo.Abp.Identity.HttpApi (8.1.3), Volo.Abp.PermissionManagement.HttpApi (8.1.3), net8.0, Volo.Abp.AspNetCore.Mvc (8.1.3) (+2 more)
 
 ### Community 136 - "PickListEventHandler"
 Cohesion: 0.20
@@ -791,24 +786,24 @@ Cohesion: 0.38
 Nodes (5): CancellationToken, Guid, List, Task, EfCoreWarehouseRepository
 
 ### Community 138 - "StockInHistoryService"
-Cohesion: 0.24
-Nodes (6): TuTa.Wms.Controllers.StockInHistories, TuTa.Wms.StockInHistories.Dtos, IStockInHistoryService, ILogger, StockInHistoryService, StockInHistoryController
+Cohesion: 0.25
+Nodes (4): TuTa.Wms.Departments.Aggregates, TuTa.Wms.Departments.Dtos, TuTa.Wms.Departments, TuTa.Wms.Repositories.Departments
 
 ### Community 139 - "StockOutHistoryService"
-Cohesion: 0.24
-Nodes (6): TuTa.Wms.StockOutHistories.Dtos, TuTa.Wms.Controllers.StockOutHistories, IStockOutHistoryService, ILogger, StockOutHistoryService, StockOutHistoryController
+Cohesion: 0.31
+Nodes (5): DateTime, Guid, List, Task, IErpOutboundOrderAppService
 
 ### Community 140 - "TuTa.Wms.Domain"
 Cohesion: 0.20
-Nodes (10): Microsoft.Extensions.Http (8.0.0), Volo.Abp.AuditLogging.Domain (8.1.3), Volo.Abp.Identity.Domain (8.1.3), Volo.Abp.OpenIddict.Domain (8.1.3), Volo.Abp.PermissionManagement.Domain.Identity (8.1.3), Volo.Abp.PermissionManagement.Domain.OpenIddict (8.1.3), Volo.Abp.TenantManagement.Domain (8.1.3), TuTa.Wms.Domain (+2 more)
+Nodes (9): Microsoft.Extensions.Http (8.0.0), Volo.Abp.AuditLogging.Domain (8.1.3), Volo.Abp.Identity.Domain (8.1.3), Volo.Abp.OpenIddict.Domain (8.1.3), Volo.Abp.PermissionManagement.Domain.Identity (8.1.3), Volo.Abp.PermissionManagement.Domain.OpenIddict (8.1.3), Volo.Abp.TenantManagement.Domain (8.1.3), net8.0 (+1 more)
 
 ### Community 141 - "TuTa.Wms.Application.Contracts"
 Cohesion: 0.20
-Nodes (10): Volo.Abp.Account.Application.Contracts (8.1.3), Volo.Abp.Identity.Application.Contracts (8.1.3), Volo.Abp.ObjectExtending (8.1.3), Volo.Abp.PermissionManagement.Application.Contracts (8.1.3), Volo.Abp.TenantManagement.Application.Contracts (8.1.3), TuTa.Wms.Application.Contracts, net8.0, netstandard2.0 (+2 more)
+Nodes (9): Volo.Abp.Account.Application.Contracts (8.1.3), Volo.Abp.Identity.Application.Contracts (8.1.3), Volo.Abp.ObjectExtending (8.1.3), Volo.Abp.PermissionManagement.Application.Contracts (8.1.3), Volo.Abp.TenantManagement.Application.Contracts (8.1.3), net8.0, netstandard2.0, netstandard2.1 (+1 more)
 
 ### Community 142 - "RecheckListService"
 Cohesion: 0.29
-Nodes (5): RecheckItemQueryDto, ILogger, List, Task, RecheckListService
+Nodes (4): DateTime, RecheckItemDto, RecheckItemQueryDto, List
 
 ### Community 143 - "WmsModuleExtensionConfigurator"
 Cohesion: 0.27
@@ -819,16 +814,16 @@ Cohesion: 0.22
 Nodes (6): TuTa.Wms._Settings, ISettingDefinitionContext, SettingDefinitionProvider, WmsSettingDefinitionProvider, string, WmsSettings
 
 ### Community 145 - "NoPlanPickTypeDto"
-Cohesion: 0.22
-Nodes (4): PickTypeMap, NoPlanPickTypeDto, List, PickTypeHelper
+Cohesion: 0.20
+Nodes (4): DateTime, GoodsInfoOfPickList, IEnumerable, PickerInfoOfPickList
 
 ### Community 146 - "CellEventHandler"
 Cohesion: 0.22
 Nodes (8): BoxManager, IBoxRepository, ILogger, object, UnitOfWorkManager, CellEventHandler, Guid, CellCreatedEvent
 
 ### Community 147 - "IRepository"
-Cohesion: 0.24
-Nodes (6): IRepository, ErpDeptTypeDetail, IErpDeptTypeDetailRepository, CancellationToken, Task, EfCoreErpDeptTypeDetailRepository
+Cohesion: 0.11
+Nodes (13): AbpDbContext, ErpDeptTypeDetail, CancellationToken, Task, IErpDeptTypeDetailRepository, DbSet, ModelBuilder, ErpDbContext (+5 more)
 
 ### Community 148 - "EfCoreAgvTaskRepository"
 Cohesion: 0.31
@@ -839,8 +834,8 @@ Cohesion: 0.25
 Nodes (5): bool, TuTa.Wms.MultiTenancy, MultiTenancyConsts, ServiceConfigurationContext, WmsDomainModule
 
 ### Community 150 - "BarcodeListService"
-Cohesion: 0.32
-Nodes (5): ILogger, Task, BarcodeListService, DateTime, BarcodeDto
+Cohesion: 0.28
+Nodes (5): Guid, BoxDto, PagedBoxesQueryDto, PagedResultDto, PagedResultDto
 
 ### Community 151 - "ErpInboundOrderRequestDto"
 Cohesion: 0.39
@@ -851,20 +846,20 @@ Cohesion: 0.46
 Nodes (5): List, LLBJDAddRequestDto, LLBJDAddResponseDto, LLBJDDataItem, LLBJDDetail
 
 ### Community 153 - "CheckInfoOfChkRsltList"
-Cohesion: 0.36
-Nodes (5): DateTime, EnumCheckResult, EnumCheckType, IEnumerable, CheckInfoOfChkRsltList
+Cohesion: 0.10
+Nodes (15): TuTa.Wms.ChkResultLists.ValueObjects, Task, DateTime, EnumCheckResult, EnumCheckType, IEnumerable, CheckInfoOfChkRsltList, IEnumerable (+7 more)
 
 ### Community 154 - "IMaterialRepository"
 Cohesion: 0.39
 Nodes (5): CancellationToken, Guid, List, Task, IMaterialRepository
 
 ### Community 155 - "AbpModule"
-Cohesion: 0.29
-Nodes (4): AbpModule, ServiceConfigurationContext, WmsApplicationContractsModule, WmsApplicationModule
+Cohesion: 0.25
+Nodes (5): AbpModule, ServiceConfigurationContext, WmsApplicationModule, ServiceConfigurationContext, ErpModule
 
 ### Community 156 - "TuTa.Wms.sln"
 Cohesion: 0.29
-Nodes (5): Tools, TuTa.Wms.AuthServer, TuTa.Wms.DbMigrator, TuTa.Wms.HttpApi.Client, TuTa.Wms.HttpApi.Host
+Nodes (4): TuTa.Wms.AuthServer, TuTa.Wms.DbMigrator, TuTa.Wms.HttpApi.Client, TuTa.Wms.HttpApi.Host
 
 ### Community 157 - "WmsPermissionDefinitionProvider"
 Cohesion: 0.33
@@ -875,16 +870,16 @@ Cohesion: 0.48
 Nodes (4): List, ErpOutboundItemRequestDto, ErpOutboundOrderRequestDto, ErpOutboundOrderResponseDto
 
 ### Community 159 - ".ModifyBoxAsync"
-Cohesion: 0.33
-Nodes (3): Task, IEnumerable, BoxSpecsValObj
+Cohesion: 0.15
+Nodes (8): BoxStatus, List, Box, Task, Guid, BoxStock, IEnumerable, BoxSpecsValObj
 
 ### Community 160 - "ErpOutboundItem"
-Cohesion: 0.38
-Nodes (3): Guid, ErpOutboundItem, OutboundItemStatus
+Cohesion: 0.33
+Nodes (5): StockConsolidationCellPosition, List, StockConsolidationCellRange, StockConsolidationOptions, List
 
 ### Community 161 - "EfCoreBarcodeCheckRepository"
-Cohesion: 0.48
-Nodes (5): CancellationToken, Guid, List, Task, EfCoreBarcodeCheckRepository
+Cohesion: 0.33
+Nodes (7): Guid, BarcodeCheck, CancellationToken, Guid, List, Task, EfCoreBarcodeCheckRepository
 
 ### Community 162 - "TuTa.Wms.Events"
 Cohesion: 0.33
@@ -895,24 +890,28 @@ Cohesion: 0.33
 Nodes (5): IDistributedEventBus, IObjectMapper, IUnitOfWorkManager, WmsDomainService, Type
 
 ### Community 164 - ".PushCGRKDAddAsync"
-Cohesion: 0.60
-Nodes (3): CGRKDAddRequestDto, CGRKDAddResponseDto, CGRKDParams
+Cohesion: 0.48
+Nodes (4): CGRKDAddRequestDto, CGRKDAddResponseDto, CGRKDParams, HttpPost
 
 ### Community 165 - ".CreateCTUSkipStockInAsync"
 Cohesion: 0.47
 Nodes (3): List, SkipStockCtuInDto, StocksCtuInDto
 
 ### Community 166 - ".PreConfigureServices"
-Cohesion: 0.33
-Nodes (3): ServiceConfigurationContext, OneTimeRunner, WmsDtoExtensions
+Cohesion: 0.25
+Nodes (4): ServiceConfigurationContext, WmsApplicationContractsModule, OneTimeRunner, WmsDtoExtensions
+
+### Community 167 - "BoxStock"
+Cohesion: 0.44
+Nodes (5): CancellationToken, Guid, List, Task, EfCoreBarcodeListRepository
 
 ### Community 168 - ".CreateContainer"
-Cohesion: 0.40
-Nodes (4): Box, HashSet, List, Stock
+Cohesion: 0.42
+Nodes (5): CancellationToken, Guid, List, Task, EfCoreDepartmentRepository
 
 ### Community 169 - ".TrackIf"
-Cohesion: 0.40
-Nodes (3): IQueryable, DbSet, EfCoreQueryableExtensions
+Cohesion: 0.12
+Nodes (11): TuTa.Wms.BarcodeChecks.Aggregates, Wms.EntityFrameworkCore, TuTa.Wms.Controllers.AgvTasks, TuTa.Wms.BarcodeLists, TuTa.Wms.BarcodeLists.Dtos, TuTa.Wms.BarcodeLists.Aggregates, TuTa.Wms.Repositories.BarcodeLists, TuTa.Wms.Controllers.BarcodeLists (+3 more)
 
 ### Community 170 - "CellInfo"
 Cohesion: 0.40
@@ -930,24 +929,52 @@ Nodes (3): AbpControllerBase, TuTa.Wms.Controllers, WmsController
 Cohesion: 0.50
 Nodes (3): TuTa.Wms.Models.Test, DateTime, TestModel
 
+### Community 174 - "PickItemQueryDto"
+Cohesion: 0.32
+Nodes (5): CancellationToken, ILogger, Task, UnitOfWorkManager, ErpDepartmentSyncJob
+
 ### Community 175 - "PickStockAllocateDto"
+Cohesion: 0.32
+Nodes (5): CancellationToken, ILogger, Task, UnitOfWorkManager, ErpStockAftChkSyncJob
+
+### Community 177 - "ErpModule.cs"
+Cohesion: 0.32
+Nodes (5): CancellationToken, ILogger, Task, UnitOfWorkManager, PickListBackGroundService
+
+### Community 181 - "WarehouseDto"
+Cohesion: 0.29
+Nodes (4): PagedWarehouseQueryDto, Guid, WarehouseDto, PagedResultDto
+
+### Community 183 - "CancellationToken"
+Cohesion: 0.38
+Nodes (3): Guid, ErpInboundItem, InboundItemStatus
+
+### Community 184 - "DateTime"
+Cohesion: 0.33
+Nodes (3): DateTime, IEnumerable, MaterialInfoOfRechkList
+
+### Community 185 - "Guid"
+Cohesion: 0.40
+Nodes (4): ILogger, List, Task, DepartmentService
+
+### Community 187 - "ILogger"
 Cohesion: 0.67
-Nodes (3): List, PickStockAllocateDto, PriorityStock
+Nodes (3): DateTime, Guid, AgvTaskDto
 
 ## Knowledge Gaps
 - **119 isolated node(s):** `TuTa.Wms.HttpApi.Client`, `TuTa.Wms.HttpApi.Host`, `TuTa.Wms.AuthServer`, `TuTa.Wms.DbMigrator`, `MaterialToInBoundDto` (+114 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **30 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **6 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `ResponseDto` connect `ResponseDto` to `CellService`, `Cell`, `.GetByBoxAsync`, `IPickListService`, `StockService`, `.FindByCellCodeAsync`, `StockController`, `BoxService`, `RecheckListService`, `SkipService`, `ISkipService`, `PickListService`, `AgvTaskPagedQueryDto`, `.CreateCTUSkipStockInAsync`, `MaterialService`, `IChkResultListRepository`, `WarehouseController`, `.MoveStockAsync`, `ChkResultListDto`, `IRecheckListService`, `WarehouseAreaDto`, `AgvTaskService`, `IMaterialService`, `DepartmentDto`, `WarehouseService`?**
-  _High betweenness centrality (0.104) - this node is a cross-community bridge._
-- **Why does `WmsDbContext` connect `WmsDbContext` to `ErpDeliveryOrderDto`, `Cell`, `ErpMaterial`, `AgvTaskManager`, `EfCoreWarehouseRepository`, `ChkResultList`, `ValueObject`, `StockService.cs`, `EfCoreAgvTaskRepository`, `EfCoreStockRepository`, `PickItem`, `WmsDomainService`, `PickList`, `ErpOutboundItem`, `Entity`, `EfCoreBarcodeCheckRepository`, `BoxStock`, `ErpAsn`, `ErpDbContext`, `RecheckItem`, `Stock`, `ErpInboundOrder`, `ErpOutboundOrder`, `RecheckList`, `Warehouse`, `Box`, `EfCoreRepository`, `Material`, `Skip`, `AuditedAggregateRoot`, `ErpDeliveryStation`, `StockOutHistory`?**
-  _High betweenness centrality (0.083) - this node is a cross-community bridge._
-- **Why does `StockService` connect `StockService` to `IErpAsnRepository`, `.GetByBoxAsync`, `Cell`, `AgvTaskManager`, `.FindByCellCodeAsync`, `ResponseDto`, `SkipService`, `StockService.cs`, `PickListService`, `IMaterialRepository`, `PickItem`, `IChkResultListRepository`, `RecheckItem`, `Stock`, `AgvTaskService`, `IErpAsnAppService`, `IWarehouseRepository`, `EfCoreRepository`, `IBarcodeListRepository`, `WmsAppService`, `IBoxRepository`, `AuditedAggregateRoot`, `ApplicationService`, `StockOutHistory`?**
-  _High betweenness centrality (0.074) - this node is a cross-community bridge._
+- **Why does `ResponseDto` connect `ResponseDto` to `IErpAsnRepository`, `CellService`, `.GetByBoxAsync`, `IPickListService`, `StockService`, `.FindByCellCodeAsync`, `StockController`, `BoxService`, `SkipService`, `ISkipService`, `PickListService`, `AgvTaskPagedQueryDto`, `.CreateCTUSkipStockInAsync`, `MaterialService`, `WarehouseController`, `.MoveStockAsync`, `ChkResultListDto`, `IRecheckListService`, `WarehouseAreaDto`, `Stock`, `Guid`, `ErpDeliveryStationDto`, `StockConsolidationService`, `IMaterialService`, `DepartmentDto`, `WarehouseService`, `Warehouse`, `MaterialDto`, `IStockConsolidationService`?**
+  _High betweenness centrality (0.114) - this node is a cross-community bridge._
+- **Why does `StockService` connect `StockService` to `.GetByBoxAsync`, `Cell`, `AgvTaskManager`, `.FindByCellCodeAsync`, `ResponseDto`, `SkipService`, `PickListService`, `IMaterialRepository`, `PickItem`, `ErpMoveSyncJob.cs`, `Stock`, `ErpDeliveryStationDto`, `AgvTaskService`, `IErpAsnAppService`, `IWarehouseRepository`, `EfCoreRepository`, `IBarcodeListRepository`, `WmsAppService`, `IBoxRepository`, `AuditedAggregateRoot`, `ApplicationService`, `StockOutHistory`?**
+  _High betweenness centrality (0.098) - this node is a cross-community bridge._
+- **Why does `WmsDbContext` connect `WmsDbContext` to `Profile`, `ErpDeliveryOrderDto`, `IErpInboundOrderRepository`, `Cell`, `ErpMaterial`, `EfCoreWarehouseRepository`, `ChkResultList`, `ValueObject`, `IRepository`, `EfCoreAgvTaskRepository`, `EfCoreStockRepository`, `TuTa.Wms.Erp.Aggregates`, `PickItem`, `WmsDomainService`, `.ModifyBoxAsync`, `ErpDeliveryStationAppService`, `Entity`, `EfCoreBarcodeCheckRepository`, `PickList`, `BoxStock`, `.CreateContainer`, `ErpAsn`, `ErpMoveSyncJob.cs`, `CancellationToken`, `Stock`, `RecheckItem`, `ErpOutboundOrder`, `RecheckList`, `Warehouse`, `Box`, `EfCoreRepository`, `Material`, `Skip`, `AuditedAggregateRoot`, `StockOutHistory`?**
+  _High betweenness centrality (0.076) - this node is a cross-community bridge._
 - **What connects `TuTa.Wms.HttpApi.Client`, `TuTa.Wms.HttpApi.Host`, `TuTa.Wms.AuthServer` to the rest of the system?**
   _119 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `ErpWorkstationMaterialRequest` be split into smaller, more focused modules?**
@@ -955,4 +982,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `ErpDeliveryOrderDto` be split into smaller, more focused modules?**
   _Cohesion score 0.05533279871692061 - nodes in this community are weakly interconnected._
 - **Should `CellService` be split into smaller, more focused modules?**
-  _Cohesion score 0.056022408963585436 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.056134723336006415 - nodes in this community are weakly interconnected._

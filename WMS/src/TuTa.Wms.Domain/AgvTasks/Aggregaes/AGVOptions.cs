@@ -56,5 +56,11 @@ namespace TuTa.Wms.AgvTasks.Aggregaes
         /// 容器搬运出库任务(createStockTaskV2)模板
         /// </summary>
         public string CreateStockOutTaskType { get; set; }
+
+        /// <summary>
+        /// 库存整理专用RCS任务模板。
+        /// 该模板只允许库存整理入口使用，不能替换普通入库、出库任务模板。
+        /// </summary>
+        public string StockConsolidationTaskType { get; set; } = "De03";
     }
 }

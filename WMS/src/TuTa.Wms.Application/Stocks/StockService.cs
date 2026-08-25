@@ -731,6 +731,47 @@ namespace TuTa.Wms.Stocks
         }
 
         /// <summary>
+        /// 创建库存整理专用搬运任务。
+        /// 本入口复用现有库位、容器和活动任务校验，但固定使用库存整理业务类型与De03模板，
+        /// 不影响普通CreateStockTask/CreateStockTaskV2的入库、出库行为。
+        /// </summary>
+        [UnitOfWork]
+        public async Task<ResponseDto> CreateStockConsolidationTask(
+            string boxCode,
+            string startCellCode,
+            string endCellCode)
+        {
+            using (var uow = UnitOfWorkManager.Begin(true, true))
+            {
+                try
+                {
+                    var taskTemplate = string.IsNullOrWhiteSpace(_aGVOptions.StockConsolidationTaskType)
+                        ? "De03"
+                        : _aGVOptions.StockConsolidationTaskType;
+                    var result = await CreateStockTaskV2CoreAsync(
+                        boxCode,
+                        startCellCode,
+                        endCellCode,
+                        ManageType.StockConsolidation,
+                        taskTemplate).ConfigureAwait(false);
+
+                    if (result.success)
+                    {
+                        await uow.CompleteAsync().ConfigureAwait(false);
+                    }
+
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    // 整理任务创建异常只转换为中文日志和失败结果，由整理线程打印后安全停止。
+                    _logger.Error($"创建库存整理任务异常：{ex.Message}");
+                    return new ResponseDto { success = false, message = $"创建库存整理任务失败：{ex.Message}" };
+                }
+            }
+        }
+
+        /// <summary>
         /// 根据单据行条码创建出库任务：校验erpoutbound记录存在，创建搬运任务，并更新实际出库数量
         /// </summary>
         [UnitOfWork]
@@ -774,9 +815,16 @@ namespace TuTa.Wms.Stocks
         }
 
         /// <summary>
-        /// 创建容器搬运任务核心逻辑（无4A巷道校验，统一使用De02模板）
+        /// 创建容器搬运任务核心逻辑。
+        /// 普通V2入口默认使用De02；库存整理入口复用相同校验并显式覆盖为De03和整理业务类型。
+        /// 这里集中校验容器、起终点和活动任务，避免两套入口出现不同的安全规则。
         /// </summary>
-        private async Task<ResponseDto> CreateStockTaskV2CoreAsync(string boxCode, string startCellCode, string endCellCode)
+        private async Task<ResponseDto> CreateStockTaskV2CoreAsync(
+            string boxCode,
+            string startCellCode,
+            string endCellCode,
+            ManageType? businessTypeOverride = null,
+            string taskTemplateOverride = null)
         {
             var box = await _boxRepository.FindByBoxCodeAsync(boxCode).ConfigureAwait(false);
             if (box == null)
@@ -853,8 +901,13 @@ namespace TuTa.Wms.Stocks
 
             _logger.Info($"开始创建agv任务(V2)，容器:{boxCode}，起点:{startCellCode}，终点:{endCell?.CellCode ?? "自动分配"}");
 
-            ManageType taskType = ManageType.CTUStockIn;
-            if (box.BoxTypeName == "1")
+            ManageType taskType;
+            if (businessTypeOverride.HasValue)
+            {
+                // 库存整理等专用业务必须保留自己的WMS业务类型，供taskFinish回调准确分流。
+                taskType = businessTypeOverride.Value;
+            }
+            else if (box.BoxTypeName == "1")
             {
                 taskType = ManageType.CTUStockOut;
             }
@@ -862,8 +915,14 @@ namespace TuTa.Wms.Stocks
             {
                 taskType = ManageType.LiftStockOut;
             }
+            else
+            {
+                taskType = ManageType.CTUStockIn;
+            }
 
-            var taskTypOverride = _aGVOptions.CreateStockOutTaskType ?? "De02";
+            var taskTypOverride = taskTemplateOverride
+                                  ?? _aGVOptions.CreateStockOutTaskType
+                                  ?? "De02";
             await SetAsExecutingAsync(startCell, endCell, null, box, taskType, true, taskTypOverride).ConfigureAwait(false);
             _logger.Info($"AGV任务V2创建成功，容器:{boxCode}，任务类型:{taskType}");
             return new ResponseDto() { success = true, message = "任务创建成功" };
@@ -4793,7 +4852,19 @@ namespace TuTa.Wms.Stocks
 
             AgvTask agvtask = null;
 
-            if (type == ManageType.CTUStockIn || type == ManageType.CTUStockMove || type==ManageType.CTUSSXIn)
+            if (type == ManageType.StockConsolidation)
+            {
+                // 库存整理统一使用专用RCS模板；仓库到仓库、仓库到4B、4B到仓库
+                // 只改变起终点CellName格式，不再借用普通入库或普通出库业务分支。
+                agvtask = await _agvTaskManager.CreateStockConsolidationTaskAsync(
+                    box.BoxCode,
+                    box.BoxTypeName,
+                    startCell.CellCode,
+                    endCell.CellCode,
+                    string.IsNullOrWhiteSpace(taskTypOverride) ? "De03" : taskTypOverride,
+                    dispatchToRcs).ConfigureAwait(false);
+            }
+            else if (type == ManageType.CTUStockIn || type == ManageType.CTUStockMove || type==ManageType.CTUSSXIn)
             {
                 agvtask = await _agvTaskManager.CreateCtuStockInByStockTaskAsync(box.BoxCode, box.BoxTypeName, startCell.CellCode, endCell.CellCode, skipCode, type, dispatchToRcs, taskTypOverride);
             }

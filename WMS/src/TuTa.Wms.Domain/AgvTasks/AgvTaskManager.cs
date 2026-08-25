@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using TuTa.Wms.AgvTasks.Aggregaes;
 using TuTa.Wms.Cells.Aggregates;
 using TuTa.Wms.Cells;
+using TuTa.Wms.Cells.Entities;
 using Volo.Abp.Uow;
 using Volo.Abp;
 using Microsoft.Extensions.Logging;
@@ -105,6 +106,46 @@ namespace TuTa.Wms.AgvTasks
             if (dispatchToRcs)
             {
                 await SetAsExecutingAsync(entity);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 创建库存整理专用AGV任务。
+        /// 起点和终点在WMS任务中保存业务库位编码；真正下发RCS时，
+        /// <see cref="SetAsExecutingAsync(AgvTask)"/> 会重新读取库位CellName，
+        /// 因此能够同时支持“仓库位${05}”和“4B暂存位”两种RCS点位格式。
+        /// </summary>
+        [UnitOfWork]
+        public async Task<AgvTask> CreateStockConsolidationTaskAsync(
+            string boxCode,
+            string ctnrTyp,
+            string startCellCode,
+            string endCellCode,
+            string taskType,
+            bool dispatchToRcs = true)
+        {
+            var reqCode = Guid.NewGuid().ToString("N");
+            var userCallCodePath = new[] { startCellCode, endCellCode };
+
+            // WMS业务类型必须明确记录为StockConsolidation。
+            // 不能因为RCS模板执行了类似入库/出库的物理动作，就复用普通入库或出库业务类型。
+            var entity = new AgvTask(
+                reqCode,
+                taskType,
+                null,
+                userCallCodePath,
+                boxCode,
+                startCellCode,
+                endCellCode,
+                ctnrTyp,
+                ManageType.StockConsolidation);
+
+            var result = await _agvTaskRepository.InsertAsync(entity, true).ConfigureAwait(false);
+            if (dispatchToRcs)
+            {
+                await SetAsExecutingAsync(entity).ConfigureAwait(false);
             }
 
             return result;
@@ -316,6 +357,14 @@ namespace TuTa.Wms.AgvTasks
                 var entity = await _agvTaskRepository.FindByReqCodeAsync(reqcode);
                 if (entity == null)
                     throw new UserFriendlyException(message: "AGV任务不存在");
+                // RCS可能因网络重试重复发送taskFinish。库存整理任务完成后再次收到回调时直接返回，
+                // 避免把已经迁移到终点的同一容器再次从原起点解绑。
+                if (entity.StockTyp == ManageType.StockConsolidation &&
+                    entity.AgvTaskStatus == AgvTaskStatus.Complete)
+                {
+                    _logger.LogInformation($"库存整理任务{reqcode}已完成，忽略重复完成回调");
+                    return entity;
+                }
                 //if (entity.AgvTaskStatus == AgvTaskStatus.Complete)
                 //{
                 //    _logger.Error(reqcode + "AgvTask任务重复完成");
@@ -368,11 +417,20 @@ namespace TuTa.Wms.AgvTasks
                     if (box == null)
                         throw new UserFriendlyException(message: "料箱不存在");
 
-                    var isSsxOut = entity.StockTyp == ManageType.CTUSSXOut || entity.StockTyp == ManageType.LiftSSXOut;
-                    if (!isSsxOut)
+                    if (entity.StockTyp == ManageType.StockConsolidation)
                     {
-                        // 起点容器/库位绑定不变，仅设无货；库存迁至终点容器
-                        endBox = await MoveStockFromStartBoxToEndBoxAsync(box, startCell, endCell);
+                        // 整理业务移动的是整个实体容器：原容器从起点解除关联后绑定终点，
+                        // 容器中的库存仍属于原容器，只更新库存所在库位、仓库和库区信息。
+                        endBox = await MoveContainerForStockConsolidationAsync(box, startCell, endCell);
+                    }
+                    else
+                    {
+                        var isSsxOut = entity.StockTyp == ManageType.CTUSSXOut || entity.StockTyp == ManageType.LiftSSXOut;
+                        if (!isSsxOut)
+                        {
+                            // 原有入库、出库行为保持不变：起点/终点使用固定容器，仅迁移库存。
+                            endBox = await MoveStockFromStartBoxToEndBoxAsync(box, startCell, endCell);
+                        }
                     }
                 }
 
@@ -931,6 +989,116 @@ namespace TuTa.Wms.AgvTasks
 
             _logger.Info($"库存从起点容器{startBox.BoxCode}迁至终点容器{endBox.BoxCode}，共{stocks.Count}条");
             return endBox;
+        }
+
+        /// <summary>
+        /// 完成库存整理任务时，将同一个实体容器从起点库位整体迁移到终点库位。
+        /// 与普通入库、出库的“固定库位容器之间迁移库存”不同，本方法保证：
+        /// 1. 起点库位移除原容器，终点库位新增的仍是同一个容器；
+        /// 2. 库存的BoxId、BoxCode保持不变，只更新库位、仓库和库区；
+        /// 3. 一个数据库工作单元内同时更新容器、库位和库存，失败时整体回滚；
+        /// 4. 终点必须没有其他容器，防止实物与WMS绑定关系发生覆盖。
+        /// </summary>
+        private async Task<Box> MoveContainerForStockConsolidationAsync(
+            Box movingBox,
+            Cell startCell,
+            Cell endCell)
+        {
+            if (movingBox == null)
+                throw new UserFriendlyException(message: "库存整理任务未找到待搬运容器");
+            if (startCell == null)
+                throw new UserFriendlyException(message: "库存整理任务未找到起点库位");
+            if (endCell == null)
+                throw new UserFriendlyException(message: "库存整理任务未找到终点库位");
+
+            // WMS以容器当前CellData为权威位置。若它已不是任务起点，说明整理期间发生了
+            // 人工改绑或其他业务搬运，此时必须停止，不能根据过期任务继续覆盖位置。
+            if (movingBox.CellData?.CellId != startCell.Id)
+            {
+                throw new UserFriendlyException(
+                    message: $"容器{movingBox.BoxCode}当前不在任务起点{startCell.CellCode}，停止完成库存整理任务");
+            }
+
+            var startBindings = startCell.CellBoxes ?? new List<CellBox>();
+            if (startBindings.Count != 1 || startBindings[0].BoxId != movingBox.Id)
+            {
+                throw new UserFriendlyException(
+                    message: $"起点库位{startCell.CellCode}的容器绑定与任务容器{movingBox.BoxCode}不一致，停止完成库存整理任务");
+            }
+
+            var endBindings = endCell.CellBoxes ?? new List<CellBox>();
+            if (endBindings.Count > 0)
+            {
+                var occupiedBoxes = string.Join("、", endBindings.Select(item => item.BoxCode));
+                throw new UserFriendlyException(
+                    message: $"终点库位{endCell.CellCode}已绑定容器{occupiedBoxes}，停止完成库存整理任务");
+            }
+
+            var warehouse = await _warehouseRepository
+                .FindByIdAsync(endCell.WarehouseId)
+                .ConfigureAwait(false);
+            if (warehouse == null)
+            {
+                throw new UserFriendlyException(message: $"终点库位{endCell.CellCode}所属仓库不存在");
+            }
+
+            if (!endCell.WarehouseAreaId.HasValue)
+            {
+                throw new UserFriendlyException(message: $"终点库位{endCell.CellCode}未配置所属库区");
+            }
+
+            var warehouseArea = warehouse.GetAreaByAreaId(endCell.WarehouseAreaId.Value);
+            if (warehouseArea == null)
+            {
+                throw new UserFriendlyException(message: $"终点库位{endCell.CellCode}所属库区不存在");
+            }
+
+            var stocks = await _stockRepository.GetByBoxIdAsync(movingBox.Id).ConfigureAwait(false);
+            if (stocks == null || stocks.Count == 0)
+            {
+                throw new UserFriendlyException(
+                    message: $"容器{movingBox.BoxCode}没有库存，停止完成库存整理任务");
+            }
+
+            // 先直接维护CellBox集合，使当前工作单元中的库位占用状态立即准确。
+            // 随后调用Box.BindCell覆盖容器位置并产生绑定事件，事件处理器会再次做幂等检查，
+            // 同步其他依赖容器绑定事件的既有业务。这里不先调用Box.DisBindCell，避免库存
+            // 在同一完成事务中经历一次没有库位的中间状态。
+            startCell.RemoveBox(movingBox.Id);
+            endCell.AddBox(new CellBox(
+                endCell.Id,
+                movingBox.Id,
+                movingBox.BoxCode,
+                movingBox.BoxName,
+                movingBox.BoxTypeName,
+                movingBox.BoxSpecs?.SpecsName,
+                movingBox.BoxSpecs?.Length,
+                movingBox.BoxSpecs?.Width,
+                movingBox.BoxSpecs?.Height));
+
+            movingBox.BindCell(endCell, warehouse, warehouseArea);
+            movingBox.SetHave();
+
+            // 库存仍绑定movingBox，不调用Stock.BindBox；只把冗余的库位、仓库和库区信息
+            // 更新成终点，确保“一个容器内多条库存”能够随容器整体到达同一库位。
+            foreach (var stock in stocks)
+            {
+                stock.BindCell(endCell, warehouse, warehouseArea);
+                await _stockRepository.UpdateAsync(stock).ConfigureAwait(false);
+            }
+
+            startCell.SetCellStatus(CellStatus.Nohave);
+            startCell.SetEnable();
+            endCell.SetCellStatus(CellStatus.Have);
+            endCell.SetEnable();
+
+            await _cellRepository.UpdateAsync(startCell).ConfigureAwait(false);
+            await _cellRepository.UpdateAsync(endCell).ConfigureAwait(false);
+            await _boxRepository.UpdateAsync(movingBox).ConfigureAwait(false);
+
+            _logger.LogInformation(
+                $"库存整理容器{movingBox.BoxCode}已从{startCell.CellCode}整体迁移到{endCell.CellCode}，容器内共{stocks.Count}条库存");
+            return movingBox;
         }
 
         /// <summary>

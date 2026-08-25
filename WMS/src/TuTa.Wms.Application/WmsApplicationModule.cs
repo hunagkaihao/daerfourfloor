@@ -31,6 +31,8 @@ public class WmsApplicationModule : AbpModule
         });
         // 库存整理调度服务为单例，Worker为每次线程运行创建的作用域服务。
         context.Services.AddTransient<StockConsolidationWorker>();
+        // 每日自动启动服务只负责读取配置并调用单例调度服务；移动端按钮仍调用同一个启动/停止入口。
+        context.Services.AddHostedService<StockConsolidationScheduleService>();
         //context.Services.AddHostedService<ErpMaterialSyncJob>(); // 暂时注释掉，等类型问题解决后再启用
         //context.Services.AddHostedService<ErpPickOrderSyncJob>();
         //context.Services.AddHostedService<ErpRecheckNotifierSyncJob>();

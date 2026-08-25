@@ -34,6 +34,12 @@ namespace TuTa.Wms.Stocks
         Task<ResponseDto> CreateStockTaskV2(string boxCode, string startCellCode, string endCellCode);
 
         /// <summary>
+        /// 创建库存整理专用容器搬运任务。
+        /// 任务固定使用库存整理模板，并记录为库存整理业务类型，确保完成回调走容器整体迁移逻辑。
+        /// </summary>
+        Task<ResponseDto> CreateStockConsolidationTask(string boxCode, string startCellCode, string endCellCode);
+
+        /// <summary>
         /// 根据单据行条码创建出库任务：校验erpoutbound记录存在，创建搬运任务，并更新实际出库数量
         /// </summary>
         Task<ResponseDto> CreateOutboundTaskFromBarcodeAsync(

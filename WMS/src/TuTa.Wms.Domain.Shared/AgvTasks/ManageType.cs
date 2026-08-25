@@ -62,5 +62,11 @@ namespace TuTa.Wms.AgvTasks
         /// 叉车输送线出库
         /// </summary>
         LiftSSXOut,
+        /// <summary>
+        /// 库存整理。
+        /// 该类型只用于四楼库存整理任务，用来在RCS完成回调时与普通入库、
+        /// 普通出库任务分流，避免整理任务触发入库质检、ERP通知或出库扣减。
+        /// </summary>
+        StockConsolidation,
     }
 }
