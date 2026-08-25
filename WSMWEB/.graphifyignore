@@ -1,0 +1,32 @@
+# Generated for the business-code Graphify corpus.
+# Keep views, API, business routes/state/services/enums/logics and exclude
+# generated output, tests, mocks, assets, and framework/UI infrastructure.
+/graphify-out/
+/build/
+/dist/
+/coverage/
+/mock/
+/tests/
+/types/
+/_nginx/
+/.vscode/
+/nswag/
+/public/
+/src/assets/
+/src/components/
+/src/design/
+/src/directives/
+/src/hooks/
+/src/layouts/
+/src/locales/
+/src/settings/
+/src/utils/
+/*.md
+/*.json
+/*.js
+/*.mjs
+/*.ts
+/*.html
+/*.zip
+/*.lock
+/.env*

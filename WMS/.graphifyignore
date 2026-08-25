@@ -1,0 +1,18 @@
+# Generated for the business-code Graphify corpus.
+# Keep the domain/application/persistence/API projects and exclude hosts,
+# tooling, generated output, logs, and tests.
+/graphify-out/
+/Logs/
+/TemplateEngineHost/
+/test/
+/src/Tools/
+/src/TuTa.Wms.AuthServer/
+/src/TuTa.Wms.DbMigrator/
+/src/TuTa.Wms.HttpApi.Client/
+/src/TuTa.Wms.HttpApi.Host/
+/src/TuTa.Wms.Web/
+/src/TuTa.Wms.EntityFrameworkCore/Migrations/
+**/bin/
+**/obj/
+**/TestResults/
+**/coverage/

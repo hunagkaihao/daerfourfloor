@@ -1,0 +1,2587 @@
+{
+  "TuTa.Wms.sln": {
+    "mtime": 1787552503.0800679,
+    "ast_hash": "397ca276ce8728cb3c19359faa2d1060",
+    "semantic_hash": "397ca276ce8728cb3c19359faa2d1060"
+  },
+  "UpdateStockInHistory.sql": {
+    "mtime": 1787552503.0811217,
+    "ast_hash": "38256638d8f67ea2a6441001b77ed582",
+    "semantic_hash": "38256638d8f67ea2a6441001b77ed582"
+  },
+  "src/TuTa.Wms.Application.Contracts/AgvTasks/Dtos/AgvCallBackRequest.cs": {
+    "mtime": 1787552503.0971446,
+    "ast_hash": "67a1f6244e9e1c5a75f8c81a1fee74be",
+    "semantic_hash": "67a1f6244e9e1c5a75f8c81a1fee74be"
+  },
+  "src/TuTa.Wms.Application.Contracts/AgvTasks/Dtos/AgvTaskDto.cs": {
+    "mtime": 1787552503.0983577,
+    "ast_hash": "d57360c725c38ecf70e008825e6e9588",
+    "semantic_hash": "d57360c725c38ecf70e008825e6e9588"
+  },
+  "src/TuTa.Wms.Application.Contracts/AgvTasks/Dtos/AgvTaskPagedQueryDto.cs": {
+    "mtime": 1787552503.0983577,
+    "ast_hash": "c800551d29954c3713fd24f4654d6159",
+    "semantic_hash": "c800551d29954c3713fd24f4654d6159"
+  },
+  "src/TuTa.Wms.Application.Contracts/AgvTasks/Dtos/AgvTaskPagedResultDto.cs": {
+    "mtime": 1787552503.0995822,
+    "ast_hash": "3ad3a39fce41ef003c3293fe086e1bf8",
+    "semantic_hash": "3ad3a39fce41ef003c3293fe086e1bf8"
+  },
+  "src/TuTa.Wms.Application.Contracts/AgvTasks/Dtos/ResultAgvTaskDto.cs": {
+    "mtime": 1787552503.0995822,
+    "ast_hash": "2d848e2f9d9c1d6db743e4186c7c8781",
+    "semantic_hash": "2d848e2f9d9c1d6db743e4186c7c8781"
+  },
+  "src/TuTa.Wms.Application.Contracts/AgvTasks/IAgvTaskService.cs": {
+    "mtime": 1787552503.1005788,
+    "ast_hash": "c4d31fab57dcb09201ba708cf1b87913",
+    "semantic_hash": "c4d31fab57dcb09201ba708cf1b87913"
+  },
+  "src/TuTa.Wms.Application.Contracts/BarcodeLists/Dtos/BarcodeDto.cs": {
+    "mtime": 1787552503.1018074,
+    "ast_hash": "70c7201d6dab27396d41b2207281e7ac",
+    "semantic_hash": "70c7201d6dab27396d41b2207281e7ac"
+  },
+  "src/TuTa.Wms.Application.Contracts/BarcodeLists/IBarcodeListService.cs": {
+    "mtime": 1787552503.1028078,
+    "ast_hash": "cbc1eef4099ef34f9e07dadb55c50192",
+    "semantic_hash": "cbc1eef4099ef34f9e07dadb55c50192"
+  },
+  "src/TuTa.Wms.Application.Contracts/Boxes/Dtos/BoxAddDto.cs": {
+    "mtime": 1787552503.103966,
+    "ast_hash": "64ba18c4dbf61f5fc98611493bd8a913",
+    "semantic_hash": "64ba18c4dbf61f5fc98611493bd8a913"
+  },
+  "src/TuTa.Wms.Application.Contracts/Boxes/Dtos/BoxDto.cs": {
+    "mtime": 1787552503.1051986,
+    "ast_hash": "ee9942e5cedb0268be463140656260d2",
+    "semantic_hash": "ee9942e5cedb0268be463140656260d2"
+  },
+  "src/TuTa.Wms.Application.Contracts/Boxes/Dtos/BoxUpdateDto.cs": {
+    "mtime": 1787552503.1051986,
+    "ast_hash": "5be7c04a6ea6f53d80b60988e66ffd9e",
+    "semantic_hash": "5be7c04a6ea6f53d80b60988e66ffd9e"
+  },
+  "src/TuTa.Wms.Application.Contracts/Boxes/Dtos/PagedBoxesQueryDto.cs": {
+    "mtime": 1787552503.1063654,
+    "ast_hash": "f5ea431e7cf7701a6a0bec52bc9ebfd7",
+    "semantic_hash": "f5ea431e7cf7701a6a0bec52bc9ebfd7"
+  },
+  "src/TuTa.Wms.Application.Contracts/Boxes/IBoxService.cs": {
+    "mtime": 1787552503.1063654,
+    "ast_hash": "a4cd7e83422ac9d53837987a312abdcf",
+    "semantic_hash": "a4cd7e83422ac9d53837987a312abdcf"
+  },
+  "src/TuTa.Wms.Application.Contracts/Cells/Dtos/CellAddDto.cs": {
+    "mtime": 1787552503.1084993,
+    "ast_hash": "f0b4ac2db5fc6bea3e1236524d5f15cf",
+    "semantic_hash": "f0b4ac2db5fc6bea3e1236524d5f15cf"
+  },
+  "src/TuTa.Wms.Application.Contracts/Cells/Dtos/CellDto.cs": {
+    "mtime": 1787552503.1084993,
+    "ast_hash": "5366613412db050b743b7288ac9ad980",
+    "semantic_hash": "5366613412db050b743b7288ac9ad980"
+  },
+  "src/TuTa.Wms.Application.Contracts/Cells/Dtos/CellLaneStatusDto.cs": {
+    "mtime": 1787552503.1094997,
+    "ast_hash": "9fc1e2ec274097351a282d5518a10f4a",
+    "semantic_hash": "9fc1e2ec274097351a282d5518a10f4a"
+  },
+  "src/TuTa.Wms.Application.Contracts/Cells/Dtos/CellsBindAreaDto.cs": {
+    "mtime": 1787552503.1094997,
+    "ast_hash": "c62bf2ec97c58a777565e753b8a106aa",
+    "semantic_hash": "c62bf2ec97c58a777565e753b8a106aa"
+  },
+  "src/TuTa.Wms.Application.Contracts/Cells/Dtos/CellsDisBindFromAreaDto.cs": {
+    "mtime": 1787552503.110637,
+    "ast_hash": "288feccb231ac3cbd1e351dad7660f31",
+    "semantic_hash": "288feccb231ac3cbd1e351dad7660f31"
+  },
+  "src/TuTa.Wms.Application.Contracts/Cells/Dtos/PagedCellsAreaDto.cs": {
+    "mtime": 1787552503.111637,
+    "ast_hash": "f23bd9b984eb97c4b1b2b3f52dc799f7",
+    "semantic_hash": "f23bd9b984eb97c4b1b2b3f52dc799f7"
+  },
+  "src/TuTa.Wms.Application.Contracts/Cells/Dtos/PagedCellsQueryDto.cs": {
+    "mtime": 1787552503.1121492,
+    "ast_hash": "102e7fe8e4f1c88fe37be8def8f0b0bf",
+    "semantic_hash": "102e7fe8e4f1c88fe37be8def8f0b0bf"
+  },
+  "src/TuTa.Wms.Application.Contracts/Cells/ICellService.cs": {
+    "mtime": 1787552503.1121492,
+    "ast_hash": "f83e8e88d51ac8776aa1fae075129bd8",
+    "semantic_hash": "f83e8e88d51ac8776aa1fae075129bd8"
+  },
+  "src/TuTa.Wms.Application.Contracts/ChkResultLists/Dtos/ChkResultListDto.cs": {
+    "mtime": 1787552503.1142464,
+    "ast_hash": "27e74bffd5ca39ba71891bf50d1568df",
+    "semantic_hash": "27e74bffd5ca39ba71891bf50d1568df"
+  },
+  "src/TuTa.Wms.Application.Contracts/ChkResultLists/Dtos/GetChkByBarcodeDto.cs": {
+    "mtime": 1787552503.1142464,
+    "ast_hash": "dbebbd859964a1e47b7214fcb6cf1c02",
+    "semantic_hash": "dbebbd859964a1e47b7214fcb6cf1c02"
+  },
+  "src/TuTa.Wms.Application.Contracts/ChkResultLists/Dtos/MaterialToInBoundDto.cs": {
+    "mtime": 1787552503.1152432,
+    "ast_hash": "a76fa0c55c1ee27e9f035c373d213d81",
+    "semantic_hash": "a76fa0c55c1ee27e9f035c373d213d81"
+  },
+  "src/TuTa.Wms.Application.Contracts/ChkResultLists/Dtos/PagedCheckItemQueryDto.cs": {
+    "mtime": 1787552503.1152432,
+    "ast_hash": "7316be1b6e0c982e00e76bfe25113dc2",
+    "semantic_hash": "7316be1b6e0c982e00e76bfe25113dc2"
+  },
+  "src/TuTa.Wms.Application.Contracts/ChkResultLists/IChkResultListService.cs": {
+    "mtime": 1787552503.1164653,
+    "ast_hash": "16f86733e69b238ab9522c6debd7c216",
+    "semantic_hash": "16f86733e69b238ab9522c6debd7c216"
+  },
+  "src/TuTa.Wms.Application.Contracts/Departments/Dtos/DepartmentDto.cs": {
+    "mtime": 1787552503.1176417,
+    "ast_hash": "3a44302bef2bf00b1a29c1ac659b6afc",
+    "semantic_hash": "3a44302bef2bf00b1a29c1ac659b6afc"
+  },
+  "src/TuTa.Wms.Application.Contracts/Departments/IDepartmentService.cs": {
+    "mtime": 1787552503.1188138,
+    "ast_hash": "bb75394ecc29afcc8aa812ed7b896f39",
+    "semantic_hash": "bb75394ecc29afcc8aa812ed7b896f39"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/Dtos/ErpGoodsAftChkDto.cs": {
+    "mtime": 1787552503.1210065,
+    "ast_hash": "3cb2e5d2768ba4f27b1bed9c96d0ba43",
+    "semantic_hash": "3cb2e5d2768ba4f27b1bed9c96d0ba43"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/Dtos/ErpPickManDto.cs": {
+    "mtime": 1787552503.121975,
+    "ast_hash": "b47bde0c771bd1fcda3c132801ebf3c6",
+    "semantic_hash": "b47bde0c771bd1fcda3c132801ebf3c6"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IDto/ErpAsnDto.cs": {
+    "mtime": 1787552503.122978,
+    "ast_hash": "982cce84bfd9ad42b51eb228edd28063",
+    "semantic_hash": "982cce84bfd9ad42b51eb228edd28063"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IDto/ErpCGRKDDto.cs": {
+    "mtime": 1787552503.122978,
+    "ast_hash": "1e0d138a2b7e19fcd7fe128d55636097",
+    "semantic_hash": "1e0d138a2b7e19fcd7fe128d55636097"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IDto/ErpDeliveryOrderDto.cs": {
+    "mtime": 1787552503.124381,
+    "ast_hash": "d210c3dbf638feaadfc5fa88704a9b7b",
+    "semantic_hash": "d210c3dbf638feaadfc5fa88704a9b7b"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IDto/ErpDeliveryStationDto.cs": {
+    "mtime": 1787552503.124381,
+    "ast_hash": "2b9ab655d9e5311536a3fc754b4a23e9",
+    "semantic_hash": "2b9ab655d9e5311536a3fc754b4a23e9"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IDto/ErpDeliveryStationRequestDto.cs": {
+    "mtime": 1787552503.1253777,
+    "ast_hash": "2862861860a8b6a4fd769b51efad212b",
+    "semantic_hash": "2862861860a8b6a4fd769b51efad212b"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IDto/ErpInboundOrderDto.cs": {
+    "mtime": 1787552503.1253777,
+    "ast_hash": "0ab1194cc426697b7f331f0607177d19",
+    "semantic_hash": "0ab1194cc426697b7f331f0607177d19"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IDto/ErpInboundOrderRequestDto.cs": {
+    "mtime": 1787552503.126378,
+    "ast_hash": "fc5f4ec6326e40ae1895668299807336",
+    "semantic_hash": "fc5f4ec6326e40ae1895668299807336"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IDto/ErpLLBJDDto.cs": {
+    "mtime": 1787552503.127705,
+    "ast_hash": "2bfdafe7dde634114e2446c3999f2a03",
+    "semantic_hash": "2bfdafe7dde634114e2446c3999f2a03"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IDto/ErpMaterialDto.cs": {
+    "mtime": 1787552503.127705,
+    "ast_hash": "147668c1a60a63eef5fc19751aaec9dd",
+    "semantic_hash": "147668c1a60a63eef5fc19751aaec9dd"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IDto/ErpMaterialRequestDto.cs": {
+    "mtime": 1787552503.1287122,
+    "ast_hash": "5f151d71be6c70c4ec73fafa95c6581d",
+    "semantic_hash": "5f151d71be6c70c4ec73fafa95c6581d"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IDto/ErpOutboundOrderDto.cs": {
+    "mtime": 1787552503.1287122,
+    "ast_hash": "1c5338ecbc230a3aebc05bf9de192171",
+    "semantic_hash": "1c5338ecbc230a3aebc05bf9de192171"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IDto/ErpOutboundOrderRequestDto.cs": {
+    "mtime": 1787552503.1298878,
+    "ast_hash": "2b6f025c079c9f96c25df23d457812f8",
+    "semantic_hash": "2b6f025c079c9f96c25df23d457812f8"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IDto/ErpPuArrVouchDto.cs": {
+    "mtime": 1787552503.1298878,
+    "ast_hash": "d134826b21257418ae867eae53604168",
+    "semantic_hash": "d134826b21257418ae867eae53604168"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IDto/ErpWorkshopMaterialTransferDto.cs": {
+    "mtime": 1787552503.1308851,
+    "ast_hash": "d5aada81c41dd32932f5d467bf580874",
+    "semantic_hash": "d5aada81c41dd32932f5d467bf580874"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IDto/ErpWorkstationMaterialReceiptDto.cs": {
+    "mtime": 1787552503.1308851,
+    "ast_hash": "31144a3c9bcd4b4a377ad30b281b7c3c",
+    "semantic_hash": "31144a3c9bcd4b4a377ad30b281b7c3c"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IDto/ErpWorkstationMaterialRequestDto.cs": {
+    "mtime": 1787552503.1323342,
+    "ast_hash": "2d101b92ec76fd29b24618f1194cbd9f",
+    "semantic_hash": "2d101b92ec76fd29b24618f1194cbd9f"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IErpAsnAppService.cs": {
+    "mtime": 1787552503.1333318,
+    "ast_hash": "30350f6204956384cbe610c1dbd38a04",
+    "semantic_hash": "30350f6204956384cbe610c1dbd38a04"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IErpDeliveryOrderAppService.cs": {
+    "mtime": 1787552503.1333318,
+    "ast_hash": "382df34f1525debd589637afc1f7a95f",
+    "semantic_hash": "382df34f1525debd589637afc1f7a95f"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IErpDeliveryStationAppService.cs": {
+    "mtime": 1787552503.134332,
+    "ast_hash": "7f9d54103ae87c2e2f97be6ff603f2b2",
+    "semantic_hash": "7f9d54103ae87c2e2f97be6ff603f2b2"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IErpInboundOrderAppService.cs": {
+    "mtime": 1787552503.134332,
+    "ast_hash": "414dbbe09b313d247bf240db284ea243",
+    "semantic_hash": "414dbbe09b313d247bf240db284ea243"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IErpMaterialAppService.cs": {
+    "mtime": 1787552503.1354878,
+    "ast_hash": "da35659d99596e438d4f420f16ce43f0",
+    "semantic_hash": "da35659d99596e438d4f420f16ce43f0"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IErpMidTableService.cs": {
+    "mtime": 1787552503.1354878,
+    "ast_hash": "3301ff920c152e7ddc0f3b8c69e5d547",
+    "semantic_hash": "3301ff920c152e7ddc0f3b8c69e5d547"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IErpOutboundOrderAppService.cs": {
+    "mtime": 1787552503.1366932,
+    "ast_hash": "cef9e8da2af39b30fbdf045103ae5ae4",
+    "semantic_hash": "cef9e8da2af39b30fbdf045103ae5ae4"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IErpWorkshopMaterialTransferAppService.cs": {
+    "mtime": 1787552503.1366932,
+    "ast_hash": "4d92e79c77f203355b3edebddd9470fe",
+    "semantic_hash": "4d92e79c77f203355b3edebddd9470fe"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IErpWorkstationMaterialReceiptAppService.cs": {
+    "mtime": 1787552503.1381545,
+    "ast_hash": "e755564a898e0cded63732e3e861a608",
+    "semantic_hash": "e755564a898e0cded63732e3e861a608"
+  },
+  "src/TuTa.Wms.Application.Contracts/Erp/IErpWorkstationMaterialRequestAppService.cs": {
+    "mtime": 1787552503.1391547,
+    "ast_hash": "cf4b9b7b2de513f7ebadf558682be974",
+    "semantic_hash": "cf4b9b7b2de513f7ebadf558682be974"
+  },
+  "src/TuTa.Wms.Application.Contracts/Materials/Dtos/MaterialCreateDto.cs": {
+    "mtime": 1787552503.1404898,
+    "ast_hash": "2dab70ac625dbe25dde4f46547abaa7d",
+    "semantic_hash": "2dab70ac625dbe25dde4f46547abaa7d"
+  },
+  "src/TuTa.Wms.Application.Contracts/Materials/Dtos/MaterialDto.cs": {
+    "mtime": 1787552503.1404898,
+    "ast_hash": "60cf96850f21c528d070a0027c71e46f",
+    "semantic_hash": "60cf96850f21c528d070a0027c71e46f"
+  },
+  "src/TuTa.Wms.Application.Contracts/Materials/Dtos/MaterialImportResultDto.cs": {
+    "mtime": 1787552503.14149,
+    "ast_hash": "d038a0142726d602016a5dcfee620138",
+    "semantic_hash": "d038a0142726d602016a5dcfee620138"
+  },
+  "src/TuTa.Wms.Application.Contracts/Materials/Dtos/MaterialUpdateDto.cs": {
+    "mtime": 1787552503.14149,
+    "ast_hash": "0a695dec64e7dcdc1c702dfa4c312e34",
+    "semantic_hash": "0a695dec64e7dcdc1c702dfa4c312e34"
+  },
+  "src/TuTa.Wms.Application.Contracts/Materials/Dtos/PagedMaterialsQueryDto.cs": {
+    "mtime": 1787552503.1426873,
+    "ast_hash": "936fa0623a056c9e409ba5199f58a448",
+    "semantic_hash": "936fa0623a056c9e409ba5199f58a448"
+  },
+  "src/TuTa.Wms.Application.Contracts/Materials/IMaterialService.cs": {
+    "mtime": 1787552503.1436877,
+    "ast_hash": "e97a8e79b83e58aa034bf0b50b9537b7",
+    "semantic_hash": "e97a8e79b83e58aa034bf0b50b9537b7"
+  },
+  "src/TuTa.Wms.Application.Contracts/Permissions/WmsPermissionDefinitionProvider.cs": {
+    "mtime": 1787552503.1441457,
+    "ast_hash": "eb2c4bca5affded9f62b90755f7c659f",
+    "semantic_hash": "eb2c4bca5affded9f62b90755f7c659f"
+  },
+  "src/TuTa.Wms.Application.Contracts/Permissions/WmsPermissions.cs": {
+    "mtime": 1787552503.1451423,
+    "ast_hash": "fc78d3dd54330bc4199e18bf9b2ff057",
+    "semantic_hash": "fc78d3dd54330bc4199e18bf9b2ff057"
+  },
+  "src/TuTa.Wms.Application.Contracts/PickLists/Dtos/GetByBarcodeBoxDto.cs": {
+    "mtime": 1787552503.1461542,
+    "ast_hash": "4e3338ae11244d85e56fd1c8ea9fdfd0",
+    "semantic_hash": "4e3338ae11244d85e56fd1c8ea9fdfd0"
+  },
+  "src/TuTa.Wms.Application.Contracts/PickLists/Dtos/NoPlanPickListDelDto.cs": {
+    "mtime": 1787552503.147151,
+    "ast_hash": "64eb159b80a1d6f2465ecb2f35827dc5",
+    "semantic_hash": "64eb159b80a1d6f2465ecb2f35827dc5"
+  },
+  "src/TuTa.Wms.Application.Contracts/PickLists/Dtos/NoPlanPickListEditDto.cs": {
+    "mtime": 1787552503.147151,
+    "ast_hash": "e00fad981fe74aa0a0460ed93509d208",
+    "semantic_hash": "e00fad981fe74aa0a0460ed93509d208"
+  },
+  "src/TuTa.Wms.Application.Contracts/PickLists/Dtos/NoPlanPickOutCreateDto.cs": {
+    "mtime": 1787552503.1483703,
+    "ast_hash": "f11e12de4f87c91855dd9aaaf2e6c977",
+    "semantic_hash": "f11e12de4f87c91855dd9aaaf2e6c977"
+  },
+  "src/TuTa.Wms.Application.Contracts/PickLists/Dtos/NoPlanPickTypeDto.cs": {
+    "mtime": 1787552503.1483703,
+    "ast_hash": "b2835c7760dacc9d8d79f6643970b22b",
+    "semantic_hash": "b2835c7760dacc9d8d79f6643970b22b"
+  },
+  "src/TuTa.Wms.Application.Contracts/PickLists/Dtos/PagedNoPlanPickItemsQueryDto.cs": {
+    "mtime": 1787552503.1493719,
+    "ast_hash": "2cc50de03ea7d271419092461f28b1b2",
+    "semantic_hash": "2cc50de03ea7d271419092461f28b1b2"
+  },
+  "src/TuTa.Wms.Application.Contracts/PickLists/Dtos/PagedPickItemQueryDto.cs": {
+    "mtime": 1787552503.1503723,
+    "ast_hash": "c6bb9495155896b525e4906917587143",
+    "semantic_hash": "c6bb9495155896b525e4906917587143"
+  },
+  "src/TuTa.Wms.Application.Contracts/PickLists/Dtos/PickItemDto.cs": {
+    "mtime": 1787552503.1503723,
+    "ast_hash": "9d023dc2715084c796d5c71f1da1ffbb",
+    "semantic_hash": "9d023dc2715084c796d5c71f1da1ffbb"
+  },
+  "src/TuTa.Wms.Application.Contracts/PickLists/Dtos/PickItemQueryDto.cs": {
+    "mtime": 1787552503.1515048,
+    "ast_hash": "908d80144dd3028d4eaebb7021511536",
+    "semantic_hash": "908d80144dd3028d4eaebb7021511536"
+  },
+  "src/TuTa.Wms.Application.Contracts/PickLists/Dtos/PickListDto.cs": {
+    "mtime": 1787552503.1515048,
+    "ast_hash": "051a974e3e3d39ad12da2369b061368a",
+    "semantic_hash": "051a974e3e3d39ad12da2369b061368a"
+  },
+  "src/TuTa.Wms.Application.Contracts/PickLists/Dtos/PickOutDto.cs": {
+    "mtime": 1787552503.1526864,
+    "ast_hash": "496a8cce832610cfad3e751eb0a422ac",
+    "semantic_hash": "496a8cce832610cfad3e751eb0a422ac"
+  },
+  "src/TuTa.Wms.Application.Contracts/PickLists/Dtos/PickStockAllocateDto.cs": {
+    "mtime": 1787552503.1536064,
+    "ast_hash": "ae2923b11af7926f3e00e5b872e9f8eb",
+    "semantic_hash": "ae2923b11af7926f3e00e5b872e9f8eb"
+  },
+  "src/TuTa.Wms.Application.Contracts/PickLists/Dtos/PickStockDto.cs": {
+    "mtime": 1787552503.1536064,
+    "ast_hash": "61003b4a274dd7ce93112c246975730a",
+    "semantic_hash": "61003b4a274dd7ce93112c246975730a"
+  },
+  "src/TuTa.Wms.Application.Contracts/PickLists/IPickListService.cs": {
+    "mtime": 1787552503.154603,
+    "ast_hash": "60f9a571b09372b340211bb7ed60ea81",
+    "semantic_hash": "60f9a571b09372b340211bb7ed60ea81"
+  },
+  "src/TuTa.Wms.Application.Contracts/RecheckLists/Dtos/RecheckItemDto.cs": {
+    "mtime": 1787552503.1556034,
+    "ast_hash": "17262cb2ab07bb2836084d952769ec97",
+    "semantic_hash": "17262cb2ab07bb2836084d952769ec97"
+  },
+  "src/TuTa.Wms.Application.Contracts/RecheckLists/Dtos/RecheckItemQueryDto.cs": {
+    "mtime": 1787552503.1568553,
+    "ast_hash": "72bd6dee8fb2271e7b09c1db4c920578",
+    "semantic_hash": "72bd6dee8fb2271e7b09c1db4c920578"
+  },
+  "src/TuTa.Wms.Application.Contracts/RecheckLists/Dtos/RecheckPickOutDto.cs": {
+    "mtime": 1787552503.1568553,
+    "ast_hash": "f73a1e8d4fe96634d0e9aa12a9845bf3",
+    "semantic_hash": "f73a1e8d4fe96634d0e9aa12a9845bf3"
+  },
+  "src/TuTa.Wms.Application.Contracts/RecheckLists/Dtos/RecheckStockDto.cs": {
+    "mtime": 1787552503.1581945,
+    "ast_hash": "bfdc05df7bc2a667728ba4e0a4809829",
+    "semantic_hash": "bfdc05df7bc2a667728ba4e0a4809829"
+  },
+  "src/TuTa.Wms.Application.Contracts/RecheckLists/IRecheckListService.cs": {
+    "mtime": 1787552503.1581945,
+    "ast_hash": "f38ebef34c052e495a1db8f49fc110ab",
+    "semantic_hash": "f38ebef34c052e495a1db8f49fc110ab"
+  },
+  "src/TuTa.Wms.Application.Contracts/Roles/Dtos/GetPermissionInput.cs": {
+    "mtime": 1787552503.1604664,
+    "ast_hash": "3456acdba64d011956242fdaee606690",
+    "semantic_hash": "3456acdba64d011956242fdaee606690"
+  },
+  "src/TuTa.Wms.Application.Contracts/Roles/Dtos/PagingRoleListInput.cs": {
+    "mtime": 1787552503.1604664,
+    "ast_hash": "0f2024c25e4dbcffd26121041097740a",
+    "semantic_hash": "0f2024c25e4dbcffd26121041097740a"
+  },
+  "src/TuTa.Wms.Application.Contracts/Roles/Dtos/PermissionOutput.cs": {
+    "mtime": 1787552503.1614628,
+    "ast_hash": "89b04e31d6c59b72043cef06de3d3f7a",
+    "semantic_hash": "89b04e31d6c59b72043cef06de3d3f7a"
+  },
+  "src/TuTa.Wms.Application.Contracts/Roles/Dtos/UpdateRoleInput.cs": {
+    "mtime": 1787552503.1614628,
+    "ast_hash": "f0acb63868fcc84dd4019703302015fb",
+    "semantic_hash": "f0acb63868fcc84dd4019703302015fb"
+  },
+  "src/TuTa.Wms.Application.Contracts/Roles/Dtos/UpdateRolePermissionsInput.cs": {
+    "mtime": 1787552503.1627107,
+    "ast_hash": "094acbe85ac79137a64d3c650ec99bf8",
+    "semantic_hash": "094acbe85ac79137a64d3c650ec99bf8"
+  },
+  "src/TuTa.Wms.Application.Contracts/Roles/IRoleAppService.cs": {
+    "mtime": 1787552503.1627107,
+    "ast_hash": "29f8a818f3282695118fe7d93265ed52",
+    "semantic_hash": "29f8a818f3282695118fe7d93265ed52"
+  },
+  "src/TuTa.Wms.Application.Contracts/Roles/IRolePermissionAppService.cs": {
+    "mtime": 1787552503.1638346,
+    "ast_hash": "18316db2b78d273e5a5f18871b4da193",
+    "semantic_hash": "18316db2b78d273e5a5f18871b4da193"
+  },
+  "src/TuTa.Wms.Application.Contracts/Shared/IdInput.cs": {
+    "mtime": 1787552503.1648345,
+    "ast_hash": "cc4bc88bb1cf230956fa791013461dc7",
+    "semantic_hash": "cc4bc88bb1cf230956fa791013461dc7"
+  },
+  "src/TuTa.Wms.Application.Contracts/Shared/PagingBase.cs": {
+    "mtime": 1787552503.1648345,
+    "ast_hash": "21807c5f73ac2fc303f789369462f44d",
+    "semantic_hash": "21807c5f73ac2fc303f789369462f44d"
+  },
+  "src/TuTa.Wms.Application.Contracts/Shared/ResponseDto.cs": {
+    "mtime": 1787552503.1659575,
+    "ast_hash": "cb6e34cc8bc01c4ad0b21c59e724c2a1",
+    "semantic_hash": "cb6e34cc8bc01c4ad0b21c59e724c2a1"
+  },
+  "src/TuTa.Wms.Application.Contracts/Skips/Dtos/PagedSkipDto.cs": {
+    "mtime": 1787552503.1672845,
+    "ast_hash": "98177817ad6afa71b933c3a604e09cae",
+    "semantic_hash": "98177817ad6afa71b933c3a604e09cae"
+  },
+  "src/TuTa.Wms.Application.Contracts/Skips/Dtos/ResultGetBySkipDto.cs": {
+    "mtime": 1787552503.168405,
+    "ast_hash": "9f9ac2b950899d3eed61255ca3ba72cc",
+    "semantic_hash": "9f9ac2b950899d3eed61255ca3ba72cc"
+  },
+  "src/TuTa.Wms.Application.Contracts/Skips/Dtos/SkipAddDto.cs": {
+    "mtime": 1787552503.1694052,
+    "ast_hash": "47cc943664ca23334e68eb8a78efe93b",
+    "semantic_hash": "47cc943664ca23334e68eb8a78efe93b"
+  },
+  "src/TuTa.Wms.Application.Contracts/Skips/Dtos/SkipDto.cs": {
+    "mtime": 1787552503.169966,
+    "ast_hash": "e8cf92608617440f76b2de65457d2077",
+    "semantic_hash": "e8cf92608617440f76b2de65457d2077"
+  },
+  "src/TuTa.Wms.Application.Contracts/Skips/Dtos/SkipInDto.cs": {
+    "mtime": 1787552503.169966,
+    "ast_hash": "84dfd19d46791660ad70d35ed8bfc92b",
+    "semantic_hash": "84dfd19d46791660ad70d35ed8bfc92b"
+  },
+  "src/TuTa.Wms.Application.Contracts/Skips/Dtos/SkipOutDto.cs": {
+    "mtime": 1787552503.1709623,
+    "ast_hash": "e9f081abeb454fc6ad7147805e33351a",
+    "semantic_hash": "e9f081abeb454fc6ad7147805e33351a"
+  },
+  "src/TuTa.Wms.Application.Contracts/Skips/ISkipService.cs": {
+    "mtime": 1787552503.1709623,
+    "ast_hash": "2abf5683287a5e89e2f7228c8f647a85",
+    "semantic_hash": "2abf5683287a5e89e2f7228c8f647a85"
+  },
+  "src/TuTa.Wms.Application.Contracts/StockInHistories/Dtos/PagedStockInHistoryQueryDto.cs": {
+    "mtime": 1787552503.1732159,
+    "ast_hash": "2a0d979198a3ac2ac5643c9db8621b0a",
+    "semantic_hash": "2a0d979198a3ac2ac5643c9db8621b0a"
+  },
+  "src/TuTa.Wms.Application.Contracts/StockInHistories/Dtos/StockInHistoryDto.cs": {
+    "mtime": 1787552503.1732159,
+    "ast_hash": "076735b11e3c511fd402ba69d49d0738",
+    "semantic_hash": "076735b11e3c511fd402ba69d49d0738"
+  },
+  "src/TuTa.Wms.Application.Contracts/StockInHistories/IStockInHistoryService.cs": {
+    "mtime": 1787552503.1746342,
+    "ast_hash": "f10f4add26dac9fa09de5cd2c9d7beaa",
+    "semantic_hash": "f10f4add26dac9fa09de5cd2c9d7beaa"
+  },
+  "src/TuTa.Wms.Application.Contracts/StockOutHistories/Dtos/PagedStockOutHistoryQueryDto.cs": {
+    "mtime": 1787552503.175631,
+    "ast_hash": "f9226eb07bbad73f4765d7b88a68d573",
+    "semantic_hash": "f9226eb07bbad73f4765d7b88a68d573"
+  },
+  "src/TuTa.Wms.Application.Contracts/StockOutHistories/Dtos/StockOutHistoryDto.cs": {
+    "mtime": 1787552503.1766312,
+    "ast_hash": "a0bb220c60c51333b7d6b94252dd2122",
+    "semantic_hash": "a0bb220c60c51333b7d6b94252dd2122"
+  },
+  "src/TuTa.Wms.Application.Contracts/StockOutHistories/IStockOutHistoryService.cs": {
+    "mtime": 1787552503.1766312,
+    "ast_hash": "da79213d1cf14818f2a5a67fa04c9709",
+    "semantic_hash": "da79213d1cf14818f2a5a67fa04c9709"
+  },
+  "src/TuTa.Wms.Application.Contracts/Stocks/Dtos/CellWithMaterialDto.cs": {
+    "mtime": 1787552503.178661,
+    "ast_hash": "1bbfd47385af497c479d22fafc50b328",
+    "semantic_hash": "1bbfd47385af497c479d22fafc50b328"
+  },
+  "src/TuTa.Wms.Application.Contracts/Stocks/Dtos/PagedStockMoveQueryDto.cs": {
+    "mtime": 1787552503.178661,
+    "ast_hash": "ddf385aeeb5ce08d4cad2ca889ffb923",
+    "semantic_hash": "ddf385aeeb5ce08d4cad2ca889ffb923"
+  },
+  "src/TuTa.Wms.Application.Contracts/Stocks/Dtos/PagedStockQueryDto.cs": {
+    "mtime": 1787552503.1797113,
+    "ast_hash": "21e11a907439fb90ae9283c89ae44dfa",
+    "semantic_hash": "21e11a907439fb90ae9283c89ae44dfa"
+  },
+  "src/TuTa.Wms.Application.Contracts/Stocks/Dtos/SkipStockCtuInDto.cs": {
+    "mtime": 1787552503.1797113,
+    "ast_hash": "0b5114df7ae6f96c529fbdb9e845c552",
+    "semantic_hash": "0b5114df7ae6f96c529fbdb9e845c552"
+  },
+  "src/TuTa.Wms.Application.Contracts/Stocks/Dtos/StockCheckDto.cs": {
+    "mtime": 1787552503.181124,
+    "ast_hash": "e1ac64c25c77bf88573e4c20ff60d6fa",
+    "semantic_hash": "e1ac64c25c77bf88573e4c20ff60d6fa"
+  },
+  "src/TuTa.Wms.Application.Contracts/Stocks/Dtos/StockCreateDto.cs": {
+    "mtime": 1787552503.1823528,
+    "ast_hash": "95e5400e6c8fc02cc23d793a9b6528b9",
+    "semantic_hash": "95e5400e6c8fc02cc23d793a9b6528b9"
+  },
+  "src/TuTa.Wms.Application.Contracts/Stocks/Dtos/StockDirectCreateDto.cs": {
+    "mtime": 1787552503.1823528,
+    "ast_hash": "eb3431e17abe045cfccd7e599794eb2e",
+    "semantic_hash": "eb3431e17abe045cfccd7e599794eb2e"
+  },
+  "src/TuTa.Wms.Application.Contracts/Stocks/Dtos/StockDto.cs": {
+    "mtime": 1787552503.1823528,
+    "ast_hash": "2ac1943ba04206aa3fe6c67cee5c0dd7",
+    "semantic_hash": "2ac1943ba04206aa3fe6c67cee5c0dd7"
+  },
+  "src/TuTa.Wms.Application.Contracts/Stocks/Dtos/StockMoveDto.cs": {
+    "mtime": 1787552503.1850364,
+    "ast_hash": "30ae52003cac8765e86215c4b301d32e",
+    "semantic_hash": "30ae52003cac8765e86215c4b301d32e"
+  },
+  "src/TuTa.Wms.Application.Contracts/Stocks/Dtos/StockQueryDto.cs": {
+    "mtime": 1787552503.1860363,
+    "ast_hash": "f3a737dd843f25b59214ddd4e74e149c",
+    "semantic_hash": "f3a737dd843f25b59214ddd4e74e149c"
+  },
+  "src/TuTa.Wms.Application.Contracts/Stocks/IStockService.cs": {
+    "mtime": 1787552503.1870365,
+    "ast_hash": "a620d8ebcf14d39c6af9cd7bfc9477f5",
+    "semantic_hash": "a620d8ebcf14d39c6af9cd7bfc9477f5"
+  },
+  "src/TuTa.Wms.Application.Contracts/TuTa.Wms.Application.Contracts.csproj": {
+    "mtime": 1787552503.1870365,
+    "ast_hash": "4d1f5f3460ed9ff7d08eba7010cd8d43",
+    "semantic_hash": "4d1f5f3460ed9ff7d08eba7010cd8d43"
+  },
+  "src/TuTa.Wms.Application.Contracts/Users/Dtos/AbpLoginResult.cs": {
+    "mtime": 1787552503.1883655,
+    "ast_hash": "1c5206e154bbf0b8adeebb484e4341f9",
+    "semantic_hash": "1c5206e154bbf0b8adeebb484e4341f9"
+  },
+  "src/TuTa.Wms.Application.Contracts/Users/Dtos/LockUserInput.cs": {
+    "mtime": 1787552503.1895416,
+    "ast_hash": "b6d318eb7526fb950fc4888fca20dcfe",
+    "semantic_hash": "b6d318eb7526fb950fc4888fca20dcfe"
+  },
+  "src/TuTa.Wms.Application.Contracts/Users/Dtos/LoginInput.cs": {
+    "mtime": 1787552503.1905425,
+    "ast_hash": "72e514ad5055ec9dcfa8928b8a4c1314",
+    "semantic_hash": "72e514ad5055ec9dcfa8928b8a4c1314"
+  },
+  "src/TuTa.Wms.Application.Contracts/Users/Dtos/LoginOutput.cs": {
+    "mtime": 1787552503.1905425,
+    "ast_hash": "ef74859fec00c7e056fda08d5b5ba291",
+    "semantic_hash": "ef74859fec00c7e056fda08d5b5ba291"
+  },
+  "src/TuTa.Wms.Application.Contracts/Users/Dtos/LoginResultType.cs": {
+    "mtime": 1787552503.1915545,
+    "ast_hash": "6d905ca61a38bfaac64f70bdf0536504",
+    "semantic_hash": "6d905ca61a38bfaac64f70bdf0536504"
+  },
+  "src/TuTa.Wms.Application.Contracts/Users/Dtos/PagingUserListInput.cs": {
+    "mtime": 1787552503.1925826,
+    "ast_hash": "e3db7dfe34dc05323cfc011e9fd9ecfd",
+    "semantic_hash": "e3db7dfe34dc05323cfc011e9fd9ecfd"
+  },
+  "src/TuTa.Wms.Application.Contracts/Users/Dtos/UpdateUserInput.cs": {
+    "mtime": 1787552503.1925826,
+    "ast_hash": "8679ead5a23917ed51454f8419b4ff8e",
+    "semantic_hash": "8679ead5a23917ed51454f8419b4ff8e"
+  },
+  "src/TuTa.Wms.Application.Contracts/Users/Dtos/UserLoginInfo.cs": {
+    "mtime": 1787552503.1935995,
+    "ast_hash": "8400850b1ab6bcd5b25e78d7f3f27047",
+    "semantic_hash": "8400850b1ab6bcd5b25e78d7f3f27047"
+  },
+  "src/TuTa.Wms.Application.Contracts/Users/IAccountService.cs": {
+    "mtime": 1787552503.1935995,
+    "ast_hash": "3f664e1a9c39b277bd8ca64a9a63ea68",
+    "semantic_hash": "3f664e1a9c39b277bd8ca64a9a63ea68"
+  },
+  "src/TuTa.Wms.Application.Contracts/Users/IUserAppService.cs": {
+    "mtime": 1787552503.1949372,
+    "ast_hash": "059bc0a27d9e0caf27e99e433aeb6dca",
+    "semantic_hash": "059bc0a27d9e0caf27e99e433aeb6dca"
+  },
+  "src/TuTa.Wms.Application.Contracts/Warehouses/Dtos/PagedWarehouseQueryDto.cs": {
+    "mtime": 1787552503.1963348,
+    "ast_hash": "0db2343fa494ea0ffc4317bf6813c706",
+    "semantic_hash": "0db2343fa494ea0ffc4317bf6813c706"
+  },
+  "src/TuTa.Wms.Application.Contracts/Warehouses/Dtos/WarehouseAddDto.cs": {
+    "mtime": 1787552503.1963348,
+    "ast_hash": "f1f17bb7458d941a4f17084932c9fda8",
+    "semantic_hash": "f1f17bb7458d941a4f17084932c9fda8"
+  },
+  "src/TuTa.Wms.Application.Contracts/Warehouses/Dtos/WarehouseAreaAddDto.cs": {
+    "mtime": 1787552503.197437,
+    "ast_hash": "9cf82528629aa3b3ab67cacd7baa7461",
+    "semantic_hash": "9cf82528629aa3b3ab67cacd7baa7461"
+  },
+  "src/TuTa.Wms.Application.Contracts/Warehouses/Dtos/WarehouseAreaDto.cs": {
+    "mtime": 1787552503.197437,
+    "ast_hash": "55cfedf85db9b4aaa55ee314dbe68bc5",
+    "semantic_hash": "55cfedf85db9b4aaa55ee314dbe68bc5"
+  },
+  "src/TuTa.Wms.Application.Contracts/Warehouses/Dtos/WarehouseAreaUpdateDto.cs": {
+    "mtime": 1787552503.198933,
+    "ast_hash": "2ee1d54d30973bbf80aa5d0c2d144c2d",
+    "semantic_hash": "2ee1d54d30973bbf80aa5d0c2d144c2d"
+  },
+  "src/TuTa.Wms.Application.Contracts/Warehouses/Dtos/WarehouseDto.cs": {
+    "mtime": 1787552503.198933,
+    "ast_hash": "39498cb9d1bea47159a90d9bba191e99",
+    "semantic_hash": "39498cb9d1bea47159a90d9bba191e99"
+  },
+  "src/TuTa.Wms.Application.Contracts/Warehouses/Dtos/WarehouseUpdateDto.cs": {
+    "mtime": 1787552503.2002466,
+    "ast_hash": "ce3355c0a47b1f16271036f1afc2904b",
+    "semantic_hash": "ce3355c0a47b1f16271036f1afc2904b"
+  },
+  "src/TuTa.Wms.Application.Contracts/Warehouses/IWarehouseService.cs": {
+    "mtime": 1787552503.2012458,
+    "ast_hash": "ec962f8f3f9ecd635b67910059f71fac",
+    "semantic_hash": "ec962f8f3f9ecd635b67910059f71fac"
+  },
+  "src/TuTa.Wms.Application.Contracts/WmsApplicationContractsModule.cs": {
+    "mtime": 1787552503.2012458,
+    "ast_hash": "7d6388848df968ee2047d023d14dc2bc",
+    "semantic_hash": "7d6388848df968ee2047d023d14dc2bc"
+  },
+  "src/TuTa.Wms.Application.Contracts/WmsDtoExtensions.cs": {
+    "mtime": 1787552503.202265,
+    "ast_hash": "8078e014b31ed71070e3f50e88cb31e8",
+    "semantic_hash": "8078e014b31ed71070e3f50e88cb31e8"
+  },
+  "src/TuTa.Wms.Application/AgvTasks/AgvTaskService.cs": {
+    "mtime": 1787552503.2037158,
+    "ast_hash": "4df740ee646b5fb6c26029c04353b091",
+    "semantic_hash": "4df740ee646b5fb6c26029c04353b091"
+  },
+  "src/TuTa.Wms.Application/BarcodeLists/BarcodeListService.cs": {
+    "mtime": 1787552503.2052205,
+    "ast_hash": "f3a389a17704b1d083e5d74cbb9991e9",
+    "semantic_hash": "f3a389a17704b1d083e5d74cbb9991e9"
+  },
+  "src/TuTa.Wms.Application/Boxes/BoxService.cs": {
+    "mtime": 1787552503.2063563,
+    "ast_hash": "523b7448a38c379a0b1d953aff98cf73",
+    "semantic_hash": "523b7448a38c379a0b1d953aff98cf73"
+  },
+  "src/TuTa.Wms.Application/Cells/CellService.cs": {
+    "mtime": 1787552503.208383,
+    "ast_hash": "aadf864491aadba374a8a861f5a54e1b",
+    "semantic_hash": "aadf864491aadba374a8a861f5a54e1b"
+  },
+  "src/TuTa.Wms.Application/ChkResultLists/ChkResultListService.cs": {
+    "mtime": 1787552503.208383,
+    "ast_hash": "c12cb1a1dc276d57a7c76d44185e7ec5",
+    "semantic_hash": "c12cb1a1dc276d57a7c76d44185e7ec5"
+  },
+  "src/TuTa.Wms.Application/Departments/DepartmentService.cs": {
+    "mtime": 1787552503.2097118,
+    "ast_hash": "edc90d1abc2279c00694ec3c968e9c28",
+    "semantic_hash": "edc90d1abc2279c00694ec3c968e9c28"
+  },
+  "src/TuTa.Wms.Application/Erp/ErpAsnAppService.cs": {
+    "mtime": 1787552503.2107239,
+    "ast_hash": "82b3b4971a938cb41a65870e93a48bbc",
+    "semantic_hash": "82b3b4971a938cb41a65870e93a48bbc"
+  },
+  "src/TuTa.Wms.Application/Erp/ErpAsnStockInService.cs": {
+    "mtime": 1787552503.2117226,
+    "ast_hash": "b9177acd004c77382102a511d7ca69e5",
+    "semantic_hash": "b9177acd004c77382102a511d7ca69e5"
+  },
+  "src/TuTa.Wms.Application/Erp/ErpBarcodeSyncJob.cs": {
+    "mtime": 1787552503.2128227,
+    "ast_hash": "ac2742b490d7b552babbf9325f236de7",
+    "semantic_hash": "ac2742b490d7b552babbf9325f236de7"
+  },
+  "src/TuTa.Wms.Application/Erp/ErpDeliveryOrderAppService.cs": {
+    "mtime": 1787552503.2128227,
+    "ast_hash": "76f77da9b30e5658fea54f4352a1c65f",
+    "semantic_hash": "76f77da9b30e5658fea54f4352a1c65f"
+  },
+  "src/TuTa.Wms.Application/Erp/ErpDeliveryStationAppService.cs": {
+    "mtime": 1787552503.2138224,
+    "ast_hash": "d3a3d0b53b556659ffe892bd29527501",
+    "semantic_hash": "d3a3d0b53b556659ffe892bd29527501"
+  },
+  "src/TuTa.Wms.Application/Erp/ErpDeliveryStationAutoMapperProfile.cs": {
+    "mtime": 1787552503.2148225,
+    "ast_hash": "a94eeb4f53a57808f99b8146efc0f2e1",
+    "semantic_hash": "a94eeb4f53a57808f99b8146efc0f2e1"
+  },
+  "src/TuTa.Wms.Application/Erp/ErpDepartmentSyncJob.cs": {
+    "mtime": 1787552503.2158227,
+    "ast_hash": "952ede75466f244075109092e618664e",
+    "semantic_hash": "952ede75466f244075109092e618664e"
+  },
+  "src/TuTa.Wms.Application/Erp/ErpInboundOrderAppService.cs": {
+    "mtime": 1787552503.2158227,
+    "ast_hash": "fa344026435415ffa57bc49307931a7f",
+    "semantic_hash": "fa344026435415ffa57bc49307931a7f"
+  },
+  "src/TuTa.Wms.Application/Erp/ErpInboundOrderAutoMapperProfile.cs": {
+    "mtime": 1787552503.2168229,
+    "ast_hash": "5956d71eaaf5cd080a42a02a7855f755",
+    "semantic_hash": "5956d71eaaf5cd080a42a02a7855f755"
+  },
+  "src/TuTa.Wms.Application/Erp/ErpMaterialAppService.cs": {
+    "mtime": 1787552503.2168229,
+    "ast_hash": "184843e07784535cf5faae50063f95bb",
+    "semantic_hash": "184843e07784535cf5faae50063f95bb"
+  },
+  "src/TuTa.Wms.Application/Erp/ErpMaterialAutoMapperProfile.cs": {
+    "mtime": 1787552503.217823,
+    "ast_hash": "c2d534cd4af93f17def31768b497c390",
+    "semantic_hash": "c2d534cd4af93f17def31768b497c390"
+  },
+  "src/TuTa.Wms.Application/Erp/ErpMidTableService.cs": {
+    "mtime": 1787552503.2188272,
+    "ast_hash": "944d5e4b4539fc33eb4cdc33a1071877",
+    "semantic_hash": "944d5e4b4539fc33eb4cdc33a1071877"
+  },
+  "src/TuTa.Wms.Application/Erp/ErpMoveSyncJob.cs": {
+    "mtime": 1787552503.2198272,
+    "ast_hash": "7f9e77a390d1f75295e5de66ffd5c3a4",
+    "semantic_hash": "7f9e77a390d1f75295e5de66ffd5c3a4"
+  },
+  "src/TuTa.Wms.Application/Erp/ErpOutboundOrderAppService.cs": {
+    "mtime": 1787552503.2210798,
+    "ast_hash": "eef838e748664e42febb339571e2a4ea",
+    "semantic_hash": "eef838e748664e42febb339571e2a4ea"
+  },
+  "src/TuTa.Wms.Application/Erp/ErpOutboundOrderAutoMapperProfile.cs": {
+    "mtime": 1787552503.2210798,
+    "ast_hash": "0c0f87d601a3b322b2e48111b355f92e",
+    "semantic_hash": "0c0f87d601a3b322b2e48111b355f92e"
+  },
+  "src/TuTa.Wms.Application/Erp/ErpPickOrderSyncJob.cs": {
+    "mtime": 1787552503.2220771,
+    "ast_hash": "7f8cc3fc60c0b061c5e4825743000fcb",
+    "semantic_hash": "7f8cc3fc60c0b061c5e4825743000fcb"
+  },
+  "src/TuTa.Wms.Application/Erp/ErpRecheckNotifierSyncJob.cs": {
+    "mtime": 1787552503.2220771,
+    "ast_hash": "e8683ac579ec612790e38ce73cff9e18",
+    "semantic_hash": "e8683ac579ec612790e38ce73cff9e18"
+  },
+  "src/TuTa.Wms.Application/Erp/ErpStateChgSyncJob.cs": {
+    "mtime": 1787552503.223325,
+    "ast_hash": "9fb0de83ce3ad90293cb9446fd9069b7",
+    "semantic_hash": "9fb0de83ce3ad90293cb9446fd9069b7"
+  },
+  "src/TuTa.Wms.Application/Erp/ErpStockAftChkSyncJob.cs": {
+    "mtime": 1787552503.223325,
+    "ast_hash": "e5edacabed4c8f8f01bcb04cae9e2f52",
+    "semantic_hash": "e5edacabed4c8f8f01bcb04cae9e2f52"
+  },
+  "src/TuTa.Wms.Application/Erp/ErpWorkshopMaterialTransferAppService.cs": {
+    "mtime": 1787552503.2246428,
+    "ast_hash": "3a000acd064a3e4af6378109ea378727",
+    "semantic_hash": "3a000acd064a3e4af6378109ea378727"
+  },
+  "src/TuTa.Wms.Application/Erp/ErpWorkshopMaterialTransferAutoMapperProfile.cs": {
+    "mtime": 1787552503.2256427,
+    "ast_hash": "413257f2b5ae96d468ba4005d06c8b5a",
+    "semantic_hash": "413257f2b5ae96d468ba4005d06c8b5a"
+  },
+  "src/TuTa.Wms.Application/Erp/ErpWorkstationMaterialReceiptAppService.cs": {
+    "mtime": 1787552503.2256427,
+    "ast_hash": "4ee5a4ebbfba8475a32e01fe5ab1a443",
+    "semantic_hash": "4ee5a4ebbfba8475a32e01fe5ab1a443"
+  },
+  "src/TuTa.Wms.Application/Erp/ErpWorkstationMaterialReceiptAutoMapperProfile.cs": {
+    "mtime": 1787552503.2256427,
+    "ast_hash": "656e27d5e39bef0371b651ef0751273c",
+    "semantic_hash": "656e27d5e39bef0371b651ef0751273c"
+  },
+  "src/TuTa.Wms.Application/Erp/ErpWorkstationMaterialRequestAppService.cs": {
+    "mtime": 1787552503.2270916,
+    "ast_hash": "201d5f831143e2f8404e91de7acd52fd",
+    "semantic_hash": "201d5f831143e2f8404e91de7acd52fd"
+  },
+  "src/TuTa.Wms.Application/Erp/ErpWorkstationMaterialRequestAutoMapperProfile.cs": {
+    "mtime": 1787552503.2284951,
+    "ast_hash": "1db27377065bda161ee293350cae0647",
+    "semantic_hash": "1db27377065bda161ee293350cae0647"
+  },
+  "src/TuTa.Wms.Application/Erp/Events/StockInCompletedEvent.cs": {
+    "mtime": 1787552503.2294948,
+    "ast_hash": "1d3b82de6268b74e6a5e42c504c7ac45",
+    "semantic_hash": "1d3b82de6268b74e6a5e42c504c7ac45"
+  },
+  "src/TuTa.Wms.Application/Erp/Events/StockInCompletedEventHandler.cs": {
+    "mtime": 1787552503.2304955,
+    "ast_hash": "864904d773f16ed4e448a7799c39a79e",
+    "semantic_hash": "864904d773f16ed4e448a7799c39a79e"
+  },
+  "src/TuTa.Wms.Application/Materials/MaterialService.cs": {
+    "mtime": 1787552503.2314954,
+    "ast_hash": "d4e1fdd99cecdb39cebae98ed795c3ac",
+    "semantic_hash": "d4e1fdd99cecdb39cebae98ed795c3ac"
+  },
+  "src/TuTa.Wms.Application/PickLists/PickListBackGroundService.cs": {
+    "mtime": 1787552503.2324953,
+    "ast_hash": "06629eb92428a523e7f86b300858de3e",
+    "semantic_hash": "06629eb92428a523e7f86b300858de3e"
+  },
+  "src/TuTa.Wms.Application/PickLists/PickListService.cs": {
+    "mtime": 1787552503.233496,
+    "ast_hash": "da0093577748101d9f073bcfdd6db730",
+    "semantic_hash": "da0093577748101d9f073bcfdd6db730"
+  },
+  "src/TuTa.Wms.Application/Properties/AssemblyInfo.cs": {
+    "mtime": 1787552503.2344964,
+    "ast_hash": "41a281ecf29a63fa10233a6e7d7408bb",
+    "semantic_hash": "41a281ecf29a63fa10233a6e7d7408bb"
+  },
+  "src/TuTa.Wms.Application/RecheckLists/RecheckListService.cs": {
+    "mtime": 1787552503.2356257,
+    "ast_hash": "c11e3b1a85079122a9c680bc85588fab",
+    "semantic_hash": "c11e3b1a85079122a9c680bc85588fab"
+  },
+  "src/TuTa.Wms.Application/Roles/RoleAppService.cs": {
+    "mtime": 1787552503.2366564,
+    "ast_hash": "c009e1fd998528df84844d68ded2b831",
+    "semantic_hash": "c009e1fd998528df84844d68ded2b831"
+  },
+  "src/TuTa.Wms.Application/Roles/RolePermissionAppService.cs": {
+    "mtime": 1787552503.2366564,
+    "ast_hash": "0af02a901e19dea7e1b0e0ab067752ae",
+    "semantic_hash": "0af02a901e19dea7e1b0e0ab067752ae"
+  },
+  "src/TuTa.Wms.Application/Skips/SkipService.cs": {
+    "mtime": 1787552503.2376566,
+    "ast_hash": "a3ba11c0232f14ded033324c3b55f2c4",
+    "semantic_hash": "a3ba11c0232f14ded033324c3b55f2c4"
+  },
+  "src/TuTa.Wms.Application/StockInHistories/StockInHistoryService.cs": {
+    "mtime": 1787552503.2388103,
+    "ast_hash": "9f87560148b754adeedf15fbb9ab12a7",
+    "semantic_hash": "9f87560148b754adeedf15fbb9ab12a7"
+  },
+  "src/TuTa.Wms.Application/StockOutHistories/StockOutHistoryService.cs": {
+    "mtime": 1787552503.240353,
+    "ast_hash": "1085fd80a81c24d74cfdb42bd3cd6a3a",
+    "semantic_hash": "1085fd80a81c24d74cfdb42bd3cd6a3a"
+  },
+  "src/TuTa.Wms.Application/Stocks/StockService.cs": {
+    "mtime": 1787552503.2413938,
+    "ast_hash": "b14e02b57d107d5b1805f0c67c3bab5d",
+    "semantic_hash": "b14e02b57d107d5b1805f0c67c3bab5d"
+  },
+  "src/TuTa.Wms.Application/TuTa.Wms.Application.csproj": {
+    "mtime": 1787552503.2424593,
+    "ast_hash": "1426487f8adf60aa40fa62fee50e4912",
+    "semantic_hash": "1426487f8adf60aa40fa62fee50e4912"
+  },
+  "src/TuTa.Wms.Application/Users/AccountService.cs": {
+    "mtime": 1787552503.2435286,
+    "ast_hash": "af3562cf0d6331f43867a7e5c9e64487",
+    "semantic_hash": "af3562cf0d6331f43867a7e5c9e64487"
+  },
+  "src/TuTa.Wms.Application/Users/UserAppService.cs": {
+    "mtime": 1787552503.2435286,
+    "ast_hash": "f4ccb1c80ea4e4fa7db149a9275ceb3f",
+    "semantic_hash": "f4ccb1c80ea4e4fa7db149a9275ceb3f"
+  },
+  "src/TuTa.Wms.Application/Warehouses/WarehouseService.cs": {
+    "mtime": 1787552503.245272,
+    "ast_hash": "ca32ca9b08457a4ad99fc834c6532ef1",
+    "semantic_hash": "ca32ca9b08457a4ad99fc834c6532ef1"
+  },
+  "src/TuTa.Wms.Application/WmsAppService.cs": {
+    "mtime": 1787552503.245272,
+    "ast_hash": "b7b5f2feaec359fff531fec26bbbcc76",
+    "semantic_hash": "b7b5f2feaec359fff531fec26bbbcc76"
+  },
+  "src/TuTa.Wms.Application/WmsApplicationAutoMapperProfile.cs": {
+    "mtime": 1787552503.245272,
+    "ast_hash": "e709f5a580b11aae271b3b8793bdabf7",
+    "semantic_hash": "e709f5a580b11aae271b3b8793bdabf7"
+  },
+  "src/TuTa.Wms.Application/WmsApplicationModule.cs": {
+    "mtime": 1787552503.2467659,
+    "ast_hash": "62d4e50539c89a3b9087cf80cc053e47",
+    "semantic_hash": "62d4e50539c89a3b9087cf80cc053e47"
+  },
+  "src/TuTa.Wms.Domain.Shared/AgvTasks/AgvTaskStatus.cs": {
+    "mtime": 1787552503.2724724,
+    "ast_hash": "8c40c97adb224033ef028a06584acd11",
+    "semantic_hash": "8c40c97adb224033ef028a06584acd11"
+  },
+  "src/TuTa.Wms.Domain.Shared/AgvTasks/ManageType.cs": {
+    "mtime": 1787552503.2734761,
+    "ast_hash": "7d27bd48f24d69da455100695da7b3e5",
+    "semantic_hash": "7d27bd48f24d69da455100695da7b3e5"
+  },
+  "src/TuTa.Wms.Domain.Shared/Boxes/BoxStatus.cs": {
+    "mtime": 1787552503.274537,
+    "ast_hash": "07923720d633dfa952b9bea44c2e4b7e",
+    "semantic_hash": "07923720d633dfa952b9bea44c2e4b7e"
+  },
+  "src/TuTa.Wms.Domain.Shared/Cells/CellRunStatus.cs": {
+    "mtime": 1787552503.275539,
+    "ast_hash": "425f1a36c2003a6fe3715246caeb3809",
+    "semantic_hash": "425f1a36c2003a6fe3715246caeb3809"
+  },
+  "src/TuTa.Wms.Domain.Shared/Cells/CellStatus.cs": {
+    "mtime": 1787552503.275539,
+    "ast_hash": "705261ebeec029da4f1114fd2911982d",
+    "semantic_hash": "705261ebeec029da4f1114fd2911982d"
+  },
+  "src/TuTa.Wms.Domain.Shared/Cells/CellType.cs": {
+    "mtime": 1787552503.2766204,
+    "ast_hash": "9079a666350e9e1221803b16518eecb2",
+    "semantic_hash": "9079a666350e9e1221803b16518eecb2"
+  },
+  "src/TuTa.Wms.Domain.Shared/ChkResultLists/BoxAftChkStatus.cs": {
+    "mtime": 1787552503.278047,
+    "ast_hash": "60aa27ab65ba5f5e08a29fefa1d6e020",
+    "semantic_hash": "60aa27ab65ba5f5e08a29fefa1d6e020"
+  },
+  "src/TuTa.Wms.Domain.Shared/ChkResultLists/ChkResultListStatus.cs": {
+    "mtime": 1787552503.278047,
+    "ast_hash": "2f5135c35d8342aec91e4a133ceff5eb",
+    "semantic_hash": "2f5135c35d8342aec91e4a133ceff5eb"
+  },
+  "src/TuTa.Wms.Domain.Shared/ChkResultLists/EnumCheckResult.cs": {
+    "mtime": 1787552503.2793481,
+    "ast_hash": "6e2abc2917db4a189d526032a6f14667",
+    "semantic_hash": "6e2abc2917db4a189d526032a6f14667"
+  },
+  "src/TuTa.Wms.Domain.Shared/ChkResultLists/EnumCheckType.cs": {
+    "mtime": 1787552503.2793481,
+    "ast_hash": "eb3eecd9e2f4146041a1ea3e9ad07764",
+    "semantic_hash": "eb3eecd9e2f4146041a1ea3e9ad07764"
+  },
+  "src/TuTa.Wms.Domain.Shared/Events/BoxBindCellEvent.cs": {
+    "mtime": 1787552503.2805972,
+    "ast_hash": "f587239b88b06ae3865eb82a89e1105b",
+    "semantic_hash": "f587239b88b06ae3865eb82a89e1105b"
+  },
+  "src/TuTa.Wms.Domain.Shared/Events/StockOutHistoryDelEvent.cs": {
+    "mtime": 1787552503.2815948,
+    "ast_hash": "f8200d5ee955aba83f6a533f0df8fa76",
+    "semantic_hash": "f8200d5ee955aba83f6a533f0df8fa76"
+  },
+  "src/TuTa.Wms.Domain.Shared/Localization/WmsResource.cs": {
+    "mtime": 1787552503.2963223,
+    "ast_hash": "2dc409a4d18420a6378a2e29daf4061a",
+    "semantic_hash": "2dc409a4d18420a6378a2e29daf4061a"
+  },
+  "src/TuTa.Wms.Domain.Shared/Localization/Wms/ar.json": {
+    "mtime": 1787552503.2826128,
+    "ast_hash": "7a813771d298524fbd488ff1f5310b7e",
+    "semantic_hash": "7a813771d298524fbd488ff1f5310b7e"
+  },
+  "src/TuTa.Wms.Domain.Shared/Localization/Wms/cs.json": {
+    "mtime": 1787552503.2838504,
+    "ast_hash": "77f61f15dba5bc8bd01af7d959629bbf",
+    "semantic_hash": "77f61f15dba5bc8bd01af7d959629bbf"
+  },
+  "src/TuTa.Wms.Domain.Shared/Localization/Wms/de.json": {
+    "mtime": 1787552503.2838504,
+    "ast_hash": "0d09e5c781b41447e08f2758b82ae217",
+    "semantic_hash": "0d09e5c781b41447e08f2758b82ae217"
+  },
+  "src/TuTa.Wms.Domain.Shared/Localization/Wms/en-GB.json": {
+    "mtime": 1787552503.2849164,
+    "ast_hash": "f96ca605e4916ed74b6410075e9306c6",
+    "semantic_hash": "f96ca605e4916ed74b6410075e9306c6"
+  },
+  "src/TuTa.Wms.Domain.Shared/Localization/Wms/en.json": {
+    "mtime": 1787552503.2859278,
+    "ast_hash": "a99336bc3a29e30e290e620c743a9f85",
+    "semantic_hash": "a99336bc3a29e30e290e620c743a9f85"
+  },
+  "src/TuTa.Wms.Domain.Shared/Localization/Wms/es.json": {
+    "mtime": 1787552503.2859278,
+    "ast_hash": "a95e049316c13af2be2a9de0f379d282",
+    "semantic_hash": "a95e049316c13af2be2a9de0f379d282"
+  },
+  "src/TuTa.Wms.Domain.Shared/Localization/Wms/fi.json": {
+    "mtime": 1787552503.2869287,
+    "ast_hash": "320aec9e12762e7ae07f930b5d5ce739",
+    "semantic_hash": "320aec9e12762e7ae07f930b5d5ce739"
+  },
+  "src/TuTa.Wms.Domain.Shared/Localization/Wms/fr.json": {
+    "mtime": 1787552503.2875516,
+    "ast_hash": "f2af2a0ad54019872a2ac4d2679a2327",
+    "semantic_hash": "f2af2a0ad54019872a2ac4d2679a2327"
+  },
+  "src/TuTa.Wms.Domain.Shared/Localization/Wms/hi.json": {
+    "mtime": 1787552503.2875516,
+    "ast_hash": "d38c0e56fda204e0b97b43db1236bbee",
+    "semantic_hash": "d38c0e56fda204e0b97b43db1236bbee"
+  },
+  "src/TuTa.Wms.Domain.Shared/Localization/Wms/hr.json": {
+    "mtime": 1787552503.2885482,
+    "ast_hash": "a7fab728a9e064d9bb18f9f52ae0fc60",
+    "semantic_hash": "a7fab728a9e064d9bb18f9f52ae0fc60"
+  },
+  "src/TuTa.Wms.Domain.Shared/Localization/Wms/hu.json": {
+    "mtime": 1787552503.2885482,
+    "ast_hash": "e69073cbb2c6e9974e04b525b07b27d2",
+    "semantic_hash": "e69073cbb2c6e9974e04b525b07b27d2"
+  },
+  "src/TuTa.Wms.Domain.Shared/Localization/Wms/is.json": {
+    "mtime": 1787552503.2895484,
+    "ast_hash": "4da1b69d18153b00a96053a92eb89f2b",
+    "semantic_hash": "4da1b69d18153b00a96053a92eb89f2b"
+  },
+  "src/TuTa.Wms.Domain.Shared/Localization/Wms/it.json": {
+    "mtime": 1787552503.2895484,
+    "ast_hash": "e576fb98acea95421bcdf263284fe8a3",
+    "semantic_hash": "e576fb98acea95421bcdf263284fe8a3"
+  },
+  "src/TuTa.Wms.Domain.Shared/Localization/Wms/nl.json": {
+    "mtime": 1787552503.2907763,
+    "ast_hash": "c679d43e296b0a73dd2b74b27b2ef546",
+    "semantic_hash": "c679d43e296b0a73dd2b74b27b2ef546"
+  },
+  "src/TuTa.Wms.Domain.Shared/Localization/Wms/pl-PL.json": {
+    "mtime": 1787552503.2907763,
+    "ast_hash": "b76375ee759f55ae1951405435951460",
+    "semantic_hash": "b76375ee759f55ae1951405435951460"
+  },
+  "src/TuTa.Wms.Domain.Shared/Localization/Wms/pt-BR.json": {
+    "mtime": 1787552503.2917762,
+    "ast_hash": "a706c6a0fbe48f2f8138e6ad5968ae98",
+    "semantic_hash": "a706c6a0fbe48f2f8138e6ad5968ae98"
+  },
+  "src/TuTa.Wms.Domain.Shared/Localization/Wms/ro-RO.json": {
+    "mtime": 1787552503.2917762,
+    "ast_hash": "d3afcccfa572e862a3f0fba58608df1a",
+    "semantic_hash": "d3afcccfa572e862a3f0fba58608df1a"
+  },
+  "src/TuTa.Wms.Domain.Shared/Localization/Wms/ru.json": {
+    "mtime": 1787552503.2930565,
+    "ast_hash": "68a6d1759bf39e6a0484f865f2f403b7",
+    "semantic_hash": "68a6d1759bf39e6a0484f865f2f403b7"
+  },
+  "src/TuTa.Wms.Domain.Shared/Localization/Wms/sk.json": {
+    "mtime": 1787552503.2930565,
+    "ast_hash": "5bbfa17f5c58c129baef58697b8a4697",
+    "semantic_hash": "5bbfa17f5c58c129baef58697b8a4697"
+  },
+  "src/TuTa.Wms.Domain.Shared/Localization/Wms/sl.json": {
+    "mtime": 1787552503.294057,
+    "ast_hash": "5b711fe7e7f3e166e06c01c0de0ee0d4",
+    "semantic_hash": "5b711fe7e7f3e166e06c01c0de0ee0d4"
+  },
+  "src/TuTa.Wms.Domain.Shared/Localization/Wms/tr.json": {
+    "mtime": 1787552503.294057,
+    "ast_hash": "b0297228e71722a9118816cd31346de1",
+    "semantic_hash": "b0297228e71722a9118816cd31346de1"
+  },
+  "src/TuTa.Wms.Domain.Shared/Localization/Wms/vi.json": {
+    "mtime": 1787552503.2953222,
+    "ast_hash": "c60b6d05396c3f1881c4c1426a49809e",
+    "semantic_hash": "c60b6d05396c3f1881c4c1426a49809e"
+  },
+  "src/TuTa.Wms.Domain.Shared/Localization/Wms/zh-Hans.json": {
+    "mtime": 1787552503.2953222,
+    "ast_hash": "4d80a7d029c842b272095caf2fc32944",
+    "semantic_hash": "4d80a7d029c842b272095caf2fc32944"
+  },
+  "src/TuTa.Wms.Domain.Shared/Localization/Wms/zh-Hant.json": {
+    "mtime": 1787552503.2963223,
+    "ast_hash": "74474939b9754ef51add3c1c6334c6fb",
+    "semantic_hash": "74474939b9754ef51add3c1c6334c6fb"
+  },
+  "src/TuTa.Wms.Domain.Shared/MultiTenancy/MultiTenancyConsts.cs": {
+    "mtime": 1787552503.297635,
+    "ast_hash": "5e7f1c83bfc515b9c0522b676aabdf26",
+    "semantic_hash": "5e7f1c83bfc515b9c0522b676aabdf26"
+  },
+  "src/TuTa.Wms.Domain.Shared/PickLists/PickItemStatus.cs": {
+    "mtime": 1787552503.2989714,
+    "ast_hash": "fbc62ee2ca0c6f9d88345ac6f835ad38",
+    "semantic_hash": "fbc62ee2ca0c6f9d88345ac6f835ad38"
+  },
+  "src/TuTa.Wms.Domain.Shared/PickLists/PickOrderStatus.cs": {
+    "mtime": 1787552503.299968,
+    "ast_hash": "362a913138c3dc7a75006e8cfb13db67",
+    "semantic_hash": "362a913138c3dc7a75006e8cfb13db67"
+  },
+  "src/TuTa.Wms.Domain.Shared/PickLists/PickType.cs": {
+    "mtime": 1787552503.299968,
+    "ast_hash": "da9cb6dc97aea0bc6b3c1247400abeff",
+    "semantic_hash": "da9cb6dc97aea0bc6b3c1247400abeff"
+  },
+  "src/TuTa.Wms.Domain.Shared/RecheckLists/RecheckItemStatus.cs": {
+    "mtime": 1787552503.3009684,
+    "ast_hash": "008d7c213334662d918cd6d56080247f",
+    "semantic_hash": "008d7c213334662d918cd6d56080247f"
+  },
+  "src/TuTa.Wms.Domain.Shared/RecheckLists/RecheckListStatus.cs": {
+    "mtime": 1787552503.3021052,
+    "ast_hash": "c4a7f4fbafd51a0e45718f60d514f730",
+    "semantic_hash": "c4a7f4fbafd51a0e45718f60d514f730"
+  },
+  "src/TuTa.Wms.Domain.Shared/Skips/SkipRunStatus.cs": {
+    "mtime": 1787552503.3032925,
+    "ast_hash": "d25f8685b3a90ac844ebeb59a451a7af",
+    "semantic_hash": "d25f8685b3a90ac844ebeb59a451a7af"
+  },
+  "src/TuTa.Wms.Domain.Shared/Skips/SkipStatus.cs": {
+    "mtime": 1787552503.3032925,
+    "ast_hash": "b8dda6528edfbd8d63e8fbc2094d0fc6",
+    "semantic_hash": "b8dda6528edfbd8d63e8fbc2094d0fc6"
+  },
+  "src/TuTa.Wms.Domain.Shared/Stocks/RunStatus.cs": {
+    "mtime": 1787552503.304289,
+    "ast_hash": "e9eaf5340a31bdeb01b0b72b064d3e90",
+    "semantic_hash": "e9eaf5340a31bdeb01b0b72b064d3e90"
+  },
+  "src/TuTa.Wms.Domain.Shared/Stocks/StockInType.cs": {
+    "mtime": 1787552503.3052895,
+    "ast_hash": "a10a08ce2a659f439193462dc796a222",
+    "semantic_hash": "a10a08ce2a659f439193462dc796a222"
+  },
+  "src/TuTa.Wms.Domain.Shared/Stocks/StockStatus.cs": {
+    "mtime": 1787552503.3052895,
+    "ast_hash": "3bebe23e5cb52d9c833337d6f6f74bbe",
+    "semantic_hash": "3bebe23e5cb52d9c833337d6f6f74bbe"
+  },
+  "src/TuTa.Wms.Domain.Shared/TuTa.Wms.Domain.Shared.csproj": {
+    "mtime": 1787552503.3065808,
+    "ast_hash": "a0d9e5e7ffa8bbb0268549109bc47cfa",
+    "semantic_hash": "a0d9e5e7ffa8bbb0268549109bc47cfa"
+  },
+  "src/TuTa.Wms.Domain.Shared/Warehouses/WarehouseAreaType.cs": {
+    "mtime": 1787552503.3077233,
+    "ast_hash": "8728ef00a4ec7568ce06e93a15a819bd",
+    "semantic_hash": "8728ef00a4ec7568ce06e93a15a819bd"
+  },
+  "src/TuTa.Wms.Domain.Shared/Warehouses/WarehouseType.cs": {
+    "mtime": 1787552503.3077233,
+    "ast_hash": "8cb5e10e8b940055937a0f5709a80157",
+    "semantic_hash": "8cb5e10e8b940055937a0f5709a80157"
+  },
+  "src/TuTa.Wms.Domain.Shared/WmsDomainErrorCodes.cs": {
+    "mtime": 1787552503.30872,
+    "ast_hash": "c81a46d700047e139ab1b385b132e3f5",
+    "semantic_hash": "c81a46d700047e139ab1b385b132e3f5"
+  },
+  "src/TuTa.Wms.Domain.Shared/WmsDomainSharedModule.cs": {
+    "mtime": 1787552503.30872,
+    "ast_hash": "a1e15c657dd3a6c55050f596ebb5aac9",
+    "semantic_hash": "a1e15c657dd3a6c55050f596ebb5aac9"
+  },
+  "src/TuTa.Wms.Domain.Shared/WmsGlobalFeatureConfigurator.cs": {
+    "mtime": 1787552503.3097205,
+    "ast_hash": "95463eb8f3d26ae789ba90c026cf7165",
+    "semantic_hash": "95463eb8f3d26ae789ba90c026cf7165"
+  },
+  "src/TuTa.Wms.Domain.Shared/WmsModuleExtensionConfigurator.cs": {
+    "mtime": 1787552503.3097205,
+    "ast_hash": "b1343fb3f620f0b0122b9e287c3de5fb",
+    "semantic_hash": "b1343fb3f620f0b0122b9e287c3de5fb"
+  },
+  "src/TuTa.Wms.Domain/AgvTasks/Aggregaes/AGVOptions.cs": {
+    "mtime": 1787552503.3122761,
+    "ast_hash": "fa775c574768ce33f8b07897fe7c55e4",
+    "semantic_hash": "fa775c574768ce33f8b07897fe7c55e4"
+  },
+  "src/TuTa.Wms.Domain/AgvTasks/Aggregaes/AgvTask.cs": {
+    "mtime": 1787552503.3132732,
+    "ast_hash": "826632697dddb9b02f3df21e9edf76a4",
+    "semantic_hash": "826632697dddb9b02f3df21e9edf76a4"
+  },
+  "src/TuTa.Wms.Domain/AgvTasks/AgvTaskManager.cs": {
+    "mtime": 1787552503.3142765,
+    "ast_hash": "5246ca636b7adf95217bc62ca72e338d",
+    "semantic_hash": "5246ca636b7adf95217bc62ca72e338d"
+  },
+  "src/TuTa.Wms.Domain/AgvTasks/Dto/BindCtnrAndBinDto.cs": {
+    "mtime": 1787552503.3147955,
+    "ast_hash": "ea583622df733a85edb5a21c46b0273d",
+    "semantic_hash": "ea583622df733a85edb5a21c46b0273d"
+  },
+  "src/TuTa.Wms.Domain/AgvTasks/Dto/BindPodAndBerthDto.cs": {
+    "mtime": 1787552503.315792,
+    "ast_hash": "43208552c3435456600674e566e9b61e",
+    "semantic_hash": "43208552c3435456600674e566e9b61e"
+  },
+  "src/TuTa.Wms.Domain/AgvTasks/Dto/CancelAgvTaskDto.cs": {
+    "mtime": 1787552503.315792,
+    "ast_hash": "63a8fc71552138127a4e252a89830b0b",
+    "semantic_hash": "63a8fc71552138127a4e252a89830b0b"
+  },
+  "src/TuTa.Wms.Domain/AgvTasks/Dto/GenAgvTaskDto.cs": {
+    "mtime": 1787552503.3167925,
+    "ast_hash": "6f53b6c4a1ae731c700518166d3b5e35",
+    "semantic_hash": "6f53b6c4a1ae731c700518166d3b5e35"
+  },
+  "src/TuTa.Wms.Domain/AgvTasks/Dto/GenPreTaskDto.cs": {
+    "mtime": 1787552503.3167925,
+    "ast_hash": "81c3058b2913e2cb61629f671dc1c03c",
+    "semantic_hash": "81c3058b2913e2cb61629f671dc1c03c"
+  },
+  "src/TuTa.Wms.Domain/AgvTasks/Dto/GetAgvTaskStatusDto.cs": {
+    "mtime": 1787552503.3179784,
+    "ast_hash": "a7b66cf553931a3ae61301a6802a0236",
+    "semantic_hash": "a7b66cf553931a3ae61301a6802a0236"
+  },
+  "src/TuTa.Wms.Domain/AgvTasks/Dto/ResultAgvTaskDto.cs": {
+    "mtime": 1787552503.3189788,
+    "ast_hash": "1ba8763575ba812e4ddbd820176c4f31",
+    "semantic_hash": "1ba8763575ba812e4ddbd820176c4f31"
+  },
+  "src/TuTa.Wms.Domain/AgvTasks/Dto/ResultAgvTaskStatusDto.cs": {
+    "mtime": 1787552503.3195078,
+    "ast_hash": "285bce18fa943f00274ecd518738b5c5",
+    "semantic_hash": "285bce18fa943f00274ecd518738b5c5"
+  },
+  "src/TuTa.Wms.Domain/AgvTasks/IAgvTaskRepository.cs": {
+    "mtime": 1787552503.3195078,
+    "ast_hash": "0280b18601756864af9b8215b619d4d9",
+    "semantic_hash": "0280b18601756864af9b8215b619d4d9"
+  },
+  "src/TuTa.Wms.Domain/AgvTasks/RcsApiManager.cs": {
+    "mtime": 1787552503.320615,
+    "ast_hash": "15dd66b7addd1d6635a2507a8c36eded",
+    "semantic_hash": "15dd66b7addd1d6635a2507a8c36eded"
+  },
+  "src/TuTa.Wms.Domain/BarcodeChecks/Aggregates/BarcodeCheck.cs": {
+    "mtime": 1787552503.321612,
+    "ast_hash": "1b825e2acdde214b4f03bab6ed7ccc19",
+    "semantic_hash": "1b825e2acdde214b4f03bab6ed7ccc19"
+  },
+  "src/TuTa.Wms.Domain/BarcodeChecks/IBarcodeCheckRepository.cs": {
+    "mtime": 1787552503.322649,
+    "ast_hash": "a9ba620cd5766f4c778cb8ed263af139",
+    "semantic_hash": "a9ba620cd5766f4c778cb8ed263af139"
+  },
+  "src/TuTa.Wms.Domain/BarcodeLists/Aggregates/BarcodeList.cs": {
+    "mtime": 1787552503.3239033,
+    "ast_hash": "36f4a8aecab375b791afaad207e37e74",
+    "semantic_hash": "36f4a8aecab375b791afaad207e37e74"
+  },
+  "src/TuTa.Wms.Domain/BarcodeLists/BarcodeListManager.cs": {
+    "mtime": 1787552503.3249009,
+    "ast_hash": "06b6f076ca56348bba948a20475b4fee",
+    "semantic_hash": "06b6f076ca56348bba948a20475b4fee"
+  },
+  "src/TuTa.Wms.Domain/BarcodeLists/IBarcodeListRepository.cs": {
+    "mtime": 1787552503.326028,
+    "ast_hash": "23a54edadf83bae45a8617f1a42719f8",
+    "semantic_hash": "23a54edadf83bae45a8617f1a42719f8"
+  },
+  "src/TuTa.Wms.Domain/BarcodeLists/ValueObjects/CountInfoOfBarcodeList.cs": {
+    "mtime": 1787552503.326028,
+    "ast_hash": "96cc63aa0e5e6c254e3aa0a21053612b",
+    "semantic_hash": "96cc63aa0e5e6c254e3aa0a21053612b"
+  },
+  "src/TuTa.Wms.Domain/BarcodeLists/ValueObjects/MaterialInfoOfBarcodeList.cs": {
+    "mtime": 1787552503.3272204,
+    "ast_hash": "aea33a5df396ff368847c5db216f08e9",
+    "semantic_hash": "aea33a5df396ff368847c5db216f08e9"
+  },
+  "src/TuTa.Wms.Domain/BarcodeLists/ValueObjects/SupplierInfoOfBarcodeList.cs": {
+    "mtime": 1787552503.3282962,
+    "ast_hash": "6bf5f70c3ea3c707e12bac1c865a42e1",
+    "semantic_hash": "6bf5f70c3ea3c707e12bac1c865a42e1"
+  },
+  "src/TuTa.Wms.Domain/BarcodeLists/ValueObjects/WarehouseInfoOfBarcodeList.cs": {
+    "mtime": 1787552503.328948,
+    "ast_hash": "e359d6060e2f997a7da504da94809967",
+    "semantic_hash": "e359d6060e2f997a7da504da94809967"
+  },
+  "src/TuTa.Wms.Domain/Boxes/Aggregates/Box.cs": {
+    "mtime": 1787552503.3304718,
+    "ast_hash": "a45be7cc6a2279e0f2d407542f6794ab",
+    "semantic_hash": "a45be7cc6a2279e0f2d407542f6794ab"
+  },
+  "src/TuTa.Wms.Domain/Boxes/BoxManager.cs": {
+    "mtime": 1787552503.331062,
+    "ast_hash": "1b9bb788f5f5ffd1a2c4b800a8f16814",
+    "semantic_hash": "1b9bb788f5f5ffd1a2c4b800a8f16814"
+  },
+  "src/TuTa.Wms.Domain/Boxes/Entities/BoxStock.cs": {
+    "mtime": 1787552503.3320587,
+    "ast_hash": "a63db40acd67767c5cff817db4f45d61",
+    "semantic_hash": "a63db40acd67767c5cff817db4f45d61"
+  },
+  "src/TuTa.Wms.Domain/Boxes/EventHandlers/CellEventHandler.cs": {
+    "mtime": 1787552503.332479,
+    "ast_hash": "848120da085d3d7a6f521e51d613c911",
+    "semantic_hash": "848120da085d3d7a6f521e51d613c911"
+  },
+  "src/TuTa.Wms.Domain/Boxes/EventHandlers/StockEventHandler.cs": {
+    "mtime": 1787552503.3334756,
+    "ast_hash": "5fc267521bc860746e3e7f8587179f82",
+    "semantic_hash": "5fc267521bc860746e3e7f8587179f82"
+  },
+  "src/TuTa.Wms.Domain/Boxes/Events/BoxBindCellEvent.cs": {
+    "mtime": 1787552503.334476,
+    "ast_hash": "f2454a07c62badb62d041dc77d52658b",
+    "semantic_hash": "f2454a07c62badb62d041dc77d52658b"
+  },
+  "src/TuTa.Wms.Domain/Boxes/Events/BoxDisBindCellEvent.cs": {
+    "mtime": 1787552503.334476,
+    "ast_hash": "d67a8a0416625eaec9a5740066996d43",
+    "semantic_hash": "d67a8a0416625eaec9a5740066996d43"
+  },
+  "src/TuTa.Wms.Domain/Boxes/IBoxRepository.cs": {
+    "mtime": 1787552503.3357742,
+    "ast_hash": "f2140805f93961f41d2f774555a07908",
+    "semantic_hash": "f2140805f93961f41d2f774555a07908"
+  },
+  "src/TuTa.Wms.Domain/Boxes/ValueObjects/BoxSpecsValObj.cs": {
+    "mtime": 1787552503.3367712,
+    "ast_hash": "ec9434d78495200b2800fd3f4a02b4b7",
+    "semantic_hash": "ec9434d78495200b2800fd3f4a02b4b7"
+  },
+  "src/TuTa.Wms.Domain/Boxes/ValueObjects/CellInfo.cs": {
+    "mtime": 1787552503.3367712,
+    "ast_hash": "97c97b172ab577d448321f2f8e1e4083",
+    "semantic_hash": "97c97b172ab577d448321f2f8e1e4083"
+  },
+  "src/TuTa.Wms.Domain/Boxes/ValueObjects/WarehouseInfo.cs": {
+    "mtime": 1787552503.3381312,
+    "ast_hash": "54decb5f1950b972f363ac0335ff02ca",
+    "semantic_hash": "54decb5f1950b972f363ac0335ff02ca"
+  },
+  "src/TuTa.Wms.Domain/Cells/Aggregates/Cell.cs": {
+    "mtime": 1787552503.3397374,
+    "ast_hash": "aebbf92a7fcce37c181a6b6db8810b3f",
+    "semantic_hash": "aebbf92a7fcce37c181a6b6db8810b3f"
+  },
+  "src/TuTa.Wms.Domain/Cells/CellCreatedEvent.cs": {
+    "mtime": 1787552503.3397374,
+    "ast_hash": "8c9715a82cdae3a8844ec27a16f5173d",
+    "semantic_hash": "8c9715a82cdae3a8844ec27a16f5173d"
+  },
+  "src/TuTa.Wms.Domain/Cells/CellManager.cs": {
+    "mtime": 1787552503.340734,
+    "ast_hash": "5ac32647b8fb03fde15e13e734770341",
+    "semantic_hash": "5ac32647b8fb03fde15e13e734770341"
+  },
+  "src/TuTa.Wms.Domain/Cells/Entities/CellBox.cs": {
+    "mtime": 1787552503.341836,
+    "ast_hash": "6355ce30787828c96e7cba4b4be32f47",
+    "semantic_hash": "6355ce30787828c96e7cba4b4be32f47"
+  },
+  "src/TuTa.Wms.Domain/Cells/EventHandlers/BoxEventHandler.cs": {
+    "mtime": 1787552503.3428695,
+    "ast_hash": "320b0e21af94098d3412b1c9e3db69b3",
+    "semantic_hash": "320b0e21af94098d3412b1c9e3db69b3"
+  },
+  "src/TuTa.Wms.Domain/Cells/ICellRepository.cs": {
+    "mtime": 1787552503.3428695,
+    "ast_hash": "39e319681faacd4dccc07309c85bf826",
+    "semantic_hash": "39e319681faacd4dccc07309c85bf826"
+  },
+  "src/TuTa.Wms.Domain/ChkResultLists/Aggregates/ChkResultList.cs": {
+    "mtime": 1787552503.3449693,
+    "ast_hash": "f80898d61e9b784c6f20be8102120437",
+    "semantic_hash": "f80898d61e9b784c6f20be8102120437"
+  },
+  "src/TuTa.Wms.Domain/ChkResultLists/ChkResultListManager.cs": {
+    "mtime": 1787552503.3449693,
+    "ast_hash": "ea7a5337292c780510be6a3683170d85",
+    "semantic_hash": "ea7a5337292c780510be6a3683170d85"
+  },
+  "src/TuTa.Wms.Domain/ChkResultLists/Entities/ChkResultBox.cs": {
+    "mtime": 1787552503.3463736,
+    "ast_hash": "6e7c326f1cce0aaf945c3e0be57b394a",
+    "semantic_hash": "6e7c326f1cce0aaf945c3e0be57b394a"
+  },
+  "src/TuTa.Wms.Domain/ChkResultLists/EventHandlers/StockEventHandler.cs": {
+    "mtime": 1787552503.3474483,
+    "ast_hash": "5c010fbdf32cc491c2293edcfc293ff9",
+    "semantic_hash": "5c010fbdf32cc491c2293edcfc293ff9"
+  },
+  "src/TuTa.Wms.Domain/ChkResultLists/Events/RecheckResultGettedEvent.cs": {
+    "mtime": 1787552503.3474483,
+    "ast_hash": "ab6c9308382c31c8bacd3bb6b801974e",
+    "semantic_hash": "ab6c9308382c31c8bacd3bb6b801974e"
+  },
+  "src/TuTa.Wms.Domain/ChkResultLists/IChkResultListRepository.cs": {
+    "mtime": 1787552503.3489366,
+    "ast_hash": "d5554fea242a9336651c1abb5d1aba5c",
+    "semantic_hash": "d5554fea242a9336651c1abb5d1aba5c"
+  },
+  "src/TuTa.Wms.Domain/ChkResultLists/ValueObjects/CheckInfoOfChkRsltList.cs": {
+    "mtime": 1787552503.3499367,
+    "ast_hash": "9479a8a16aec7c0d73b7a896cdf457d7",
+    "semantic_hash": "9479a8a16aec7c0d73b7a896cdf457d7"
+  },
+  "src/TuTa.Wms.Domain/ChkResultLists/ValueObjects/CountInfoOfChkRsltList.cs": {
+    "mtime": 1787552503.3499367,
+    "ast_hash": "19791e2068230bd9fc03fc7e793127ad",
+    "semantic_hash": "19791e2068230bd9fc03fc7e793127ad"
+  },
+  "src/TuTa.Wms.Domain/ChkResultLists/ValueObjects/MaterialInfoOfChkRsltList.cs": {
+    "mtime": 1787552503.3509538,
+    "ast_hash": "a8534799c55002e490ca377a208c33ac",
+    "semantic_hash": "a8534799c55002e490ca377a208c33ac"
+  },
+  "src/TuTa.Wms.Domain/ChkResultLists/ValueObjects/SupplierInfoOfChkRsltList.cs": {
+    "mtime": 1787552503.3509538,
+    "ast_hash": "be94111547e6f1f99e6aca1f004a3f30",
+    "semantic_hash": "be94111547e6f1f99e6aca1f004a3f30"
+  },
+  "src/TuTa.Wms.Domain/ChkResultLists/ValueObjects/WarehouseInfoOfChkRsltList.cs": {
+    "mtime": 1787552503.3527305,
+    "ast_hash": "cd48b5a122c3bfd6cce9be905afe06da",
+    "semantic_hash": "cd48b5a122c3bfd6cce9be905afe06da"
+  },
+  "src/TuTa.Wms.Domain/Data/IWmsDbSchemaMigrator.cs": {
+    "mtime": 1787552503.353727,
+    "ast_hash": "01783ea2f099a47e9518f0b4d85ee761",
+    "semantic_hash": "01783ea2f099a47e9518f0b4d85ee761"
+  },
+  "src/TuTa.Wms.Domain/Data/NullWmsDbSchemaMigrator.cs": {
+    "mtime": 1787552503.353727,
+    "ast_hash": "a7be23358091bc9e63b2e89854cffecc",
+    "semantic_hash": "a7be23358091bc9e63b2e89854cffecc"
+  },
+  "src/TuTa.Wms.Domain/Data/WmsDbMigrationService.cs": {
+    "mtime": 1787552503.3547275,
+    "ast_hash": "7ee4718a41f49f905b9f130dd045e97d",
+    "semantic_hash": "7ee4718a41f49f905b9f130dd045e97d"
+  },
+  "src/TuTa.Wms.Domain/Departments/Aggregates/Department.cs": {
+    "mtime": 1787552503.355751,
+    "ast_hash": "5776491475787e3f5f50c0133fb0d564",
+    "semantic_hash": "5776491475787e3f5f50c0133fb0d564"
+  },
+  "src/TuTa.Wms.Domain/Departments/DepartmentManager.cs": {
+    "mtime": 1787552503.357263,
+    "ast_hash": "61596d9cdf699a27e264e24938349d55",
+    "semantic_hash": "61596d9cdf699a27e264e24938349d55"
+  },
+  "src/TuTa.Wms.Domain/Departments/IDepartmentRepository.cs": {
+    "mtime": 1787552503.3579378,
+    "ast_hash": "f02df0808e05a5a3f11c7116d3615fd8",
+    "semantic_hash": "f02df0808e05a5a3f11c7116d3615fd8"
+  },
+  "src/TuTa.Wms.Domain/Erp/Aggregates/ErpDeliveryStation.cs": {
+    "mtime": 1787552503.3589344,
+    "ast_hash": "fbf2548e123c762cb820f58115eee17c",
+    "semantic_hash": "fbf2548e123c762cb820f58115eee17c"
+  },
+  "src/TuTa.Wms.Domain/Erp/Aggregates/ErpInboundOrder.cs": {
+    "mtime": 1787552503.3589344,
+    "ast_hash": "87c0870ebd3daae39d77f64e7c5e0ac0",
+    "semantic_hash": "87c0870ebd3daae39d77f64e7c5e0ac0"
+  },
+  "src/TuTa.Wms.Domain/Erp/Aggregates/ErpMaterial.cs": {
+    "mtime": 1787552503.3605845,
+    "ast_hash": "f91ea40bf0e45f82a65af47db9e3c340",
+    "semantic_hash": "f91ea40bf0e45f82a65af47db9e3c340"
+  },
+  "src/TuTa.Wms.Domain/Erp/Aggregates/ErpOutboundOrder.cs": {
+    "mtime": 1787552503.3605845,
+    "ast_hash": "d3319037265630e70addf037399b3044",
+    "semantic_hash": "d3319037265630e70addf037399b3044"
+  },
+  "src/TuTa.Wms.Domain/Erp/Aggregates/ErpWorkshopMaterialTransfer.cs": {
+    "mtime": 1787552503.36178,
+    "ast_hash": "06b8f722b27c405182658f63d3564a49",
+    "semantic_hash": "06b8f722b27c405182658f63d3564a49"
+  },
+  "src/TuTa.Wms.Domain/Erp/Aggregates/ErpWorkstationMaterialReceipt.cs": {
+    "mtime": 1787552503.36178,
+    "ast_hash": "4100e372565c8eea60edcdd155a0157b",
+    "semantic_hash": "4100e372565c8eea60edcdd155a0157b"
+  },
+  "src/TuTa.Wms.Domain/Erp/Aggregates/ErpWorkstationMaterialRequest.cs": {
+    "mtime": 1787552503.3627765,
+    "ast_hash": "286010548ab616bfd4370930ed9ccc36",
+    "semantic_hash": "286010548ab616bfd4370930ed9ccc36"
+  },
+  "src/TuTa.Wms.Domain/Erp/Entities/ErpAsn.cs": {
+    "mtime": 1787552503.3637767,
+    "ast_hash": "eec71ea8d8c5b7fe16847f095f2cf6d6",
+    "semantic_hash": "eec71ea8d8c5b7fe16847f095f2cf6d6"
+  },
+  "src/TuTa.Wms.Domain/Erp/Entities/ErpBarcode.cs": {
+    "mtime": 1787552503.3637767,
+    "ast_hash": "4c0b821e15689aa2544d358d697ee10b",
+    "semantic_hash": "4c0b821e15689aa2544d358d697ee10b"
+  },
+  "src/TuTa.Wms.Domain/Erp/Entities/ErpDeliveryOrder.cs": {
+    "mtime": 1787552503.3647935,
+    "ast_hash": "aaeabe40ef92cd4ecd9da4e445457e93",
+    "semantic_hash": "aaeabe40ef92cd4ecd9da4e445457e93"
+  },
+  "src/TuTa.Wms.Domain/Erp/Entities/ErpDepartment.cs": {
+    "mtime": 1787552503.3647935,
+    "ast_hash": "465bae504aa488dbfb73ee1a48b7f6d6",
+    "semantic_hash": "465bae504aa488dbfb73ee1a48b7f6d6"
+  },
+  "src/TuTa.Wms.Domain/Erp/Entities/ErpDeptType.cs": {
+    "mtime": 1787552503.3662193,
+    "ast_hash": "596386270968ea71116b803ed35b30a5",
+    "semantic_hash": "596386270968ea71116b803ed35b30a5"
+  },
+  "src/TuTa.Wms.Domain/Erp/Entities/ErpDeptTypeDetail.cs": {
+    "mtime": 1787552503.3674188,
+    "ast_hash": "aaee8562d36c3fece1a71a0793527e5a",
+    "semantic_hash": "aaee8562d36c3fece1a71a0793527e5a"
+  },
+  "src/TuTa.Wms.Domain/Erp/Entities/ErpInboundItem.cs": {
+    "mtime": 1787552503.3674188,
+    "ast_hash": "93f6829429c1136085fee50b7c08abc7",
+    "semantic_hash": "93f6829429c1136085fee50b7c08abc7"
+  },
+  "src/TuTa.Wms.Domain/Erp/Entities/ErpMaterial.cs": {
+    "mtime": 1787552503.3687484,
+    "ast_hash": "ef8da9344548f3face08028bbc2d87d6",
+    "semantic_hash": "ef8da9344548f3face08028bbc2d87d6"
+  },
+  "src/TuTa.Wms.Domain/Erp/Entities/ErpMove.cs": {
+    "mtime": 1787552503.3692665,
+    "ast_hash": "1f564debe3b7cfc211ccd5741fc62bcc",
+    "semantic_hash": "1f564debe3b7cfc211ccd5741fc62bcc"
+  },
+  "src/TuTa.Wms.Domain/Erp/Entities/ErpNoPlanPickType.cs": {
+    "mtime": 1787552503.3692665,
+    "ast_hash": "ddcdfff2273486aac966a02dfe8d77b2",
+    "semantic_hash": "ddcdfff2273486aac966a02dfe8d77b2"
+  },
+  "src/TuTa.Wms.Domain/Erp/Entities/ErpOutboundItem.cs": {
+    "mtime": 1787552503.370291,
+    "ast_hash": "802448a760320156af1042a44467db81",
+    "semantic_hash": "802448a760320156af1042a44467db81"
+  },
+  "src/TuTa.Wms.Domain/Erp/Entities/ErpOutboundRecord.cs": {
+    "mtime": 1787552503.370291,
+    "ast_hash": "8c8bd031b4e745c7166968be8a9b253e",
+    "semantic_hash": "8c8bd031b4e745c7166968be8a9b253e"
+  },
+  "src/TuTa.Wms.Domain/Erp/Entities/ErpPickMan.cs": {
+    "mtime": 1787552503.3712883,
+    "ast_hash": "f0ecadf138070aae43fa42b86bd1c8c2",
+    "semantic_hash": "f0ecadf138070aae43fa42b86bd1c8c2"
+  },
+  "src/TuTa.Wms.Domain/Erp/Entities/ErpPickOrder.cs": {
+    "mtime": 1787552503.3712883,
+    "ast_hash": "5d8612d7d22c62853d01222376eed268",
+    "semantic_hash": "5d8612d7d22c62853d01222376eed268"
+  },
+  "src/TuTa.Wms.Domain/Erp/Entities/ErpRecheckNotifier.cs": {
+    "mtime": 1787552503.3724885,
+    "ast_hash": "ff837f4f11e4688bab46cc6fe199cfdd",
+    "semantic_hash": "ff837f4f11e4688bab46cc6fe199cfdd"
+  },
+  "src/TuTa.Wms.Domain/Erp/Entities/ErpStateChgNotifier.cs": {
+    "mtime": 1787552503.3724885,
+    "ast_hash": "541d0d0d7d47a94af5f158e90688325e",
+    "semantic_hash": "541d0d0d7d47a94af5f158e90688325e"
+  },
+  "src/TuTa.Wms.Domain/Erp/Entities/ErpStockAftChk.cs": {
+    "mtime": 1787552503.373803,
+    "ast_hash": "e47b0885564d10cc2166af340b2df19c",
+    "semantic_hash": "e47b0885564d10cc2166af340b2df19c"
+  },
+  "src/TuTa.Wms.Domain/Erp/Entities/ErpStockCheck.cs": {
+    "mtime": 1787552503.373803,
+    "ast_hash": "51af551fd76026f836e8c6ba8ef6be52",
+    "semantic_hash": "51af551fd76026f836e8c6ba8ef6be52"
+  },
+  "src/TuTa.Wms.Domain/Erp/Entities/ErpStockInReturn.cs": {
+    "mtime": 1787552503.3747995,
+    "ast_hash": "ac05946dbf2d18f25af1a6a156d0bf90",
+    "semantic_hash": "ac05946dbf2d18f25af1a6a156d0bf90"
+  },
+  "src/TuTa.Wms.Domain/Erp/Entities/ErpStockMoveReturn.cs": {
+    "mtime": 1787552503.3747995,
+    "ast_hash": "9a751bedc4cb39daeb6fe84d58102b64",
+    "semantic_hash": "9a751bedc4cb39daeb6fe84d58102b64"
+  },
+  "src/TuTa.Wms.Domain/Erp/Entities/ErpStockOutReturn.cs": {
+    "mtime": 1787552503.376137,
+    "ast_hash": "31350e9c929abd15bb6f4e389c3f915d",
+    "semantic_hash": "31350e9c929abd15bb6f4e389c3f915d"
+  },
+  "src/TuTa.Wms.Domain/Erp/Entities/ErpWarehouseAreaPrdt.cs": {
+    "mtime": 1787552503.376137,
+    "ast_hash": "a6c6922d3439f362960cea0d84dc9499",
+    "semantic_hash": "a6c6922d3439f362960cea0d84dc9499"
+  },
+  "src/TuTa.Wms.Domain/Erp/ErpDeliveryStationManager.cs": {
+    "mtime": 1787552503.3771336,
+    "ast_hash": "4146dfa90ded17f23d3eefe562b0e0c2",
+    "semantic_hash": "4146dfa90ded17f23d3eefe562b0e0c2"
+  },
+  "src/TuTa.Wms.Domain/Erp/ErpInboundOrderManager.cs": {
+    "mtime": 1787552503.3778205,
+    "ast_hash": "5f62bb3e5538080d5215fc59b0924722",
+    "semantic_hash": "5f62bb3e5538080d5215fc59b0924722"
+  },
+  "src/TuTa.Wms.Domain/Erp/ErpMaterialManager.cs": {
+    "mtime": 1787552503.3784938,
+    "ast_hash": "23f266c869d84fed15a2a5e01d82b98f",
+    "semantic_hash": "23f266c869d84fed15a2a5e01d82b98f"
+  },
+  "src/TuTa.Wms.Domain/Erp/ErpModule.cs": {
+    "mtime": 1787552503.3784938,
+    "ast_hash": "728b51e17ed9740a2b472e162fde73ab",
+    "semantic_hash": "728b51e17ed9740a2b472e162fde73ab"
+  },
+  "src/TuTa.Wms.Domain/Erp/ErpOutboundOrderManager.cs": {
+    "mtime": 1787552503.3794904,
+    "ast_hash": "4eb0b7a53a01e87793bbebf8c8250f0a",
+    "semantic_hash": "4eb0b7a53a01e87793bbebf8c8250f0a"
+  },
+  "src/TuTa.Wms.Domain/Erp/ErpWorkshopMaterialTransferManager.cs": {
+    "mtime": 1787552503.3794904,
+    "ast_hash": "ac451cf838ffa56655561f8645e7bdd7",
+    "semantic_hash": "ac451cf838ffa56655561f8645e7bdd7"
+  },
+  "src/TuTa.Wms.Domain/Erp/ErpWorkstationMaterialReceiptManager.cs": {
+    "mtime": 1787552503.3804908,
+    "ast_hash": "7fcbd24e04d126bca2964fe99da7a3f5",
+    "semantic_hash": "7fcbd24e04d126bca2964fe99da7a3f5"
+  },
+  "src/TuTa.Wms.Domain/Erp/ErpWorkstationMaterialRequestManager.cs": {
+    "mtime": 1787552503.3804908,
+    "ast_hash": "d21a7efa52b3e59481fdcaa630f8fb0c",
+    "semantic_hash": "d21a7efa52b3e59481fdcaa630f8fb0c"
+  },
+  "src/TuTa.Wms.Domain/Erp/EventHandlers/Erp_StockEventHandler.cs": {
+    "mtime": 1787552503.3817697,
+    "ast_hash": "6f42225161cd46ee21f821e0ca2f3481",
+    "semantic_hash": "6f42225161cd46ee21f821e0ca2f3481"
+  },
+  "src/TuTa.Wms.Domain/Erp/IErpAsnRepository.cs": {
+    "mtime": 1787552503.38277,
+    "ast_hash": "23dcc5aa877fdf181e3d22f3d4a306ec",
+    "semantic_hash": "23dcc5aa877fdf181e3d22f3d4a306ec"
+  },
+  "src/TuTa.Wms.Domain/Erp/IErpBarcodeRepository.cs": {
+    "mtime": 1787552503.38277,
+    "ast_hash": "6841db82b7274ed89332b97cdd92e050",
+    "semantic_hash": "6841db82b7274ed89332b97cdd92e050"
+  },
+  "src/TuTa.Wms.Domain/Erp/IErpDeliveryOrderRepository.cs": {
+    "mtime": 1787552503.384045,
+    "ast_hash": "0ec97fc29e6cb45969293617268a6f89",
+    "semantic_hash": "0ec97fc29e6cb45969293617268a6f89"
+  },
+  "src/TuTa.Wms.Domain/Erp/IErpDeliveryStationRepository.cs": {
+    "mtime": 1787552503.384045,
+    "ast_hash": "f16ba13dc40c8f8ce90e32e171c223e1",
+    "semantic_hash": "f16ba13dc40c8f8ce90e32e171c223e1"
+  },
+  "src/TuTa.Wms.Domain/Erp/IErpDepartmentRepository.cs": {
+    "mtime": 1787552503.3850453,
+    "ast_hash": "ecc459048723dac5c3c197db3fc4e4de",
+    "semantic_hash": "ecc459048723dac5c3c197db3fc4e4de"
+  },
+  "src/TuTa.Wms.Domain/Erp/IErpDeptTypeDetailRepository.cs": {
+    "mtime": 1787552503.3850453,
+    "ast_hash": "aeab73e98a10ffc1962eaa43bc662430",
+    "semantic_hash": "aeab73e98a10ffc1962eaa43bc662430"
+  },
+  "src/TuTa.Wms.Domain/Erp/IErpDeptTypeRepository.cs": {
+    "mtime": 1787552503.3863814,
+    "ast_hash": "5665984abc6831a27e6cd3d5bf5af64e",
+    "semantic_hash": "5665984abc6831a27e6cd3d5bf5af64e"
+  },
+  "src/TuTa.Wms.Domain/Erp/IErpInboundOrderRepository.cs": {
+    "mtime": 1787552503.3863814,
+    "ast_hash": "c195f400371babadfbe098e27ec6a306",
+    "semantic_hash": "c195f400371babadfbe098e27ec6a306"
+  },
+  "src/TuTa.Wms.Domain/Erp/IErpMaterialRepository.cs": {
+    "mtime": 1787552503.387589,
+    "ast_hash": "ed9eaf1fa6e022d793d7aa890a4c79e3",
+    "semantic_hash": "ed9eaf1fa6e022d793d7aa890a4c79e3"
+  },
+  "src/TuTa.Wms.Domain/Erp/IErpMoveRepository.cs": {
+    "mtime": 1787552503.387589,
+    "ast_hash": "ce23710288bf06c689ec1383bb23c92f",
+    "semantic_hash": "ce23710288bf06c689ec1383bb23c92f"
+  },
+  "src/TuTa.Wms.Domain/Erp/IErpNoPlanPickTypeRepository.cs": {
+    "mtime": 1787552503.3887162,
+    "ast_hash": "dc2f77fc47f53d5998c4917d4d03575e",
+    "semantic_hash": "dc2f77fc47f53d5998c4917d4d03575e"
+  },
+  "src/TuTa.Wms.Domain/Erp/IErpOutboundOrderRepository.cs": {
+    "mtime": 1787552503.3887162,
+    "ast_hash": "fea2d76f59fca0722a394049fe239d25",
+    "semantic_hash": "fea2d76f59fca0722a394049fe239d25"
+  },
+  "src/TuTa.Wms.Domain/Erp/IErpPickManRepository.cs": {
+    "mtime": 1787552503.3897164,
+    "ast_hash": "97223c218117b10a0dde16187c29a557",
+    "semantic_hash": "97223c218117b10a0dde16187c29a557"
+  },
+  "src/TuTa.Wms.Domain/Erp/IErpPickOrderRepository.cs": {
+    "mtime": 1787552503.3897164,
+    "ast_hash": "c832599ef506c752ce3800a7ec6981ff",
+    "semantic_hash": "c832599ef506c752ce3800a7ec6981ff"
+  },
+  "src/TuTa.Wms.Domain/Erp/IErpRecheckNotifierRepository.cs": {
+    "mtime": 1787552503.3909636,
+    "ast_hash": "1bf90931cdfe70c96bf3c3f3b90d9f6a",
+    "semantic_hash": "1bf90931cdfe70c96bf3c3f3b90d9f6a"
+  },
+  "src/TuTa.Wms.Domain/Erp/IErpStateChgNotifierRepository.cs": {
+    "mtime": 1787552503.3909636,
+    "ast_hash": "648d1194f484dd59cb4c6199a2f036ab",
+    "semantic_hash": "648d1194f484dd59cb4c6199a2f036ab"
+  },
+  "src/TuTa.Wms.Domain/Erp/IErpStockAftChkRepository.cs": {
+    "mtime": 1787552503.3921804,
+    "ast_hash": "f9150f9bd0247efdf9fd27c7ed9ec29e",
+    "semantic_hash": "f9150f9bd0247efdf9fd27c7ed9ec29e"
+  },
+  "src/TuTa.Wms.Domain/Erp/IErpWarehouseAreaPrdtRepository.cs": {
+    "mtime": 1787552503.3921804,
+    "ast_hash": "69ea617f758c70aa2df131f0fad0b61b",
+    "semantic_hash": "69ea617f758c70aa2df131f0fad0b61b"
+  },
+  "src/TuTa.Wms.Domain/Erp/IErpWorkshopMaterialTransferRepository.cs": {
+    "mtime": 1787552503.3932817,
+    "ast_hash": "4d462b57cdbc88f222e394894617274c",
+    "semantic_hash": "4d462b57cdbc88f222e394894617274c"
+  },
+  "src/TuTa.Wms.Domain/Erp/IErpWorkstationMaterialReceiptRepository.cs": {
+    "mtime": 1787552503.3932817,
+    "ast_hash": "b00c4c792f2d7d5f2c98b9c172e1aacc",
+    "semantic_hash": "b00c4c792f2d7d5f2c98b9c172e1aacc"
+  },
+  "src/TuTa.Wms.Domain/Erp/IErpWorkstationMaterialRequestRepository.cs": {
+    "mtime": 1787552503.395046,
+    "ast_hash": "b1d5548180fcde4b0b3bc819ac9d0bf2",
+    "semantic_hash": "b1d5548180fcde4b0b3bc819ac9d0bf2"
+  },
+  "src/TuTa.Wms.Domain/Materials/Aggregates/Material.cs": {
+    "mtime": 1787552503.396043,
+    "ast_hash": "8375857004308d0850fdfde41eacccc7",
+    "semantic_hash": "8375857004308d0850fdfde41eacccc7"
+  },
+  "src/TuTa.Wms.Domain/Materials/IMaterialRepository.cs": {
+    "mtime": 1787552503.3970432,
+    "ast_hash": "d68ca48bddd9678ebeec0cc9a2af49d5",
+    "semantic_hash": "d68ca48bddd9678ebeec0cc9a2af49d5"
+  },
+  "src/TuTa.Wms.Domain/Materials/MaterialManager.cs": {
+    "mtime": 1787552503.398207,
+    "ast_hash": "9fd65f5651e1f4e29cd7007d30d1c90d",
+    "semantic_hash": "9fd65f5651e1f4e29cd7007d30d1c90d"
+  },
+  "src/TuTa.Wms.Domain/Moves/Aggregates/Move.cs": {
+    "mtime": 1787552503.3996751,
+    "ast_hash": "6922a1a6225a1318ef69e4ef132c9d6c",
+    "semantic_hash": "6922a1a6225a1318ef69e4ef132c9d6c"
+  },
+  "src/TuTa.Wms.Domain/Moves/IMoveRepository.cs": {
+    "mtime": 1787552503.3996751,
+    "ast_hash": "0a6c5eba8cea5e8ade460577bb617ab0",
+    "semantic_hash": "0a6c5eba8cea5e8ade460577bb617ab0"
+  },
+  "src/TuTa.Wms.Domain/OpenIddict/OpenIddictDataSeedContributor.cs": {
+    "mtime": 1787552503.400673,
+    "ast_hash": "a1154b0a311847b8a86e59b7e716b29f",
+    "semantic_hash": "a1154b0a311847b8a86e59b7e716b29f"
+  },
+  "src/TuTa.Wms.Domain/PickLists/Aggregates/PickList.cs": {
+    "mtime": 1787552503.4021318,
+    "ast_hash": "b20a50a42f344bbea6a3c0cd27b079be",
+    "semantic_hash": "b20a50a42f344bbea6a3c0cd27b079be"
+  },
+  "src/TuTa.Wms.Domain/PickLists/Entities/PickItem.cs": {
+    "mtime": 1787552503.4036436,
+    "ast_hash": "357f23c85d956ac6bb644db5f167bbea",
+    "semantic_hash": "357f23c85d956ac6bb644db5f167bbea"
+  },
+  "src/TuTa.Wms.Domain/PickLists/Entities/PickStock.cs": {
+    "mtime": 1787552503.4036436,
+    "ast_hash": "b516651328a2ff76551d50bf642d4521",
+    "semantic_hash": "b516651328a2ff76551d50bf642d4521"
+  },
+  "src/TuTa.Wms.Domain/PickLists/Events/PickListStockOutEvent.cs": {
+    "mtime": 1787552503.4046402,
+    "ast_hash": "52564ed595740f63f561ffe78a48790d",
+    "semantic_hash": "52564ed595740f63f561ffe78a48790d"
+  },
+  "src/TuTa.Wms.Domain/PickLists/IPickItemRepository.cs": {
+    "mtime": 1787552503.406048,
+    "ast_hash": "a1c91e01c942ae6408ad0dbd526496d0",
+    "semantic_hash": "a1c91e01c942ae6408ad0dbd526496d0"
+  },
+  "src/TuTa.Wms.Domain/PickLists/IPickListRepository.cs": {
+    "mtime": 1787552503.406048,
+    "ast_hash": "9c9f05b2eb95e16814e83d8561053743",
+    "semantic_hash": "9c9f05b2eb95e16814e83d8561053743"
+  },
+  "src/TuTa.Wms.Domain/PickLists/PickListManager.cs": {
+    "mtime": 1787552503.4070444,
+    "ast_hash": "56d96c70f6eb7e8d24f7557a9ba3c44d",
+    "semantic_hash": "56d96c70f6eb7e8d24f7557a9ba3c44d"
+  },
+  "src/TuTa.Wms.Domain/PickLists/PickTypeHelper.cs": {
+    "mtime": 1787552503.4070444,
+    "ast_hash": "418b50c1f84f762a759aaa219a9abc69",
+    "semantic_hash": "418b50c1f84f762a759aaa219a9abc69"
+  },
+  "src/TuTa.Wms.Domain/PickLists/ValueObjects/GoodsInfoOfPickList.cs": {
+    "mtime": 1787552503.4083436,
+    "ast_hash": "ac5b89cb57322f1b144345247eec5506",
+    "semantic_hash": "ac5b89cb57322f1b144345247eec5506"
+  },
+  "src/TuTa.Wms.Domain/PickLists/ValueObjects/PickerInfoOfPickList.cs": {
+    "mtime": 1787552503.4093401,
+    "ast_hash": "9eac86d993ccf95a9af2a317a33e17fc",
+    "semantic_hash": "9eac86d993ccf95a9af2a317a33e17fc"
+  },
+  "src/TuTa.Wms.Domain/Properties/AssemblyInfo.cs": {
+    "mtime": 1787552503.4104948,
+    "ast_hash": "e2bccf29de7822ae618e563e1e987fa2",
+    "semantic_hash": "e2bccf29de7822ae618e563e1e987fa2"
+  },
+  "src/TuTa.Wms.Domain/QueryDataInPage.cs": {
+    "mtime": 1787552503.4104948,
+    "ast_hash": "6f6286c4474b15f30bef454da9638b13",
+    "semantic_hash": "6f6286c4474b15f30bef454da9638b13"
+  },
+  "src/TuTa.Wms.Domain/RecheckLists/Aggregates/RecheckList.cs": {
+    "mtime": 1787552503.4114914,
+    "ast_hash": "9b34fa04e27c31f3ecc82ac722a8cac6",
+    "semantic_hash": "9b34fa04e27c31f3ecc82ac722a8cac6"
+  },
+  "src/TuTa.Wms.Domain/RecheckLists/Entities/ReCheckItem.cs": {
+    "mtime": 1787552503.4129806,
+    "ast_hash": "02d80087fe450ac39ef0cd1e83dfb4fe",
+    "semantic_hash": "02d80087fe450ac39ef0cd1e83dfb4fe"
+  },
+  "src/TuTa.Wms.Domain/RecheckLists/Entities/RecheckStock.cs": {
+    "mtime": 1787552503.4139776,
+    "ast_hash": "e233cb02134ea358bbd32b3e7281b500",
+    "semantic_hash": "e233cb02134ea358bbd32b3e7281b500"
+  },
+  "src/TuTa.Wms.Domain/RecheckLists/Events/FreezeStockEvent.cs": {
+    "mtime": 1787552503.4148514,
+    "ast_hash": "c2d7b3609f76e332b8d5aee6d134c694",
+    "semantic_hash": "c2d7b3609f76e332b8d5aee6d134c694"
+  },
+  "src/TuTa.Wms.Domain/RecheckLists/Events/ReCheckStockOutEvent.cs": {
+    "mtime": 1787552503.4158483,
+    "ast_hash": "644b04d688b941013cc3fb3887a55bb4",
+    "semantic_hash": "644b04d688b941013cc3fb3887a55bb4"
+  },
+  "src/TuTa.Wms.Domain/RecheckLists/Events/UnFreezeStockEvent.cs": {
+    "mtime": 1787552503.4165409,
+    "ast_hash": "80a1e03f7f78cc6d753878a7df6b3ff8",
+    "semantic_hash": "80a1e03f7f78cc6d753878a7df6b3ff8"
+  },
+  "src/TuTa.Wms.Domain/RecheckLists/IRecheckItemRepository.cs": {
+    "mtime": 1787552503.4171946,
+    "ast_hash": "09bc7a32bc247a35f5d75943338fad97",
+    "semantic_hash": "09bc7a32bc247a35f5d75943338fad97"
+  },
+  "src/TuTa.Wms.Domain/RecheckLists/IRecheckListRepository.cs": {
+    "mtime": 1787552503.4171946,
+    "ast_hash": "11ed883eb8316ccd2dfc71df6cc34616",
+    "semantic_hash": "11ed883eb8316ccd2dfc71df6cc34616"
+  },
+  "src/TuTa.Wms.Domain/RecheckLists/RecheckListManager.cs": {
+    "mtime": 1787552503.418208,
+    "ast_hash": "acb402fa395cc8960d9618af5ee1a388",
+    "semantic_hash": "acb402fa395cc8960d9618af5ee1a388"
+  },
+  "src/TuTa.Wms.Domain/RecheckLists/ValueObjects/MaterialInfoOfRechkList.cs": {
+    "mtime": 1787552503.419448,
+    "ast_hash": "a3bda477fa8c06a0b87465ec1d9bfd2f",
+    "semantic_hash": "a3bda477fa8c06a0b87465ec1d9bfd2f"
+  },
+  "src/TuTa.Wms.Domain/Settings/WmsSettingDefinitionProvider.cs": {
+    "mtime": 1787552503.420445,
+    "ast_hash": "859efb2c8baf9aad58a2c2e7f9f667b1",
+    "semantic_hash": "859efb2c8baf9aad58a2c2e7f9f667b1"
+  },
+  "src/TuTa.Wms.Domain/Settings/WmsSettings.cs": {
+    "mtime": 1787552503.420445,
+    "ast_hash": "d093addb786dae6e8aa14bf79cbba45d",
+    "semantic_hash": "d093addb786dae6e8aa14bf79cbba45d"
+  },
+  "src/TuTa.Wms.Domain/Skips/Aggregates/Skip.cs": {
+    "mtime": 1787552503.421911,
+    "ast_hash": "c39c20a00eeae89b745748b29583ff5c",
+    "semantic_hash": "c39c20a00eeae89b745748b29583ff5c"
+  },
+  "src/TuTa.Wms.Domain/Skips/ISkipRepository.cs": {
+    "mtime": 1787552503.4230423,
+    "ast_hash": "019541b544bdcee82c290d62f6749861",
+    "semantic_hash": "019541b544bdcee82c290d62f6749861"
+  },
+  "src/TuTa.Wms.Domain/Skips/SkipManager.cs": {
+    "mtime": 1787552503.4241583,
+    "ast_hash": "5237ce76f2e13c131decfdf35c7970b7",
+    "semantic_hash": "5237ce76f2e13c131decfdf35c7970b7"
+  },
+  "src/TuTa.Wms.Domain/StockInHistories/Aggregates/StockInHistory.cs": {
+    "mtime": 1787552503.4251585,
+    "ast_hash": "138a1d07d757eddb749ed95d158fb168",
+    "semantic_hash": "138a1d07d757eddb749ed95d158fb168"
+  },
+  "src/TuTa.Wms.Domain/StockInHistories/EventHandlers/StockInHistory_StockEventHandler.cs": {
+    "mtime": 1787552503.4264667,
+    "ast_hash": "26882a8283a157cd4000103908756971",
+    "semantic_hash": "26882a8283a157cd4000103908756971"
+  },
+  "src/TuTa.Wms.Domain/StockInHistories/IStockInHistoryRepository.cs": {
+    "mtime": 1787552503.4264667,
+    "ast_hash": "6ddbacfccb931f8568c0911ccd9db964",
+    "semantic_hash": "6ddbacfccb931f8568c0911ccd9db964"
+  },
+  "src/TuTa.Wms.Domain/StockInHistories/ValueObjects/CheckInfoOfStockInHistory.cs": {
+    "mtime": 1787552503.4276874,
+    "ast_hash": "21810f4a922d42a0d175b6188d019a80",
+    "semantic_hash": "21810f4a922d42a0d175b6188d019a80"
+  },
+  "src/TuTa.Wms.Domain/StockInHistories/ValueObjects/MaterialInfoOfStockInHistory.cs": {
+    "mtime": 1787552503.4276874,
+    "ast_hash": "d4f928afc47dbaa8938472dbc21295b7",
+    "semantic_hash": "d4f928afc47dbaa8938472dbc21295b7"
+  },
+  "src/TuTa.Wms.Domain/StockInHistories/ValueObjects/StockPlaceOfStockInHistory.cs": {
+    "mtime": 1787552503.4291348,
+    "ast_hash": "9855a444dc87002f3ee2b162648dfb8d",
+    "semantic_hash": "9855a444dc87002f3ee2b162648dfb8d"
+  },
+  "src/TuTa.Wms.Domain/StockInHistories/ValueObjects/SupplierInfoOfStockInHistory.cs": {
+    "mtime": 1787552503.4291348,
+    "ast_hash": "98cfaf2082e881dbf6c7b93d039abad8",
+    "semantic_hash": "98cfaf2082e881dbf6c7b93d039abad8"
+  },
+  "src/TuTa.Wms.Domain/StockOutHistories/Aggregates/StockOutHistory.cs": {
+    "mtime": 1787552503.4317727,
+    "ast_hash": "f4d3613e5f5c9c7bbb963160f9dc758a",
+    "semantic_hash": "f4d3613e5f5c9c7bbb963160f9dc758a"
+  },
+  "src/TuTa.Wms.Domain/StockOutHistories/EventHandlers/StockOutHistory_StockEventHandler.cs": {
+    "mtime": 1787552503.4327729,
+    "ast_hash": "ea3e83b5d4e5c0d8fc083bdb5baee37f",
+    "semantic_hash": "ea3e83b5d4e5c0d8fc083bdb5baee37f"
+  },
+  "src/TuTa.Wms.Domain/StockOutHistories/IStockOutHistoryRepository.cs": {
+    "mtime": 1787552503.4327729,
+    "ast_hash": "4994100fcd87d105354bf36e87732c6f",
+    "semantic_hash": "4994100fcd87d105354bf36e87732c6f"
+  },
+  "src/TuTa.Wms.Domain/Stocks/Aggregates/Stock.cs": {
+    "mtime": 1787552503.4350464,
+    "ast_hash": "8caba453a8cf8e8ecbb6ebcf39d9a20c",
+    "semantic_hash": "8caba453a8cf8e8ecbb6ebcf39d9a20c"
+  },
+  "src/TuTa.Wms.Domain/Stocks/EventHandlers/BoxEventHandler.cs": {
+    "mtime": 1787552503.436043,
+    "ast_hash": "9c5eca819335dd8411511a63707353b3",
+    "semantic_hash": "9c5eca819335dd8411511a63707353b3"
+  },
+  "src/TuTa.Wms.Domain/Stocks/EventHandlers/ChkResultListEventHandler.cs": {
+    "mtime": 1787552503.436043,
+    "ast_hash": "ac2d56b48d12026ed1415c68dc9b384e",
+    "semantic_hash": "ac2d56b48d12026ed1415c68dc9b384e"
+  },
+  "src/TuTa.Wms.Domain/Stocks/EventHandlers/Stock_PickListEventHandler.cs": {
+    "mtime": 1787552503.4373007,
+    "ast_hash": "5911a7fb55d79b25ffe4f63e28eea04b",
+    "semantic_hash": "5911a7fb55d79b25ffe4f63e28eea04b"
+  },
+  "src/TuTa.Wms.Domain/Stocks/EventHandlers/Stock_RecheckListEventHandler.cs": {
+    "mtime": 1787552503.4373007,
+    "ast_hash": "feda60a9eb39306d4b05a3e425bc5a05",
+    "semantic_hash": "feda60a9eb39306d4b05a3e425bc5a05"
+  },
+  "src/TuTa.Wms.Domain/Stocks/Events/StockBindBoxAndCellEvent.cs": {
+    "mtime": 1787552503.4382973,
+    "ast_hash": "fc6f8bbf23e96004a61a578e93dc94b9",
+    "semantic_hash": "fc6f8bbf23e96004a61a578e93dc94b9"
+  },
+  "src/TuTa.Wms.Domain/Stocks/Events/StockBindBoxEvent.cs": {
+    "mtime": 1787552503.4394917,
+    "ast_hash": "39181cf42df8f579e48054f963dcf265",
+    "semantic_hash": "39181cf42df8f579e48054f963dcf265"
+  },
+  "src/TuTa.Wms.Domain/Stocks/Events/StockCheckEvent.cs": {
+    "mtime": 1787552503.4400897,
+    "ast_hash": "62361fce061ee728aa7558ddcdbf2dc6",
+    "semantic_hash": "62361fce061ee728aa7558ddcdbf2dc6"
+  },
+  "src/TuTa.Wms.Domain/Stocks/Events/StockMoveEvent.cs": {
+    "mtime": 1787552503.4400897,
+    "ast_hash": "56b1c4509ce0155efc8335879f5fcb31",
+    "semantic_hash": "56b1c4509ce0155efc8335879f5fcb31"
+  },
+  "src/TuTa.Wms.Domain/Stocks/Events/StockPickOutEvent.cs": {
+    "mtime": 1787552503.4410863,
+    "ast_hash": "b23654b5e002a2f9e8b8883a705edf04",
+    "semantic_hash": "b23654b5e002a2f9e8b8883a705edf04"
+  },
+  "src/TuTa.Wms.Domain/Stocks/Events/StockRecheckOutEvent.cs": {
+    "mtime": 1787552503.4418495,
+    "ast_hash": "b28587df0476b34b9eb9327469739db2",
+    "semantic_hash": "b28587df0476b34b9eb9327469739db2"
+  },
+  "src/TuTa.Wms.Domain/Stocks/Events/StockUsedUpEvent.cs": {
+    "mtime": 1787552503.4418495,
+    "ast_hash": "0366641957b1acb8188a433c9dfd04d7",
+    "semantic_hash": "0366641957b1acb8188a433c9dfd04d7"
+  },
+  "src/TuTa.Wms.Domain/Stocks/IStockRepository.cs": {
+    "mtime": 1787552503.442846,
+    "ast_hash": "e0ba7839ef3e12dfe59a41d67da8106a",
+    "semantic_hash": "e0ba7839ef3e12dfe59a41d67da8106a"
+  },
+  "src/TuTa.Wms.Domain/Stocks/StockManager.cs": {
+    "mtime": 1787552503.442846,
+    "ast_hash": "9a73299479e7f0a9baffb81d03b11113",
+    "semantic_hash": "9a73299479e7f0a9baffb81d03b11113"
+  },
+  "src/TuTa.Wms.Domain/Stocks/ValueObjects/BoxInfoOfStock.cs": {
+    "mtime": 1787552503.444006,
+    "ast_hash": "63e1a43eece12d39f6b22f61bac18f76",
+    "semantic_hash": "63e1a43eece12d39f6b22f61bac18f76"
+  },
+  "src/TuTa.Wms.Domain/Stocks/ValueObjects/CellInfoOfStock.cs": {
+    "mtime": 1787552503.4451375,
+    "ast_hash": "378dda132839bab742b306a3cde4e1d8",
+    "semantic_hash": "378dda132839bab742b306a3cde4e1d8"
+  },
+  "src/TuTa.Wms.Domain/Stocks/ValueObjects/CheckInfoOfStock.cs": {
+    "mtime": 1787552503.4451375,
+    "ast_hash": "aa7a8a6421dd650a44945150ffecfc83",
+    "semantic_hash": "aa7a8a6421dd650a44945150ffecfc83"
+  },
+  "src/TuTa.Wms.Domain/Stocks/ValueObjects/CountInfoOfStock.cs": {
+    "mtime": 1787552503.4464512,
+    "ast_hash": "048823c6037edf80eca925e87d50dfda",
+    "semantic_hash": "048823c6037edf80eca925e87d50dfda"
+  },
+  "src/TuTa.Wms.Domain/Stocks/ValueObjects/MaterialInfoOfStock.cs": {
+    "mtime": 1787552503.4464512,
+    "ast_hash": "85209c4025a0b3749f266c129e64d154",
+    "semantic_hash": "85209c4025a0b3749f266c129e64d154"
+  },
+  "src/TuTa.Wms.Domain/Stocks/ValueObjects/SupplierInfoOfStock.cs": {
+    "mtime": 1787552503.4476025,
+    "ast_hash": "04acc25d4815b46257afa8ea2d1fcc54",
+    "semantic_hash": "04acc25d4815b46257afa8ea2d1fcc54"
+  },
+  "src/TuTa.Wms.Domain/Stocks/ValueObjects/WarehouseInfoOfStock.cs": {
+    "mtime": 1787552503.4476025,
+    "ast_hash": "24120c154b2a7267d4025388f2493eef",
+    "semantic_hash": "24120c154b2a7267d4025388f2493eef"
+  },
+  "src/TuTa.Wms.Domain/TuTa.Wms.Domain.csproj": {
+    "mtime": 1787552503.4486027,
+    "ast_hash": "6c7245a9b541287affc08cd99c622225",
+    "semantic_hash": "6c7245a9b541287affc08cd99c622225"
+  },
+  "src/TuTa.Wms.Domain/Warehouses/Aggregates/Warehouse.cs": {
+    "mtime": 1787552503.4501076,
+    "ast_hash": "3da59e71ad6837a2f7caa0318fee1509",
+    "semantic_hash": "3da59e71ad6837a2f7caa0318fee1509"
+  },
+  "src/TuTa.Wms.Domain/Warehouses/Entities/WarehouseArea.cs": {
+    "mtime": 1787552503.451381,
+    "ast_hash": "3e9cd8dfa6b263ead1398e640df7c684",
+    "semantic_hash": "3e9cd8dfa6b263ead1398e640df7c684"
+  },
+  "src/TuTa.Wms.Domain/Warehouses/IWarehouseRepository.cs": {
+    "mtime": 1787552503.451381,
+    "ast_hash": "d617913fe5a9e60a32c1f5734a53228f",
+    "semantic_hash": "d617913fe5a9e60a32c1f5734a53228f"
+  },
+  "src/TuTa.Wms.Domain/Warehouses/WarehouseDataSeedContributor.cs": {
+    "mtime": 1787552503.4526262,
+    "ast_hash": "613675d31ce50dd2855118a79246ab53",
+    "semantic_hash": "613675d31ce50dd2855118a79246ab53"
+  },
+  "src/TuTa.Wms.Domain/Warehouses/WarehouseManager.cs": {
+    "mtime": 1787552503.4526262,
+    "ast_hash": "9d6171e393d04b5272bbf836bae6334c",
+    "semantic_hash": "9d6171e393d04b5272bbf836bae6334c"
+  },
+  "src/TuTa.Wms.Domain/WmsConsts.cs": {
+    "mtime": 1787552503.4536228,
+    "ast_hash": "b95b2799ba7d65363a69d3e751212879",
+    "semantic_hash": "b95b2799ba7d65363a69d3e751212879"
+  },
+  "src/TuTa.Wms.Domain/WmsDomainHelper.cs": {
+    "mtime": 1787552503.4536228,
+    "ast_hash": "a0ea29a006c2f9d1f31fb8d84459edcb",
+    "semantic_hash": "a0ea29a006c2f9d1f31fb8d84459edcb"
+  },
+  "src/TuTa.Wms.Domain/WmsDomainModule.cs": {
+    "mtime": 1787552503.4549224,
+    "ast_hash": "4235cd5c36876e45f21414b615991dc4",
+    "semantic_hash": "4235cd5c36876e45f21414b615991dc4"
+  },
+  "src/TuTa.Wms.Domain/WmsDomainService.cs": {
+    "mtime": 1787552503.4549224,
+    "ast_hash": "f3fa41f7cc6b838f41a86b9d9afedb7c",
+    "semantic_hash": "f3fa41f7cc6b838f41a86b9d9afedb7c"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/EntityFrameworkCore/EntityFrameworkCoreWmsDbSchemaMigrator.cs": {
+    "mtime": 1787552503.4561226,
+    "ast_hash": "d53820ed685e5fc44a85e9950d562f89",
+    "semantic_hash": "d53820ed685e5fc44a85e9950d562f89"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/EntityFrameworkCore/ErpDbContext.cs": {
+    "mtime": 1787552503.4573536,
+    "ast_hash": "6e51f7af9447898307d31e063fe31023",
+    "semantic_hash": "6e51f7af9447898307d31e063fe31023"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/EntityFrameworkCore/ErpDbContextFactory.cs": {
+    "mtime": 1787552503.4583898,
+    "ast_hash": "8c929e7376bb09375d0a304bfaa26d41",
+    "semantic_hash": "8c929e7376bb09375d0a304bfaa26d41"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/EntityFrameworkCore/Repositories/ErpDeliveryStationRepository.cs": {
+    "mtime": 1787552503.4596095,
+    "ast_hash": "590f113158c441196b7562b4f2bdfba9",
+    "semantic_hash": "590f113158c441196b7562b4f2bdfba9"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/EntityFrameworkCore/Repositories/ErpInboundOrderRepository.cs": {
+    "mtime": 1787552503.4596095,
+    "ast_hash": "91eb0bcb8d97a12dcc5eb89912009baa",
+    "semantic_hash": "91eb0bcb8d97a12dcc5eb89912009baa"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/EntityFrameworkCore/Repositories/ErpMaterialRepository.cs": {
+    "mtime": 1787552503.4607031,
+    "ast_hash": "11b7391f6490c5960cfabf1c3aa44403",
+    "semantic_hash": "11b7391f6490c5960cfabf1c3aa44403"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/EntityFrameworkCore/Repositories/ErpOutboundOrderRepository.cs": {
+    "mtime": 1787552503.4607031,
+    "ast_hash": "06877bc909520d2b504e7f070daf925e",
+    "semantic_hash": "06877bc909520d2b504e7f070daf925e"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/EntityFrameworkCore/WmsDbContext.cs": {
+    "mtime": 1787552503.461968,
+    "ast_hash": "87735ae8a4b5759b8cbcb2dd24cd31f5",
+    "semantic_hash": "87735ae8a4b5759b8cbcb2dd24cd31f5"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/EntityFrameworkCore/WmsDbContextFactory.cs": {
+    "mtime": 1787552503.461968,
+    "ast_hash": "68e234586721454dbb91f67a6a88e08f",
+    "semantic_hash": "68e234586721454dbb91f67a6a88e08f"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/EntityFrameworkCore/WmsEfCoreEntityExtensionMappings.cs": {
+    "mtime": 1787552503.4632752,
+    "ast_hash": "21e9b38ca9efc4f5d62015d82269ef8b",
+    "semantic_hash": "21e9b38ca9efc4f5d62015d82269ef8b"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/EntityFrameworkCore/WmsEntityFrameworkCoreModule.cs": {
+    "mtime": 1787552503.4632752,
+    "ast_hash": "a86110bf80b788bc83687037bb00ac95",
+    "semantic_hash": "a86110bf80b788bc83687037bb00ac95"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Erp/ErpAsnRepository.cs": {
+    "mtime": 1787552503.4642725,
+    "ast_hash": "25f554464d4c05ccdf2ffaa435732b1d",
+    "semantic_hash": "25f554464d4c05ccdf2ffaa435732b1d"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Erp/ErpDeliveryOrderRepository.cs": {
+    "mtime": 1787552503.4654415,
+    "ast_hash": "d0eae3703f805c1b8d41fc345184ea22",
+    "semantic_hash": "d0eae3703f805c1b8d41fc345184ea22"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Properties/AssemblyInfo.cs": {
+    "mtime": 1787552503.4740577,
+    "ast_hash": "032309c77a2660d35a60e7e5ee843e74",
+    "semantic_hash": "032309c77a2660d35a60e7e5ee843e74"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/AgvTasks/EfCoreAgvTaskRepository.cs": {
+    "mtime": 1787552503.4762614,
+    "ast_hash": "2e406e50f26ed15bcfe67d2287693b36",
+    "semantic_hash": "2e406e50f26ed15bcfe67d2287693b36"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/BarcodeChecks/EfCoreBarcodeCheckRepository.cs": {
+    "mtime": 1787552503.4762614,
+    "ast_hash": "142437eeaa2c131296d91577ed101318",
+    "semantic_hash": "142437eeaa2c131296d91577ed101318"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/BarcodeLists/EfCoreBarcodeListRepository.cs": {
+    "mtime": 1787552503.477727,
+    "ast_hash": "0db1893b64270768de9988e0dee2e6f1",
+    "semantic_hash": "0db1893b64270768de9988e0dee2e6f1"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/Boxes/EfCoreBoxRepository.cs": {
+    "mtime": 1787552503.4793634,
+    "ast_hash": "7691009065a4c505301a907a18528efa",
+    "semantic_hash": "7691009065a4c505301a907a18528efa"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/Cells/EfCoreCellRepository.cs": {
+    "mtime": 1787552503.4803667,
+    "ast_hash": "88d74f39130f62ca996de63c42106590",
+    "semantic_hash": "88d74f39130f62ca996de63c42106590"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/ChkResultLists/EfCoreChkResultListRepository.cs": {
+    "mtime": 1787552503.4813156,
+    "ast_hash": "1447a703487ac0cb205e818ba51a1e9e",
+    "semantic_hash": "1447a703487ac0cb205e818ba51a1e9e"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/Departments/EfCoreDepartmentRepository.cs": {
+    "mtime": 1787552503.4823122,
+    "ast_hash": "e31c64c01bf49815ed345c0f652329c8",
+    "semantic_hash": "e31c64c01bf49815ed345c0f652329c8"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/EfCoreQueryableExtensions.cs": {
+    "mtime": 1787552503.4823122,
+    "ast_hash": "3e457c24c0c20730b607b1e4642ad3fc",
+    "semantic_hash": "3e457c24c0c20730b607b1e4642ad3fc"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/Erp/EfCoreErpBarcodeRepository.cs": {
+    "mtime": 1787552503.4833057,
+    "ast_hash": "9389e88a1cbf6d7319ff719d311841a5",
+    "semantic_hash": "9389e88a1cbf6d7319ff719d311841a5"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/Erp/EfCoreErpDepartmentRepository.cs": {
+    "mtime": 1787552503.4843025,
+    "ast_hash": "3afd6b50b7b21b486f36a714fcf8f266",
+    "semantic_hash": "3afd6b50b7b21b486f36a714fcf8f266"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/Erp/EfCoreErpDeptTypeDetailRepository.cs": {
+    "mtime": 1787552503.4848993,
+    "ast_hash": "7032bed8f9def23ed5fed6fa92669495",
+    "semantic_hash": "7032bed8f9def23ed5fed6fa92669495"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/Erp/EfCoreErpDeptTypeRepository.cs": {
+    "mtime": 1787552503.4848993,
+    "ast_hash": "012237ec7392661c04c8fa0fad3d9294",
+    "semantic_hash": "012237ec7392661c04c8fa0fad3d9294"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/Erp/EfCoreErpMoveRepository.cs": {
+    "mtime": 1787552503.4862652,
+    "ast_hash": "6de0d2cda06fb25f03a534f0c814f6f0",
+    "semantic_hash": "6de0d2cda06fb25f03a534f0c814f6f0"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/Erp/EfCoreErpNoPlanPickTypeRepository.cs": {
+    "mtime": 1787552503.4862652,
+    "ast_hash": "0c27ff312ad4b484cdd3643c22f628c1",
+    "semantic_hash": "0c27ff312ad4b484cdd3643c22f628c1"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/Erp/EfCoreErpPickManRepository.cs": {
+    "mtime": 1787552503.4872622,
+    "ast_hash": "dca58f8200875699201889c4a84a621c",
+    "semantic_hash": "dca58f8200875699201889c4a84a621c"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/Erp/EfCoreErpPickOrderRepository.cs": {
+    "mtime": 1787552503.487867,
+    "ast_hash": "3ac4fe0277fcbe509a57438e44b4e198",
+    "semantic_hash": "3ac4fe0277fcbe509a57438e44b4e198"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/Erp/EfCoreErpRecheckNotifierRepository.cs": {
+    "mtime": 1787552503.487867,
+    "ast_hash": "1158af885580f73948a705d54eefa675",
+    "semantic_hash": "1158af885580f73948a705d54eefa675"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/Erp/EfCoreErpStateChgNotifierRepository.cs": {
+    "mtime": 1787552503.4888637,
+    "ast_hash": "9bf3bd4c348baf3cbe6f06d845484108",
+    "semantic_hash": "9bf3bd4c348baf3cbe6f06d845484108"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/Erp/EfCoreErpStockAftChkRepository.cs": {
+    "mtime": 1787552503.4888637,
+    "ast_hash": "a808daf0914299c4a0cbd525b45dbeec",
+    "semantic_hash": "a808daf0914299c4a0cbd525b45dbeec"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/Erp/EfCoreErpWarehouseAreaPrdtRepository.cs": {
+    "mtime": 1787552503.490188,
+    "ast_hash": "604d052facd7bf4fbbe5bf164e3422d8",
+    "semantic_hash": "604d052facd7bf4fbbe5bf164e3422d8"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/Erp/EfCoreErpWorkshopMaterialTransferRepository.cs": {
+    "mtime": 1787552503.490188,
+    "ast_hash": "ae3be4c1a112dc2ee3ca98e4a131f629",
+    "semantic_hash": "ae3be4c1a112dc2ee3ca98e4a131f629"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/Erp/EfCoreErpWorkstationMaterialReceiptRepository.cs": {
+    "mtime": 1787552503.4911847,
+    "ast_hash": "8b6d5b3df7518cd885f440cac94ad2bb",
+    "semantic_hash": "8b6d5b3df7518cd885f440cac94ad2bb"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/Erp/EfCoreErpWorkstationMaterialRequestRepository.cs": {
+    "mtime": 1787552503.4911847,
+    "ast_hash": "053b4c2c3584a3f34dc9fc94d1a66152",
+    "semantic_hash": "053b4c2c3584a3f34dc9fc94d1a66152"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/Materials/EfCoreMaterialRepository.cs": {
+    "mtime": 1787552503.492492,
+    "ast_hash": "669f11c5e16e2d091ed461e21332d36d",
+    "semantic_hash": "669f11c5e16e2d091ed461e21332d36d"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/Moves/EfCoreMoveRepository.cs": {
+    "mtime": 1787552503.4934886,
+    "ast_hash": "378aeafe676b576cbd1705ce1e0072c0",
+    "semantic_hash": "378aeafe676b576cbd1705ce1e0072c0"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/PickLists/EfCorePickItemRepository.cs": {
+    "mtime": 1787552503.4948382,
+    "ast_hash": "a0dcda5ea2b6ca93eb709ff3dc3010f8",
+    "semantic_hash": "a0dcda5ea2b6ca93eb709ff3dc3010f8"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/PickLists/EfCorePickListRepository.cs": {
+    "mtime": 1787552503.4948382,
+    "ast_hash": "3ea37f64ca01f103397d35aa0f12c168",
+    "semantic_hash": "3ea37f64ca01f103397d35aa0f12c168"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/ReCheckLists/EfCoreRecheckItemRepository.cs": {
+    "mtime": 1787552503.4958348,
+    "ast_hash": "174646e692f292ce42e4a0e2568d6bf7",
+    "semantic_hash": "174646e692f292ce42e4a0e2568d6bf7"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/ReCheckLists/EfCoreRecheckListRepository.cs": {
+    "mtime": 1787552503.4969225,
+    "ast_hash": "df8ce0a6fc460f917b57907caa64d9e1",
+    "semantic_hash": "df8ce0a6fc460f917b57907caa64d9e1"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/SKips/EfCoreSkipRepository.cs": {
+    "mtime": 1787552503.497919,
+    "ast_hash": "9b524e81ef59895b4278778a151e6e32",
+    "semantic_hash": "9b524e81ef59895b4278778a151e6e32"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/StockInHistories/EfCoreStockInHistoryRepository.cs": {
+    "mtime": 1787552503.498725,
+    "ast_hash": "bf3025555a072ca37a46878ee778de41",
+    "semantic_hash": "bf3025555a072ca37a46878ee778de41"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/StockOutHistories/EfCoreStockOutHistoryRepository.cs": {
+    "mtime": 1787552503.4997218,
+    "ast_hash": "6e8023caf067dba413794571390ab78d",
+    "semantic_hash": "6e8023caf067dba413794571390ab78d"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/Stocks/EfCoreStockRepository.cs": {
+    "mtime": 1787552503.5006907,
+    "ast_hash": "555d8a8c0dc7e5b2a0f86dfbc58a351e",
+    "semantic_hash": "555d8a8c0dc7e5b2a0f86dfbc58a351e"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/Repositories/Warehouses/EfCoreWarehouseRepository.cs": {
+    "mtime": 1787552503.5016873,
+    "ast_hash": "12b28fecf408fc65fbbb3079f29d1d79",
+    "semantic_hash": "12b28fecf408fc65fbbb3079f29d1d79"
+  },
+  "src/TuTa.Wms.EntityFrameworkCore/TuTa.Wms.EntityFrameworkCore.csproj": {
+    "mtime": 1787552503.5027134,
+    "ast_hash": "f0f9d4c990c6414136e5b7a0963e9a34",
+    "semantic_hash": "f0f9d4c990c6414136e5b7a0963e9a34"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/AgvTasks/AgvTaskController.cs": {
+    "mtime": 1787552503.5140343,
+    "ast_hash": "4f04c2f7d215c895f9d78a84bce2c99c",
+    "semantic_hash": "4f04c2f7d215c895f9d78a84bce2c99c"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/BarcodeLists/BarcodeListController.cs": {
+    "mtime": 1787552503.5150318,
+    "ast_hash": "eefcef32743eeb741b6ae77ef6630f7c",
+    "semantic_hash": "eefcef32743eeb741b6ae77ef6630f7c"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/Boxes/BoxController.cs": {
+    "mtime": 1787552503.5161028,
+    "ast_hash": "01b50f026fdbf83fcf6594fd0a0d9c94",
+    "semantic_hash": "01b50f026fdbf83fcf6594fd0a0d9c94"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/Cells/CellController.cs": {
+    "mtime": 1787552503.5170996,
+    "ast_hash": "0995b5865e56098e8212f2786252b052",
+    "semantic_hash": "0995b5865e56098e8212f2786252b052"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/ChkResultLists/ChkResultListController.cs": {
+    "mtime": 1787552503.5184934,
+    "ast_hash": "7a98218b3f749d8e58da7f72582eeaaa",
+    "semantic_hash": "7a98218b3f749d8e58da7f72582eeaaa"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/Departments/DepartmentController.cs": {
+    "mtime": 1787552503.5194905,
+    "ast_hash": "0a1883cc65d83f038a5d7b06095fbe16",
+    "semantic_hash": "0a1883cc65d83f038a5d7b06095fbe16"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/Erp/ErpAsnController.cs": {
+    "mtime": 1787552503.5200937,
+    "ast_hash": "6c65e0c618ef946d07b17e33a7bb55cf",
+    "semantic_hash": "6c65e0c618ef946d07b17e33a7bb55cf"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/Erp/ErpDeliveryOrderController.cs": {
+    "mtime": 1787552503.5213008,
+    "ast_hash": "9b7b9f68545fb8b14e05e10e26fcc6d8",
+    "semantic_hash": "9b7b9f68545fb8b14e05e10e26fcc6d8"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/Erp/ErpDeliveryStationController.cs": {
+    "mtime": 1787552503.5213008,
+    "ast_hash": "e8f45a1aadabdb5aa65f9dc461fe51aa",
+    "semantic_hash": "e8f45a1aadabdb5aa65f9dc461fe51aa"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/Erp/ErpInboundOrderController.cs": {
+    "mtime": 1787552503.5223172,
+    "ast_hash": "55d2aec0f102db6e3ec40f3b53c6cfd3",
+    "semantic_hash": "55d2aec0f102db6e3ec40f3b53c6cfd3"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/Erp/ErpMaterialController.cs": {
+    "mtime": 1787552503.5223172,
+    "ast_hash": "efc761b5a71a6d924a6fcf336ace024d",
+    "semantic_hash": "efc761b5a71a6d924a6fcf336ace024d"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/Erp/ErpMidTableController.cs": {
+    "mtime": 1787552503.523399,
+    "ast_hash": "5470146c8224abf9bf2ea00bad0f0316",
+    "semantic_hash": "5470146c8224abf9bf2ea00bad0f0316"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/Erp/ErpOutboundOrderController.cs": {
+    "mtime": 1787552503.523399,
+    "ast_hash": "36ba67f68daa1f7bf1107207a868d2c5",
+    "semantic_hash": "36ba67f68daa1f7bf1107207a868d2c5"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/Erp/ErpWorkshopMaterialTransferController.cs": {
+    "mtime": 1787552503.5248604,
+    "ast_hash": "44bee0d59646f5d9fb0607b0c77a6f8d",
+    "semantic_hash": "44bee0d59646f5d9fb0607b0c77a6f8d"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/Erp/ErpWorkstationMaterialReceiptController.cs": {
+    "mtime": 1787552503.5248604,
+    "ast_hash": "ba499e56afe25e948c2ecb4f4ea174b8",
+    "semantic_hash": "ba499e56afe25e948c2ecb4f4ea174b8"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/Erp/ErpWorkstationMaterialRequestController.cs": {
+    "mtime": 1787552503.5258572,
+    "ast_hash": "df786d9c2b860bcc67ee1f61eecb3bec",
+    "semantic_hash": "df786d9c2b860bcc67ee1f61eecb3bec"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/Materials/MaterialController.cs": {
+    "mtime": 1787552503.5258572,
+    "ast_hash": "0400ccb5e75c83692d2e0222990a7451",
+    "semantic_hash": "0400ccb5e75c83692d2e0222990a7451"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/PickLists/PickListController.cs": {
+    "mtime": 1787552503.527359,
+    "ast_hash": "0f159de5436f0526756156c695096073",
+    "semantic_hash": "0f159de5436f0526756156c695096073"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/RecheckLists/RecheckListController.cs": {
+    "mtime": 1787552503.528356,
+    "ast_hash": "5ca13e2699968a45dd0a905ec1b68def",
+    "semantic_hash": "5ca13e2699968a45dd0a905ec1b68def"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/Skips/SkipController.cs": {
+    "mtime": 1787552503.5297194,
+    "ast_hash": "1588ddf7ea4a0afac71b101a981b1a40",
+    "semantic_hash": "1588ddf7ea4a0afac71b101a981b1a40"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/StockInHistories/StockInHistoryController.cs": {
+    "mtime": 1787552503.5297194,
+    "ast_hash": "b7cddadeb38e8107923322113a89dcfe",
+    "semantic_hash": "b7cddadeb38e8107923322113a89dcfe"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/StockOutHistories/StockOutHistoryController.cs": {
+    "mtime": 1787552503.5310922,
+    "ast_hash": "038391b7302e27545ed750123e84199d",
+    "semantic_hash": "038391b7302e27545ed750123e84199d"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/Stocks/StockController.cs": {
+    "mtime": 1787552503.532772,
+    "ast_hash": "6e5be571ac72df05e02bb2320897a699",
+    "semantic_hash": "6e5be571ac72df05e02bb2320897a699"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/Systems/NewAccountController.cs": {
+    "mtime": 1787552503.5337749,
+    "ast_hash": "85fa0e954f70b3710d2b1baad3e48709",
+    "semantic_hash": "85fa0e954f70b3710d2b1baad3e48709"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/Systems/PermissionController.cs": {
+    "mtime": 1787552503.5337749,
+    "ast_hash": "fde93d3a7a005363fb29329715a1b374",
+    "semantic_hash": "fde93d3a7a005363fb29329715a1b374"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/Systems/RoleController.cs": {
+    "mtime": 1787552503.535233,
+    "ast_hash": "6d26f8f8bf2d30f012940a62fef7e537",
+    "semantic_hash": "6d26f8f8bf2d30f012940a62fef7e537"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/Systems/UserController.cs": {
+    "mtime": 1787552503.535233,
+    "ast_hash": "62a0b15a7274d34963eac938481ea1ad",
+    "semantic_hash": "62a0b15a7274d34963eac938481ea1ad"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/Warehouses/WarehouseController.cs": {
+    "mtime": 1787552503.5362294,
+    "ast_hash": "6d8cd2a21d5ab67c9a9dd2f149dc6122",
+    "semantic_hash": "6d8cd2a21d5ab67c9a9dd2f149dc6122"
+  },
+  "src/TuTa.Wms.HttpApi/Controllers/WmsController.cs": {
+    "mtime": 1787552503.5374627,
+    "ast_hash": "aac56eb328a3ec9894b7304ed2b32c19",
+    "semantic_hash": "aac56eb328a3ec9894b7304ed2b32c19"
+  },
+  "src/TuTa.Wms.HttpApi/Models/Test/TestModel.cs": {
+    "mtime": 1787552503.5384595,
+    "ast_hash": "cdc27d01c22fd3df589a2818463c2c0d",
+    "semantic_hash": "cdc27d01c22fd3df589a2818463c2c0d"
+  },
+  "src/TuTa.Wms.HttpApi/TuTa.Wms.HttpApi.csproj": {
+    "mtime": 1787552503.5384595,
+    "ast_hash": "a8e5fd85ecfbb3fd4a3ea6fe30ff9b4a",
+    "semantic_hash": "a8e5fd85ecfbb3fd4a3ea6fe30ff9b4a"
+  },
+  "src/TuTa.Wms.HttpApi/WmsHttpApiModule.cs": {
+    "mtime": 1787552503.539816,
+    "ast_hash": "ccd42830b8741a5a638291ef75b13ac0",
+    "semantic_hash": "ccd42830b8741a5a638291ef75b13ac0"
+  },
+  "src/TuTa.Wms.HttpApi/appsettings.json": {
+    "mtime": 1787552503.540813,
+    "ast_hash": "3b0f54760a6fda5e4514062314bd4513",
+    "semantic_hash": "3b0f54760a6fda5e4514062314bd4513"
+  }
+}
