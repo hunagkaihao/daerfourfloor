@@ -6,6 +6,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using TuTa.Wms.AgvTasks;
+using TuTa.Wms.Boxes;
+using TuTa.Wms.Boxes.Aggregates;
 using TuTa.Wms.Cells;
 using TuTa.Wms.Stocks;
 using TuTa.Wms.Stocks.Aggregates;
@@ -21,6 +23,7 @@ namespace TuTa.Wms.StockConsolidations
     {
         private readonly IStockRepository _stockRepository;
         private readonly ICellRepository _cellRepository;
+        private readonly IBoxRepository _boxRepository;
         private readonly IAgvTaskRepository _agvTaskRepository;
         private readonly IStockService _stockService;
         private readonly IUnitOfWorkManager _unitOfWorkManager;
@@ -31,6 +34,7 @@ namespace TuTa.Wms.StockConsolidations
         public StockConsolidationWorker(
             IStockRepository stockRepository,
             ICellRepository cellRepository,
+            IBoxRepository boxRepository,
             IAgvTaskRepository agvTaskRepository,
             IStockService stockService,
             IUnitOfWorkManager unitOfWorkManager,
@@ -39,6 +43,7 @@ namespace TuTa.Wms.StockConsolidations
         {
             _stockRepository = stockRepository;
             _cellRepository = cellRepository;
+            _boxRepository = boxRepository;
             _agvTaskRepository = agvTaskRepository;
             _stockService = stockService;
             _unitOfWorkManager = unitOfWorkManager;
@@ -75,6 +80,8 @@ namespace TuTa.Wms.StockConsolidations
             Action<StockConsolidationProgress> reportProgress,
             CancellationToken cancellationToken)
         {
+            // 第一步：读取整理配置并建立启动时仓库快照。
+            // 快照只保存业务需要的标量，不把EF实体带出UnitOfWork。
             var options = LoadOptions();
             var initialResult = await BuildSnapshotAsync(options, cancellationToken).ConfigureAwait(false);
             if (!initialResult.IsSuccess)
@@ -85,6 +92,8 @@ namespace TuTa.Wms.StockConsolidations
 
             var initialSnapshot = initialResult.Snapshot;
             // 启动时拒绝与现有4F/4B活动任务并行，避免整理途中可用库位集合发生变化。
+            // 第二步：整理开始前必须保证4F和4B没有其他活动任务。
+            // 当前实现没有整仓资源预占能力，与其他搬运并发会改变S型可用库位集合。
             var activeManagedPallet = initialSnapshot.Pallets.Values.FirstOrDefault(pallet =>
                 pallet.HasActiveTask &&
                 (pallet.CellCode.StartsWith("4F", StringComparison.OrdinalIgnoreCase) ||
@@ -97,6 +106,8 @@ namespace TuTa.Wms.StockConsolidations
                 return;
             }
 
+            // 第三步：根据真实可用库位生成固定S型顺序。
+            // 偶数排由大列到小列、奇数排由小列到大列，同列先二层再一层。
             var orderedCells = _planner.BuildOrderedCells(initialSnapshot, options);
             if (orderedCells.Count == 0)
             {
@@ -104,6 +115,7 @@ namespace TuTa.Wms.StockConsolidations
                 return;
             }
 
+            // 第四步：校验4B至少存在一个启用空位，用作一个空洞轮转的启动周转位。
             var emptyBufferCells = options.BufferCells.Where(cellCode =>
                 initialSnapshot.Cells.TryGetValue(cellCode, out var cell) &&
                 cell.IsEmpty &&
@@ -121,6 +133,8 @@ namespace TuTa.Wms.StockConsolidations
             var completedGroups = 0;
             var completedMoves = 0;
 
+            // 第五步：从S型序列起点逐物料推进。每完成一个物料组后重新读取仓库，
+            // 防止使用上一个物料组执行前的过期库存和库位状态。
             while (cursorIndex < orderedCells.Count)
             {
                 if (cancellationToken.IsCancellationRequested)
@@ -144,6 +158,8 @@ namespace TuTa.Wms.StockConsolidations
                     return;
                 }
 
+                // 第六步：当前游标库位决定本轮主物料，并生成腾位、归拢、回收动作。
+                // 混料托盘只归属于数量最多的主物料；已整理前缀不会再次进入规划。
                 var groupPlan = _planner.PlanCurrentGroup(
                     snapshot,
                     orderedCells,
@@ -170,6 +186,8 @@ namespace TuTa.Wms.StockConsolidations
                     CompletedMoveCount = completedMoves
                 });
 
+                // 第七步：严格串行执行当前物料组动作。上一条AGV任务未完成前，
+                // 不创建下一条任务，避免起点和目标位发生资源竞争。
                 foreach (var move in groupPlan.Moves.OrderBy(item => item.Sequence))
                 {
                     if (cancellationToken.IsCancellationRequested)
@@ -205,6 +223,8 @@ namespace TuTa.Wms.StockConsolidations
                     });
                 }
 
+                // 第八步：整组完成后推进游标。游标之前的库位成为已整理前缀，
+                // 后续所有物料分组和来源选择都不会再使用这些库位。
                 cursorIndex = groupPlan.NextCursorIndex;
                 currentHole = groupPlan.NextHoleCell;
                 completedGroups++;
@@ -355,12 +375,74 @@ namespace TuTa.Wms.StockConsolidations
                     .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
                 var snapshot = new StockConsolidationSnapshot();
-                foreach (var group in stocks
-                             .Where(stock => stock.BoxData != null && !string.IsNullOrWhiteSpace(stock.BoxData.BoxCode))
-                             .Where(stock => stock.CellData != null && !string.IsNullOrWhiteSpace(stock.CellData.CellCode))
-                             .GroupBy(stock => stock.BoxData.BoxCode, StringComparer.OrdinalIgnoreCase))
+                // 库位是库存整理的物理最小单位：一个库位对应一个托盘/容器，
+                // 一个容器允许包含任意数量的库存记录和多个不同物料。
+                // 因此必须先按CellCode聚合，不能按每条库存冗余保存的BoxCode拆分托盘。
+                var stocksByCell = stocks
+                    .Where(stock => stock.CellData != null && !string.IsNullOrWhiteSpace(stock.CellData.CellCode))
+                    .GroupBy(stock => stock.CellData.CellCode, StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+                var cellByCode = cells
+                    .Where(cell => !string.IsNullOrWhiteSpace(cell.CellCode))
+                    .GroupBy(cell => cell.CellCode, StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(group => group.Key, group => group.First(), StringComparer.OrdinalIgnoreCase);
+
+                // 批量查询所有有货库位当前绑定的容器，避免逐库位查询产生N+1数据库请求。
+                var occupiedCellIds = stocksByCell
+                    .Where(group => cellByCode.ContainsKey(group.Key))
+                    .Select(group => cellByCode[group.Key].Id)
+                    .Distinct()
+                    .ToList();
+                var boundBoxes = occupiedCellIds.Count == 0
+                    ? new List<Box>()
+                    : await _boxRepository.GetByCellsIdAsync(
+                        occupiedCellIds,
+                        false,
+                        true,
+                        cancellationToken).ConfigureAwait(false);
+                var boxesByCellId = boundBoxes
+                    .Where(box => box.CellData?.CellId != null)
+                    .GroupBy(box => box.CellData.CellId.Value)
+                    .ToDictionary(group => group.Key, group => group.ToList());
+
+                foreach (var group in stocksByCell)
                 {
-                    var pallet = CreatePallet(group.Key, group.ToList(), activeBoxes, out var palletError);
+                    if (!cellByCode.TryGetValue(group.Key, out var cell))
+                    {
+                        return FailedSnapshot($"库存所在库位{group.Key}不存在。分组已停止。");
+                    }
+
+                    if (!boxesByCellId.TryGetValue(cell.Id, out var cellBoxes) || cellBoxes.Count == 0)
+                    {
+                        return FailedSnapshot($"库位{group.Key}存在库存，但没有查询到绑定容器。分组已停止。");
+                    }
+
+                    // 真正违反业务模型的是一个库位绑定多个容器，而不是一个库位存在多条库存。
+                    if (cellBoxes.Count != 1)
+                    {
+                        var boxCodes = string.Join("、", cellBoxes.Select(box => box.BoxCode));
+                        return FailedSnapshot($"库位{group.Key}绑定了多个容器：{boxCodes}。请先处理容器关系。");
+                    }
+
+                    var boundBox = cellBoxes[0];
+                    // 库存记录中的BoxId必须指向库位当前唯一容器；BoxCode可以是历史冗余值，
+                    // 整理执行始终以当前库位绑定容器的BoxCode为准。
+                    var inconsistentStock = group.FirstOrDefault(stock =>
+                        stock.BoxData == null ||
+                        !stock.BoxData.BoxId.HasValue ||
+                        stock.BoxData.BoxId.Value != boundBox.Id);
+                    if (inconsistentStock != null)
+                    {
+                        return FailedSnapshot(
+                            $"库位{group.Key}的库存{inconsistentStock.Id}与当前容器{boundBox.BoxCode}绑定不一致。");
+                    }
+
+                    var pallet = CreatePallet(
+                        group.Key,
+                        boundBox,
+                        group.ToList(),
+                        activeBoxes,
+                        out var palletError);
                     if (pallet == null)
                     {
                         return FailedSnapshot(palletError);
@@ -373,12 +455,13 @@ namespace TuTa.Wms.StockConsolidations
                     snapshot.Pallets.Add(pallet.PalletKey, pallet);
                 }
 
+                // 每个库位现在只会生成一个托盘快照，多条库存都属于这个托盘。
                 var palletByCell = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 foreach (var pallet in snapshot.Pallets.Values)
                 {
                     if (palletByCell.ContainsKey(pallet.CellCode))
                     {
-                        return FailedSnapshot($"库位{pallet.CellCode}存在多个托盘。");
+                        return FailedSnapshot($"库位{pallet.CellCode}被重复生成托盘快照，整理流程已停止。");
                     }
                     palletByCell.Add(pallet.CellCode, pallet.PalletKey);
                 }
@@ -478,22 +561,13 @@ namespace TuTa.Wms.StockConsolidations
         /// 数量最多的物料优先；数量相同则取查询顺序中首次出现的物料。
         /// </summary>
         private static StockConsolidationPalletSnapshot CreatePallet(
-            string boxCode,
+            string cellCode,
+            Box boundBox,
             List<Stock> stocks,
             HashSet<string> activeBoxes,
             out string errorMessage)
         {
             errorMessage = null;
-            var cellCodes = stocks
-                .Select(stock => stock.CellData.CellCode)
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToList();
-            if (cellCodes.Count != 1)
-            {
-                errorMessage = $"容器{boxCode}的库存分布在多个库位。";
-                return null;
-            }
-
             // 保留仓储查询返回顺序；数量相同时，第一个查找到的物料获得整理优先级。
             var orderedStocks = stocks.ToList();
             var materialCandidates = orderedStocks
@@ -516,7 +590,7 @@ namespace TuTa.Wms.StockConsolidations
                 .ToList();
             if (materialCandidates.Count == 0)
             {
-                errorMessage = $"容器{boxCode}没有可用于整理的物料编码。";
+                errorMessage = $"库位{cellCode}的容器{boundBox.BoxCode}没有可用于整理的物料编码。";
                 return null;
             }
 
@@ -529,13 +603,14 @@ namespace TuTa.Wms.StockConsolidations
             return new StockConsolidationPalletSnapshot
             {
                 PalletKey = string.Join("-", stockIds.Select(id => id.ToString("N"))),
-                BoxCode = boxCode,
-                CellCode = cellCodes[0],
+                // 以库位当前绑定容器为准，不再使用单条库存中的冗余BoxCode。
+                BoxCode = boundBox.BoxCode,
+                CellCode = cellCode,
                 StockIds = stockIds,
                 Barcodes = barcodes,
                 GroupMaterialCode = materialCandidates[0].MaterialCode,
                 IsMixedMaterial = materialCandidates.Count > 1,
-                HasActiveTask = activeBoxes.Contains(boxCode)
+                HasActiveTask = activeBoxes.Contains(boundBox.BoxCode)
             };
         }
 
