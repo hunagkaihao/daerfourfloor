@@ -11,6 +11,7 @@ using TuTa.Wms.Cells;
 using TuTa.Wms.Cells.Aggregates;
 using TuTa.Wms.Stocks;
 using TuTa.Wms.Stocks.Aggregates;
+using Volo.Abp.Uow;
 
 namespace TuTa.Wms.StockConsolidations
 {
@@ -24,6 +25,7 @@ namespace TuTa.Wms.StockConsolidations
         private readonly ICellRepository _cellRepository;
         private readonly IAgvTaskRepository _agvTaskRepository;
         private readonly IStockService _stockService;
+        private readonly IUnitOfWorkManager _unitOfWorkManager;
         private readonly IConfiguration _configuration;
         private readonly ILogger<StockConsolidationWorker> _logger;
         private readonly StockConsolidationPlanner _planner = new StockConsolidationPlanner();
@@ -33,6 +35,7 @@ namespace TuTa.Wms.StockConsolidations
             ICellRepository cellRepository,
             IAgvTaskRepository agvTaskRepository,
             IStockService stockService,
+            IUnitOfWorkManager unitOfWorkManager,
             IConfiguration configuration,
             ILogger<StockConsolidationWorker> logger)
         {
@@ -40,6 +43,7 @@ namespace TuTa.Wms.StockConsolidations
             _cellRepository = cellRepository;
             _agvTaskRepository = agvTaskRepository;
             _stockService = stockService;
+            _unitOfWorkManager = unitOfWorkManager;
             _configuration = configuration;
             _logger = logger;
         }
@@ -204,19 +208,18 @@ namespace TuTa.Wms.StockConsolidations
             var deadline = DateTime.Now.AddMinutes(Math.Max(1, options.TaskTimeoutMinutes));
             while (DateTime.Now < deadline)
             {
-                var tasks = await _agvTaskRepository.GetListAsync(task =>
-                    task.BoxCode == pallet.BoxCode &&
-                    task.StartPositionCode == move.FromCell &&
-                    task.EndPositionCode == move.ToCell &&
-                    task.CreationTime >= submittedAt.AddMinutes(-1)).ConfigureAwait(false);
-                var agvTask = tasks.OrderByDescending(task => task.CreationTime).FirstOrDefault();
+                var agvTask = await GetLatestAgvTaskAsync(
+                    pallet.BoxCode,
+                    move.FromCell,
+                    move.ToCell,
+                    submittedAt).ConfigureAwait(false);
                 if (agvTask == null)
                 {
                     await Task.Delay(TimeSpan.FromSeconds(Math.Max(1, options.PollIntervalSeconds))).ConfigureAwait(false);
                     continue;
                 }
 
-                if (agvTask.AgvTaskStatus == AgvTaskStatus.Complete)
+                if (agvTask.Status == AgvTaskStatus.Complete)
                 {
                     var afterMove = await BuildSnapshotAsync(options, CancellationToken.None).ConfigureAwait(false);
                     var movedPallet = ResolvePalletByStockIds(afterMove, move.StockIds);
@@ -228,12 +231,12 @@ namespace TuTa.Wms.StockConsolidations
                     return;
                 }
 
-                if (agvTask.AgvTaskStatus == AgvTaskStatus.Cancel ||
-                    agvTask.AgvTaskStatus == AgvTaskStatus.Error ||
-                    agvTask.AgvTaskStatus == AgvTaskStatus.ExceptionComplete)
+                if (agvTask.Status == AgvTaskStatus.Cancel ||
+                    agvTask.Status == AgvTaskStatus.Error ||
+                    agvTask.Status == AgvTaskStatus.ExceptionComplete)
                 {
                     throw new InvalidOperationException(
-                        $"AGV任务{agvTask.ReqCode}进入异常状态{agvTask.AgvTaskStatus}。");
+                        $"AGV任务{agvTask.ReqCode}进入异常状态{agvTask.Status}。");
                 }
 
                 await Task.Delay(TimeSpan.FromSeconds(Math.Max(1, options.PollIntervalSeconds))).ConfigureAwait(false);
@@ -249,6 +252,8 @@ namespace TuTa.Wms.StockConsolidations
             StockConsolidationOptions options,
             CancellationToken cancellationToken)
         {
+            // 每次快照使用独立UnitOfWork，绝不复用HTTP请求或上一轮查询的DbContext。
+            using var unitOfWork = _unitOfWorkManager.Begin(true, false);
             var stocks = await _stockRepository.GetListAsync(true, cancellationToken).ConfigureAwait(false);
             var cells = await _cellRepository.GetListAsync(true, cancellationToken).ConfigureAwait(false);
             var activeTasks = await _agvTaskRepository.GetListAsync(task =>
@@ -319,7 +324,35 @@ namespace TuTa.Wms.StockConsolidations
                 }
             }
 
+            await unitOfWork.CompleteAsync().ConfigureAwait(false);
             return snapshot;
+        }
+
+        /// <summary>
+        /// 在独立UnitOfWork中查询最新AGV任务，并立即转换为标量快照。
+        /// </summary>
+        private async Task<StockConsolidationAgvTaskSnapshot> GetLatestAgvTaskAsync(
+            string boxCode,
+            string fromCell,
+            string toCell,
+            DateTime submittedAt)
+        {
+            using var unitOfWork = _unitOfWorkManager.Begin(true, false);
+            var tasks = await _agvTaskRepository.GetListAsync(task =>
+                task.BoxCode == boxCode &&
+                task.StartPositionCode == fromCell &&
+                task.EndPositionCode == toCell &&
+                task.CreationTime >= submittedAt.AddMinutes(-1)).ConfigureAwait(false);
+            var entity = tasks.OrderByDescending(task => task.CreationTime).FirstOrDefault();
+            var result = entity == null
+                ? null
+                : new StockConsolidationAgvTaskSnapshot
+                {
+                    ReqCode = entity.ReqCode,
+                    Status = entity.AgvTaskStatus
+                };
+            await unitOfWork.CompleteAsync().ConfigureAwait(false);
+            return result;
         }
 
         /// <summary>

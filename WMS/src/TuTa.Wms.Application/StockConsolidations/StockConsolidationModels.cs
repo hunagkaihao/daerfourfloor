@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TuTa.Wms.AgvTasks;
 
 namespace TuTa.Wms.StockConsolidations
 {
@@ -97,5 +98,15 @@ namespace TuTa.Wms.StockConsolidations
         public int CompletedGroupCount { get; set; }
         public int CompletedMoveCount { get; set; }
         public string LastError { get; set; }
+    }
+
+    /// <summary>
+    /// AGV任务查询结果快照。
+    /// 只携带库存整理需要的标量，避免在UnitOfWork结束后继续持有实体。
+    /// </summary>
+    internal class StockConsolidationAgvTaskSnapshot
+    {
+        public string ReqCode { get; set; }
+        public AgvTaskStatus Status { get; set; }
     }
 }

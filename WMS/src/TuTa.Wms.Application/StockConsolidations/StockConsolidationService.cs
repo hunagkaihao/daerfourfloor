@@ -71,7 +71,13 @@ namespace TuTa.Wms.StockConsolidations
                     CompletedGroupCount = 0,
                     CompletedMoveCount = 0
                 };
-                _runningTask = Task.Run(() => RunWorkerAsync(_cancellationTokenSource.Token));
+                var cancellationToken = _cancellationTokenSource.Token;
+                // 禁止HTTP请求的AsyncLocal/UnitOfWork流入后台线程。
+                // 否则请求结束后，后台线程会继续引用已经释放的WmsDbContext。
+                using (ExecutionContext.SuppressFlow())
+                {
+                    _runningTask = Task.Run(() => RunWorkerAsync(cancellationToken));
+                }
             }
 
             return Task.FromResult(new ResponseDto
@@ -149,7 +155,9 @@ namespace TuTa.Wms.StockConsolidations
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, "库存整理线程异常停止");
+                // 异常只在后台线程边界转换成中文日志和状态，不向宿主继续抛出，
+                // 同时不传入异常对象，避免日志打印大段英文调用堆栈。
+                _logger.LogError("库存整理线程异常停止：{错误信息}", exception.Message);
                 lock (_stateLock)
                 {
                     _status.Status = "异常停止";
