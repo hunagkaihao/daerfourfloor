@@ -1,6 +1,0 @@
-**/bin/
-**/obj/
-src/FourFloor.Consolidation/data/
-src/FourFloor.Consolidation/logs/
-*.user
-*.suo

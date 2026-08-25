@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using TuTa.Wms.Erp;
+using TuTa.Wms.StockConsolidations;
 using Volo.Abp.Account;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Identity;
@@ -28,6 +29,8 @@ public class WmsApplicationModule : AbpModule
         {
             options.AddMaps<WmsApplicationModule>();  
         });
+        // 库存整理调度服务为单例，Worker为每次线程运行创建的作用域服务。
+        context.Services.AddTransient<StockConsolidationWorker>();
         //context.Services.AddHostedService<ErpMaterialSyncJob>(); // 暂时注释掉，等类型问题解决后再启用
         //context.Services.AddHostedService<ErpPickOrderSyncJob>();
         //context.Services.AddHostedService<ErpRecheckNotifierSyncJob>();
