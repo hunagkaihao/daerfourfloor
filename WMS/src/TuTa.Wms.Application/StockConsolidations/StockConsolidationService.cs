@@ -143,7 +143,11 @@ namespace TuTa.Wms.StockConsolidations
 
                 lock (_stateLock)
                 {
-                    _status.Status = _status.IsStopping ? "已停止" : "已完成";
+                    // Worker已经报告异常停止或主动停止时，保留其状态，不覆盖成已完成。
+                    if (_status.Status != "异常停止" && _status.Status != "已停止")
+                    {
+                        _status.Status = _status.IsStopping ? "已停止" : "已完成";
+                    }
                 }
             }
             catch (OperationCanceledException)

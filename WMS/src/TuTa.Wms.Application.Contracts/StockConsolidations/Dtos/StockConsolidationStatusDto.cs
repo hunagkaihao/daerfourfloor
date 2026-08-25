@@ -43,7 +43,8 @@ namespace TuTa.Wms.StockConsolidations.Dtos
         public string CurrentCellCode { get; set; }
 
         /// <summary>
-        /// 当前正在整理的首个Barcode。
+        /// 当前正在整理的主物料编码。
+        /// 字段名为兼容既有前端保留，值不再表示首个Barcode。
         /// </summary>
         public string CurrentGroupBarcode { get; set; }
 

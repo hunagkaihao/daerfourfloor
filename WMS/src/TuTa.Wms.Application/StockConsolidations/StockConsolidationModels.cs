@@ -42,7 +42,11 @@ namespace TuTa.Wms.StockConsolidations
         public string CellCode { get; set; }
         public List<Guid> StockIds { get; set; } = new List<Guid>();
         public List<string> Barcodes { get; set; } = new List<string>();
-        public string GroupBarcode { get; set; }
+        /// <summary>
+        /// 托盘内数量最多的物料编码；数量相同时取查询顺序最先出现的物料。
+        /// </summary>
+        public string GroupMaterialCode { get; set; }
+        public bool IsMixedMaterial { get; set; }
         public bool HasActiveTask { get; set; }
     }
 
@@ -66,7 +70,7 @@ namespace TuTa.Wms.StockConsolidations
         public int Sequence { get; set; }
         public string PalletKey { get; set; }
         public List<Guid> StockIds { get; set; } = new List<Guid>();
-        public string GroupBarcode { get; set; }
+        public string GroupMaterialCode { get; set; }
         public string FromCell { get; set; }
         public string ToCell { get; set; }
         public string MoveType { get; set; }
@@ -77,7 +81,12 @@ namespace TuTa.Wms.StockConsolidations
     /// </summary>
     internal class StockConsolidationGroupPlan
     {
-        public string GroupBarcode { get; set; }
+        /// <summary>
+        /// 规划是否成功。失败时Worker打印ErrorMessage并安全结束线程。
+        /// </summary>
+        public bool IsSuccess { get; set; } = true;
+        public string ErrorMessage { get; set; }
+        public string GroupMaterialCode { get; set; }
         public List<string> TargetCells { get; set; } = new List<string>();
         public List<StockConsolidationMovePlan> Moves { get; set; } = new List<StockConsolidationMovePlan>();
         public int NextCursorIndex { get; set; }
@@ -108,5 +117,35 @@ namespace TuTa.Wms.StockConsolidations
     {
         public string ReqCode { get; set; }
         public AgvTaskStatus Status { get; set; }
+    }
+
+    /// <summary>
+    /// 仓库快照构建结果，使用结果对象传递错误而不是抛出异常。
+    /// </summary>
+    internal class StockConsolidationSnapshotResult
+    {
+        public bool IsSuccess { get; set; }
+        public string ErrorMessage { get; set; }
+        public StockConsolidationSnapshot Snapshot { get; set; }
+    }
+
+    /// <summary>
+    /// 单条搬运执行结果。
+    /// </summary>
+    internal class StockConsolidationMoveResult
+    {
+        public bool IsSuccess { get; set; }
+        public string ErrorMessage { get; set; }
+    }
+
+    /// <summary>
+    /// AGV任务查询结果，区分“暂未查到”和“查询失败”。
+    /// </summary>
+    internal class StockConsolidationAgvQueryResult
+    {
+        public bool IsSuccess { get; set; }
+        public bool IsFound { get; set; }
+        public string ErrorMessage { get; set; }
+        public StockConsolidationAgvTaskSnapshot Task { get; set; }
     }
 }

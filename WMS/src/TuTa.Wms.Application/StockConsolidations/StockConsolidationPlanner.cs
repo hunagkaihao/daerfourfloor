@@ -71,6 +71,9 @@ namespace TuTa.Wms.StockConsolidations
                 .ToList();
             var managedCells = new HashSet<string>(orderedCells, StringComparer.OrdinalIgnoreCase);
             managedCells.UnionWith(validBufferCells);
+            var finalizedCells = new HashSet<string>(
+                orderedCells.Take(cursorIndex),
+                StringComparer.OrdinalIgnoreCase);
             var pallets = snapshot.Pallets.Values
                 .Where(pallet => managedCells.Contains(pallet.CellCode))
                 .ToDictionary(pallet => pallet.PalletKey, ClonePallet, StringComparer.OrdinalIgnoreCase);
@@ -106,16 +109,21 @@ namespace TuTa.Wms.StockConsolidations
             }
 
             var groupPallets = pallets.Values
-                .Where(pallet => string.Equals(pallet.GroupBarcode, seedPallet.GroupBarcode, StringComparison.OrdinalIgnoreCase))
+                // 已整理前缀中的托盘不再进入任何物料组，混料托盘因此不会被重复搬运。
+                .Where(pallet => !finalizedCells.Contains(pallet.CellCode))
+                .Where(pallet => string.Equals(
+                    pallet.GroupMaterialCode,
+                    seedPallet.GroupMaterialCode,
+                    StringComparison.OrdinalIgnoreCase))
                 .ToList();
             if (groupPallets.Any(pallet => pallet.HasActiveTask))
             {
-                throw new InvalidOperationException($"物料组{seedPallet.GroupBarcode}存在活动任务，无法整理。");
+                return FailedPlan($"物料组{seedPallet.GroupMaterialCode}存在活动任务，无法整理。");
             }
 
             if (cursorIndex + groupPallets.Count > orderedCells.Count)
             {
-                throw new InvalidOperationException($"物料组{seedPallet.GroupBarcode}所需库位超过剩余可用容量。");
+                return FailedPlan($"物料组{seedPallet.GroupMaterialCode}所需库位超过剩余可用容量。");
             }
 
             var targetCells = orderedCells.Skip(cursorIndex).Take(groupPallets.Count).ToList();
@@ -128,14 +136,18 @@ namespace TuTa.Wms.StockConsolidations
                 var source = FindSource(groupPallets, targetCells, validBufferCells);
                 if (source == null)
                 {
-                    throw new InvalidOperationException($"目标位{targetCell}为空，但找不到物料组{seedPallet.GroupBarcode}的来源托盘。");
+                    return FailedPlan($"目标位{targetCell}为空，但找不到物料组{seedPallet.GroupMaterialCode}的来源托盘。");
                 }
 
                 var sourceCell = source.CellCode;
                 AddMove(moves, source, sourceCell, targetCell,
                     validBufferCells.Contains(sourceCell, StringComparer.OrdinalIgnoreCase) ? "暂存物料回收" : "归拢",
                     moveSequence++);
-                ApplyMove(source, sourceCell, targetCell, occupancy);
+                var applyError = ApplyMove(source, sourceCell, targetCell, occupancy);
+                if (!string.IsNullOrWhiteSpace(applyError))
+                {
+                    return FailedPlan(applyError);
+                }
                 currentHole = sourceCell;
             }
 
@@ -149,21 +161,24 @@ namespace TuTa.Wms.StockConsolidations
                 }
 
                 var blocker = pallets[targetPalletKey];
-                if (string.Equals(blocker.GroupBarcode, seedPallet.GroupBarcode, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(blocker.GroupMaterialCode, seedPallet.GroupMaterialCode, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
 
                 if (blocker.HasActiveTask)
                 {
-                    throw new InvalidOperationException($"目标位{targetCell}的阻挡托盘存在活动任务。");
+                    return FailedPlan($"目标位{targetCell}的阻挡托盘存在活动任务。");
                 }
 
                 if (!IsUsableHole(currentHole, occupancy, targetCells, orderedCells.Take(cursorIndex)))
                 {
                     currentHole = FindEmptyCell(validBufferCells, occupancy)
-                                  ?? FindEmptyCell(orderedCells.Skip(cursorIndex), occupancy)
-                                  ?? throw new InvalidOperationException("没有可用于腾位的空库位。");
+                                  ?? FindEmptyCell(orderedCells.Skip(cursorIndex), occupancy);
+                    if (string.IsNullOrWhiteSpace(currentHole))
+                    {
+                        return FailedPlan("没有可用于腾位的空库位。");
+                    }
                 }
 
                 var blockerFrom = blocker.CellCode;
@@ -171,21 +186,32 @@ namespace TuTa.Wms.StockConsolidations
                 AddMove(moves, blocker, blockerFrom, blockerTo,
                     validBufferCells.Contains(blockerTo, StringComparer.OrdinalIgnoreCase) ? "腾位到4B" : "腾位",
                     moveSequence++);
-                ApplyMove(blocker, blockerFrom, blockerTo, occupancy);
+                var blockerError = ApplyMove(blocker, blockerFrom, blockerTo, occupancy);
+                if (!string.IsNullOrWhiteSpace(blockerError))
+                {
+                    return FailedPlan(blockerError);
+                }
 
-                var source = FindSource(groupPallets, targetCells, validBufferCells)
-                             ?? throw new InvalidOperationException($"目标位{targetCell}已腾空，但找不到对应目标物料。");
+                var source = FindSource(groupPallets, targetCells, validBufferCells);
+                if (source == null)
+                {
+                    return FailedPlan($"目标位{targetCell}已腾空，但找不到对应目标物料。");
+                }
                 var sourceCell = source.CellCode;
                 AddMove(moves, source, sourceCell, targetCell,
                     validBufferCells.Contains(sourceCell, StringComparer.OrdinalIgnoreCase) ? "暂存物料回收" : "归拢",
                     moveSequence++);
-                ApplyMove(source, sourceCell, targetCell, occupancy);
+                var sourceError = ApplyMove(source, sourceCell, targetCell, occupancy);
+                if (!string.IsNullOrWhiteSpace(sourceError))
+                {
+                    return FailedPlan(sourceError);
+                }
                 currentHole = sourceCell;
             }
 
             return new StockConsolidationGroupPlan
             {
-                GroupBarcode = seedPallet.GroupBarcode,
+                GroupMaterialCode = seedPallet.GroupMaterialCode,
                 TargetCells = targetCells,
                 Moves = moves,
                 NextCursorIndex = cursorIndex + groupPallets.Count,
@@ -243,14 +269,14 @@ namespace TuTa.Wms.StockConsolidations
                 Sequence = sequence,
                 PalletKey = pallet.PalletKey,
                 StockIds = pallet.StockIds.ToList(),
-                GroupBarcode = pallet.GroupBarcode,
+                GroupMaterialCode = pallet.GroupMaterialCode,
                 FromCell = fromCell,
                 ToCell = toCell,
                 MoveType = moveType
             });
         }
 
-        private static void ApplyMove(
+        private static string ApplyMove(
             StockConsolidationPalletSnapshot pallet,
             string fromCell,
             string toCell,
@@ -259,17 +285,30 @@ namespace TuTa.Wms.StockConsolidations
             if (!occupancy.TryGetValue(fromCell, out var currentPallet) ||
                 !string.Equals(currentPallet, pallet.PalletKey, StringComparison.OrdinalIgnoreCase))
             {
-                throw new InvalidOperationException($"托盘{pallet.PalletKey}不在计划起点{fromCell}。");
+                return $"托盘{pallet.PalletKey}不在计划起点{fromCell}。";
             }
 
             if (occupancy.TryGetValue(toCell, out var targetPallet) && !string.IsNullOrWhiteSpace(targetPallet))
             {
-                throw new InvalidOperationException($"计划目标位{toCell}不是空位。");
+                return $"计划目标位{toCell}不是空位。";
             }
 
             occupancy[fromCell] = null;
             occupancy[toCell] = pallet.PalletKey;
             pallet.CellCode = toCell;
+            return null;
+        }
+
+        /// <summary>
+        /// 创建失败规划结果，由Worker统一打印中文日志并停止。
+        /// </summary>
+        private static StockConsolidationGroupPlan FailedPlan(string message)
+        {
+            return new StockConsolidationGroupPlan
+            {
+                IsSuccess = false,
+                ErrorMessage = message
+            };
         }
 
         private static bool IsUsableHole(
@@ -319,7 +358,8 @@ namespace TuTa.Wms.StockConsolidations
                 CellCode = source.CellCode,
                 StockIds = source.StockIds.ToList(),
                 Barcodes = source.Barcodes.ToList(),
-                GroupBarcode = source.GroupBarcode,
+                GroupMaterialCode = source.GroupMaterialCode,
+                IsMixedMaterial = source.IsMixedMaterial,
                 HasActiveTask = source.HasActiveTask
             };
         }
