@@ -12,7 +12,7 @@ namespace TuTa.Wms.Controllers.StockConsolidations
     /// 四楼库存整理线程调度接口。
     /// Controller只负责接收前端请求，实际线程和业务逻辑由Application服务处理。
     /// </summary>
-    [Authorize]
+    [AllowAnonymous]
     [Route("wms/stock-consolidation")]
     [ApiController]
     public class StockConsolidationController : WmsController
