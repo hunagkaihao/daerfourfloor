@@ -29,7 +29,11 @@ public class WmsApplicationModule : AbpModule
         {
             options.AddMaps<WmsApplicationModule>();  
         });
-        // 库存整理调度服务为单例，Worker为每次线程运行创建的作用域服务。
+        // 显式覆盖ABP应用服务的约定注册，保证启动、状态、停止和每日调度共享同一实例。
+        // 必须在注册HostedService前完成，否则定时服务可能持有另一份独立的内存状态。
+        context.Services.AddStockConsolidationScheduling();
+
+        // Worker只在每次整理线程启动时由独立作用域创建，不在多个运行批次之间保存EF实体。
         context.Services.AddTransient<StockConsolidationWorker>();
         // 每日自动启动服务只负责读取配置并调用单例调度服务；移动端按钮仍调用同一个启动/停止入口。
         context.Services.AddHostedService<StockConsolidationScheduleService>();

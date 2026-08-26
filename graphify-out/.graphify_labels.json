@@ -597,12 +597,5 @@
   "595": "FeatureProviderDto",
   "596": "[2.0.0](https://github.com/anncwb/vue-vben-admin/compare/v2.0.0-rc.18...v2.0.0) (2021-02-17)",
   "597": "WarehouseInfoOfChkRsltList",
-  "598": "WmsHttpApiClientModule",
-  "599": "LanguageInfo",
-  "600": "SkipStockCtuInDto",
-  "601": "tsconfig-paths",
-  "602": "tsconfig.json",
-  "603": "CountInfoOfStock",
-  "604": "WmsEntityFrameworkCoreModule",
   "605": "[2.4.0](https://github.com/anncwb/vue-vben-admin/compare/v2.2.0...v2.4.0) (2021-05-25)"
 }
