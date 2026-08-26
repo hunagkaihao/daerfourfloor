@@ -410,12 +410,12 @@ namespace TuTa.Wms.StockConsolidations
 
                 foreach (var cell in managedCells)
                 {
-                    if (!boxesByCellId.TryGetValue(cell.Id, out var cellBoxes) || cellBoxes.Count == 0)
+                    if (!boxesByCellId.TryGetValue(cell.Id, out var cellBoxes) || cellBoxes.Count == 0 || cell.CellStatus == CellStatus.Nohave)
                     {
-                        // 无容器就是空库位，不要求CellStatus必须为Nohave。
+                        // 无容器就是空库位，要求CellStatus必须为Nohave。
                         continue;
                     }
-
+                    
                     // 一个库位只能绑定一个容器；容器内库存数量不受限制。
                     if (cellBoxes.Count != 1)
                     {

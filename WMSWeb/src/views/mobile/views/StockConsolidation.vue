@@ -181,7 +181,7 @@ function handleStop() {
 onMounted(async () => {
   await refreshStatus();
   // 页面停留期间每五秒刷新一次线程状态。
-  refreshTimer = setInterval(() => refreshStatus(false), 5000);
+  //refreshTimer = setInterval(() => refreshStatus(false), 5000);
 });
 
 onBeforeUnmount(() => {
