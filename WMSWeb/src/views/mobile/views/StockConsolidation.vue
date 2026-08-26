@@ -14,6 +14,18 @@
       </div>
 
       <a-descriptions :column="1" size="small" bordered>
+        <a-descriptions-item label="运行状态">
+          {{ status.isRunning ? '运行中' : '未运行' }}
+        </a-descriptions-item>
+        <a-descriptions-item label="停止状态">
+          {{ status.isStopping ? '正在停止' : '未请求停止' }}
+        </a-descriptions-item>
+        <a-descriptions-item label="启动时间">
+          {{ formatDateTime(status.startedAt) }}
+        </a-descriptions-item>
+        <a-descriptions-item label="停止时间">
+          {{ formatDateTime(status.stoppedAt) }}
+        </a-descriptions-item>
         <a-descriptions-item label="当前库位">
           {{ status.currentCellCode || '-' }}
         </a-descriptions-item>
@@ -69,7 +81,7 @@
         停止库存整理线程
       </a-button>
 
-      <a-button size="large" block :loading="refreshing" @click="refreshStatus">
+      <a-button size="large" block :loading="refreshing" @click="() => refreshStatus()">
         刷新线程状态
       </a-button>
     </div>
@@ -84,7 +96,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 import { Modal, message } from 'ant-design-vue';
 import Header from '../header/Header.vue';
 import {
@@ -99,14 +111,21 @@ const status = reactive<any>({
   isRunning: false,
   isStopping: false,
   status: '读取中',
+  startedAt: undefined,
+  stoppedAt: undefined,
+  currentCellCode: '',
+  currentMaterialCode: '',
+  currentAction: '',
+  currentFromCell: '',
+  currentToCell: '',
   completedGroupCount: 0,
   completedMoveCount: 0,
+  lastError: '',
 });
 
 const starting = ref(false);
 const stopping = ref(false);
 const refreshing = ref(false);
-let refreshTimer: ReturnType<typeof setInterval> | undefined;
 
 const statusText = computed(() => status.status || (status.isRunning ? '运行中' : '未启动'));
 const statusColor = computed(() => {
@@ -116,17 +135,61 @@ const statusColor = computed(() => {
   return 'default';
 });
 
-/** 兼容HTTP封装返回原始响应或直接返回data的两种形式。 */
+/**
+ * 兼容库存整理接口在不同部署环境中的响应包装形式。
+ * 支持Axios原生响应、ABP result包装、data包装以及直接返回DTO。
+ */
 function unwrapResponse(result: any): any {
-  return result?.data ?? result;
+  return result?.data?.result ?? result?.result ?? result?.data ?? result;
+}
+
+/** 同时读取后端小驼峰和PascalCase字段，避免序列化策略差异导致页面状态始终使用初始值。 */
+function readStatusField(payload: any, camelName: string, pascalName: string, fallback?: any): any {
+  if (payload && payload[camelName] !== undefined) return payload[camelName];
+  if (payload && payload[pascalName] !== undefined) return payload[pascalName];
+  return fallback;
+}
+
+/**
+ * 将后端状态DTO显式映射到页面状态。
+ * 不使用Object.assign直接合并，防止IsRunning等PascalCase字段被新增到对象后，
+ * 模板仍然读取旧的isRunning=false，导致停止按钮一直禁用。
+ */
+function applyStatusResponse(result: any) {
+  const payload = unwrapResponse(result);
+  const isRunning = readStatusField(payload, 'isRunning', 'IsRunning');
+  if (typeof isRunning !== 'boolean') {
+    throw new Error('库存整理状态接口返回格式不正确，缺少isRunning字段');
+  }
+
+  status.isEnabled = Boolean(readStatusField(payload, 'isEnabled', 'IsEnabled', false));
+  status.isRunning = isRunning;
+  status.isStopping = Boolean(readStatusField(payload, 'isStopping', 'IsStopping', false));
+  status.status = readStatusField(payload, 'status', 'Status', status.isRunning ? '运行中' : '未运行');
+  status.startedAt = readStatusField(payload, 'startedAt', 'StartedAt');
+  status.stoppedAt = readStatusField(payload, 'stoppedAt', 'StoppedAt');
+  status.currentCellCode = readStatusField(payload, 'currentCellCode', 'CurrentCellCode', '');
+  status.currentMaterialCode = readStatusField(payload, 'currentMaterialCode', 'CurrentMaterialCode', '');
+  status.currentAction = readStatusField(payload, 'currentAction', 'CurrentAction', '');
+  status.currentFromCell = readStatusField(payload, 'currentFromCell', 'CurrentFromCell', '');
+  status.currentToCell = readStatusField(payload, 'currentToCell', 'CurrentToCell', '');
+  status.completedGroupCount = Number(readStatusField(payload, 'completedGroupCount', 'CompletedGroupCount', 0));
+  status.completedMoveCount = Number(readStatusField(payload, 'completedMoveCount', 'CompletedMoveCount', 0));
+  status.lastError = readStatusField(payload, 'lastError', 'LastError', '');
+}
+
+/** 将后端时间显示为本地时间；没有时间时统一显示短横线。 */
+function formatDateTime(value?: string | Date): string {
+  if (!value) return '-';
+  const date = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString();
 }
 
 /** 刷新库存整理线程状态。 */
 async function refreshStatus(showLoading = true) {
   if (showLoading) refreshing.value = true;
   try {
-    const result = unwrapResponse(await getStockConsolidationStatus());
-    Object.assign(status, result || {});
+    applyStatusResponse(await getStockConsolidationStatus());
   } catch (error: any) {
     message.error(error?.message || '查询库存整理线程状态失败');
   } finally {
@@ -145,8 +208,16 @@ function handleStart() {
       starting.value = true;
       try {
         const result = unwrapResponse(await startStockConsolidation());
-        result?.success ? message.success(result.message || '库存整理线程已启动') : message.error(result?.message || '启动失败');
-        await refreshStatus(false);
+        if (result?.success) {
+          // 启动接口成功即表示后台线程已经创建，先同步本地按钮状态，再读取后端完整状态。
+          status.isRunning = true;
+          status.isStopping = false;
+          status.status = '正在启动';
+          message.success(result.message || '库存整理线程已启动');
+          await refreshStatus(false);
+        } else {
+          message.error(result?.message || '启动失败');
+        }
       } catch (error: any) {
         message.error(error?.message || '启动库存整理线程失败');
       } finally {
@@ -167,8 +238,14 @@ function handleStop() {
       stopping.value = true;
       try {
         const result = unwrapResponse(await stopStockConsolidation());
-        result?.success ? message.success(result.message || '已请求停止') : message.warning(result?.message || '停止失败');
-        await refreshStatus(false);
+        if (result?.success) {
+          status.isStopping = true;
+          status.status = '正在停止，等待当前搬运任务结束';
+          message.success(result.message || '已请求停止');
+          await refreshStatus(false);
+        } else {
+          message.warning(result?.message || '停止失败');
+        }
       } catch (error: any) {
         message.error(error?.message || '停止库存整理线程失败');
       } finally {
@@ -180,12 +257,7 @@ function handleStop() {
 
 onMounted(async () => {
   await refreshStatus();
-  // 页面停留期间每五秒刷新一次线程状态。
-  //refreshTimer = setInterval(() => refreshStatus(false), 5000);
-});
-
-onBeforeUnmount(() => {
-  if (refreshTimer) clearInterval(refreshTimer);
+  // 按业务要求不启用轮询，后续状态由启动、停止和手动刷新按钮主动获取。
 });
 </script>
 

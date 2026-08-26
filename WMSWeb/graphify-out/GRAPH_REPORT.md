@@ -1,15 +1,16 @@
-# Graph Report - .  (2026-08-25)
+# Graph Report - WMSWeb  (2026-08-26)
 
 ## Corpus Check
-- cluster-only mode — file stats not available
+- 106 files · ~50,842 words
+- Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1256 nodes · 1326 edges · 81 communities (74 shown, 7 thin omitted)
+- 1260 nodes · 1339 edges · 81 communities (74 shown, 7 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 11 edges (avg confidence: 0.58)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `810fc49e`
+- Built from commit: `4a327585`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -94,23 +95,27 @@
 2. `data()` - 4 edges
 3. `scanboxCode()` - 4 edges
 4. `scanboxCode()` - 4 edges
-5. `queryStocks()` - 4 edges
-6. `getStockConsolidationRequestOptions()` - 4 edges
-7. `normalizeRunStatus()` - 3 edges
-8. `scangoodsCode()` - 3 edges
-9. `data()` - 3 edges
-10. `data()` - 3 edges
+5. `getStockConsolidationRequestOptions()` - 4 edges
+6. `startStockConsolidation()` - 4 edges
+7. `stopStockConsolidation()` - 4 edges
+8. `getStockConsolidationStatus()` - 4 edges
+9. `applyStatusResponse()` - 4 edges
+10. `queryStocks()` - 4 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `createTask()` --calls--> `createStockTask()`  [INFERRED]
-  src/views/mobile/views/CreateStockTask.vue → src/views/mobile/home/home.vue
+  WMSWeb/src/views/mobile/views/CreateStockTask.vue → WMSWeb/src/views/mobile/home/home.vue
 - `createOutStockTask()` --calls--> `createStockTask()`  [INFERRED]
-  src/views/mobile/views/CreateOutStockTaskSummary.vue → src/views/mobile/home/home.vue
+  WMSWeb/src/views/mobile/views/CreateOutStockTaskSummary.vue → WMSWeb/src/views/mobile/home/home.vue
 - `setup()` --calls--> `emit`  [INFERRED]
-  src/views/warehouse/boxs/EditStorageBox.vue → src/views/warehouse/boxs/CreateStorageBox.vue
+  WMSWeb/src/views/warehouse/boxs/EditStorageBox.vue → WMSWeb/src/views/warehouse/boxs/CreateStorageBox.vue
+- `handleStart()` --calls--> `startStockConsolidation()`  [EXTRACTED]
+  WMSWeb/src/views/mobile/views/StockConsolidation.vue → WMSWeb/src/views/mobile/views/StockConsolidation.ts
+- `handleStop()` --calls--> `stopStockConsolidation()`  [EXTRACTED]
+  WMSWeb/src/views/mobile/views/StockConsolidation.vue → WMSWeb/src/views/mobile/views/StockConsolidation.ts
 
 ## Import Cycles
-- None detected.
+- 1-file cycle: `WMSWeb/src/views/mobile/views/StockConsolidation.vue -> WMSWeb/src/views/mobile/views/StockConsolidation.vue`
 
 ## Communities (81 total, 7 thin omitted)
 
@@ -124,7 +129,7 @@ Nodes (31): DataItem, dataSource, editableData, emit, getdata(), good, handleTab
 
 ### Community 2 - "CreateOrder.vue"
 Cohesion: 0.05
-Nodes (29): cancel(), dataSource, emit, good, goodlist, [registerAutoModal, { openModal: openAutoModal }], [registerCreateOrderModal, { openModal: openCreateOrderModal }], [registerModal, { changeOkLoading, closeModal }] (+21 more)
+Nodes (29): DataItem, dataSource, editableData, emit, getdata(), good, handleTableChange(), materialCode (+21 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.06
@@ -259,8 +264,8 @@ Cohesion: 0.15
 Nodes (13): barcodeGet(), boxCode, CellSelectModal, clear(), createAgv(), { createConfirm }, goods, newBoxCode (+5 more)
 
 ### Community 36 - "StockConsolidation.vue"
-Cohesion: 0.17
-Nodes (12): getStockConsolidationRequestOptions(), getStockConsolidationStatus(), refreshing, refreshStatus(), starting, startStockConsolidation(), status, statusColor (+4 more)
+Cohesion: 0.18
+Nodes (16): applyStatusResponse(), getStockConsolidationRequestOptions(), getStockConsolidationStatus(), handleStart(), handleStop(), readStatusField(), refreshing, refreshStatus() (+8 more)
 
 ### Community 37 - "AcceptanceCall2.vue"
 Cohesion: 0.16
@@ -391,7 +396,7 @@ Nodes (4): { createError }, modifiedSearchFormSchema, [registerTable, { reload, 
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `createStockTask()` connect `createStockTask` to `Community 4`, `home.vue`?**
-  _High betweenness centrality (0.033) - this node is a cross-community bridge._
+  _High betweenness centrality (0.034) - this node is a cross-community bridge._
 - **Why does `createTask()` connect `Community 4` to `createStockTask`?**
   _High betweenness centrality (0.018) - this node is a cross-community bridge._
 - **Why does `createOutStockTask()` connect `createStockTask` to `Community 31`?**
