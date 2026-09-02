@@ -87,9 +87,14 @@
         </a-row>
 
         <a-row justify="center" style="margin-top: 20px; margin-bottom: 20px">
-
-
-
+          <a-col :span="8">
+            <div class="menu-item-card" @click="agvTaskManage">
+              <div class="menu-item-icon-wrapper">
+                <BoxPlotOutlined class="menu-item-icon" />
+              </div>
+              <div class="menu-item-text">AGV任务管理</div>
+            </div>
+          </a-col>
         </a-row>
 
 
@@ -370,6 +375,9 @@ const boxbind = async () => {
 };
 const containerUnbind = async () => {
   await router.replace('/containerUnbind');
+};
+const agvTaskManage = async () => {
+  await router.replace('/agvTaskManage');
 };
 const boxdisk = async () => {
   await router.replace('/boxDisk');

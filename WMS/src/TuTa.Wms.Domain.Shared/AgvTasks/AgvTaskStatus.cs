@@ -23,7 +23,7 @@ namespace TuTa.Wms.AgvTasks
         /// </summary>
         TaskStart = 3,
         /// <summary>
-        /// 任务开始
+        /// 出储位
         /// </summary>
         CellOut = 4,
         /// <summary>

@@ -134,6 +134,16 @@ export const ContainerUnbind: AppRouteRecordRaw = {
     ignoreAuth: true,
   },
 };
+//AGV任务管理
+export const AgvTaskManage: AppRouteRecordRaw = {
+  path: '/agvTaskManage',
+  name: 'AgvTaskManage',
+  component: () => import('/@/views/mobile/views/AgvTaskManage.vue'),
+  meta: {
+    title: t('AGV任务管理'),
+    ignoreAuth: true,
+  },
+};
 // GoodAndBoxBind路由已删除
 //容器组盘
 export const BoxDisk: AppRouteRecordRaw = {
@@ -411,6 +421,7 @@ export const basicRoutes = [
   BoxDiskWithAsn,
   BoxIncell,
   ContainerUnbind,
+  AgvTaskManage,
   MaterialSampling,
   MaterialStatusChange,
   GoodsBind,
