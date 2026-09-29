@@ -27,8 +27,7 @@ export async function getAgvTaskList(params: {
 export async function cancelAgvTask(taskId: number): Promise<any> {
   return defHttp.post(
     {
-      url: `/wms/agvtask/cancel`,
-      params: { taskId },
+      url: `/wms/agvtask/cancel?taskId=${taskId}`,
     },
     { isTransformResponse: false }
   );
