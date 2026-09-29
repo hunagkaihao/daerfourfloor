@@ -256,6 +256,13 @@ namespace TuTa.Wms.Stocks
             var box = await _boxRepository.FindByBoxCodeAsync(boxCode).ConfigureAwait(false);
             Cell cell = null;
 
+            // 合并库存前校验来源，避免同物料合并后只保留原批次而丢失混装信息。
+            var existingStocks = box == null
+                ? new List<Stock>()
+                : await _stockRepository.GetByBoxIdAsync(box.Id).ConfigureAwait(false);
+            GetInboundSelfProduced(paras.Select(p => p.BatchCode)
+                .Concat(existingStocks.Select(s => s.BatchCode)));
+
             if (box == null)
             {
                 // 容器不存在，使用传入的容器编号创建
@@ -616,14 +623,17 @@ namespace TuTa.Wms.Stocks
                     if (endCellCode == null || endCellCode == "")
                     {
                         var availableCells = await _cellRepository.GetListAsync(
-                            f => f.CellCode.StartsWith("4F")
-                                 && f.CellStatus == CellStatus.Nohave
-                                 && f.RunStatus == CellRunStatus.Enable).ConfigureAwait(false);
-                        endCell = SelectEndCellBy4FOrdering(availableCells);
+                                                         f => f.CellCode.StartsWith("4F") && 
+                                                         f.CellStatus == CellStatus.Nohave && 
+                                                         f.RunStatus == CellRunStatus.Enable).ConfigureAwait(false);
+                        var stocks = await _stockRepository.GetByBoxIdAsync(box.Id).ConfigureAwait(false);
+                        var selfProduced = GetInboundSelfProduced(stocks.Select(s => s.BatchCode));
+                        endCell = SelectInboundEndCell(availableCells, selfProduced);
                         if (endCell == null)
                         {
-                            _logger.Warn($"创建搬运任务失败：4F区域无可用空库位(共检查{availableCells.Count}个)");
-                            return new ResponseDto() { success = false, message = "4F区域无可用空库位" };
+                            var shelfRange = selfProduced ? "第1、2、3排" : "第1、2、3排以外";
+                            _logger.Warn($"创建搬运任务失败：4F区域{shelfRange}无可用空库位");
+                            return new ResponseDto() { success = false, message = $"4F区域{shelfRange}无可用空库位" };
                         }
                     }
                     else
@@ -4839,6 +4849,46 @@ namespace TuTa.Wms.Stocks
                 .ThenBy(item => item.Layer)
                 .Select(item => item.Cell)
                 .FirstOrDefault();
+        }
+
+        /// <summary>
+        /// 判断批次是否自产：忽略首尾空白及开头数字，来源前缀G（不区分大小写）为自产。
+        /// F、空批次及其他前缀均归其他货架，例如260924G1042为自产、260924F1042为外采。
+        /// </summary>
+        private static bool IsSelfProducedBatch(string batchCode)
+        {
+            var batch = batchCode?.Trim() ?? string.Empty;
+            var index = 0;
+            while (index < batch.Length && batch[index] >= '0' && batch[index] <= '9')
+                index++;
+            return index < batch.Length && (batch[index] == 'G' || batch[index] == 'g');
+        }
+
+        /// <summary>
+        /// 获取整盘的货架来源类别；无批次归其他货架，跨来源混装必须分开组盘。
+        /// </summary>
+        /// <param name="batchCodes">本次组盘及容器已有库存的批次，允许空批次。</param>
+        /// <returns>全部为自产时返回true，无库存或均为其他来源时返回false。</returns>
+        private static bool GetInboundSelfProduced(IEnumerable<string> batchCodes)
+        {
+            var categories = batchCodes.Select(IsSelfProducedBatch).Distinct().ToList();
+            if (categories.Count > 1)
+                throw new UserFriendlyException("自产批次与外采或未识别批次不能混装，请分开组盘");
+            return categories.Count == 1 && categories[0];
+        }
+
+        /// <summary>
+        /// 在可用库位中限定入库货架：自产仅1～3排，其他来源仅其余有效排号；无位时不跨范围回退。
+        /// 范围内沿用排降序、列升序、层升序。
+        /// </summary>
+        /// <param name="cells">已筛选为空闲且启用的候选库位。</param>
+        /// <param name="selfProduced">整盘是否为自产物料。</param>
+        /// <returns>符合来源范围的首个库位，无符合库位时为null。</returns>
+        private static Cell SelectInboundEndCell(IEnumerable<Cell> cells, bool selfProduced)
+        {
+            return SelectEndCellBy4FOrdering(cells.Where(cell =>
+                TryParse4FCellLocation(cell.CellCode, out var row, out _, out _)
+                && row > 0 && (selfProduced ? row <= 3 : row > 3)));
         }
 
         private async Task<AgvTask> SetAsExecutingAsync(Cell startCell, Cell endCell, string skipCode, Box box, ManageType type, bool dispatchToRcs = true, string taskTypOverride = null)
