@@ -25,7 +25,7 @@ namespace TuTa.Wms.AgvTasks
         Task<AgvTaskPagedResultDto> GetPagedListAsync(AgvTaskPagedQueryDto input);
 
         /// <summary>
-        /// 取消AGV任务：下发给RCS取消任务、容器解绑、恢复库位状态、删除组盘库存
+        /// 取消AGV任务：回库组盘任务在RCS确认后解锁并保留已有库存；其他任务沿用容器解绑和删除组盘库存流程。
         /// </summary>
         Task<ResponseDto> CancelAgvTaskAsync(int taskId);
 

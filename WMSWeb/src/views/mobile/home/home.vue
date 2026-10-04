@@ -46,6 +46,14 @@
               <div class="menu-item-text">容器组盘</div>
             </div>
           </a-col>
+          <a-col :span="8">
+            <div class="menu-item-card" @click="inboundReturn">
+              <div class="menu-item-icon-wrapper">
+                <RollbackOutlined class="menu-item-icon" />
+              </div>
+              <div class="menu-item-text">物料回库组盘</div>
+            </div>
+          </a-col>
         </a-row>
         <!-- <a-row justify="center" style="margin-top: 20px; margin-bottom: 20px">
           <a-col :span="8">
@@ -381,6 +389,10 @@ const agvTaskManage = async () => {
 };
 const boxdisk = async () => {
   await router.replace('/boxDisk');
+};
+/** 扫描收料码后将已有库存整盘搬运到入库区，供人工继续组盘。 */
+const inboundReturn = async () => {
+  await router.replace('/inboundReturn');
 };
 const boxdiskWithAsn = async () => {
   await router.replace('/boxDiskWithAsn');

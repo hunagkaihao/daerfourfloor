@@ -204,6 +204,25 @@ namespace TuTa.Wms.AgvTasks
 
                     _logger.LogInformation($"任务信息: ReqCode={task.ReqCode}, TaskCode={task.TaskCode}, BoxCode={task.BoxCode}, 状态={task.AgvTaskStatus}, 起点={task.StartPositionCode}, 终点={task.EndPositionCode}");
 
+                    if (task.StockTyp == ManageType.StockReturnToInbound)
+                    {
+                        if (task.AgvTaskStatus == AgvTaskStatus.Complete || task.AgvTaskStatus == AgvTaskStatus.Cancel)
+                            return new ResponseDto { success = false, message = "回库任务已完成或已取消" };
+
+                        // 回库搬运使用已有库存，必须等RCS确认取消后才解锁，且不能删除库存或解绑固定容器。
+                        var returnCancelResult = await _rcsApiManager.CancelTaskAsync(task.ReqCode, task.TaskCode).ConfigureAwait(false);
+                        if (returnCancelResult == null || returnCancelResult.Code != "0")
+                            return new ResponseDto
+                            {
+                                success = false,
+                                message = returnCancelResult?.Message ?? "RCS未确认取消回库任务"
+                            };
+
+                        await _agvTaskManager.SetAsCancelAsync(task.ReqCode).ConfigureAwait(false);
+                        await uow.CompleteAsync().ConfigureAwait(false);
+                        return new ResponseDto { success = true, message = "回库任务已取消，库位已解锁，原库存已保留" };
+                    }
+
                     // 1. 下发给RCS取消任务
                     _logger.LogInformation("步骤1: 下发给RCS取消任务");
                     var rcsResult = await _rcsApiManager.CancelTaskAsync(task.ReqCode, task.TaskCode).ConfigureAwait(false);

@@ -65,7 +65,7 @@ using TuTa.Wms.Boxes;
 
 namespace TuTa.Wms.Stocks
 {
-    public class StockService : WmsAppService, IStockService
+    public partial class StockService : WmsAppService, IStockService
     {
         private readonly IStockRepository _stockRepository;
         private readonly StocksManager _stocksManager;
@@ -256,12 +256,12 @@ namespace TuTa.Wms.Stocks
             var box = await _boxRepository.FindByBoxCodeAsync(boxCode).ConfigureAwait(false);
             Cell cell = null;
 
-            // 合并库存前校验来源，避免同物料合并后只保留原批次而丢失混装信息。
-            var existingStocks = box == null
-                ? new List<Stock>()
-                : await _stockRepository.GetByBoxIdAsync(box.Id).ConfigureAwait(false);
-            GetInboundSelfProduced(paras.Select(p => p.BatchCode)
-                .Concat(existingStocks.Select(s => s.BatchCode)));
+            // RCS尚未提供自产点位，暂时停用自产/外采混装校验；点位齐备后恢复此代码块。
+            // var existingStocks = box == null
+            //     ? new List<Stock>()
+            //     : await _stockRepository.GetByBoxIdAsync(box.Id).ConfigureAwait(false);
+            // GetInboundSelfProduced(paras.Select(p => p.BatchCode)
+            //     .Concat(existingStocks.Select(s => s.BatchCode)));
 
             if (box == null)
             {
@@ -626,14 +626,16 @@ namespace TuTa.Wms.Stocks
                                                          f => f.CellCode.StartsWith("4F") && 
                                                          f.CellStatus == CellStatus.Nohave && 
                                                          f.RunStatus == CellRunStatus.Enable).ConfigureAwait(false);
-                        var stocks = await _stockRepository.GetByBoxIdAsync(box.Id).ConfigureAwait(false);
-                        var selfProduced = GetInboundSelfProduced(stocks.Select(s => s.BatchCode));
-                        endCell = SelectInboundEndCell(availableCells, selfProduced);
+                        // RCS尚未提供自产点位，暂时停用来源分区，沿用原有4F库位排序；点位齐备后恢复。
+                        // var stocks = await _stockRepository.GetByBoxIdAsync(box.Id).ConfigureAwait(false);
+                        // var selfProduced = GetInboundSelfProduced(stocks.Select(s => s.BatchCode));
+                        // endCell = SelectInboundEndCell(availableCells, selfProduced);
+                        endCell = SelectEndCellBy4FOrdering(availableCells);
                         if (endCell == null)
                         {
-                            var shelfRange = selfProduced ? "第1、2、3排" : "第1、2、3排以外";
-                            _logger.Warn($"创建搬运任务失败：4F区域{shelfRange}无可用空库位");
-                            return new ResponseDto() { success = false, message = $"4F区域{shelfRange}无可用空库位" };
+                            // var shelfRange = selfProduced ? "第1、2、3排" : "第1、2、3排以外";
+                            _logger.Warn("创建搬运任务失败：4F区域无可用空库位");
+                            return new ResponseDto() { success = false, message = "4F区域无可用空库位" };
                         }
                     }
                     else
@@ -4918,7 +4920,7 @@ namespace TuTa.Wms.Stocks
             {
                 agvtask = await _agvTaskManager.CreateCtuStockInByStockTaskAsync(box.BoxCode, box.BoxTypeName, startCell.CellCode, endCell.CellCode, skipCode, type, dispatchToRcs, taskTypOverride);
             }
-            else if (type == ManageType.CTUStockOut)
+            else if (type == ManageType.CTUStockOut || type == ManageType.StockReturnToInbound)
             {
                 agvtask = await _agvTaskManager.CreateCTUStockOutByStockTaskAsync(box.BoxCode, box.BoxTypeName, startCell.CellCode, endCell.CellCode, skipCode, type, null, null, dispatchToRcs, taskTypOverride);
             }

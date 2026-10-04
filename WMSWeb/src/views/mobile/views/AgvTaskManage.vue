@@ -253,11 +253,14 @@ const viewDetail = (task: any) => {
   detailVisible.value = true
 }
 
-// 显示取消确认
+// 回库组盘业务类型为15；该任务取消后保留已有库存和固定容器绑定。
 const showCancelConfirm = (task: any) => {
+  const isInboundReturn = task.stockTyp === 15 || task.stockTyp === 'StockReturnToInbound'
   Modal.confirm({
     title: '确认取消任务',
-    content: `确定要取消任务 ${task.reqCode} 吗？此操作将下发给RCS取消任务、容器解绑、恢复库位状态。`,
+    content: isInboundReturn
+      ? `确定要取消回库任务 ${task.reqCode} 吗？RCS确认取消后将解锁库位，保留原库存和容器绑定。`
+      : `确定要取消任务 ${task.reqCode} 吗？此操作将下发给RCS取消任务、容器解绑、恢复库位状态。`,
     okText: '确认取消',
     okType: 'danger',
     cancelText: '我再想想',

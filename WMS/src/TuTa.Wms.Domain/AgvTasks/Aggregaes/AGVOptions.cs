@@ -62,5 +62,10 @@ namespace TuTa.Wms.AgvTasks.Aggregaes
         /// 该模板只允许库存整理入口使用，不能替换普通入库、出库任务模板。
         /// </summary>
         public string StockConsolidationTaskType { get; set; } = "De03";
+
+        /// <summary>
+        /// 物料回库组盘专用RCS任务模板，将已有库存整盘搬运到入库区；未配置或为空时使用De04。
+        /// </summary>
+        public string StockReturnToInboundTaskType { get; set; } = "De04";
     }
 }

@@ -155,6 +155,17 @@ export const BoxDisk: AppRouteRecordRaw = {
     ignoreAuth: true,
   },
 };
+// 已有库存搬运到入库区，供人工回库组盘。
+export const InboundReturn: AppRouteRecordRaw = {
+  path: '/inboundReturn',
+  name: 'InboundReturn',
+  component: () => import('/@/views/mobile/views/InboundReturn.vue'),
+  meta: {
+    title: t('物料回库组盘'),
+    ignoreKeepAlive: true,
+    ignoreAuth: true,
+  },
+};
 //容器组盘(ASN校验)
 export const BoxDiskWithAsn: AppRouteRecordRaw = {
   path: '/boxDiskWithAsn',
@@ -418,6 +429,7 @@ export const basicRoutes = [
   CreateOutStockTask,
   BoxBind,
   BoxDisk,
+  InboundReturn,
   BoxDiskWithAsn,
   BoxIncell,
   ContainerUnbind,

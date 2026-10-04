@@ -160,6 +160,27 @@ namespace TuTa.Wms.Controllers.Stocks
             return _stockService.CreateStockConsolidationTask(boxCode, startCellCode, endCellCode);
         }
 
+        /// <summary>扫描收料条码，查询命中库存及来源库位的整托物料明细和汇总。</summary>
+        [HttpGet("inboundReturnStocks")]
+        [SwaggerOperation(summary: "查询回库组盘库存", Tags = new[] { "Stock" })]
+        public Task<List<InboundReturnStockDto>> GetInboundReturnStocksAsync([FromQuery] string receivingMaterialBarcode)
+        {
+            return _stockService.GetInboundReturnStocksAsync(receivingMaterialBarcode);
+        }
+
+        /// <summary>人工选择库存并指定入库库位，使用De04下发整盘回库任务。</summary>
+        [HttpPost("createInboundReturnTask")]
+        [SwaggerOperation(summary: "创建回库组盘搬运任务", Tags = new[] { "Stock" })]
+        public async Task<ResponseDto> CreateInboundReturnTaskAsync([FromBody] InboundReturnTaskCreateDto input)
+        {
+            await Task.Delay(1);
+            // 与既有入库、出库任务入口使用同一把锁，避免同时选择相同起终点。
+            lock (_lock)
+            {
+                return _stockService.CreateInboundReturnTaskAsync(input).GetAwaiter().GetResult();
+            }
+        }
+
         /// <summary>
         /// 根据单据行条码创建出库任务（校验erpoutbound记录，创建搬运任务，更新实际出库数量）
         /// </summary>

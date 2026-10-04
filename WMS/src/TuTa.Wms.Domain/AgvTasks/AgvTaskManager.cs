@@ -357,13 +357,33 @@ namespace TuTa.Wms.AgvTasks
                 var entity = await _agvTaskRepository.FindByReqCodeAsync(reqcode);
                 if (entity == null)
                     throw new UserFriendlyException(message: "AGV任务不存在");
-                // RCS可能因网络重试重复发送taskFinish。库存整理任务完成后再次收到回调时直接返回，
-                // 避免把已经迁移到终点的同一容器再次从原起点解绑。
-                if (entity.StockTyp == ManageType.StockConsolidation &&
+                // 整理和回库任务忽略重复完成回调，防止把起点后来新增的库存再次搬走。
+                if ((entity.StockTyp == ManageType.StockConsolidation || entity.StockTyp == ManageType.StockReturnToInbound) &&
                     entity.AgvTaskStatus == AgvTaskStatus.Complete)
                 {
-                    _logger.LogInformation($"库存整理任务{reqcode}已完成，忽略重复完成回调");
+                    _logger.LogInformation($"任务{reqcode}已完成，忽略重复完成回调");
                     return entity;
+                }
+                if (entity.StockTyp == ManageType.StockReturnToInbound)
+                {
+                    if (entity.AgvTaskStatus == AgvTaskStatus.Cancel)
+                        throw new UserFriendlyException(message: "回库任务已取消，不能执行完成回调");
+                    // 回库不应与新入库记账混用；完成前确认固定容器仍在来源位置，目标仍没有其他库存。
+                    var returnBox = await _boxRepository.FindByBoxCodeAsync(entity.BoxCode).ConfigureAwait(false);
+                    var returnStart = await _cellRepository.FindByCellCodeAsync(entity.StartPositionCode).ConfigureAwait(false);
+                    var returnEnd = await _cellRepository.FindByCellCodeAsync(entity.EndPositionCode).ConfigureAwait(false);
+                    if (returnBox == null || returnStart == null || returnEnd == null
+                        || returnBox.CellData?.CellId != returnStart.Id)
+                        throw new UserFriendlyException(message: "回库任务来源库位或容器已改变，无法完成库存迁移");
+                    var returnTargetBox = await _boxRepository.FindByCellIdAsync(returnEnd.Id).ConfigureAwait(false)
+                        ?? await _boxRepository.FindByBoxCodeAsync(returnEnd.CellCode).ConfigureAwait(false);
+                    if (returnTargetBox == null || returnTargetBox.Id == returnBox.Id
+                        || (returnTargetBox.CellData?.CellId.HasValue == true && returnTargetBox.CellData.CellId != returnEnd.Id))
+                        throw new UserFriendlyException(message: "回库任务目标库位的固定容器无效");
+                    var occupied = await _stockRepository.GetByCellIdAsync(returnEnd.Id).ConfigureAwait(false);
+                    var targetStocks = await _stockRepository.GetByBoxIdAsync(returnTargetBox.Id).ConfigureAwait(false);
+                    if (occupied.Count > 0 || targetStocks.Count > 0)
+                        throw new UserFriendlyException(message: "回库任务目标库位已有库存，无法完成库存迁移");
                 }
                 //if (entity.AgvTaskStatus == AgvTaskStatus.Complete)
                 //{
@@ -429,7 +449,8 @@ namespace TuTa.Wms.AgvTasks
                         if (!isSsxOut)
                         {
                             // 原有入库、出库行为保持不变：起点/终点使用固定容器，仅迁移库存。
-                            endBox = await MoveStockFromStartBoxToEndBoxAsync(box, startCell, endCell);
+                            endBox = await MoveStockFromStartBoxToEndBoxAsync(box, startCell, endCell,
+                                entity.StockTyp == ManageType.StockReturnToInbound);
                         }
                     }
                 }
@@ -756,6 +777,9 @@ namespace TuTa.Wms.AgvTasks
                 var entity = await _agvTaskRepository.FindByReqCodeAsync(reqcode);
                 if (entity == null)
                     throw new UserFriendlyException(message: "AGV任务不存在");
+                // RCS可能重发取消回调；已取消的回库任务不能再次解锁后来创建的任务库位。
+                if (entity.StockTyp == ManageType.StockReturnToInbound && entity.AgvTaskStatus == AgvTaskStatus.Cancel)
+                    return entity;
                 if (entity.AgvTaskStatus == AgvTaskStatus.Complete || entity.AgvTaskStatus == AgvTaskStatus.Cancel)
                     throw new UserFriendlyException(message: "AGV任务已完成或取消");
                 entity.SetAsCancel();
@@ -838,16 +862,46 @@ namespace TuTa.Wms.AgvTasks
                 var endCell = await _cellRepository.FindByCellCodeAsync(entity.EndPositionCode).ConfigureAwait(false);
 
                 string[] userCallCodePath = new string[2];
-                    userCallCodePath[0] = startCell.CellName;
-                    userCallCodePath[1] = endCell.CellName;
-                    //设置AGV执行任务
-                    _logger.LogInformation($"创建StockTask任务: userCallCodePath={string.Join(',', userCallCodePath)}, CtnrCode=(empty, WMS BoxCode={entity.BoxCode})");
-                    var response = await _rcsApiManager.CreateStockTaskAsync(entity.ReqCode, entity.TaskTyp, entity.CtnrTyp, userCallCodePath
-                        , entity.ReqCode, "", "");
-                    if (response.Code != "0")
-                    {
-                        _logger.LogError($"创建StockTask任务失败: {response.Message}");
+                userCallCodePath[0] = startCell.CellName;
+                userCallCodePath[1] = endCell.CellName;
+                // 优先直接下发；RCS已绑定的来源仓位不再调用绑定接口。
+                _logger.LogInformation($"创建StockTask任务: userCallCodePath={string.Join(',', userCallCodePath)}, CtnrCode=(empty, WMS BoxCode={entity.BoxCode})");
+                var response = await _rcsApiManager.CreateStockTaskAsync(entity.ReqCode, entity.TaskTyp, entity.CtnrTyp, userCallCodePath
+                    , entity.ReqCode, "", "");
+                if (entity.StockTyp == ManageType.StockReturnToInbound && response != null && response.Code != "0"
+                    && response.Message?.Contains("未绑定任何容器类型", StringComparison.Ordinal) == true)
+                {
+                    // 当前无RCS绑定状态查询接口，仅对明确的来源仓位未绑定错误补绑并重试一次。
+                    // RCS仓位使用CellName中的真实点位编码，不使用WMS库位号或路径参数后缀${05}。
+                    if (string.IsNullOrWhiteSpace(startCell?.CellName) || string.IsNullOrWhiteSpace(entity.CtnrTyp)
+                        || string.IsNullOrWhiteSpace(entity.BoxCode))
+                        throw new UserFriendlyException(message: "回库来源库位未配置RCS点位、容器类型或容器编号，无法绑定");
+                    var rcsBinCode = startCell.CellName.Trim();
+                    var pathParameterIndex = rcsBinCode.IndexOf("${", StringComparison.Ordinal);
+                    if (pathParameterIndex >= 0)
+                        rcsBinCode = rcsBinCode.Substring(0, pathParameterIndex).Trim();
+                    if (string.IsNullOrWhiteSpace(rcsBinCode))
+                        throw new UserFriendlyException(message: "回库来源库位的RCS仓位编码为空，无法绑定");
+                    // 目标仓位或其他点位的绑定错误不能通过修改来源仓位处理。
+                    if (!response.Message.Contains(rcsBinCode, StringComparison.Ordinal))
                         throw new UserFriendlyException(message: response.Message);
+
+                    _logger.LogInformation($"回库绑定RCS来源仓位: WmsCell={startCell.CellCode}, StgBinCode={rcsBinCode}, CtnrTyp={entity.CtnrTyp}, CtnrCode={entity.BoxCode}");
+                    var bindResult = await _rcsApiManager.BindCtnrAndBinAsync(
+                        Guid.NewGuid().ToString("N"), rcsBinCode, entity.CtnrTyp, entity.BoxCode, "1").ConfigureAwait(false);
+                    if (bindResult == null || bindResult.Code != "0")
+                        throw new UserFriendlyException(message: $"回库来源仓位{rcsBinCode}绑定容器失败：{bindResult?.Message ?? "RCS未返回结果"}");
+                    _logger.LogInformation($"回库来源仓位{rcsBinCode}绑定容器成功，重试下发搬运任务一次");
+                    // 重试使用新的请求编号，保留原任务编号，避免RCS请求去重及回调找不到WMS任务。
+                    response = await _rcsApiManager.CreateStockTaskAsync(Guid.NewGuid().ToString("N"), entity.TaskTyp,
+                        entity.CtnrTyp, userCallCodePath, entity.ReqCode, "", "").ConfigureAwait(false);
+                }
+
+                    if (response == null || response.Code != "0")
+                    {
+                        var errorMessage = response?.Message ?? "RCS未返回任务下发结果";
+                        _logger.LogError($"创建StockTask任务失败: {errorMessage}");
+                        throw new UserFriendlyException(message: errorMessage);
                     }
                     _logger.LogInformation($"创建StockTask任务成功: {response.Message}");
                 
@@ -905,6 +959,10 @@ namespace TuTa.Wms.AgvTasks
                 var entity = await _agvTaskRepository.FindByReqCodeAsync(rqecode);
                 if (entity == null)
                     throw new UserFriendlyException(message: "AGV任务不存在");
+                // 回库任务结束后到达的延迟回调不能重置终态，否则重复完成回调会再次迁移库存。
+                if (entity.StockTyp == ManageType.StockReturnToInbound
+                    && (entity.AgvTaskStatus == AgvTaskStatus.Complete || entity.AgvTaskStatus == AgvTaskStatus.Cancel))
+                    return entity;
                 entity.SetAsTaskStart();
                 return await _agvTaskRepository.UpdateAsync(entity);
             }
@@ -922,6 +980,10 @@ namespace TuTa.Wms.AgvTasks
                 var entity = await _agvTaskRepository.FindByReqCodeAsync(reqcode);
                 if (entity == null)
                     throw new UserFriendlyException(message: "AGV任务不存在");
+                // 保持回库任务终态，忽略完成或取消后补发的出储位回调。
+                if (entity.StockTyp == ManageType.StockReturnToInbound
+                    && (entity.AgvTaskStatus == AgvTaskStatus.Complete || entity.AgvTaskStatus == AgvTaskStatus.Cancel))
+                    return entity;
                 entity.SetAsCellOut();
 
                 if (entity.StockTyp == ManageType.SkipMove || entity.StockTyp == ManageType.SkipCall || entity.StockTyp == ManageType.SkipSend)
@@ -946,7 +1008,9 @@ namespace TuTa.Wms.AgvTasks
         /// <summary>
         /// 任务完成时：起点/终点容器与库位绑定关系不变，起点容器设无货，仅迁移库存到终点容器。
         /// </summary>
-        private async Task<Box> MoveStockFromStartBoxToEndBoxAsync(Box startBox, Cell startCell, Cell endCell)
+        /// <param name="preserveBoxNumber">回库组盘保留原库存箱号；其他业务沿用原有迁移行为。</param>
+        private async Task<Box> MoveStockFromStartBoxToEndBoxAsync(Box startBox, Cell startCell, Cell endCell,
+            bool preserveBoxNumber = false)
         {
             var endBox = await _boxRepository.FindByCellIdAsync(endCell.Id);
             if (endBox == null)
@@ -965,7 +1029,8 @@ namespace TuTa.Wms.AgvTasks
             foreach (var stock in stocks)
             {
                 startBox.RemoveStock(stock.Id);
-                stock.BindBox(endBox.Id, endBox.BoxCode, endBox.BoxName);
+                stock.BindBox(endBox.Id, endBox.BoxCode, endBox.BoxName,
+                    preserveBoxNumber ? stock.BoxData?.BoxNumber : null);
                 stock.BindCell(endCell, warehouse, warehouseArea);
                 await _stockRepository.UpdateAsync(stock);
             }

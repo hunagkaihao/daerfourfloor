@@ -68,5 +68,9 @@ namespace TuTa.Wms.AgvTasks
         /// 普通出库任务分流，避免整理任务触发入库质检、ERP通知或出库扣减。
         /// </summary>
         StockConsolidation,
+        /// <summary>
+        /// 已有库存回入库区组盘，使用De04模板；完成仅迁移库存，取消保留原库存和固定容器。
+        /// </summary>
+        StockReturnToInbound,
     }
 }

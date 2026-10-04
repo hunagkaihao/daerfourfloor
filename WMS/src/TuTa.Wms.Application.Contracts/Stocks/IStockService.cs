@@ -34,6 +34,18 @@ namespace TuTa.Wms.Stocks
         Task<ResponseDto> CreateStockTaskV2(string boxCode, string startCellCode, string endCellCode);
 
         /// <summary>
+        /// 根据完整收料条码的物料编号查询可回库组盘的仓库库存，包含不同批次并标记不可搬运的记录。
+        /// </summary>
+        /// <param name="receivingMaterialBarcode">以英文逗号分隔的6段或8段完整收料条码。</param>
+        /// <returns>已绑定库位和容器且数量大于零的命中库存，包含所在库位全部物料明细及数量、箱数汇总。</returns>
+        Task<List<InboundReturnStockDto>> GetInboundReturnStocksAsync(string receivingMaterialBarcode);
+
+        /// <summary>使用De04模板将所选库存所在整盘搬运到入库区，已有库存不重复记入库账。</summary>
+        /// <param name="input">所选库存、原库位及容器、完整收料条码和目标入库库位。</param>
+        /// <returns>RCS任务下发结果。</returns>
+        Task<ResponseDto> CreateInboundReturnTaskAsync(InboundReturnTaskCreateDto input);
+
+        /// <summary>
         /// 创建库存整理专用容器搬运任务。
         /// 任务固定使用库存整理模板，并记录为库存整理业务类型，确保完成回调走容器整体迁移逻辑。
         /// </summary>
