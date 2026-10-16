@@ -12,6 +12,7 @@ using Volo.Abp;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Uow;
+using Volo.Abp.DistributedLocking;
 
 namespace TuTa.Wms.Erp
 {
@@ -25,19 +26,22 @@ namespace TuTa.Wms.Erp
         private readonly ILogger<ErpOutboundOrderAppService> _logger;
         private readonly IErpoutboundRepository _outboundRepository;
         private readonly IRepository<ErpOutboundRecord, string> _erpOutboundRecordRepository;
+        /// <summary>U8整单扫码和生单共享的分布式锁。</summary>
+        private readonly IAbpDistributedLock _u8Lock;
 
         public ErpOutboundOrderAppService(
             IErpOutboundOrderRepository erpOutboundOrderRepository,
             ErpOutboundOrderManager erpOutboundOrderManager,
             ILogger<ErpOutboundOrderAppService> logger,
             IErpoutboundRepository outboundRepository,
-            IRepository<ErpOutboundRecord, string> erpOutboundRecordRepository)
+            IRepository<ErpOutboundRecord, string> erpOutboundRecordRepository, IAbpDistributedLock u8Lock = null)
         {
             _erpOutboundOrderRepository = erpOutboundOrderRepository;
             _erpOutboundOrderManager = erpOutboundOrderManager;
             _logger = logger;
             _outboundRepository = outboundRepository;
             _erpOutboundRecordRepository = erpOutboundRecordRepository;
+            _u8Lock = u8Lock;
         }
 
         /// <summary>
@@ -185,45 +189,64 @@ namespace TuTa.Wms.Erp
         /// <summary>
         /// 根据条码创建出库记录（已有存货编码则不重复录入）
         /// </summary>
-        [UnitOfWork]
+        [UnitOfWork(IsDisabled = true)]
         public async Task<ErpOutboundRecordDto> CreateFromBarcodeAsync(CreateFromBarcodeDto dto)
         {
-            var exists = await _erpOutboundRecordRepository.AnyAsync(e =>
-                e.DeliveryOrderNo == dto.DeliveryOrderNo && e.MaterialCode == dto.MaterialCode);
-
-            if (exists)
-                throw new UserFriendlyException($"存货编码 {dto.MaterialCode} 已存在于出库单 {dto.DeliveryOrderNo} 中，不能重复录入");
-
-            var record = ErpOutboundRecord.Create(
-                dto.WarehouseCode,
-                dto.CustomerCode,
-                dto.MasterId,
-                dto.Quantity,
-                dto.QtyPerBox,
-                dto.MaterialCode,
-                dto.Packaging,
-                dto.Grade,
-                dto.LabelPrint,
-                dto.DeliveryOrderNo);
-
-            await _erpOutboundRecordRepository.InsertAsync(record);
-
-            return new ErpOutboundRecordDto
+            await ErpAsnAppService.LocalPushLock.WaitAsync();
+            try
             {
-                Id = record.Id,
-                Warehouse = record.Warehouse,
-                CustomerCode = record.CustomerCode,
-                MasterId = record.MasterId,
-                Quantity = record.Quantity,
-                QtyPerBox = record.QtyPerBox,
-                MaterialCode = record.MaterialCode,
-                Package = record.Package,
-                Grade = record.Grade,
-                LabelText = record.LabelText,
-                DeliveryOrderNo = record.DeliveryOrderNo,
-                ActualOutboundQuantity = record.ActualOutboundQuantity,
-                CreationTime = record.CreationTime,
-            };
+                await using var handle = _u8Lock == null ? null : await _u8Lock.TryAcquireAsync("U8:SALES:" + dto.DeliveryOrderNo);
+                if (_u8Lock != null && handle == null) throw new UserFriendlyException("该U8发货单正在处理，请稍后重试");
+                using (var uow = UnitOfWorkManager.Begin(true, true))
+                {
+                    if (await _erpOutboundRecordRepository.AnyAsync(x => x.DeliveryOrderNo == dto.DeliveryOrderNo && x.IsDeliveryScanCompleted))
+                        throw new UserFriendlyException("该U8发货单已确认整单扫码完成，不能追加明细");
+                    var exists = await _erpOutboundRecordRepository.AnyAsync(e =>
+                        e.DeliveryOrderNo == dto.DeliveryOrderNo && e.MaterialCode == dto.MaterialCode);
+
+                    if (exists)
+                        throw new UserFriendlyException($"存货编码 {dto.MaterialCode} 已存在于出库单 {dto.DeliveryOrderNo} 中，不能重复录入");
+
+                    var record = ErpOutboundRecord.Create(
+                        dto.WarehouseCode,
+                        dto.CustomerCode,
+                        dto.MasterId,
+                        dto.Quantity,
+                        dto.QtyPerBox,
+                        dto.MaterialCode,
+                        dto.Packaging,
+                        dto.Grade,
+                        dto.LabelPrint,
+                        dto.DeliveryOrderNo);
+
+                    record.SetU8SalesSource(dto.SourceDetailId, dto.SalesDepartmentCode);
+                    await _erpOutboundRecordRepository.InsertAsync(record);
+
+                    var response = new ErpOutboundRecordDto
+                    {
+                        Id = record.Id,
+                        Warehouse = record.Warehouse,
+                        CustomerCode = record.CustomerCode,
+                        MasterId = record.MasterId,
+                        Quantity = record.Quantity,
+                        QtyPerBox = record.QtyPerBox,
+                        MaterialCode = record.MaterialCode,
+                        Package = record.Package,
+                        Grade = record.Grade,
+                        LabelText = record.LabelText,
+                        DeliveryOrderNo = record.DeliveryOrderNo,
+                        ActualOutboundQuantity = record.ActualOutboundQuantity,
+                        CreationTime = record.CreationTime,
+                        SourceDetailId = record.SourceDetailId,
+                        SalesDepartmentCode = record.SalesDepartmentCode,
+                        IsSalesPushed = record.IsSalesPushed,
+                        SalesPushError = record.SalesPushError,
+                    };
+                    await uow.CompleteAsync();
+                    return response;
+                }
+            }
+            finally { ErpAsnAppService.LocalPushLock.Release(); }
         }
 
         /// <summary>

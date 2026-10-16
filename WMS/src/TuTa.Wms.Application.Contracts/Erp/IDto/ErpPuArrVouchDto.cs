@@ -36,6 +36,19 @@ namespace TuTa.Wms.Erp.Dto
         /// </summary>
         [Required]
         public List<PuArrVouchDetailRequestDto> Data { get; set; }
+
+        /// <summary>ASN采购部门编码。</summary>
+        public string DepartmentCode { get; set; }
+        /// <summary>制单人；未提供时使用WMS。</summary>
+        public string Maker { get; set; }
+        /// <summary>采购类型编码。</summary>
+        public string ProcessTypeCode { get; set; }
+        /// <summary>币种名称。</summary>
+        public string ExchangeName { get; set; }
+        /// <summary>税率，百分比。</summary>
+        public decimal TaxRate { get; set; }
+        /// <summary>汇率。</summary>
+        public decimal ExchangeRate { get; set; }
     }
 
     /// <summary>
@@ -104,6 +117,11 @@ namespace TuTa.Wms.Erp.Dto
         /// 等级
         /// </summary>
         public string? CFree5 { get; set; }
+
+        /// <summary>实际U8仓库编码，不使用接口示例中的仓库。</summary>
+        public string WarehouseCode { get; set; }
+        /// <summary>是否需要来料检验，1为需要。</summary>
+        public int Bgsp { get; set; }
     }
 
     /// <summary>

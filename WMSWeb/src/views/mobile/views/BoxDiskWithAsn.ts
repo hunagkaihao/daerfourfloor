@@ -1,3 +1,4 @@
+import { defHttp } from '/@/utils/http/axios';
 import { FormSchema } from '/@/components/Table';
 import { BasicColumn } from '/@/components/Table';
 import moment from 'moment';
@@ -126,7 +127,10 @@ export async function materialsWithCodeTipGet(params: any): Promise<any> {
  * 容器组盘（关联ASN订单号）
  */
 export async function stockCreateAndBindBoxWithAsn(boxcode: string, orderCode: string, params: any): Promise<any> {
-  return _stockServiceProxy.stockCreateAndBindBoxWithAsn(boxcode, orderCode, params);
+  return defHttp.post({ url: '/wms/stock/stockCreateAndBindBoxWithAsn',
+    params: { boxcode, orderCode },
+    data: params.map((item: any) => ({ ...item.toJSON(), asnLineId: item.asnLineId })) },
+    { isTransformResponse: false });
 }
 
 /**

@@ -1,5 +1,6 @@
 namespace TuTa.Wms.Erp.IDto
 {
+    /// <summary>采购入库请求，兼容旧Params.Json及新Base接口Data报文。</summary>
     public class CGRKDAddRequestDto
     {
         public string Cmd { get; set; } = "CGRKDAdd";
@@ -9,6 +10,14 @@ namespace TuTa.Wms.Erp.IDto
         public string LoginName { get; set; }
         public string LoginPwd { get; set; }
         public CGRKDParams Params { get; set; }
+        /// <summary>新接口幂等任务ID。</summary>
+        public string Taskid { get; set; }
+        /// <summary>新接口业务ID。</summary>
+        public long Id { get; set; }
+        /// <summary>新接口制单人。</summary>
+        public string Maker { get; set; }
+        /// <summary>新接口采购入库单数组的JSON字符串，与Params互斥。</summary>
+        public string Data { get; set; }
     }
 
     public class CGRKDParams

@@ -1,6 +1,7 @@
 <template>
     <div class="box-disk-container">
         <Header numb="组盘(ASN)"></Header>
+        <U8InboundActions :asn-code="asnCodeValidated || asnCode" />
         <a-row class="input-row">
             <a-col :span="6">
                 <div class="htext">
@@ -107,6 +108,7 @@
     </div>
 </template>
 <script lang="ts" setup>
+import U8InboundActions from "../components/U8InboundActions.vue";
 import { ref, h, onMounted, computed } from 'vue';
 import { SearchOutlined, ScanOutlined, DeleteOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
@@ -130,6 +132,8 @@ let boxCode = ref<string>('');
 let asnCode = ref<string>('');
 let loadingAsn = ref(false);
 let asnCodeValidated = ref('');
+// 保留完整来源行，收料扫码时按物料、批次、等级匹配采购订单明细。
+const loadedAsnLines = ref<any[]>([]);
 const laneCellStatusList = ref<CellLaneStatusDto[]>([]);
 
 const fetchLaneCellStatus = async () => {
@@ -137,7 +141,7 @@ const fetchLaneCellStatus = async () => {
     try { const r = await getLaneCellStatusByCellCode(boxCode.value); laneCellStatusList.value = r || []; } catch { laneCellStatusList.value = []; }
 };
 
-interface AsnOrderItem { rowKey: string; materialCode: string; materialName: string; specs: string; quantity: number; }
+interface AsnOrderItem { rowKey: string; materialCode: string; materialName: string; specs: string; quantity: number; asnLineId: string; batchCode: string; grade: string; }
 interface AsnOrderGroup { orderCode: string; items: AsnOrderItem[]; }
 const asnOrderGroups = ref<AsnOrderGroup[]>([]);
 const asnOrderColumns = [
@@ -154,12 +158,13 @@ async function loadAsnData() {
     try {
         const res = await validateAsn(asnCode.value.trim());
         if (res && res.success && res.data && res.data.length > 0) {
+            loadedAsnLines.value = res.data.filter((item: any) => item.status !== 4);
             const groupMap = new Map<string, AsnOrderItem[]>();
             res.data.forEach((item: any) => {
                 // 过滤已入库数量 >= 应入库数量的已完成项
                 const alreadyIn = item.alreadyStockInQuantity || 0;
                 const planQty = item.iquantity || 0;
-                if (alreadyIn >= planQty) return;
+                if (item.status === 4 || alreadyIn >= planQty) return;
 
                 const orderCode = item.cordercode || item.ccode || 'default';
                 if (!groupMap.has(orderCode)) groupMap.set(orderCode, []);
@@ -169,6 +174,7 @@ async function loadAsnData() {
                     materialName: item.cinvname || '',
                     specs: item.cinvstd || '',
                     quantity: planQty - alreadyIn,
+                    asnLineId: item.autoid, batchCode: item.cbatch || '', grade: item.cfree5 || '',
                 });
             });
             asnOrderGroups.value = Array.from(groupMap.entries()).map(([orderCode, items]) => ({ orderCode, items }));
@@ -189,8 +195,11 @@ function selectAsnOrder(group: AsnOrderGroup) {
         g.incellshu = item.quantity;
         g.baoshu = 0; g.sanjianshu = 0;
         g.countInOnePkgOrBox = item.quantity;
-        g.dataCode = `${item.materialCode}_${Date.now()}`;
-        g.goodsBatchNo = group.orderCode;
+        g.dataCode = `ASN_${item.asnLineId}`;
+        g.goodsBatchNo = item.batchCode;
+        (g as any).orderCode = group.orderCode;
+        (g as any).asnLineId = item.asnLineId;
+        (g as any).grade = item.grade;
         (goods.value as any[]).push(g);
     });
     asnOrderGroups.value = asnOrderGroups.value.filter(g => g.orderCode !== group.orderCode);
@@ -239,23 +248,51 @@ const incell = async () => {
     let stockCreateDto: StockCreateDto[] = [];
     if (goods.value.length == 0) { message.error("没有物料信息"); return; }
     if (boxCode.value == '') { message.error("没有容器信息"); return; }
+    if (asnCodeValidated.value) {
+        for (const item of goods.value) {
+            if (item.asnLineId) continue;
+            const matches = loadedAsnLines.value.filter((line: any) =>
+                line.cinvcode === item.materialCode && line.cbatch === item.goodsBatchNo &&
+                (!item.grade || line.cfree5 === item.grade) &&
+                Number(line.alreadyStockInQuantity || 0) < Number(line.iquantity));
+            if (matches.length !== 1) {
+                message.error('收料物料与ASN来源不匹配或存在多条订单明细，请选择对应ASN明细');
+                return;
+            }
+            item.asnLineId = matches[0].autoid;
+            item.orderCode = matches[0].cordercode;
+        }
+    }
     goods.value.forEach((e: any) => {
         let p = new StockCreateDto(); p.totalCount = e.incellshu; p.barcode = e.materialCode; p.materialCode = e.materialCode;
         p.boxNumber = e.boxNumber || undefined; p.receivePkgOrBoxCount = e.baoshu || undefined;
         p.countInOnePkgOrBox = e.countInOnePkgOrBox || undefined; p.batchCode = e.goodsBatchNo || '';
         p.grade = e.grade || ''; p.processNo = e.processNo || '';
+        if (asnCodeValidated.value) {
+            p.asnCode = asnCodeValidated.value;
+            (p as any).asnLineId = e.asnLineId;
+            (p as any).orderCode = e.orderCode;
+        }
         stockCreateDto.push(p);
     });
     try {
         if (asnCodeValidated.value) {
             const grouped = new Map<string, StockCreateDto[]>();
             stockCreateDto.forEach(dto => {
-                const oc = (goods.value.find((g: any) => g.materialCode === dto.materialCode)?.goodsBatchNo) || asnCodeValidated.value;
+                const oc = (dto as any).orderCode || '';
                 if (!grouped.has(oc)) grouped.set(oc, []);
                 grouped.get(oc)!.push(dto);
             });
             let ok = true;
-            for (const [oc, dtos] of grouped) { const res = await stockCreateAndBindBoxWithAsn(boxCode.value, oc, dtos); if (!res || res.success !== true) { ok = false; message.error(res?.message || '组盘失败'); } }
+            for (const [oc, dtos] of grouped) {
+                const res = await stockCreateAndBindBoxWithAsn(boxCode.value, oc, dtos);
+                if (!res || res.success !== true) { ok = false; message.error(res?.message || '组盘失败'); }
+                else {
+                    const ids = new Set(dtos.map((dto: any) => dto.asnLineId));
+                    goods.value = goods.value.filter((g: any) => !ids.has(g.asnLineId));
+                    message.success(res.message || '组盘完成');
+                }
+            }
             if (ok) { message.success('组盘完成，ASN已更新'); goods.value.length = 0; QRcode.value = ''; laneCellStatusList.value = []; setTimeout(() => { if (focus1.value) focus1.value.focus(); }, 100); }
         } else {
             await stockCreateAndBindBox(boxCode.value, stockCreateDto).then((res) => {

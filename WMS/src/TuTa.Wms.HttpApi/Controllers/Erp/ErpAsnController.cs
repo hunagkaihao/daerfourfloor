@@ -1,7 +1,8 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using TuTa.Wms.Erp;
 using TuTa.Wms.Erp.Dto;
 using TuTa.Wms.Erp.IDto;
@@ -101,6 +102,50 @@ namespace TuTa.Wms.Controllers.Erp
         {
             return await _erpAsnAppService.PushCGRKDAddAsync(input);
         }
+
+        /// <summary>按完整ASN生成到货单，或重试失败的到货单推送。</summary>
+        [HttpPost("push-arrival-by-asn")]
+        public Task<PuArrVouchAddResponseDto> PushAsnArrivalAsync(string asnCode)
+        {
+            return _erpAsnAppService.PushAsnArrivalAsync(asnCode);
+        }
+
+        /// <summary>生成ASN来料报检单，或重试失败的报检推送。</summary>
+        [HttpPost("push-inspection-by-asn")]
+        public Task<LLBJDAddResponseDto> PushAsnInspectionReportAsync(string asnCode)
+        {
+            return _erpAsnAppService.PushAsnInspectionReportAsync(asnCode);
+        }
+
+        /// <summary>查询ASN对应来料检验单，未匹配或未审核时返回等待原因。</summary>
+        [HttpGet("inspection-results")]
+        public Task<U8InspectionResultsDto> GetAsnInspectionResultsAsync(string asnCode)
+            => _erpAsnAppService.GetAsnInspectionResultsAsync(asnCode);
+
+        /// <summary>根据ASN行的合格检验单生成采购入库，允许失败后独立重试。</summary>
+        [HttpPost("push-purchase-by-inspection")]
+        public Task<CGRKDAddResponseDto> PushInspectionPurchaseAsync(Guid asnLineId)
+            => _erpAsnAppService.PushInspectionPurchaseAsync(asnLineId);
+
+        /// <summary>整张发货单完成后的销售出库推送/失败重试。</summary>
+        [HttpPost("push-sales-outbound")]
+        public Task<CGRKDAddResponseDto> PushSalesOutboundAsync(string deliveryOrderNo)
+            => _erpAsnAppService.PushSalesOutboundAsync(deliveryOrderNo);
+
+        /// <summary>补充发货条码未提供的U8明细ID及销售部门。</summary>
+        [HttpPost("sales-source")]
+        public Task<CGRKDAddResponseDto> SetSalesSourceAsync(string recordId, long sourceDetailId, string departmentCode)
+            => _erpAsnAppService.SetSalesSourceAsync(recordId, sourceDetailId, departmentCode);
+
+        /// <summary>确认整张U8发货单已全部扫码，防止漏扫明细时提前生单。</summary>
+        [HttpPost("confirm-delivery-scan")]
+        public Task<CGRKDAddResponseDto> ConfirmDeliveryScanAsync(string deliveryOrderNo)
+            => _erpAsnAppService.ConfirmDeliveryScanAsync(deliveryOrderNo);
+
+        /// <summary>查询已保存U8发货记录及推送状态。</summary>
+        [HttpGet("sales-records")]
+        public Task<List<ErpOutboundRecordDto>> GetSalesRecordsAsync(string deliveryOrderNo)
+            => _erpAsnAppService.GetSalesRecordsAsync(deliveryOrderNo);
 
         [HttpPost("push-llbjd")]
         public async Task<LLBJDAddResponseDto> PushLLBJDAddAsync([FromBody] LLBJDAddRequestDto input)

@@ -1,10 +1,11 @@
 <template>
   <div class="asn-list">
+    <a-alert type="info" show-icon message="全部组盘后生成U8到货单；仓管员在U8审核后，通过PDA推送报检。未审核时请等待审核后重试。检验完成后查询U8结果并生成采购入库单。" style="margin-bottom: 12px" />
     <BasicTable @register="registerTable" size="small" :clickToRowSelect="false">
       <template #expandedRowRender="{ record }">
         <div class="expanded-row">
           <div class="expanded-row__title">
-            ASN明细（{{ record.lineCount }} 行，待入库总数 {{ formatQuantity(record.totalPendingStockInQuantity) }}）
+            ASN明细（{{ record.lineCount }} 行，待组盘总数 {{ formatQuantity(record.totalPendingStockInQuantity) }}）
           </div>
           <BasicTable
             :columns="detailTableColumns"
@@ -13,13 +14,18 @@
             size="small"
             bordered
             rowKey="autoid"
-            :scroll="{ x: 1800 }"
+            :scroll="{ x: 2150 }"
           />
         </div>
       </template>
       <template #action="{ record }">
-        <Button type="link" @click="handlePushReceipt(record.ccode)">
-          推送收货单
+        <Button type="link" :disabled="!record.canPushArrival || !!pushing[record.ccode]"
+          :loading="pushing[record.ccode] === 'arrival'" @click="handlePush(record, 'arrival')">
+          {{ record.arrivalPushError ? '重试到货单' : '生成到货单' }}
+        </Button>
+        <Button type="link" :disabled="!record.canPushInspection || !!pushing[record.ccode]"
+          :loading="pushing[record.ccode] === 'inspection'" @click="handlePush(record, 'inspection')">
+          {{ record.inspectionPushError ? '重试报检单' : '生成报检单' }}
         </Button>
       </template>
     </BasicTable>
@@ -27,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, reactive } from 'vue';
 import { BasicTable, useTable } from '/@/components/Table';
 import { Button } from 'ant-design-vue';
 import {
@@ -35,7 +41,8 @@ import {
   detailTableColumns,
   searchFormSchema,
   getAsnListAsync,
-  pushErpReceiptAsync,
+  pushAsnArrivalAsync,
+  pushAsnInspectionAsync,
 } from './AsnList';
 import { useI18n } from '/@/hooks/web/useI18n';
 import { useMessage } from '/@/hooks/web/useMessage';
@@ -46,6 +53,7 @@ defineComponent({
 
 const { t } = useI18n();
 const { createConfirm } = useMessage();
+const pushing = reactive<Record<string, string>>({});
 
 function formatQuantity(value?: number | null) {
   if (value === null || value === undefined || Number.isNaN(Number(value))) {
@@ -73,9 +81,9 @@ const [registerTable, { reload }] = useTable({
   showIndexColumn: true,
   rowKey: 'rowKey',
   expandable: true,
-  scroll: { x: 1600 },
+  scroll: { x: 2700 },
   actionColumn: {
-    width: 120,
+    width: 230,
     title: t('common.action'),
     dataIndex: 'action',
     slots: {
@@ -85,14 +93,23 @@ const [registerTable, { reload }] = useTable({
   },
 });
 
-const handlePushReceipt = async (asnCode: string) => {
+/** 仅对整单满足条件的操作弹出确认；同一ASN请求期间禁用两个按钮。 */
+const handlePush = (record: any, kind: 'arrival' | 'inspection') => {
+  if (pushing[record.ccode] || !(kind === 'arrival' ? record.canPushArrival : record.canPushInspection)) return;
   createConfirm({
     iconType: 'info',
     title: t('common.tip'),
-    content: `确定要推送ASN码为 ${asnCode} 的收货单吗？`,
+    content: `确定为ASN ${record.ccode} 生成U8${kind === 'arrival' ? '到货单' : '来料报检单'}吗？`,
     onOk: async () => {
-      await pushErpReceiptAsync(asnCode);
-      reload();
+      if (pushing[record.ccode]) return;
+      pushing[record.ccode] = kind;
+      try {
+        const result = await (kind === 'arrival' ? pushAsnArrivalAsync : pushAsnInspectionAsync)(record.ccode);
+        await reload();
+        return result;
+      } finally {
+        delete pushing[record.ccode];
+      }
     },
   });
 };

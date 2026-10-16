@@ -557,6 +557,35 @@ namespace TuTa.Wms.Stocks.Aggregates
         [StringLength(200)]
         public virtual string ReceivingMaterialBarcode { get; private set; }
 
+        /// <summary>明确关联的本地U8 ASN明细ID；普通库存为空。</summary>
+        public virtual Guid? U8AsnLineId { get; private set; }
+
+        /// <summary>关联的U8发货记录ID；搬运任务绑定，普通出库不填写。</summary>
+        [StringLength(36)]
+        public virtual string U8OutboundRecordId { get; private set; }
+
+        /// <summary>关联真实ASN来源，防止不同ASN物料合并后丢失单据关系。</summary>
+        public void BindU8AsnLine(Guid lineId)
+        {
+            if (U8AsnLineId.HasValue && U8AsnLineId != lineId)
+                throw new BusinessException("该库存已关联其他ASN明细，不能合并");
+            U8AsnLineId = lineId;
+        }
+
+        /// <summary>绑定U8发货单行；同一库存不能同时分配给不同发货记录。</summary>
+        public void BindU8Outbound(string recordId)
+        {
+            if (!string.IsNullOrWhiteSpace(U8OutboundRecordId) && U8OutboundRecordId != recordId)
+                throw new BusinessException("该库存已经关联其他U8发货单");
+            U8OutboundRecordId = recordId;
+        }
+
+        /// <summary>发货计划数量出库完成后释放余料，允许回库或分配其他发货单。</summary>
+        public void ReleaseU8Outbound()
+        {
+            U8OutboundRecordId = null;
+        }
+
         /// <summary>
         /// 入库日期
         /// </summary>

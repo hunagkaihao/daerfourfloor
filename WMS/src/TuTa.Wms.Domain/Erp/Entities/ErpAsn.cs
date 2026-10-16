@@ -1,7 +1,8 @@
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Volo.Abp;
+using Volo.Abp.Data;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace TuTa.Wms.Erp.Entities
@@ -242,6 +243,102 @@ namespace TuTa.Wms.Erp.Entities
         public virtual bool IsPushedToErp { get; private set; }
 
         public virtual DateTime? PushTime { get; private set; }
+
+        /// <summary>到货单推送任务UID，失败重试沿用，避免U8重复生单。</summary>
+        public virtual long? ArrivalPushUid { get; private set; }
+
+        /// <summary>U8到货单主表ID；历史未关联数据为空。</summary>
+        public virtual long? ArrivalVoucherId { get; private set; }
+
+        /// <summary>U8生成的到货单号，用于报检来源关联。</summary>
+        [StringLength(50)]
+        public virtual string ArrivalVoucherCode { get; private set; }
+
+        /// <summary>U8到货单明细autoid，不能使用本地ASN的GUID代替。</summary>
+        public virtual long? ArrivalDetailId { get; private set; }
+
+        /// <summary>最近一次到货单失败原因；成功后清空。</summary>
+        [StringLength(2000)]
+        public virtual string ArrivalPushError { get; private set; }
+
+        /// <summary>最近一次到货单推送尝试时间。</summary>
+        public virtual DateTime? ArrivalPushAttemptTime { get; private set; }
+
+        /// <summary>报检推送UID，同一到货单失败重试沿用。</summary>
+        public virtual long? InspectionPushUid { get; private set; }
+
+        /// <summary>是否已经成功生成U8来料报检单。</summary>
+        public virtual bool IsInspectionReportPushed { get; private set; }
+
+        /// <summary>来料报检单推送失败原因。</summary>
+        [StringLength(2000)]
+        public virtual string InspectionPushError { get; private set; }
+
+        /// <summary>在网络请求前保留整单推送UID。</summary>
+        public void BeginArrivalPush(long uid)
+        {
+            ArrivalPushUid = uid;
+            ArrivalPushAttemptTime = DateTime.Now;
+        }
+
+        /// <summary>记录返回的来源单据关联；缺失明细ID时仍保留已生单状态防止重建。</summary>
+        public void CompleteArrivalPush(long? voucherId, string voucherCode, long? detailId)
+        {
+            ArrivalVoucherId = voucherId;
+            ArrivalVoucherCode = voucherCode;
+            ArrivalDetailId = detailId;
+            ArrivalPushError = voucherId.HasValue && !string.IsNullOrWhiteSpace(voucherCode) && detailId.HasValue
+                ? null : "到货单已生成，但U8来源关联不完整，请核对到货单；禁止重复生成";
+            MarkAsPushedToErp();
+        }
+
+        /// <summary>保存ERP错误供管理页重试，不改变本地组盘结果。</summary>
+        public void FailArrivalPush(string error)
+        {
+            ArrivalPushError = LimitError(error);
+        }
+
+        /// <summary>记录来料报检结果；失败时保留UID，成功后禁止重复生单。</summary>
+        public void RecordInspectionPush(long uid, bool success, string error)
+        {
+            InspectionPushUid = uid;
+            IsInspectionReportPushed = success;
+            InspectionPushError = success ? null : LimitError(error);
+        }
+
+        // 复用已映射的ExtraProperties持久化采购推送信息，兼容已有ASN记录，无需增加数据库列。
+        /// <summary>采购推送任务号，首次生成后失败重试保持不变。</summary>
+        [NotMapped]
+        public string PurchaseTaskId => this.GetProperty<string>("U8PurchaseTaskId");
+        /// <summary>已冻结的采购入库内层报文，重试不得更换来源或数量。</summary>
+        [NotMapped]
+        public string PurchasePayload => this.GetProperty<string>("U8PurchasePayload");
+        /// <summary>U8已确认采购入库成功，禁止重复生成。</summary>
+        [NotMapped]
+        public bool IsPurchasePushed => this.GetProperty<string>("U8PurchasePushed") == "true";
+        /// <summary>最近采购推送错误，审核与数量等待提示不计为成功。</summary>
+        [NotMapped]
+        public string PurchasePushError => this.GetProperty<string>("U8PurchaseError");
+        /// <summary>冻结首次提交的数据和任务号；返回采购失败时仍保留。</summary>
+        public void BeginPurchasePush(string taskId, string payload)
+        {
+            if (IsPurchasePushed) throw new BusinessException("采购入库已推送");
+            this.SetProperty("U8PurchaseTaskId", taskId);
+            this.SetProperty("U8PurchasePayload", payload);
+        }
+        /// <summary>独立记录采购推送结果及原始回执，避免重复回补样品库存。</summary>
+        public void RecordPurchasePush(bool success, string message, string data)
+        {
+            this.SetProperty("U8PurchasePushed", success ? "true" : "false");
+            this.SetProperty("U8PurchaseError", success ? null : LimitError(message));
+            if (success) this.SetProperty("U8PurchaseReceipt", data);
+        }
+
+        /// <summary>限制接口异常文本长度，确保错误信息可落库。</summary>
+        private static string LimitError(string error)
+        {
+            return error?.Length > 2000 ? error.Substring(0, 2000) : error;
+        }
 
         public void SetStatus(AsnStatus status)
         {

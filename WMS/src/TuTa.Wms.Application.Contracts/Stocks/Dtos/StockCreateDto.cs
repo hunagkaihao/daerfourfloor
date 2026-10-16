@@ -63,6 +63,9 @@ namespace TuTa.Wms.Stocks.Dtos
         /// </summary>
         public string AsnCode { get; set; }
 
+        /// <summary>U8组盘选择的本地ASN明细ID，普通组盘不填写。</summary>
+        public Guid? AsnLineId { get; set; }
+
         /// <summary>
         /// 收料时的包或箱数
         /// </summary>

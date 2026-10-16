@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -193,42 +193,37 @@ namespace TuTa.Wms.Stocks
             {
                 try
                 {
-                    var validateResult = await ValidateAsnOrderStockInAsync(orderCode, paras).ConfigureAwait(false);
-                    if (!validateResult.success)
+                    var asnLines = await ResolveU8AsnLinesAsync(orderCode, paras);
+                    var result = await CreateStockAndBindBoxCoreAsync(paras, boxCode, asnLines).ConfigureAwait(false);
+                    if (!result.success) return result;
+                    foreach (var group in asnLines.GroupBy(x => x.Value.Id))
                     {
-                        return validateResult;
+                        var line = group.First().Value;
+                        line.ApplyAlreadyStockInQuantity(group.Sum(x => x.Key.TotalCount));
+                        await _erpAsnRepository.UpdateAsync(line);
                     }
-
-                    var result = new ResponseDto();
-
-                    await UpdateAsnOrderStockInAsync(orderCode, paras).ConfigureAwait(false);
-
-                    var asnCode = await GetAsnCodeByOrderAndMaterialAsync(orderCode, paras).ConfigureAwait(false);
+                    var asnCode = asnLines.Values.First().AsnCode;
                     await uow.CompleteAsync().ConfigureAwait(false);
 
+                    // 本地作业已提交；U8失败保留结果，允许管理页重试。
                     if (!string.IsNullOrWhiteSpace(asnCode))
                     {
-                        var pushResult = await _erpAsnAppService.TryPushPuArrVouchIfAllLinesCompletedAsync(asnCode).ConfigureAwait(false);
-                        if (pushResult != null)
+                        try
                         {
-                            if (pushResult.Success)
+                            var push = await _erpAsnAppService.TryPushPuArrVouchIfAllLinesCompletedAsync(asnCode);
+                            if (push != null)
                             {
-                                // U8推送成功后，才创建库存和绑定容器
-                                result = await CreateStockAndBindBoxCoreAsync(paras, boxCode).ConfigureAwait(false);
-                                if (!result.success)
+                                result.message += push.Success ? "，" + push.Message : "，U8到货单推送失败，可在ASN管理重试：" + push.Message;
+                                if (push.Success)
                                 {
-                                    return result;
+                                    result.message += "，请仓管员在U8审核到货单后，通过PDA推送来料报检单";
                                 }
-
-                                result.message = string.IsNullOrWhiteSpace(pushResult.Message)
-                                    ? result.message + "，已自动推送U8到货单"
-                                    : result.message + "，" + pushResult.Message;
                             }
-                            else
-                            {
-                                _logger.Warn($"ASN {asnCode} 自动推送到货单失败：{pushResult.Message}，开始回滚ASN已入库数量和状态");
-                                await RevertAsnOrderStockInAsync(orderCode, paras).ConfigureAwait(false);
-                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Warn($"ASN {asnCode} 本地组盘完成，U8同步异常：{ex.Message}");
+                            result.message += "，本地组盘完成，U8同步待重试";
                         }
                     }
 
@@ -247,7 +242,8 @@ namespace TuTa.Wms.Stocks
         /// <param name="paras"></param>
         /// <param name="boxCode"></param>
         /// <returns></returns>
-        private async Task<ResponseDto> CreateStockAndBindBoxCoreAsync(List<StockCreateDto> paras, string boxCode)
+        private async Task<ResponseDto> CreateStockAndBindBoxCoreAsync(List<StockCreateDto> paras, string boxCode,
+            IReadOnlyDictionary<StockCreateDto, ErpAsn> u8Lines = null)
         {
             if (string.IsNullOrWhiteSpace(boxCode))
                 return new ResponseDto() { success = false, message = "容器编号不能为空" };
@@ -360,6 +356,8 @@ namespace TuTa.Wms.Stocks
                     null,
                     null);
 
+                if (u8Lines != null) stock.BindU8AsnLine(u8Lines[para].Id);
+
                 // 设置生产日期
                 if (para.SupplierProductionDate.HasValue)
                 {
@@ -384,6 +382,12 @@ namespace TuTa.Wms.Stocks
                     var existingStockByReceivingBarcode = await _stockRepository.FindByReceivingMaterialBarcodeAsync(para.ReceivingMaterialBarcode).ConfigureAwait(false);
                     if (existingStockByReceivingBarcode != null)
                     {
+                        if (u8Lines != null)
+                        {
+                            if (existingStockByReceivingBarcode.U8AsnLineId != u8Lines[para].Id ||
+                                existingStockByReceivingBarcode.BoxData?.BoxId != box.Id)
+                                throw new BusinessException("收料码已关联其他ASN明细或容器，不能跨单合并");
+                        }
                         existingStockByReceivingBarcode.CombineStock(para.TotalCount);
                         await _stockRepository.UpdateAsync(existingStockByReceivingBarcode).ConfigureAwait(false);
 
@@ -413,7 +417,7 @@ namespace TuTa.Wms.Stocks
 
                             await _stockInHistoryRepository.InsertAsync(stockInHistory).ConfigureAwait(false);
 
-                            if (!string.IsNullOrWhiteSpace(para.AsnCode))
+                            if (u8Lines == null && !string.IsNullOrWhiteSpace(para.AsnCode))
                             {
                                 await _erpAsnStockInService.HandleStockInCompletedAsync(para.AsnCode, para.TotalCount).ConfigureAwait(false);
                             }
@@ -427,9 +431,12 @@ namespace TuTa.Wms.Stocks
  
                 // 检查是否已存在相同库存
                 var stockExist = await _stockRepository.FindByBoxIdAndBarcodeAsync(box.Id, materialCode).ConfigureAwait(false);
+                // 仅U8库存按来源区分，普通组盘仍沿用原有按物料合并规则。
+                if (u8Lines != null && stockExist != null &&
+                    (stockExist.U8AsnLineId != stock.U8AsnLineId || stockExist.BatchCode != stock.BatchCode || stockExist.Grade != stock.Grade))
+                    stockExist = null;
                 if (stockExist != null)
                 {
-                    // 合并库存
                     stockExist.CombineStock(stock);
                     await _stockRepository.UpdateAsync(stockExist).ConfigureAwait(false);
                 }
@@ -465,7 +472,7 @@ namespace TuTa.Wms.Stocks
 
                         await _stockInHistoryRepository.InsertAsync(stockInHistory).ConfigureAwait(false);
 
-                        if (!string.IsNullOrWhiteSpace(para.AsnCode))
+                        if (u8Lines == null && !string.IsNullOrWhiteSpace(para.AsnCode))
                         {
                             await _erpAsnStockInService.HandleStockInCompletedAsync(para.AsnCode, para.TotalCount).ConfigureAwait(false);
                         }
@@ -488,108 +495,49 @@ namespace TuTa.Wms.Stocks
             return new ResponseDto() { success = true, message = "创建库存并绑定容器成功" };
         }
 
-        private async Task<ResponseDto> ValidateAsnOrderStockInAsync(string orderCode, List<StockCreateDto> paras)
+        /// <summary>解析PDA选中的ASN明细，按来源合计校验组盘数量；旧客户端来源不唯一时拒绝猜测。</summary>
+        private async Task<Dictionary<StockCreateDto, ErpAsn>> ResolveU8AsnLinesAsync(string orderCode, List<StockCreateDto> paras)
         {
-            if (string.IsNullOrWhiteSpace(orderCode))
+            if (string.IsNullOrWhiteSpace(orderCode) || paras == null || paras.Count == 0)
+                throw new BusinessException("订单号和组盘明细不能为空");
+            var result = new Dictionary<StockCreateDto, ErpAsn>();
+            foreach (var para in paras)
             {
-                return new ResponseDto() { success = false, message = "订单号不能为空" };
+                var material = string.IsNullOrWhiteSpace(para.MaterialCode) ? para.Barcode : para.MaterialCode;
+                ErpAsn line;
+                if (para.AsnLineId.HasValue)
+                    line = await _erpAsnRepository.GetAsync(para.AsnLineId.Value);
+                else
+                {
+                    var candidates = await _erpAsnRepository.GetListAsync(x =>
+                        x.OrderCode == orderCode && x.MaterialCode == material && x.Status != AsnStatus.Cancelled);
+                    candidates = candidates.Where(x =>
+                        (string.IsNullOrWhiteSpace(para.AsnCode) || x.AsnCode == para.AsnCode) &&
+                        (string.IsNullOrWhiteSpace(para.BatchCode) || x.BatchCode == para.BatchCode)).ToList();
+                    if (candidates.Count != 1) throw new BusinessException("ASN来源不唯一，请重新选择ASN明细");
+                    line = candidates[0];
+                }
+                if (line.OrderCode != orderCode || line.MaterialCode != material ||
+                    (!string.IsNullOrWhiteSpace(para.AsnCode) && line.AsnCode != para.AsnCode) ||
+                    (!string.IsNullOrWhiteSpace(para.BatchCode) && para.BatchCode != line.BatchCode) ||
+                    (!string.IsNullOrWhiteSpace(para.Grade) && para.Grade != line.Free5) ||
+                    line.Status == AsnStatus.Cancelled || line.IsPushedToErp || para.TotalCount <= 0)
+                    throw new BusinessException("所选ASN明细与物料、订单、批次、等级或数量不匹配");
+                para.BatchCode = line.BatchCode;
+                para.AsnCode = line.AsnCode;
+                result.Add(para, line);
             }
-
-            if (paras == null || paras.Count == 0)
+            if (result.Values.Select(x => x.AsnCode).Distinct().Count() != 1)
+                throw new BusinessException("一次组盘提交只能关联一张ASN");
+            foreach (var group in result.GroupBy(x => x.Value.Id))
             {
-                return new ResponseDto() { success = false, message = "库存创建参数不能为空" };
+                var line = group.First().Value;
+                if ((line.AlreadyStockInQuantity ?? 0) + group.Sum(x => x.Key.TotalCount) > line.InWarehouseQuantity)
+                    throw new BusinessException($"物料{line.MaterialCode}本次组盘超过ASN剩余数量");
             }
-
-            var quantityByMaterial = GetStockInQuantityByMaterial(paras);
-            foreach (var item in quantityByMaterial)
-            {
-                var erpAsn = await _erpAsnRepository.GetByOrderCodeAndMaterialCodeAsync(orderCode, item.Key).ConfigureAwait(false);
-                if (erpAsn == null)
-                {
-                    return new ResponseDto()
-                    {
-                        success = false,
-                        message = $"未找到订单号{orderCode}、物料{item.Key}对应的ASN单据"
-                    };
-                }
-
-                if (erpAsn.Status == AsnStatus.Completed)
-                {
-                    return new ResponseDto()
-                    {
-                        success = false,
-                        message = $"订单号{orderCode}、物料{item.Key}对应的ASN单据已完成"
-                    };
-                }
-
-                var current = erpAsn.AlreadyStockInQuantity ?? 0;
-                if (current + item.Value > erpAsn.InWarehouseQuantity)
-                {
-                    return new ResponseDto()
-                    {
-                        success = false,
-                        message = $"订单号{orderCode}本次组盘数量{item.Value}加上已入库数{current}不能超过入库数{erpAsn.InWarehouseQuantity}"
-                    };
-                }
-            }
-
-            return new ResponseDto() { success = true };
+            return result;
         }
 
-        private async Task UpdateAsnOrderStockInAsync(string orderCode, List<StockCreateDto> paras)
-        {
-            var quantityByMaterial = GetStockInQuantityByMaterial(paras);
-            foreach (var item in quantityByMaterial)
-            {
-                var erpAsn = await _erpAsnRepository.GetByOrderCodeAndMaterialCodeAsync(orderCode, item.Key).ConfigureAwait(false);
-                if (erpAsn == null)
-                {
-                    throw new BusinessException($"未找到订单号{orderCode}、物料{item.Key}对应的ASN单据");
-                }
-
-                erpAsn.ApplyAlreadyStockInQuantity(item.Value);
-                await _erpAsnRepository.UpdateAsync(erpAsn).ConfigureAwait(false);
-            }
-        }
-
-        private async Task RevertAsnOrderStockInAsync(string orderCode, List<StockCreateDto> paras)
-        {
-            var quantityByMaterial = GetStockInQuantityByMaterial(paras);
-            foreach (var item in quantityByMaterial)
-            {
-                var erpAsn = await _erpAsnRepository.GetByOrderCodeAndMaterialCodeAsync(orderCode, item.Key).ConfigureAwait(false);
-                if (erpAsn == null)
-                {
-                    _logger.Warn($"回滚ASN失败：未找到订单号{orderCode}、物料{item.Key}对应的ASN单据");
-                    continue;
-                }
-
-                erpAsn.RevertAlreadyStockInQuantity(item.Value);
-                await _erpAsnRepository.UpdateAsync(erpAsn).ConfigureAwait(false);
-                _logger.Warn($"已回滚ASN {erpAsn.AsnCode} 物料 {item.Key} 已入库数量 {item.Value}");
-            }
-        }
-
-        private async Task<string> GetAsnCodeByOrderAndMaterialAsync(string orderCode, List<StockCreateDto> paras)
-        {
-            var quantityByMaterial = GetStockInQuantityByMaterial(paras);
-            if (quantityByMaterial.Count == 0)
-            {
-                return null;
-            }
-
-            var firstMaterial = quantityByMaterial.Keys.First();
-            var erpAsn = await _erpAsnRepository.GetByOrderCodeAndMaterialCodeAsync(orderCode, firstMaterial).ConfigureAwait(false);
-            return erpAsn?.AsnCode;
-        }
-
-        private static Dictionary<string, decimal> GetStockInQuantityByMaterial(List<StockCreateDto> paras)
-        {
-            return paras
-                .GroupBy(p => !string.IsNullOrWhiteSpace(p.MaterialCode) ? p.MaterialCode : p.Barcode)
-                .Where(g => !string.IsNullOrWhiteSpace(g.Key))
-                .ToDictionary(g => g.Key, g => g.Sum(p => p.TotalCount));
-        }
         //创建容器搬运任务
         [UnitOfWork]
         public async Task<ResponseDto> CreateStockTask(string boxCode, string startCellCode, string endCellCode)
@@ -807,10 +755,27 @@ namespace TuTa.Wms.Stocks
                         return new ResponseDto() { success = false, message = $"未找到发货单 {deliveryOrderNo} 下存货编码 {materialCode} 的出库记录，请先扫描出库单保存" };
                     }
 
+                    if (actualOutboundQuantity <= 0 || actualOutboundQuantity > record.Quantity - (record.ActualOutboundQuantity ?? 0))
+                        return new ResponseDto { success = false, message = "出库数量必须大于0且不得超过U8发货剩余数量" };
+                    var box = await _boxRepository.FindByBoxCodeAsync(boxCode);
+                    if (box == null) return new ResponseDto { success = false, message = "出库容器不存在" };
+                    var selected = (await _stockRepository.GetByBoxIdAsync(box.Id))
+                        .Where(x => x.Material.MaterialCode == materialCode && x.Grade == record.Grade).ToList();
+                    if (selected.Count == 0 || selected.Sum(x => x.TotalCountInTime) < actualOutboundQuantity)
+                        return new ResponseDto { success = false, message = "容器库存与U8物料、等级或数量不匹配" };
+                    if (selected.Any(x => !string.IsNullOrWhiteSpace(x.U8OutboundRecordId) && x.U8OutboundRecordId != record.Id))
+                        return new ResponseDto { success = false, message = "所选库存已关联其他U8发货单" };
+
                     var result = await CreateStockTaskV2CoreAsync(boxCode, startCellCode, endCellCode).ConfigureAwait(false);
                     if (!result.success)
                         return result;
 
+                    // 搬运不代表实际出库，只保存U8来源，PDA实际出库后才累计数量。
+                    foreach (var stock in selected)
+                    {
+                        stock.BindU8Outbound(record.Id);
+                        await _stockRepository.UpdateAsync(stock);
+                    }
                     //record.ActualOutboundQuantity = actualOutboundQuantity;
                     await _erpOutboundRecordRepository.UpdateAsync(record).ConfigureAwait(false);
 
@@ -4287,6 +4252,16 @@ namespace TuTa.Wms.Stocks
                     if (stockExist == null)
                         return new ResponseDto() { success = false, message = $"库存{stockId}不存在" };
 
+                    ErpOutboundRecord u8Record = null;
+                    if (!string.IsNullOrWhiteSpace(stockExist.U8OutboundRecordId))
+                    {
+                        u8Record = await _erpOutboundRecordRepository.FindAsync(stockExist.U8OutboundRecordId);
+                        if (u8Record == null || u8Record.MaterialCode != stockExist.Material.MaterialCode ||
+                            u8Record.Grade != stockExist.Grade || outBoundCount <= 0 ||
+                            outBoundCount > u8Record.Quantity - (u8Record.ActualOutboundQuantity ?? 0))
+                            return new ResponseDto { success = false, message = "U8出库关联无效或数量超过发货剩余数量" };
+                    }
+
                     Guid? cellId = stockExist.CellData.CellId;
                     bool willBeFullyConsumed = stockExist.TotalCountInTime <= outBoundCount;
 
@@ -4325,23 +4300,33 @@ namespace TuTa.Wms.Stocks
 
                     _logger.Info($"物料信息: MaterialCode={material?.MaterialCode}, CellCode={cellData?.CellCode}, BoxCode={boxData?.BoxCode}, Warehouse={warehouseData?.HouseCode}");
 
-                    // 更新erpoutbound实际出库数量（按存货编码取最早一条记录累加）
-                    if (material != null && !string.IsNullOrEmpty(material.MaterialCode))
+                    // 仅明确绑定的U8库存更新对应发货单；不再按物料猜测最早单据。
+                    if (u8Record != null)
                     {
-                        var erpRecords = await _erpOutboundRecordRepository.GetListAsync(
-                            e => e.MaterialCode == material.MaterialCode).ConfigureAwait(false);
-                        var erpRecord = erpRecords.OrderBy(e => e.CreationTime).FirstOrDefault();
-                        if (erpRecord != null)
+                        var actualDetails = string.IsNullOrWhiteSpace(u8Record.ActualOutboundDetailsJson)
+                            ? new Newtonsoft.Json.Linq.JArray() : Newtonsoft.Json.Linq.JArray.Parse(u8Record.ActualOutboundDetailsJson);
+                        var row = actualDetails.FirstOrDefault(x => x["batch"]?.ToString() == stockExist.BatchCode);
+                        if (row == null)
+                            actualDetails.Add(new Newtonsoft.Json.Linq.JObject { ["batch"] = stockExist.BatchCode, ["quantity"] = outBoundCount });
+                        else row["quantity"] = (decimal)row["quantity"] + outBoundCount;
+                        u8Record.RecordActualOutbound(outBoundCount, actualDetails.ToString(Newtonsoft.Json.Formatting.None));
+                        await _erpOutboundRecordRepository.UpdateAsync(u8Record);
+                        if (u8Record.ActualOutboundQuantity == u8Record.Quantity)
                         {
-                            erpRecord.ActualOutboundQuantity = (erpRecord.ActualOutboundQuantity ?? 0) + outBoundCount;
-                            await _erpOutboundRecordRepository.UpdateAsync(erpRecord).ConfigureAwait(false);
-                            _logger.Info($"erpoutbound实际出库数量已更新，存货编码:{material.MaterialCode}，出库单:{erpRecord.DeliveryOrderNo}，累加数量:{outBoundCount}");
+                            // U8计划完成后的余料释放关联，原回库/普通出库仍可照常使用。
+                            if (stockExist.TotalCountInTime > 0)
+                            {
+                                stockExist.ReleaseU8Outbound();
+                                await _stockRepository.UpdateAsync(stockExist);
+                            }
+                            var remainder = await _stockRepository.GetListAsync(x =>
+                                x.U8OutboundRecordId == u8Record.Id && x.Id != stockId);
+                            foreach (var remainingStock in remainder)
+                            {
+                                remainingStock.ReleaseU8Outbound();
+                                await _stockRepository.UpdateAsync(remainingStock);
+                            }
                         }
-                        else
-                        {
-                            _logger.Info($"erpoutbound未找到存货编码{material.MaterialCode}的记录，跳过实际出库数量更新");
-                        }
-                        // 如果出库单全部出库，则调用销售出库单接口
                     }
 
                     var stockOutHistory = new StockOutHistory(
@@ -4389,7 +4374,21 @@ namespace TuTa.Wms.Stocks
                     await uow.CompleteAsync().ConfigureAwait(false);
 
                     _logger.Info($"Id为{stockId}，barcode为{stockExist.Barcode}，物料码为{stockExist.Material.MaterialCode}, 物料名为{stockExist.Material.MaterialName}，手动出库数量为{outBoundCount}的库存");
-                    return new ResponseDto() { success = true, message = $"库存{stockId}手动出库{outBoundCount}成功" };
+                    var message = $"库存{stockId}手动出库{outBoundCount}成功";
+                    if (u8Record != null)
+                    {
+                        try
+                        {
+                            var orderLines = await _erpOutboundRecordRepository.GetListAsync(x => x.DeliveryOrderNo == u8Record.DeliveryOrderNo);
+                            if (orderLines.All(x => x.Quantity > 0 && x.ActualOutboundQuantity == x.Quantity))
+                            {
+                                var push = await _erpAsnAppService.PushSalesOutboundAsync(u8Record.DeliveryOrderNo);
+                                message += push.Success ? "，" + push.Message : "，U8销售出库待重试：" + push.Message;
+                            }
+                        }
+                        catch (Exception ex) { _logger.Warn(ex.Message); message += "，U8同步待重试"; }
+                    }
+                    return new ResponseDto() { success = true, message = message };
                 }
                 catch (Exception ex)
                 {
@@ -4517,8 +4516,28 @@ namespace TuTa.Wms.Stocks
             }
         }
 
+        [UnitOfWork(IsDisabled = true)]
         public async Task<ResponseDto> ConfirmInspectionQualifiedAsync(Guid stockId, decimal qualifiedQty)
         {
+            Guid? sourceLineId;
+            string sourceAsn = null;
+            using (var read = UnitOfWorkManager.Begin(true, false))
+            {
+                var snapshot = await _stockRepository.FindAsync(stockId);
+                if (snapshot == null) return new ResponseDto { success = false, message = $"库存{stockId}不存在" };
+                sourceLineId = snapshot.U8AsnLineId;
+                if (sourceLineId.HasValue)
+                    sourceAsn = (await _erpAsnRepository.GetAsync(sourceLineId.Value)).AsnCode;
+                await read.CompleteAsync();
+            }
+            // U8查询在本地写事务外执行；普通库存不受新增检验流程影响。
+            if (sourceLineId.HasValue)
+            {
+                var checks = await _erpAsnAppService.GetAsnInspectionResultsAsync(sourceAsn);
+                var check = checks.Items?.SingleOrDefault(x => x.AsnLineId == sourceLineId.Value);
+                if (!checks.Success || check == null || !check.CanPurchase)
+                    return new ResponseDto { success = false, message = check?.Message ?? checks.Message ?? "U8检验结果尚未确认" };
+            }
             using (var uow = UnitOfWorkManager.Begin(true, true))
             {
                 try
@@ -4527,6 +4546,8 @@ namespace TuTa.Wms.Stocks
                     if (stock == null)
                         return new ResponseDto { success = false, message = $"库存{stockId}不存在" };
 
+                    if (stock.U8AsnLineId != sourceLineId)
+                        return new ResponseDto { success = false, message = "库存U8来源已变化，请重新查询" };
                     if (stock.InspectionStatus != InspectionStatus.InProgressInspection)
                         return new ResponseDto { success = false, message = "当前不处于抽检状态" };
 
@@ -4536,6 +4557,8 @@ namespace TuTa.Wms.Stocks
                     var inspectionCount = stock.InspectionCount ?? 0;
                     if (qualifiedQty > inspectionCount)
                         return new ResponseDto { success = false, message = $"合格数量({qualifiedQty})不能超过抽检数量({inspectionCount})" };
+                    if (sourceLineId.HasValue && qualifiedQty != inspectionCount)
+                        return new ResponseDto { success = false, message = "U8整批合格后请归还该库存全部抽检样品，再确认合格" };
 
                     var pagOrBoxDelta = stock.ReceiveCount?.CountInOnePkgOrBox > 0
                         ? (int)(qualifiedQty / stock.ReceiveCount.CountInOnePkgOrBox.Value)
@@ -4576,7 +4599,17 @@ namespace TuTa.Wms.Stocks
                     await uow.CompleteAsync().ConfigureAwait(false);
 
                     _logger.Info($"库存{stockId}确认抽检合格，加回数量{qualifiedQty}");
-                    return new ResponseDto { success = true, message = "确认合格成功" };
+                    var resultMessage = "确认合格成功";
+                    if (sourceLineId.HasValue)
+                    {
+                        try
+                        {
+                            var purchase = await _erpAsnAppService.PushInspectionPurchaseAsync(sourceLineId.Value);
+                            resultMessage += purchase.Success ? "，采购入库已推送U8" : "，U8采购入库待处理：" + purchase.Message;
+                        }
+                        catch (Exception ex) { resultMessage += "，本地数量已保存，U8采购入库可独立重试：" + ex.Message; }
+                    }
+                    return new ResponseDto { success = true, message = resultMessage };
                 }
                 catch (Exception ex)
                 {
@@ -4666,40 +4699,17 @@ namespace TuTa.Wms.Stocks
                 if (stockList.Count == 0)
                     return new ResponseDto() { success = false, message = "无有效的抽检记录" };
 
-                var items = stockList.Select(s => new TuTa.Wms.Erp.IDto.LLBJDDataItem
+                if (stockList.Any(x => !x.U8AsnLineId.HasValue))
+                    return new ResponseDto { success = false, message = "所选库存未关联U8 ASN来源，不能生成报检单" };
+                var codes = new HashSet<string>();
+                foreach (var stock in stockList)
+                    codes.Add((await _erpAsnRepository.GetAsync(stock.U8AsnLineId.Value)).AsnCode);
+                foreach (var code in codes)
                 {
-                    AddType = 0,
-                    CSourceCode = s.ReceivingMaterialBarcode ?? s.Barcode,
-                    CMemo = $"物料抽检-{s.Material?.MaterialName}",
-                    CMAKER = "WMS",
-                    Details = new List<TuTa.Wms.Erp.IDto.LLBJDDetail>
-                    {
-                        new TuTa.Wms.Erp.IDto.LLBJDDetail
-                        {
-                            SourceAutoId = 0,
-                            CInvCode = s.Material?.MaterialCode,
-                            CBatch = s.BatchCode,
-                            FQuantity = s.InspectionCount ?? 0
-                        }
-                    }
-                }).ToList();
-
-                var request = new TuTa.Wms.Erp.IDto.LLBJDAddRequestDto
-                {
-                    Cmd = "LLBJDAdd",
-                    Maker = "WMS",
-                    Data = items
-                };
-
-                var result = await _erpAsnAppService.PushLLBJDAddAsync(request).ConfigureAwait(false);
-                if (result != null && result.Success)
-                {
-                    _logger.Info($"推送来料报检单成功，共{stockList.Count}条");
-                    return new ResponseDto() { success = true, message = "推送来料报检单成功" };
+                    var result = await _erpAsnAppService.PushAsnInspectionReportAsync(code);
+                    if (!result.Success) return new ResponseDto { success = false, message = result.Message };
                 }
-
-                _logger.Warn($"推送来料报检单失败: {result?.Message}");
-                return new ResponseDto() { success = false, message = result?.Message ?? "推送来料报检单失败" };
+                return new ResponseDto { success = true, message = "ASN来料报检单已推送" };
             }
             catch (Exception ex)
             {

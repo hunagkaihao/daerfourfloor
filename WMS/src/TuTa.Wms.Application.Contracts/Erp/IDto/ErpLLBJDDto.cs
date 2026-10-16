@@ -26,7 +26,7 @@ namespace TuTa.Wms.Erp.IDto
         /// <summary>
         /// 主键ID
         /// </summary>
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         /// <summary>
         /// 报检单数据（序列化后会自动转换为 JSON 字符串）

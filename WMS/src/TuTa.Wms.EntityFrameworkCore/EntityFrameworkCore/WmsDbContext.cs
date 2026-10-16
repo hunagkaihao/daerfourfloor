@@ -343,7 +343,34 @@ public class WmsDbContext :
             b.Property(e => e.LabelText).HasMaxLength(200);
             b.Property(e => e.DeliveryOrderNo).HasMaxLength(50);
             b.Property(e => e.ActualOutboundQuantity).HasColumnType("decimal(18,4)");
+            b.Property(e => e.ConcurrencyStamp).IsConcurrencyToken();
+            b.Property(e => e.SourceDetailId).HasComment("U8发货来源明细ID，不能用主表ID替代");
+            b.Property(e => e.SalesDepartmentCode).HasComment("U8销售部门编码");
+            b.Property(e => e.ActualOutboundDetailsJson).HasComment("实际出库批次及数量JSON数组");
+            b.Property(e => e.SalesPushTaskId).HasComment("U8销售推送UID，失败重试沿用");
+            b.Property(e => e.IsSalesPushed).HasComment("U8销售出库单是否成功推送");
+            b.Property(e => e.SalesPushTime).HasComment("U8销售出库推送成功时间");
+            b.Property(e => e.SalesPushError).HasComment("U8销售出库最近失败原因");
+            b.Property(e => e.IsDeliveryScanCompleted).HasComment("整张U8发货单已确认全部扫码");
             b.HasIndex(e => new { e.DeliveryOrderNo, e.MaterialCode }).IsUnique();
+        });
+
+        builder.Entity<ErpAsn>(b =>
+        {
+            b.Property(e => e.ArrivalPushUid).HasComment("U8到货单推送UID，失败重试沿用");
+            b.Property(e => e.ArrivalVoucherId).HasComment("U8到货单主表ID");
+            b.Property(e => e.ArrivalVoucherCode).HasComment("U8到货单号");
+            b.Property(e => e.ArrivalDetailId).HasComment("U8到货单明细autoid");
+            b.Property(e => e.ArrivalPushError).HasComment("U8到货单最近失败原因");
+            b.Property(e => e.ArrivalPushAttemptTime).HasComment("U8到货单最近推送尝试时间");
+            b.Property(e => e.InspectionPushUid).HasComment("U8来料报检单推送UID");
+            b.Property(e => e.IsInspectionReportPushed).HasComment("U8来料报检单是否成功推送");
+            b.Property(e => e.InspectionPushError).HasComment("U8来料报检单最近失败原因");
+        });
+        builder.Entity<Stock>(b =>
+        {
+            b.Property(e => e.U8AsnLineId).HasComment("U8关联ASN明细ID，普通库存为空");
+            b.Property(e => e.U8OutboundRecordId).HasComment("U8发货记录ID，普通库存为空");
         });
 
     }

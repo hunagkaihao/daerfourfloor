@@ -104,6 +104,11 @@ namespace TuTa.Wms.Erp.Dto
 
         /// <summary>每箱数量</summary>
         public decimal QtyPerBox { get; set; }
+
+        /// <summary>可选U8发货来源明细ID；缺少时本地业务照常，销售推送等待补充。</summary>
+        public long? SourceDetailId { get; set; }
+        /// <summary>可选销售部门编码。</summary>
+        public string SalesDepartmentCode { get; set; }
     }
 
     /// <summary>
@@ -124,6 +129,19 @@ namespace TuTa.Wms.Erp.Dto
         public string DeliveryOrderNo { get; set; }
         public decimal? ActualOutboundQuantity { get; set; }
         public DateTime CreationTime { get; set; }
+
+        /// <summary>U8发货来源明细ID。</summary>
+        public long? SourceDetailId { get; set; }
+        /// <summary>U8销售部门编码。</summary>
+        public string SalesDepartmentCode { get; set; }
+        /// <summary>销售单推送结果。</summary>
+        public bool IsSalesPushed { get; set; }
+        /// <summary>销售单失败原因。</summary>
+        public string SalesPushError { get; set; }
+        /// <summary>仓管员已确认整单扫码完成。</summary>
+        public bool IsDeliveryScanCompleted { get; set; }
+        /// <summary>U8销售推送成功时间。</summary>
+        public DateTime? SalesPushTime { get; set; }
     }
 
     /// <summary>

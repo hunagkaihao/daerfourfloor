@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
@@ -12,6 +12,8 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Volo.Abp.DistributedLocking;
+using Volo.Abp.Domain.Repositories;
 using TuTa.Wms.Erp.Dto;
 using TuTa.Wms.Erp.Entities;
 using TuTa.Wms.Erp.IDto;
@@ -29,6 +31,8 @@ namespace TuTa.Wms.Erp
         public string PushReceiptUrl { get; set; }
         public string PuArrVouchAddUrl { get; set; }
         public string U8ApiUrl { get; set; }
+        /// <summary>采购入库类别编码，默认沿用U8测试示例301。</summary>
+        public string PurchaseReceiptCategory { get; set; } = "301";
         public string AppKey { get; set; }
         public string AppSecret { get; set; }
     }
@@ -36,18 +40,33 @@ namespace TuTa.Wms.Erp
     /// <summary>
     /// ERP ASN应用服务
     /// </summary>
-    public class ErpAsnAppService : ApplicationService, IErpAsnAppService
+    public partial class ErpAsnAppService : ApplicationService, IErpAsnAppService
     {
         private readonly ILogger<ErpAsnAppService> _logger;
         private readonly IErpAsnRepository _erpAsnRepository;
         private readonly ErpSettings _erpSettings;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IAbpDistributedLock _u8Lock;
+        private readonly IRepository<ErpOutboundRecord, string> _u8OutboundRepository;
+        /// <summary>校验抽检物料是否已回盘，防止采购入库早于本地作业完成。</summary>
+        private readonly TuTa.Wms.Stocks.IStockRepository _u8StockRepository;
 
-        public ErpAsnAppService(IErpAsnRepository erpAsnRepository, ILogger<ErpAsnAppService> logger, IConfiguration configuration)
+        public ErpAsnAppService(IErpAsnRepository erpAsnRepository, ILogger<ErpAsnAppService> logger, IConfiguration configuration,
+            IHttpClientFactory httpClientFactory = null, IAbpDistributedLock u8Lock = null,
+            IRepository<ErpOutboundRecord, string> u8OutboundRepository = null,
+            TuTa.Wms.Stocks.IStockRepository u8StockRepository = null)
         {
             _logger = logger;
             _erpAsnRepository = erpAsnRepository;
             _erpSettings = configuration.GetSection("Erp").Get<ErpSettings>();
+            _httpClientFactory = httpClientFactory;
+            _u8Lock = u8Lock;
+            _u8OutboundRepository = u8OutboundRepository;
+            _u8StockRepository = u8StockRepository;
         }
+
+        /// <summary>创建U8专用HTTP客户端；允许测试隔离真实ERP网络。</summary>
+        private HttpClient CreateU8Client() => _httpClientFactory?.CreateClient("U8") ?? new HttpClient();
 
         /// <summary>
         /// 通过ASN码获取信息
@@ -69,7 +88,7 @@ namespace TuTa.Wms.Erp
 
                 _logger.LogInformation($"开始登录ERP获取token，登录地址：{_erpSettings.LoginUrl}");
                 string token;
-                using (var loginClient = new HttpClient())
+                using (var loginClient = CreateU8Client())
                 {
                     var loginData = new
                     {
@@ -126,7 +145,7 @@ namespace TuTa.Wms.Erp
                 }
 
                 _logger.LogInformation($"使用token请求ASN信息，ASN码：{asnCode}，请求地址：{_erpSettings.GetAsnUrl}");
-                using var getInfoClient = new HttpClient();
+                using var getInfoClient = CreateU8Client();
                 getInfoClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 getInfoClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
@@ -376,7 +395,7 @@ namespace TuTa.Wms.Erp
             _logger.LogInformation($"[操作ID: {operationId}] 开始从ERP获取ASN信息，ASN码：{asnCode}");
             
             string token;
-            using (var loginClient = new HttpClient())
+            using (var loginClient = CreateU8Client())
             {
                 var loginData = new
                 {
@@ -404,7 +423,7 @@ namespace TuTa.Wms.Erp
                 token = loginObj.data.token;
             }
 
-            using var getInfoClient = new HttpClient();
+            using var getInfoClient = CreateU8Client();
             getInfoClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             getInfoClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
@@ -509,7 +528,7 @@ namespace TuTa.Wms.Erp
             try
             {
                 string token;
-                using (var loginClient = new HttpClient())
+                using (var loginClient = CreateU8Client())
                 {
                     var loginData = new
                     {
@@ -582,7 +601,7 @@ namespace TuTa.Wms.Erp
 
                 _logger.LogInformation($"[操作ID: {operationId}] 开始登录ERP获取token");
                 string token;
-                using (var loginClient = new HttpClient())
+                using (var loginClient = CreateU8Client())
                 {
                     var loginData = new
                     {
@@ -626,7 +645,7 @@ namespace TuTa.Wms.Erp
                 }
 
                 _logger.LogInformation($"[操作ID: {operationId}] 使用token推送ERP收货单，ASN码：{asnCode}，请求地址：{_erpSettings.PushReceiptUrl}");
-                using (var pushClient = new HttpClient())
+                using (var pushClient = CreateU8Client())
                 {
                     pushClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                     pushClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -754,6 +773,10 @@ namespace TuTa.Wms.Erp
                 for (var i = 0; i < input.Data.Count; i++)
                 {
                     var detail = input.Data[i];
+                    if (detail.IPoDetailId <= 0 || !detail.IPoDetailId.HasValue ||
+                        string.IsNullOrWhiteSpace(detail.WarehouseCode) || detail.IQuantity <= 0)
+                        return new PuArrVouchAddResponseDto { Success = false,
+                            Message = $"第{i + 1}行缺少有效采购订单行ID、仓库编码或数量" };
                     if (string.IsNullOrWhiteSpace(detail.CInvCode))
                     {
                         return new PuArrVouchAddResponseDto
@@ -801,7 +824,7 @@ namespace TuTa.Wms.Erp
                 var pushDataJson = System.Text.Json.JsonSerializer.Serialize(pushPayload, options);
                 _logger.LogInformation($"[操作ID: {operationId}] 请求ERP生成到货单接口，URL：{_erpSettings.PuArrVouchAddUrl}，请求参数：{pushDataJson}");
 
-                using var pushClient = new HttpClient();
+                using var pushClient = CreateU8Client();
                 pushClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 pushClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
@@ -831,7 +854,8 @@ namespace TuTa.Wms.Erp
 
                 var jObject = JObject.Parse(responseBody);
                 var success = jObject["success"]?.ToObject<bool>() ?? false;
-                var message = jObject["message"]?.ToString() ?? jObject["msg"]?.ToString();
+                var message = jObject["data"]?.Type == JTokenType.String ? jObject["data"].ToString()
+                    : jObject["message"]?.ToString() ?? jObject["msg"]?.ToString();
 
                 return new PuArrVouchAddResponseDto
                 {
@@ -883,17 +907,25 @@ namespace TuTa.Wms.Erp
                 var jsonOptions = new JsonSerializerOptions
                 {
                     Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase // 根据实际接口大小写要求调整
+                    PropertyNameCaseInsensitive = true
                 };
 
                 // 将 Data 列表序列化为字符串
-                string dataJsonString = JsonSerializer.Serialize(input.Data, jsonOptions);
+                var reportData = input.Data.Select(item => new {
+                    AddType = item.AddType, ddate = (string)null, cinspectcode = "",
+                    csourcecode = item.CSourceCode, cinspectdepcode = item.CInspectDepCode,
+                    cmemo = item.CMemo, Details = item.Details.Select(detail => new {
+                        sourceautoid = detail.SourceAutoId, cinvcode = detail.CInvCode,
+                        cbatch = detail.CBatch, fquantity = detail.FQuantity
+                    }).ToList()
+                }).ToList();
+                string dataJsonString = JsonSerializer.Serialize(reportData, jsonOptions);
 
                 // 构建最终发送的匿名对象（确保 Data 是字符串类型）
                 var payload = new
                 {
                     Cmd = input.Cmd,
-                    TaskId = input.TaskId ?? string.Empty,
+                    Taskid = input.TaskId ?? string.Empty,
                     Maker = input.Maker,
                     Id = input.Id,
                     Data = dataJsonString
@@ -903,18 +935,13 @@ namespace TuTa.Wms.Erp
                 _logger.LogInformation($"推送报文内容：{jsonContent}");
 
                 // 3. 发送 HTTP POST 请求
-                if (string.IsNullOrWhiteSpace(_erpSettings.U8ApiUrl))
-                {
-                    return new LLBJDAddResponseDto { Success = false, Message = "U8ApiUrl 未配置或为空" };
-                }
-
-                using var pushClient = new HttpClient();
+                using var pushClient = CreateU8Client();
                 pushClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 pushClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-                var response = await pushClient.PostAsync(_erpSettings.U8ApiUrl, content);
+                var response = await pushClient.PostAsync(GetU8Endpoint(""), content);
                 string responseBody = await response.Content.ReadAsStringAsync();
 
                 _logger.LogInformation($"推送来料报检单响应状态码：{(int)response.StatusCode}，响应内容：{responseBody}");
@@ -922,8 +949,14 @@ namespace TuTa.Wms.Erp
                 // 4. 解析响应结果
                 if (response.IsSuccessStatusCode)
                 {
-                    var result = JsonSerializer.Deserialize<LLBJDAddResponseDto>(responseBody, jsonOptions);
-                    return result ?? new LLBJDAddResponseDto { Success = false, Message = "响应结果解析为空" };
+                    var result = JObject.Parse(responseBody);
+                    return new LLBJDAddResponseDto {
+                        Success = result["success"]?.Value<bool>() ?? false,
+                        Code = result["code"]?.Value<int>() ?? 0,
+                        Message = result["success"]?.Value<bool>() == true ? "来料报检单生成成功"
+                            : result["data"]?.ToString() ?? result["msg"]?.ToString() ?? "报检失败",
+                        Data = result["data"]?.ToString()
+                    };
                 }
                 else
                 {
@@ -945,6 +978,8 @@ namespace TuTa.Wms.Erp
         /// </summary>
         public async Task<CGRKDAddResponseDto> PushCGRKDAddAsync(CGRKDAddRequestDto input)
         {
+            if (input?.Data != null)
+                return await PushPurchaseBaseAsync(input);
             var operationId = Guid.NewGuid().ToString();
             _logger.LogInformation($"[操作ID: {operationId}] 开始推送采购入库单");
 
@@ -986,7 +1021,7 @@ namespace TuTa.Wms.Erp
                 string jsonContent = JsonSerializer.Serialize(payload, jsonOptions);
                 _logger.LogInformation($"[操作ID: {operationId}] 推送采购入库单报文：{jsonContent}");
 
-                using var pushClient = new HttpClient();
+                using var pushClient = CreateU8Client();
                 pushClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 pushClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
@@ -1022,89 +1057,12 @@ namespace TuTa.Wms.Erp
         /// </summary>
         public async Task<PuArrVouchAddResponseDto> TryPushPuArrVouchIfAllLinesCompletedAsync(string asnCode)
         {
-            var operationId = Guid.NewGuid().ToString();
-            if (string.IsNullOrWhiteSpace(asnCode))
-            {
+            var lines = await _erpAsnRepository.GetListByAsnCodeAsync(asnCode);
+            var active = lines.Where(x => x.Status != AsnStatus.Cancelled).ToList();
+            if (active.Count == 0 || active.Any(x => x.InWarehouseQuantity <= 0 ||
+                (x.AlreadyStockInQuantity ?? 0) != x.InWarehouseQuantity))
                 return null;
-            }
-
-            var allLines = await _erpAsnRepository.GetListByAsnCodeAsync(asnCode).ConfigureAwait(false);
-            var activeLines = allLines.Where(x => x.Status != AsnStatus.Cancelled).ToList();
-            if (activeLines.Count == 0)
-            {
-                return null;
-            }
-
-            if (activeLines.Any(x => x.IsPushedToErp))
-            {
-                _logger.LogInformation($"[操作ID: {operationId}] ASN {asnCode} 已推送过到货单，跳过");
-                return new PuArrVouchAddResponseDto
-                {
-                    Success = true,
-                    Message = "已推送过到货单"
-                };
-            }
-
-            if (!activeLines.All(x => x.Status == AsnStatus.Completed))
-            {
-                _logger.LogInformation($"[操作ID: {operationId}] ASN {asnCode} 尚有明细未完成入库，暂不推送");
-                return null;
-            }
-
-            var firstLine = activeLines.First();
-            if (string.IsNullOrWhiteSpace(firstLine.SupplierCode))
-            {
-                _logger.LogWarning($"[操作ID: {operationId}] ASN {asnCode} 供应商编码为空，无法推送到货单");
-                return new PuArrVouchAddResponseDto
-                {
-                    Success = false,
-                    Message = "供应商编码为空，无法推送到货单"
-                };
-            }
-
-            var headerOrderCode = !string.IsNullOrWhiteSpace(firstLine.OrderCode)
-                ? firstLine.OrderCode
-                : activeLines.Select(x => x.OrderCode).FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
-
-            var request = new PuArrVouchAddRequestDto
-            {
-                CAsnCode = asnCode,
-                CVenCode = firstLine.SupplierCode,
-                Cpocode = headerOrderCode,
-                Data = activeLines.Select(line => new PuArrVouchDetailRequestDto
-                {
-                    CInvCode = line.MaterialCode,
-                    IQuantity = line.InWarehouseQuantity,
-                    INum = 1,
-                    FRealQuantity = line.AlreadyStockInQuantity ?? 0,
-                    FRealNumy = 1,
-                    CBatch = string.IsNullOrWhiteSpace(line.BatchCode) ? "0" : line.BatchCode,
-                    Cordercode = line.OrderCode,
-                    IPoDetailId = line.PoDetailId ?? line.ErpOrderDetailId,
-                    CFree2 = line.Free2,
-                    CFree3 = line.Free3,
-                    CFree5 = line.Free5
-                }).ToList()
-            };
-
-            _logger.LogInformation($"[操作ID: {operationId}] ASN {asnCode} 全部入库完成，开始自动推送到货单");
-            var result = await PushPuArrVouchAsync(request).ConfigureAwait(false);
-            if (result.Success)
-            {
-                foreach (var line in activeLines)
-                {
-                    line.MarkAsPushedToErp();
-                    await _erpAsnRepository.UpdateAsync(line).ConfigureAwait(false);
-                }
-
-                _logger.LogInformation($"[操作ID: {operationId}] ASN {asnCode} 自动推送到货单成功");
-            }
-            else
-            {
-                _logger.LogWarning($"[操作ID: {operationId}] ASN {asnCode} 自动推送到货单失败：{result.Message}");
-            }
-
-            return result;
+            return await PushAsnArrivalAsync(asnCode);
         }
 
         private static long GeneratePuArrVouchUid()
@@ -1119,29 +1077,27 @@ namespace TuTa.Wms.Erp
                 uid = uid,
                 cAsnCode = input.CAsnCode,
                 cVenCode = input.CVenCode,
-                cDepCode = "11",
-                cMaker = "张三",
+                cDepCode = input.DepartmentCode,
+                cMaker = input.Maker ?? "WMS",
                 cBusType = "普通采购",
-                cexch_name = "人民币",
+                cexch_name = input.ExchangeName,
                 cpocode = input.Cpocode,
-                cPtCode = 11,
-                itaxrate = 13,
-                iexchrate = 1,
+                cPtCode = input.ProcessTypeCode,
+                itaxrate = input.TaxRate,
+                iexchrate = input.ExchangeRate,
                 cMemo = "",
                 Data = input.Data.Select((item, index) => new
                 {
                     ivouchrowno = index + 1,
-                    cWhCode = "200",
+                    cWhCode = item.WarehouseCode,
                     cInvCode = item.CInvCode,
-                    iQuantity = Math.Round(item.IQuantity, 0),
-                    iinvexchrate = 1500,
-                    cunitid = "202",
+                    iQuantity = item.IQuantity,
                     iNum = Math.Round(item.INum, 0),
-                    fRealQuantity = Math.Round(item.FRealQuantity, 0),
+                    fRealQuantity = item.FRealQuantity,
                     fRealNumy = item.FRealNumy,
-                    bGsp = 0,
+                    bGsp = item.Bgsp,
                     cBatch = item.CBatch,
-                    iPOsID = item.IPoDetailId ?? 1000104266,
+                    iPOsID = item.IPoDetailId,
                     cordercode = item.Cordercode,
                     cFree2 = item.CFree2,
                     cFree3 = item.CFree3,
@@ -1152,7 +1108,7 @@ namespace TuTa.Wms.Erp
 
         private async Task<string> GetErpTokenAsync(string operationId)
         {
-            using var loginClient = new HttpClient();
+            using var loginClient = CreateU8Client();
             var loginData = new
             {
                 appKey = _erpSettings.AppKey,
@@ -1344,7 +1300,13 @@ namespace TuTa.Wms.Erp
                 Status = (int)asn.Status,
                 StatusName = GetAsnStatusName(asn.Status),
                 AlreadyStockInQuantity = asn.AlreadyStockInQuantity,
-                PendingStockInQuantity = asn.GetPendingStockInQuantity()
+                PendingStockInQuantity = asn.GetPendingStockInQuantity(),
+                IsPushedToErp = asn.IsPushedToErp, PushTime = asn.PushTime,
+                ArrivalVoucherId = asn.ArrivalVoucherId, ArrivalVoucherCode = asn.ArrivalVoucherCode,
+                ArrivalDetailId = asn.ArrivalDetailId, ArrivalPushError = asn.ArrivalPushError,
+                ArrivalPushAttemptTime = asn.ArrivalPushAttemptTime,
+                IsInspectionReportPushed = asn.IsInspectionReportPushed,
+                InspectionPushError = asn.InspectionPushError
             };
         }
 

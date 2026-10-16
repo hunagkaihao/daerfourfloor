@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TuTa.Wms.Erp.Dto;
 using TuTa.Wms.Erp.IDto;
@@ -61,6 +62,25 @@ namespace TuTa.Wms.Erp
         /// <param name="asnCode">ASN单号</param>
         /// <returns>推送结果；未满足推送条件时返回 null</returns>
         Task<PuArrVouchAddResponseDto> TryPushPuArrVouchIfAllLinesCompletedAsync(string asnCode);
+
+        /// <summary>完整ASN到货单生成/失败重试，保留来源单据关联。</summary>
+        Task<PuArrVouchAddResponseDto> PushAsnArrivalAsync(string asnCode);
+        /// <summary>到货成功后生成来料报检单，不查询来料检验单。</summary>
+        Task<LLBJDAddResponseDto> PushAsnInspectionReportAsync(string asnCode);
+
+        /// <summary>从U8查询当前ASN的来料检验单，严格校验来源和审核、合格数量。</summary>
+        Task<U8InspectionResultsDto> GetAsnInspectionResultsAsync(string asnCode);
+        /// <summary>根据一条ASN对应的已审核合格检验单生成采购入库；失败独立重试。</summary>
+        Task<CGRKDAddResponseDto> PushInspectionPurchaseAsync(Guid asnLineId);
+
+        /// <summary>整张发货单实际完成后推送/重试U8销售出库单。</summary>
+        Task<CGRKDAddResponseDto> PushSalesOutboundAsync(string deliveryOrderNo);
+        /// <summary>补充U8发货来源明细及销售部门，不影响普通库存。</summary>
+        Task<CGRKDAddResponseDto> SetSalesSourceAsync(string recordId, long sourceDetailId, string departmentCode);
+        /// <summary>仓管员确认发货单所有明细已扫码，之后才允许整单销售推送。</summary>
+        Task<CGRKDAddResponseDto> ConfirmDeliveryScanAsync(string deliveryOrderNo);
+        /// <summary>读取U8发货单明细及推送状态，供补录和重试。</summary>
+        Task<List<ErpOutboundRecordDto>> GetSalesRecordsAsync(string deliveryOrderNo);
 
         /// <summary>
         /// 获取ASN列表

@@ -1,10 +1,10 @@
-import { getAsnList, pushReceipt } from '/@/api/erp/asn';
+import { getAsnList, pushReceipt, pushAsnArrival, pushAsnInspection } from '/@/api/erp/asn';
+import type { AsnWorkflowLine } from '/@/api/erp/asn';
 import { BasicColumn } from '/@/components/Table';
 import { Tag } from 'ant-design-vue';
 import { message } from 'ant-design-vue';
 import moment from 'moment';
 import { h } from 'vue';
-import type { ErpAsnDto } from '/@/services/ServiceProxies';
 
 const wrapTextCell = {
   ellipsis: false,
@@ -73,7 +73,20 @@ export interface AsnGroupRow {
   totalAlreadyStockInQuantity: number;
   totalPendingStockInQuantity: number;
   lineCount: number;
-  asnItems: ErpAsnDto[];
+  /** 完整ASN明细，包含取消行供追溯。 */
+  asnItems: AsnWorkflowLine[];
+  /** 是否允许生成/重试到货单。 */
+  canPushArrival: boolean;
+  /** 是否允许生成/重试来料报检单。 */
+  canPushInspection: boolean;
+  /** 到货单推送状态和关联单号。 */
+  arrivalStatus: string;
+  arrivalVoucherCode: string;
+  pushTime?: string;
+  arrivalPushError: string;
+  /** 来料报检单推送状态及最近失败原因。 */
+  inspectionStatus: string;
+  inspectionPushError: string;
 }
 
 export const parentTableColumns: BasicColumn[] = [
@@ -108,19 +121,19 @@ export const parentTableColumns: BasicColumn[] = [
     width: 90,
   },
   {
-    title: '状态',
+    title: '组盘状态',
     dataIndex: 'statusSummary',
     width: 100,
     customRender: ({ record }) => renderStatusTag(record),
   },
   {
-    title: '已入库总数',
+    title: '已组盘总数',
     dataIndex: 'totalAlreadyStockInQuantity',
     width: 110,
     customRender: ({ record }) => formatQuantity(record.totalAlreadyStockInQuantity),
   },
   {
-    title: '待入库总数',
+    title: '待组盘总数',
     dataIndex: 'totalPendingStockInQuantity',
     width: 110,
     customRender: ({ record }) => formatQuantity(record.totalPendingStockInQuantity),
@@ -152,6 +165,15 @@ export const parentTableColumns: BasicColumn[] = [
   },
 ];
 
+parentTableColumns.splice(9, 0,
+  { title: 'U8到货单状态', dataIndex: 'arrivalStatus', width: 130 },
+  { title: 'U8到货单号', dataIndex: 'arrivalVoucherCode', width: 180 },
+  { title: '到货推送时间', dataIndex: 'pushTime', width: 170 },
+  { title: '到货失败原因', dataIndex: 'arrivalPushError', width: 240, ...wrapTextCell },
+  { title: '报检单状态', dataIndex: 'inspectionStatus', width: 130 },
+  { title: '报检失败原因', dataIndex: 'inspectionPushError', width: 240, ...wrapTextCell },
+);
+
 export const detailTableColumns: BasicColumn[] = [
   {
     title: '采购订单号',
@@ -181,25 +203,25 @@ export const detailTableColumns: BasicColumn[] = [
     width: 80,
   },
   {
-    title: '应入库数量',
+    title: '应组盘数量',
     dataIndex: 'iquantity',
     width: 110,
     customRender: ({ record }) => formatQuantity(record.iquantity),
   },
   {
-    title: '已经入库数量',
+    title: '已组盘数量',
     dataIndex: 'alreadyStockInQuantity',
     width: 120,
     customRender: ({ record }) => formatQuantity(record.alreadyStockInQuantity),
   },
   {
-    title: '待入库数量',
+    title: '待组盘数量',
     dataIndex: 'pendingStockInQuantity',
     width: 110,
     customRender: ({ record }) => formatQuantity(record.pendingStockInQuantity),
   },
   {
-    title: '状态',
+    title: '组盘状态',
     dataIndex: 'statusName',
     width: 100,
     customRender: ({ record }) => renderStatusTag(record),
@@ -230,6 +252,11 @@ export const detailTableColumns: BasicColumn[] = [
     width: 120,
   },
 ];
+
+detailTableColumns.push(
+  { title: 'U8到货单号', dataIndex: 'arrivalVoucherCode', width: 180 },
+  { title: 'U8到货明细ID', dataIndex: 'arrivalDetailId', width: 140 },
+);
 
 export const searchFormSchema = [
   {
@@ -275,8 +302,8 @@ export const searchFormSchema = [
   },
 ];
 
-function groupAsnListItems(items: ErpAsnDto[] = []): AsnGroupRow[] {
-  const groupMap = new Map<string, ErpAsnDto[]>();
+function groupAsnListItems(items: AsnWorkflowLine[] = []): AsnGroupRow[] {
+  const groupMap = new Map<string, AsnWorkflowLine[]>();
 
   items.forEach((item) => {
     const code = item.ccode || '';
@@ -287,15 +314,24 @@ function groupAsnListItems(items: ErpAsnDto[] = []): AsnGroupRow[] {
   });
 
   return Array.from(groupMap.entries()).map(([ccode, lines]) => {
-    const first = lines[0] || ({} as ErpAsnDto);
+    const first = lines[0] || ({} as AsnWorkflowLine);
+    const activeLines = lines.filter((line) => line.status !== 4);
+    const allPushed = activeLines.length > 0 && activeLines.every((line) => line.isPushedToErp);
+    const anyPushed = activeLines.some((line) => line.isPushedToErp);
+    const allGrouped = activeLines.length > 0 && activeLines.every((line) =>
+      Number(line.iquantity) > 0 && Number(line.alreadyStockInQuantity || 0) === Number(line.iquantity));
+    const arrivalPushError = [...new Set(activeLines.map((line) => line.arrivalPushError).filter(Boolean))].join('；');
+    const inspectionPushError = [...new Set(activeLines.map((line) => line.inspectionPushError).filter(Boolean))].join('；');
+    const allReported = activeLines.length > 0 && activeLines.every((line) => line.isInspectionReportPushed);
+    const anyReported = activeLines.some((line) => line.isInspectionReportPushed);
     const statusLabels = [
       ...new Set(lines.map((line) => getStatusName(line)).filter((name) => name !== '-')),
     ];
-    const totalAlreadyStockInQuantity = lines.reduce(
+    const totalAlreadyStockInQuantity = activeLines.reduce(
       (sum, line) => sum + (Number(line.alreadyStockInQuantity) || 0),
       0,
     );
-    const totalPendingStockInQuantity = lines.reduce(
+    const totalPendingStockInQuantity = activeLines.reduce(
       (sum, line) => sum + (Number(line.pendingStockInQuantity) || 0),
       0,
     );
@@ -323,6 +359,15 @@ function groupAsnListItems(items: ErpAsnDto[] = []): AsnGroupRow[] {
       totalPendingStockInQuantity,
       lineCount: lines.length,
       asnItems: lines,
+      canPushArrival: allGrouped && !anyPushed,
+      canPushInspection: allPushed && !anyReported && activeLines.every((line) =>
+        !!line.arrivalVoucherId && !!line.arrivalVoucherCode && !!line.arrivalDetailId),
+      arrivalStatus: allPushed ? '已推送' : anyPushed ? '状态异常' : arrivalPushError ? '推送失败' : allGrouped ? '待推送' : '待组盘完成',
+      arrivalVoucherCode: [...new Set(activeLines.map((line) => line.arrivalVoucherCode).filter(Boolean))].join('、'),
+      pushTime: activeLines.find((line) => line.pushTime)?.pushTime,
+      arrivalPushError,
+      inspectionStatus: allReported ? '已推送' : anyReported ? '状态异常' : inspectionPushError ? '推送失败' : '待推送',
+      inspectionPushError,
     };
   });
 }
@@ -376,4 +421,27 @@ export async function pushErpReceiptAsync(asnCode: string) {
     message.error('推送失败');
     return { success: false };
   }
+}
+
+/** 展示U8具体结果，网络错误也保留失败语义供页面决定是否刷新。 */
+async function pushAsnDocument(asnCode: string, api: typeof pushAsnArrival) {
+  try {
+    const result = await api(asnCode);
+    if (result.success) message.success(result.message || '推送成功');
+    else message.error(result.message || '推送失败');
+    return result;
+  } catch (error: any) {
+    message.error(error?.response?.data?.error?.message || error?.message || '推送失败');
+    return { success: false };
+  }
+}
+
+/** 完整ASN到货单推送，与组盘后的自动推送共用后端入口。 */
+export function pushAsnArrivalAsync(asnCode: string) {
+  return pushAsnDocument(asnCode, pushAsnArrival);
+}
+
+/** 到货单来源关联齐全后推送来料报检单。 */
+export function pushAsnInspectionAsync(asnCode: string) {
+  return pushAsnDocument(asnCode, pushAsnInspection);
 }

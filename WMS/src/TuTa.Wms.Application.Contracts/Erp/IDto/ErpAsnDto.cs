@@ -253,6 +253,25 @@ namespace TuTa.Wms.Erp.Dto
         /// 待入库数量
         /// </summary>
         public decimal PendingStockInQuantity { get; set; }
+
+        /// <summary>是否已成功生成U8到货单。</summary>
+        public bool IsPushedToErp { get; set; }
+        /// <summary>到货单推送成功时间。</summary>
+        public DateTime? PushTime { get; set; }
+        /// <summary>U8到货单主表ID。</summary>
+        public long? ArrivalVoucherId { get; set; }
+        /// <summary>U8到货单号。</summary>
+        public string ArrivalVoucherCode { get; set; }
+        /// <summary>U8到货单明细ID。</summary>
+        public long? ArrivalDetailId { get; set; }
+        /// <summary>最近一次到货单推送失败原因。</summary>
+        public string ArrivalPushError { get; set; }
+        /// <summary>最近一次到货单推送尝试时间。</summary>
+        public DateTime? ArrivalPushAttemptTime { get; set; }
+        /// <summary>是否已生成来料报检单。</summary>
+        public bool IsInspectionReportPushed { get; set; }
+        /// <summary>来料报检单失败原因。</summary>
+        public string InspectionPushError { get; set; }
     }
 
     /// <summary>

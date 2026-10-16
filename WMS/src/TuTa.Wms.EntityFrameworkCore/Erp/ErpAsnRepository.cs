@@ -82,16 +82,22 @@ namespace TuTa.Wms.Erp
             {
                 if (DateTime.TryParse(endDate, out var end))
                 {
-                    query = query.Where(x => x.BillDate <= end);
+                    var exclusiveEnd = end.Date.AddDays(1);
+                    query = query.Where(x => x.BillDate < exclusiveEnd);
                 }
             }
 
-            var total = await query.CountAsync();
-            var items = await query
-                .OrderByDescending(x => x.BillDate)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            // 先按ASN单号分页，再读取完整明细，避免状态筛选或分页截断整单。
+            page = Math.Max(1, page);
+            pageSize = Math.Max(1, Math.Min(200, pageSize));
+            var groups = query.GroupBy(x => x.AsnCode)
+                .Select(g => new { Code = g.Key, BillDate = g.Max(x => x.BillDate) });
+            var total = await groups.CountAsync();
+            var codes = await groups.OrderByDescending(x => x.BillDate).ThenBy(x => x.Code)
+                .Skip((page - 1) * pageSize).Take(pageSize).Select(x => x.Code).ToListAsync();
+            var allItems = await DbContext.Set<ErpAsn>().Where(x => codes.Contains(x.AsnCode))
+                .OrderBy(x => x.OrderCode).ThenBy(x => x.MaterialCode).ThenBy(x => x.Id).ToListAsync();
+            var items = codes.SelectMany(code => allItems.Where(x => x.AsnCode == code)).ToList();
 
             return (items, total);
         }
