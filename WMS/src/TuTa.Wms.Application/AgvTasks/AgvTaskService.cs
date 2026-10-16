@@ -226,10 +226,17 @@ namespace TuTa.Wms.AgvTasks
                     // 1. 下发给RCS取消任务
                     _logger.LogInformation("步骤1: 下发给RCS取消任务");
                     var rcsResult = await _rcsApiManager.CancelTaskAsync(task.ReqCode, task.TaskCode).ConfigureAwait(false);
-                    if (rcsResult.Code != "0")
-                        _logger.LogWarning($"RCS取消任务返回非0: Code={rcsResult.Code}, Message={rcsResult.Message}");
-                    else
-                        _logger.LogInformation("RCS取消任务成功");
+                    // RCS拒绝或未返回结果时，不能提前取消本地任务、解绑容器或删除库存。
+                    if (rcsResult == null || rcsResult.Code != "0")
+                    {
+                        _logger.LogWarning($"RCS未确认取消任务: Code={rcsResult?.Code}, Message={rcsResult?.Message}");
+                        return new ResponseDto
+                        {
+                            success = false,
+                            message = $"RCS取消任务失败：{rcsResult?.Message ?? "RCS未返回取消结果"}"
+                        };
+                    }
+                    _logger.LogInformation("RCS取消任务成功");
 
                     // 2. 标记任务状态为取消
                     _logger.LogInformation("步骤2: 标记任务状态为取消");

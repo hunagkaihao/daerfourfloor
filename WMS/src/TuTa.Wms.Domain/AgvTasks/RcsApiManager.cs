@@ -140,12 +140,19 @@ namespace TuTa.Wms.AgvTasks
         }
         */
 
+        /// <summary>使用独立请求号取消RCS任务，兼容历史记录未保存TaskCode的搬运任务。</summary>
+        /// <param name="reqCode">原创建任务请求号；现有搬运下发同时将其作为RCS任务号。</param>
+        /// <param name="taskCode">已保存的RCS任务号；为空时使用原创建任务请求号。</param>
+        /// <returns>RCS取消结果，Code为0时才允许执行本地取消处理。</returns>
         public async Task<ResultAgvTaskDto> CancelTaskAsync(string reqCode, string taskCode)
         {
-            CancelAgvTaskDto cancelAgvTaskDto = new CancelAgvTaskDto(reqCode, taskCode);
-            var response =
-  await HttpApiHelper.PostAsync<CancelAgvTaskDto, ResultAgvTaskDto>("TTWMS",
-  $"{CMSServer}/rcms/services/rest/hikRpcService/cancelTask", cancelAgvTaskDto);
+            var rcsTaskCode = string.IsNullOrWhiteSpace(taskCode) ? reqCode : taskCode;
+            if (string.IsNullOrWhiteSpace(rcsTaskCode))
+                throw new ArgumentException("RCS任务号为空，无法取消任务", nameof(taskCode));
+            // 取消是新的接口请求，不能复用创建时的请求号；任务号仍指向原任务。
+            CancelAgvTaskDto cancelAgvTaskDto = new CancelAgvTaskDto(Guid.NewGuid().ToString("N"), rcsTaskCode);
+            var response = await HttpApiHelper.PostAsync<CancelAgvTaskDto, ResultAgvTaskDto>("TTWMS",
+                                    $"{CMSServer}/rcms/services/rest/hikRpcService/cancelTask", cancelAgvTaskDto);
             return response;
         }
 
