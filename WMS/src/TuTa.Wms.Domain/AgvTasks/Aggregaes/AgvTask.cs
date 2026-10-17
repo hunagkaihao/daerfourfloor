@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations.Schema;
+using Volo.Abp.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -218,6 +220,16 @@ namespace TuTa.Wms.AgvTasks.Aggregaes
         /// 任务开始时间
         /// </summary>
         public DateTime? TaskStartTime { get; set; }
+
+        /// <summary>RCS已明确接收过该任务；使用既有扩展属性保存，历史记录默认未记录。</summary>
+        [NotMapped]
+        public bool WasAcceptedByRcs => this.GetProperty<string>("RcsTaskAccepted") == "true";
+
+        /// <summary>仅在真实下发成功后记录接收证据，防止后续误走本地未下发取消。</summary>
+        public void MarkAcceptedByRcs()
+        {
+            this.SetProperty("RcsTaskAccepted", "true");
+        }
 
         public void SetAsCreated()
         {

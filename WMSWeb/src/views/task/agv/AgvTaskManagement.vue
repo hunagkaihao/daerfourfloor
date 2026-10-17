@@ -166,17 +166,20 @@ function getManageTypeText(type: ManageType) {
 
 // 取消任务
 function handleCancel(record: any) {
+  const isInboundReturn = record.stockTyp === 15 || record.stockTyp === 'StockReturnToInbound';
   Modal.confirm({
     title: '确认取消任务',
     icon: createVNode(ExclamationCircleOutlined),
-    content: `确定要取消任务 ${record.taskCode || record.id} 吗？此操作将下发给RCS取消任务、解绑容器、恢复库位状态并删除组盘库存。`,
+    content: isInboundReturn
+      ? `确定要取消回库任务 ${record.reqCode || record.id} 吗？未成功下发的任务可在WMS关闭，原库存和容器绑定将保留。`
+      : `确定要取消任务 ${record.reqCode || record.taskCode || record.id} 吗？未下发残留任务仅关闭WMS记录并保留库存；普通任务在RCS取消成功后将解绑容器并清理组盘库存。`,
     okText: '确定',
     cancelText: '取消',
     onOk: async () => {
       try {
         const res = await cancelAgvTask(record.id);
         if (res && res.success) {
-          createMessage.success('任务取消成功');
+          createMessage.success(res.message || '任务取消成功');
           reload();
         } else {
           createMessage.error(res?.message || '取消失败');

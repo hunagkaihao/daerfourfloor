@@ -204,29 +204,17 @@ namespace TuTa.Wms.AgvTasks
 
                     _logger.LogInformation($"任务信息: ReqCode={task.ReqCode}, TaskCode={task.TaskCode}, BoxCode={task.BoxCode}, 状态={task.AgvTaskStatus}, 起点={task.StartPositionCode}, 终点={task.EndPositionCode}");
 
-                    if (task.StockTyp == ManageType.StockReturnToInbound)
-                    {
-                        if (task.AgvTaskStatus == AgvTaskStatus.Complete || task.AgvTaskStatus == AgvTaskStatus.Cancel)
-                            return new ResponseDto { success = false, message = "回库任务已完成或已取消" };
+                    if (task.AgvTaskStatus == AgvTaskStatus.Complete || task.AgvTaskStatus == AgvTaskStatus.Cancel)
+                        return new ResponseDto { success = false, message = "任务已完成或已取消" };
 
-                        // 回库搬运使用已有库存，必须等RCS确认取消后才解锁，且不能删除库存或解绑固定容器。
-                        var returnCancelResult = await _rcsApiManager.CancelTaskAsync(task.ReqCode, task.TaskCode).ConfigureAwait(false);
-                        if (returnCancelResult == null || returnCancelResult.Code != "0")
-                            return new ResponseDto
-                            {
-                                success = false,
-                                message = returnCancelResult?.Message ?? "RCS未确认取消回库任务"
-                            };
-
-                        await _agvTaskManager.SetAsCancelAsync(task.ReqCode).ConfigureAwait(false);
-                        await uow.CompleteAsync().ConfigureAwait(false);
-                        return new ResponseDto { success = true, message = "回库任务已取消，库位已解锁，原库存已保留" };
-                    }
-
-                    // 1. 下发给RCS取消任务
-                    _logger.LogInformation("步骤1: 下发给RCS取消任务");
                     var rcsResult = await _rcsApiManager.CancelTaskAsync(task.ReqCode, task.TaskCode).ConfigureAwait(false);
-                    // RCS拒绝或未返回结果时，不能提前取消本地任务、解绑容器或删除库存。
+                    if (await TryCancelUndispatchedTaskAsync(task, rcsResult).ConfigureAwait(false))
+                    {
+                        await uow.CompleteAsync().ConfigureAwait(false);
+                        return new ResponseDto { success = true,
+                            message = "RCS无对应任务，已取消WMS未下发任务；原库存及托盘绑定已保留" };
+                    }
+                    // 下发成功或已有执行证据的任务，仍必须由RCS确认取消。
                     if (rcsResult == null || rcsResult.Code != "0")
                     {
                         _logger.LogWarning($"RCS未确认取消任务: Code={rcsResult?.Code}, Message={rcsResult?.Message}");
@@ -235,6 +223,13 @@ namespace TuTa.Wms.AgvTasks
                             success = false,
                             message = $"RCS取消任务失败：{rcsResult?.Message ?? "RCS未返回取消结果"}"
                         };
+                    }
+
+                    if (task.StockTyp == ManageType.StockReturnToInbound)
+                    {
+                        await _agvTaskManager.SetAsCancelAsync(task.ReqCode).ConfigureAwait(false);
+                        await uow.CompleteAsync().ConfigureAwait(false);
+                        return new ResponseDto { success = true, message = "回库任务已取消，库位已解锁，原库存已保留" };
                     }
                     _logger.LogInformation("RCS取消任务成功");
 
@@ -351,6 +346,47 @@ namespace TuTa.Wms.AgvTasks
                     return new ResponseDto() { success = false, message = $"取消任务失败: {ex.Message}" };
                 }
             }
+        }
+
+        /// <summary>
+        /// 关闭因RCS未建单而残留的早期WMS任务。仅接受明确不存在的业务响应，
+        /// 不以超时或普通失败作为依据；库存、容器绑定及库位有货状态保持不变。
+        /// </summary>
+        /// <param name="task">当前事务读取的WMS任务。</param>
+        /// <param name="rcsResult">本次RCS取消响应。</param>
+        /// <returns>已完成本地关闭时为true，由调用方提交事务。</returns>
+        private async Task<bool> TryCancelUndispatchedTaskAsync(
+            Aggregaes.AgvTask task, AgvTasks.Dto.ResultAgvTaskDto rcsResult)
+        {
+            var missing = rcsResult != null && rcsResult.Code != "0" &&
+                (rcsResult.Message?.Contains("任务单不存在", StringComparison.Ordinal) == true ||
+                 rcsResult.Message?.Contains("任务不存在", StringComparison.Ordinal) == true);
+            var earlyStatus = task.AgvTaskStatus == AgvTaskStatus.Created ||
+                task.AgvTaskStatus == AgvTaskStatus.WaitingExecuting || task.AgvTaskStatus == AgvTaskStatus.Executing;
+            // 历史任务没有接收标记时，结合RCS明确不存在和未开始状态判断；任务号冲突须先人工核对。
+            if (!missing || !earlyStatus || task.WasAcceptedByRcs || task.TaskStartTime.HasValue ||
+                (!string.IsNullOrWhiteSpace(task.TaskCode) && task.TaskCode != task.ReqCode))
+                return false;
+
+            task.SetAsCancel();
+            await _agvTaskRepository.UpdateAsync(task).ConfigureAwait(false);
+            foreach (var code in new[] { task.StartPositionCode, task.EndPositionCode }
+                .Where(x => !string.IsNullOrWhiteSpace(x)).Distinct())
+            {
+                // 不能解除另一个有效任务占用的锁，亦不重置库位有货状态。
+                var occupied = await _agvTaskRepository.AnyAsync(x => x.Id != task.Id &&
+                    (int)x.AgvTaskStatus < (int)AgvTaskStatus.Complete &&
+                    (x.StartPositionCode == code || x.EndPositionCode == code)).ConfigureAwait(false);
+                if (occupied) continue;
+                var cell = await _cellRepository.FindByCellCodeAsync(code).ConfigureAwait(false);
+                if (cell != null && cell.RunStatus == CellRunStatus.Selected)
+                {
+                    cell.SetEnable();
+                    await _cellRepository.UpdateAsync(cell).ConfigureAwait(false);
+                }
+            }
+            _logger.LogInformation($"RCS无对应任务，本地关闭未下发任务：ReqCode={task.ReqCode}，保留库存和容器绑定");
+            return true;
         }
 
         /// <summary>

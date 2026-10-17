@@ -259,8 +259,8 @@ const showCancelConfirm = (task: any) => {
   Modal.confirm({
     title: '确认取消任务',
     content: isInboundReturn
-      ? `确定要取消回库任务 ${task.reqCode} 吗？RCS确认取消后将解锁库位，保留原库存和容器绑定。`
-      : `确定要取消任务 ${task.reqCode} 吗？此操作将下发给RCS取消任务、容器解绑、恢复库位状态。`,
+      ? `确定要取消回库任务 ${task.reqCode} 吗？未成功下发的任务可在WMS关闭；原库存和容器绑定将保留。`
+      : `确定要取消任务 ${task.reqCode} 吗？未下发残留任务仅关闭WMS记录并保留库存；普通任务在RCS取消成功后将解绑容器并清理组盘库存。`,
     okText: '确认取消',
     okType: 'danger',
     cancelText: '我再想想',
@@ -276,7 +276,7 @@ const handleCancelTask = async (taskId: number) => {
   try {
     const res = await cancelAgvTask(taskId)
     if (res.success !== false) {
-      message.success('任务取消成功')
+      message.success(res.message || '任务取消成功')
       loadTaskList()
     } else {
       message.error(res.message || '任务取消失败')

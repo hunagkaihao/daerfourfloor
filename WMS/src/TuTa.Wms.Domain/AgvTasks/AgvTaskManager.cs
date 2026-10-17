@@ -903,6 +903,7 @@ namespace TuTa.Wms.AgvTasks
                         _logger.LogError($"创建StockTask任务失败: {errorMessage}");
                         throw new UserFriendlyException(message: errorMessage);
                     }
+                    if (_rcsApiManager.AGVEnable == "true") entity.MarkAcceptedByRcs();
                     _logger.LogInformation($"创建StockTask任务成功: {response.Message}");
                 
 
@@ -937,6 +938,7 @@ namespace TuTa.Wms.AgvTasks
                     throw new UserFriendlyException(message: response.Message);
                 }
 
+                if (_rcsApiManager.AGVEnable == "true") entity.MarkAcceptedByRcs();
                 return await _agvTaskRepository.UpdateAsync(entity);
             }
             catch (Exception e)
