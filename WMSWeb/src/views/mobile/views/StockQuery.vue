@@ -9,7 +9,7 @@
       <a-col :span="17">
         <a-input
           v-model:value="queryForm.materialCode"
-          placeholder="输入物料编号"
+          placeholder="输入物料编号或扫描发货条码"
           :allowClear="true"
           class="search-input"
           @keyup.enter="handleSearch"
@@ -161,7 +161,16 @@ function mapStock(item: any, index: number) {
 }
 
 async function queryStocks() {
-  const materialCode = queryForm.materialCode.trim();
+  let materialCode = queryForm.materialCode.trim();
+  // 发货条码按@分隔，第5段是物料编码；查询按钮与扫码回车共用此解析。
+  if (materialCode.includes('@')) {
+    materialCode = materialCode.split('@')[4]?.trim() || '';
+    if (!materialCode) {
+      message.warning('条码第5段物料编码为空，请重新扫码');
+      return;
+    }
+  }
+  queryForm.materialCode = materialCode;
   const batchCode = queryForm.batchCode.trim();
   const cellCode = queryForm.cellCode.trim();
 
