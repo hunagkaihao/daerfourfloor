@@ -56,7 +56,7 @@
             <a-col :span="17"><a-input v-model:value="QRcode" :disabled="submitting || !!pendingTransport" ref="focus2"
                 placeholder="检验合格后一箱一扫" @keyup.enter="scangoodsCode" :allowClear="true" /></a-col>
         </a-row>
-        <p style="margin-left: 20px">一箱一扫，每次保存一箱；{{ selectedLineId ? '已选择来源明细' : '自动匹配唯一来源明细' }}</p>
+        <p style="margin-left: 20px">一箱一扫，同托最多2种规格且等级、纸箱包装一致；{{ selectedLineId ? '已选择来源明细' : '自动匹配唯一来源明细' }}</p>
         <p style="margin-left: 20px">收料码数量:{{ goods.length }}</p>
         <div style="overflow:auto;" :style="{ height: goodheight + 'vh' }">
             <a-card style="margin: 10px 5px 20px 5px" v-for="(i, index) in goods">
@@ -69,6 +69,8 @@
                            <a-col :span="12"><p>批次号:{{ i.goodsBatchNo || '-' }}</p></a-col></a-row>
                     <a-row><a-col :span="12"><p>工序号:{{ i.processNo || '-' }}</p></a-col>
                            <a-col :span="12"><p>等级:{{ i.grade || '-' }}</p></a-col></a-row>
+                    <a-row><a-col :span="12"><p>规格:{{ i.goodsSpec || '-' }}</p></a-col>
+                           <a-col :span="12"><p>纸箱包装:{{ i.cartonType || '未提供' }}</p></a-col></a-row>
                     <a-row class="goods-info-bold">
                         <a-col :span="12"><p>整箱数量:{{ i.quantity || '-' }}</p></a-col>
                         <a-col :span="12"><p>箱号:{{ i.boxNumber ?? '-' }}</p></a-col>

@@ -21,13 +21,24 @@ export function createAsnBoxItem(
   const pending = queued.filter(row => row.asnLineId === line.autoid).reduce((sum, row) => sum + Number(row.incellshu), 0);
   if (Number(line.alreadyStockInQuantity || 0) + pending + quantity > Number(line.iquantity))
     throw new Error('本次扫码数量超过ASN剩余待组盘数量');
-  return {
+  const item = {
     materialCode, materialName: line.cinvname || '', goodsSpec: line.cinvstd || '',
+    cartonType: line.cfree3 || '',
     goodsBatchNo: batchCode || '', grade: grade || line.cfree5 || '', processNo,
     quantity, countInOnePkgOrBox: quantity, incellshu: quantity,
     baoshu: 1, sanjianshu: 0, boxNumber: boxNumber || undefined,
     dataCode: barcode.trim(), asnLineId: line.autoid, orderCode: line.cordercode,
     asnBoxScanId: scanId,
   };
+  // 先核对本次扫码队列；托盘已有库存由后端在写入前统一校验。
+  const pallet = [...queued, item];
+  const specs = new Set(pallet.map(row => String(row.goodsSpec || '').trim()
+    ? 'spec:' + String(row.goodsSpec).trim() : 'code:' + String(row.materialCode || '').trim()));
+  if (specs.size > 2) throw new Error('同一托盘至多放置2种不同规格的物料，请分托组盘');
+  if (new Set(pallet.map(row => String(row.grade || '').trim())).size > 1)
+    throw new Error('不同等级的物料不允许放置在同一个托盘上，请分托组盘');
+  if (new Set(pallet.map(row => String(row.cartonType || '').trim())).size > 1)
+    throw new Error('不同纸箱包装不允许放置在同一个托盘上，请分托组盘');
+  return item;
 }
 

@@ -212,6 +212,10 @@ namespace TuTa.Wms.Stocks
                         await _u8GroupingLock.TryAcquireAsync("U8:ASN:" + asnCodes[0]);
                     if (_u8GroupingLock != null && handle == null)
                         return new ResponseDto { success = false, message = "该ASN正在处理，请稍后重试" };
+                    await using var palletHandle = _u8GroupingLock == null ? null :
+                        await _u8GroupingLock.TryAcquireAsync("U8:PALLET:" + boxCode?.Trim());
+                    if (_u8GroupingLock != null && palletHandle == null)
+                        return new ResponseDto { success = false, message = "该托盘正在组盘，请稍后重试" };
                     using (var uow = UnitOfWorkManager.Begin(true, true))
                     {
                     var asnLines = await ResolveU8AsnLinesAsync(orderCode, paras);
@@ -290,6 +294,8 @@ namespace TuTa.Wms.Stocks
 
             // 按容器编号查找容器
             var box = await _boxRepository.FindByBoxCodeAsync(boxCode).ConfigureAwait(false);
+            // 只约束ASN组盘；在创建托盘、绑定库位和写入库存之前核对全部箱料。
+            if (u8Lines != null) await ValidateAsnPalletRulesAsync(box, u8Lines);
             Cell cell = null;
 
             // RCS尚未提供自产点位，暂时停用自产/外采混装校验；点位齐备后恢复此代码块。
@@ -587,6 +593,8 @@ namespace TuTa.Wms.Stocks
                     throw new BusinessException("该箱已组盘或本次重复扫描，不能重复入账");
                 para.BatchCode = line.BatchCode;
                 para.AsnCode = line.AsnCode;
+                // 箱码未携带等级时补齐来源等级，防止后续校验将空值视为未知等级。
+                if (string.IsNullOrWhiteSpace(para.Grade)) para.Grade = line.Free5;
                 result.Add(para, line);
             }
             if (result.Values.Select(x => x.AsnCode).Distinct().Count() != 1)
