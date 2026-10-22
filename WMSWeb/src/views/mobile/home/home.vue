@@ -182,19 +182,6 @@
               </div>
             </a-col>
         </a-row>
-        <a-row justify="center" style="margin-top: 20px; margin-bottom: 20px">
-          <a-col :span="8">
-            <div class="menu-item-card" @click="createStockTask">
-              <div class="menu-item-icon-wrapper">
-                <InboxOutlined class="menu-item-icon" />
-              </div>
-              <div class="menu-item-text">创建入库任务</div>
-            </div>
-          </a-col>
-          <a-col :span="8">
-            <!-- 暂时没有东西 -->
-          </a-col>
-        </a-row> 
       </a-tab-pane>
 
       <a-tab-pane key="3" tab="出库" force-render>

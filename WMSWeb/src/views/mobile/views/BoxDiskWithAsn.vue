@@ -9,7 +9,7 @@
                 </div>
             </a-col>
             <a-col :span="17">
-                <a-input v-model:value="boxCode" :disabled="submitting" placeholder="扫描库位" @keyup.enter="scanboxCode" ref="focus1"
+                <a-input v-model:value="boxCode" :disabled="submitting || !!pendingTransport" placeholder="扫描库位" @keyup.enter="scanboxCode" ref="focus1"
                     :allowClear="true" @focus="focusFn" class="modern-input" autofocus>
                     <template #suffix>
                         <scan-outlined class="scan-icon" />
@@ -17,6 +17,8 @@
                 </a-input>
             </a-col>
         </a-row>
+        <a-alert v-if="pendingTransport" type="warning" show-icon style="margin: 8px 12px"
+            message="组盘已保存，AGV搬运任务尚未确认创建成功，请点击重试AGV搬运；无需重复扫码组盘。" />
         <LaneCellChips :list="laneCellStatusList" :current-cell-code="boxCode" />
         <a-row class="input-row">
             <a-col :span="6">
@@ -25,7 +27,7 @@
                 </div>
             </a-col>
             <a-col :span="17">
-                <a-input v-model:value="asnCode" :disabled="submitting" placeholder="输入ASN码" @keyup.enter="loadAsnData" :allowClear="true"
+                <a-input v-model:value="asnCode" :disabled="submitting || !!pendingTransport" placeholder="输入ASN码" @keyup.enter="loadAsnData" :allowClear="true"
                     @focus="focusFn" class="modern-input" ref="asnInputRef">
                     <template #suffix>
                         <search-outlined class="scan-icon" @click="loadAsnData" />
@@ -51,7 +53,7 @@
 
         <a-row class="input-row">
             <a-col :span="6"><div class="htext"><h1>收料箱码:</h1></div></a-col>
-            <a-col :span="17"><a-input v-model:value="QRcode" :disabled="submitting" ref="focus2"
+            <a-col :span="17"><a-input v-model:value="QRcode" :disabled="submitting || !!pendingTransport" ref="focus2"
                 placeholder="检验合格后一箱一扫" @keyup.enter="scangoodsCode" :allowClear="true" /></a-col>
         </a-row>
         <p style="margin-left: 20px">一箱一扫，每次保存一箱；{{ selectedLineId ? '已选择来源明细' : '自动匹配唯一来源明细' }}</p>
@@ -107,8 +109,8 @@
                 </template>
             </a-table>
             <div class="tab-bar">
-                <a-button @click="openCancelModal" type="primary" class="modern-btn">组盘取消</a-button>
-                <a-button @click="incell" :loading="submitting" type="primary" class="modern-btn">组盘确认</a-button>
+                <a-button @click="openCancelModal" :disabled="submitting || !!pendingTransport" type="primary" class="modern-btn">组盘取消</a-button>
+                <a-button @click="incell" :loading="submitting" type="primary" class="modern-btn">{{ pendingTransport ? '重试AGV搬运' : '组盘确认并搬运' }}</a-button>
             </div>
         </div>
     </div>
@@ -123,7 +125,7 @@ import { validateAsn } from '/@/views/mobile/views/Material';
 import { createAsnBoxItem } from './AsnBoxGrouping';
 import { queryU8Inspection, U8InspectionLine } from './U8InboundApi';
 import { stockCreateAndBindBoxWithAsn } from './BoxDiskWithAsn';
-import { stocksGetInBox, columns, stocksDisBindBox, stockRemoveDirect, stocksQuery } from '../views/Stock';
+import { stocksGetInBox, columns, stocksDisBindBox, stockRemoveDirect, stocksQuery, stocksGetInCell, createStockTask } from '../views/Stock';
 import { getLaneCellStatusByCellCode } from '/@/views/warehouse/cells/Cell';
 import LaneCellChips from '../components/LaneCellChips.vue';
 import { PagedStockQueryDto, CellLaneStatusDto, StockCreateDto } from '/@/services/ServiceProxies';
@@ -145,6 +147,8 @@ const loadedAsnLines = ref<any[]>([]);
 const inspectionChecks = ref<U8InspectionLine[]>([]);
 const selectedLineId = ref<string>();
 const submitting = ref(false);
+/** 组盘已提交但AGV任务尚未确认成功时，只重试搬运，不再次提交箱码。 */
+const pendingTransport = ref<{ cellCode: string; boxCode?: string } | null>(null);
 const laneCellStatusList = ref<CellLaneStatusDto[]>([]);
 
 const fetchLaneCellStatus = async () => {
@@ -214,7 +218,7 @@ async function loadAsnData() {
 
 /** 多个来源行匹配同一物料时，由操作员明确选择来源行，数量仍以箱码为准。 */
 function selectAsnLine(item: AsnOrderItem) {
-    if (submitting.value) return;
+    if (submitting.value || pendingTransport.value) return;
     selectedLineId.value = item.asnLineId;
     message.info('已选择来源明细，请扫描每箱收料码');
     focus2.value?.focus();
@@ -222,7 +226,7 @@ function selectAsnLine(item: AsnOrderItem) {
 
 /** 每个物理箱生成稳定提交标识，网络重试沿用原标识。 */
 function scangoodsCode() {
-    if (submitting.value) return;
+    if (submitting.value || pendingTransport.value) return;
     if (!boxCode.value || !asnCodeValidated.value) {
         message.warning('请先扫描库位并加载 ASN'); return;
     }
@@ -263,15 +267,46 @@ const scanboxCode = async () => {
     setTimeout(() => { if (focus2.value) focus2.value.focus(); }, 100);
 }
 
-const deletegood = (index: number) => { if (!submitting.value) goods.value.splice(index, 1); }
+const deletegood = (index: number) => { if (!submitting.value && !pendingTransport.value) goods.value.splice(index, 1); }
 const deleteStock = async (record: any, index: number) => {
+    if (submitting.value || pendingTransport.value) return;
     createConfirm({ title: '确认删除', content: `删除物料 ${record.materialName} 的库存？`, okText: '确定', cancelText: '取消',
         onOk: async () => { try { await stockRemoveDirect(record.id); message.success('删除成功'); dataSource.value.splice(index, 1); if (boxCode.value) await scanboxCode(); } catch { message.error('删除失败'); } } });
 };
 
+/** 使用当前库位的实际容器调用既有入库任务接口，目标库位由后端自动分配。 */
+async function createGroupedTransport() {
+    const pending = pendingTransport.value;
+    if (!pending) return;
+    try {
+        const stocks = await stocksGetInCell(pending.cellCode);
+        const boxes = [...new Set((stocks || []).map((row: any) => row.boxCode).filter(Boolean))] as string[];
+        if (boxes.length !== 1)
+            throw new Error('当前库位未找到唯一容器，请核对库位库存后重试');
+        if (pending.boxCode && pending.boxCode !== boxes[0])
+            throw new Error('当前库位容器已变更，请核对原托盘搬运情况');
+        pending.boxCode = boxes[0];
+        const result = await createStockTask(pending.boxCode, pending.cellCode, '');
+        if (!result?.success) throw new Error(result?.message || '任务接口未确认成功');
+        message.success('组盘已保存，' + (result.message || 'AGV搬运任务已创建'));
+        pendingTransport.value = null;
+        boxCode.value = ''; QRcode.value = ''; dataSource.value = []; laneCellStatusList.value = [];
+        focus1.value?.focus();
+    } catch (error: any) {
+        message.warning('组盘已保存，AGV搬运待重试：' +
+            (error?.error?.message || error?.message || '请求失败，请核对任务状态后重试'));
+    }
+}
+
 /** 按订单顺序提交；成功箱码移出队列，失败箱码保留原标识用于重试。 */
 const incell = async () => {
     if (submitting.value) return;
+    if (pendingTransport.value) {
+        submitting.value = true;
+        try { await createGroupedTransport(); }
+        finally { submitting.value = false; }
+        return;
+    }
     if (!goods.value.length || !boxCode.value || !asnCodeValidated.value) {
         message.error('请扫描库位、加载 ASN 并逐箱扫码'); return;
     }
@@ -282,6 +317,7 @@ const incell = async () => {
             if (!grouped.has(item.orderCode)) grouped.set(item.orderCode, []);
             grouped.get(item.orderCode)!.push(item);
         }
+        let allSaved = true;
         for (const [orderCode, boxes] of grouped) {
             const dtos = boxes.map(e => {
                 const p = new StockCreateDto();
@@ -295,12 +331,16 @@ const incell = async () => {
                 return p;
             });
             const res = await stockCreateAndBindBoxWithAsn(boxCode.value, orderCode, dtos);
-            if (!res?.success) { message.error(res?.message || '组盘失败'); break; }
+            if (!res?.success) { allSaved = false; message.error(res?.message || '组盘失败'); break; }
             const saved = new Set(boxes.map(e => e.asnBoxScanId));
             goods.value = goods.value.filter(e => !saved.has(e.asnBoxScanId));
             message.success(res.message || '组盘已保存');
         }
-        await scanboxCode();
+        if (allSaved) {
+            pendingTransport.value = { cellCode: boxCode.value };
+            await createGroupedTransport();
+        }
+        if (boxCode.value) await scanboxCode();
         await loadAsnData();
     } catch (error: any) {
         message.error(error.message || '提交失败，请核对已组盘信息后重试');
@@ -308,6 +348,7 @@ const incell = async () => {
 }
 
 const openCancelModal = () => {
+    if (submitting.value || pendingTransport.value) return;
     if (boxCode.value == '') { message.error("没有容器信息"); return; }
     if (dataSource.value.length === 0) { message.error("没有已组盘信息"); return; }
     createConfirm({ title: '确认取消组盘', content: '确定取消？', okText: '确定', cancelText: '取消', onOk: () => { diskcancel(); } });
