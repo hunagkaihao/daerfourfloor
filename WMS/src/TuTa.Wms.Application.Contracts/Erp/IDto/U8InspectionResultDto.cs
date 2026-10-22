@@ -33,6 +33,12 @@ namespace TuTa.Wms.Erp.IDto
         public decimal QualifiedQuantity { get; set; }
         /// <summary>已审核且整批合格、来源完整时为true。</summary>
         public bool CanPurchase { get; set; }
+        /// <summary>来源匹配且检验合格，可在检验后执行一箱一扫组盘。</summary>
+        public bool CanGroup { get; set; }
+        /// <summary>本地累计已组盘件数。</summary>
+        public decimal GroupedQuantity { get; set; }
+        /// <summary>当前ASN行剩余待组盘件数。</summary>
+        public decimal PendingGroupingQuantity { get; set; }
         /// <summary>当前ASN行是否已成功推送采购入库。</summary>
         public bool IsPurchasePushed { get; set; }
         /// <summary>等待原因、检验结果或采购推送错误。</summary>

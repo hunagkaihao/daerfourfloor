@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace TuTa.Wms.Stocks.Dtos
 {
@@ -65,6 +65,8 @@ namespace TuTa.Wms.Stocks.Dtos
 
         /// <summary>U8组盘选择的本地ASN明细ID，普通组盘不填写。</summary>
         public Guid? AsnLineId { get; set; }
+        /// <summary>一箱一扫的提交标识；无箱号的标签也需提供，重试同一箱必须保持不变。</summary>
+        public string AsnBoxScanId { get; set; }
 
         /// <summary>
         /// 收料时的包或箱数

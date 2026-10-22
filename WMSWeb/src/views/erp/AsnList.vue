@@ -1,6 +1,6 @@
 <template>
   <div class="asn-list">
-    <a-alert type="info" show-icon message="全部组盘后生成U8到货单；仓管员在U8审核后，通过PDA推送报检。未审核时请等待审核后重试。检验完成后查询U8结果并生成采购入库单。" style="margin-bottom: 12px" />
+    <a-alert type="info" show-icon message="保存ASN后生成到货单；U8审核后由PDA报检，检验合格后逐箱组盘，整单完成后生成采购入库单。" style="margin-bottom: 12px" />
     <BasicTable @register="registerTable" size="small" :clickToRowSelect="false">
       <template #expandedRowRender="{ record }">
         <div class="expanded-row">

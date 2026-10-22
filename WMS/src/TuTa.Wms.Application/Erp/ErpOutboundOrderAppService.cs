@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,13 +28,16 @@ namespace TuTa.Wms.Erp
         private readonly IRepository<ErpOutboundRecord, string> _erpOutboundRecordRepository;
         /// <summary>U8整单扫码和生单共享的分布式锁。</summary>
         private readonly IAbpDistributedLock _u8Lock;
+        /// <summary>发货通知单保存前核对实际可用库存。</summary>
+        private readonly TuTa.Wms.Stocks.IStockRepository _stockRepository;
 
         public ErpOutboundOrderAppService(
             IErpOutboundOrderRepository erpOutboundOrderRepository,
             ErpOutboundOrderManager erpOutboundOrderManager,
             ILogger<ErpOutboundOrderAppService> logger,
             IErpoutboundRepository outboundRepository,
-            IRepository<ErpOutboundRecord, string> erpOutboundRecordRepository, IAbpDistributedLock u8Lock = null)
+            IRepository<ErpOutboundRecord, string> erpOutboundRecordRepository, IAbpDistributedLock u8Lock = null,
+            TuTa.Wms.Stocks.IStockRepository stockRepository = null)
         {
             _erpOutboundOrderRepository = erpOutboundOrderRepository;
             _erpOutboundOrderManager = erpOutboundOrderManager;
@@ -42,6 +45,7 @@ namespace TuTa.Wms.Erp
             _outboundRepository = outboundRepository;
             _erpOutboundRecordRepository = erpOutboundRecordRepository;
             _u8Lock = u8Lock;
+            _stockRepository = stockRepository;
         }
 
         /// <summary>
@@ -192,6 +196,9 @@ namespace TuTa.Wms.Erp
         [UnitOfWork(IsDisabled = true)]
         public async Task<ErpOutboundRecordDto> CreateFromBarcodeAsync(CreateFromBarcodeDto dto)
         {
+            if (dto == null || string.IsNullOrWhiteSpace(dto.DeliveryOrderNo) || string.IsNullOrWhiteSpace(dto.MaterialCode) ||
+                dto.Quantity <= 0 || dto.QtyPerBox <= 0)
+                throw new UserFriendlyException("发货条码缺少有效单号、物料、数量或每箱数量");
             await ErpAsnAppService.LocalPushLock.WaitAsync();
             try
             {
@@ -206,6 +213,16 @@ namespace TuTa.Wms.Erp
 
                     if (exists)
                         throw new UserFriendlyException($"存货编码 {dto.MaterialCode} 已存在于出库单 {dto.DeliveryOrderNo} 中，不能重复录入");
+
+                    if (_stockRepository == null) throw new UserFriendlyException("库存校验服务不可用，不能保存发货明细");
+                    var stocks = await _stockRepository.GetListAsync(x => x.Material.MaterialCode == dto.MaterialCode &&
+                        x.Status == TuTa.Wms.Stocks.StockStatus.Available && x.TotalCountInTime > 0 &&
+                        (string.IsNullOrEmpty(dto.Grade) || x.Grade == dto.Grade) &&
+                        (x.U8OutboundRecordId == null || x.U8OutboundRecordId == ""));
+                    var available = stocks.Where(x => !x.U8AsnLineId.HasValue ||
+                        x.InspectionStatus == TuTa.Wms.Stocks.InspectionStatus.InspectionQualified).Sum(x => x.TotalCountInTime);
+                    if (available < dto.Quantity)
+                        throw new UserFriendlyException($"库存校验失败：物料{dto.MaterialCode}、等级{dto.Grade}可用{available}，发货需要{dto.Quantity}");
 
                     var record = ErpOutboundRecord.Create(
                         dto.WarehouseCode,

@@ -189,7 +189,7 @@ async function onScan() {
       text: `存货编码 ${p.materialCode} 保存成功`,
       detail: `发货单号: ${p.deliveryOrderNo}`,
     };
-    message.success('保存成功');
+    message.success('库存校验通过，发货明细已保存');
     barcode.value = '';
   } catch (error: any) {
     const msg = error?.response?.data?.message || error?.message || '保存失败';

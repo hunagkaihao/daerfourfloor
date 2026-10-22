@@ -1,15 +1,18 @@
 <template>
   <div class="u8-inbound-actions">
-    <a-input v-model:value="code" placeholder="扫描或输入ASN单号" :allowClear="true" :disabled="busy" />
+    <a-input v-if="showAsnInput !== false" v-model:value="code" placeholder="扫描或输入ASN单号" :allowClear="true" :disabled="busy" />
+    <p v-else>当前ASN：{{ code || '请先输入ASN单号' }}</p>
     <div class="actions">
+      <a-button :loading="busy" :disabled="!code.trim() || busy" @click="arrival">生成或重试到货单</a-button>
       <a-button :loading="busy" :disabled="!code.trim() || busy" @click="report">推送来料报检单</a-button>
       <a-button :loading="busy" :disabled="!code.trim() || busy" @click="query">查询U8检验结果</a-button>
     </div>
-    <p>到货单须先由仓管员在U8审核，再推送报检。确认合格前请将抽检样品放回托盘。</p>
+    <p>先保存ASN并生成到货单，由仓管员在U8审核后报检；检验合格后逐箱扫码组盘，全部完成后推送采购入库。</p>
     <a-alert v-if="notice" :message="notice" :type="noticeType" show-icon />
     <div v-for="row in rows" :key="row.asnLineId" class="inspection-row">
       <div>{{ row.materialCode }} / {{ row.batchCode || '-' }}</div>
       <div>检验单：{{ row.checkCode || '待检验' }}；合格数量：{{ row.qualifiedQuantity }}</div>
+      <div>已组盘：{{ row.groupedQuantity || 0 }}；待组盘：{{ row.pendingGroupingQuantity || 0 }}</div>
       <div>{{ row.message }}</div>
       <a-button :disabled="busy || !row.canPurchase || row.isPurchasePushed" @click="purchase(row)">
         {{ row.isPurchasePushed ? '采购入库已推送' : '推送或重试采购入库' }}
@@ -21,9 +24,10 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
 import { useMessage } from '/@/hooks/web/useMessage';
-import { queryU8Inspection, reportU8Inspection, retryU8Purchase, U8InspectionLine } from '../views/U8InboundApi';
+import { createU8Arrival, queryU8Inspection, reportU8Inspection, retryU8Purchase, U8InspectionLine } from '../views/U8InboundApi';
 
-const props = defineProps<{ asnCode?: string }>();
+const emit = defineEmits<{ (event: 'inspection-results', rows: U8InspectionLine[]): void }>();
+const props = defineProps<{ asnCode?: string; showAsnInput?: boolean }>();
 const { createConfirm } = useMessage();
 const code = ref(props.asnCode || '');
 const busy = ref(false);
@@ -32,7 +36,7 @@ const noticeType = ref<'success' | 'warning' | 'error'>('warning');
 const rows = ref<U8InspectionLine[]>([]);
 
 /** 当前ASN变化时清除旧检验结果，避免使用上一次查询的来源行操作。 */
-watch(() => props.asnCode, value => { if (value) code.value = value; });
+watch(() => props.asnCode, value => { code.value = value || ''; });
 watch(code, () => { rows.value = []; notice.value = ''; });
 
 /** 执行单次业务操作，失败说明持续显示，避免仅用短暂消息掩盖待审核状态。 */
@@ -43,13 +47,20 @@ async function run(action: () => Promise<any>) {
     const result = await action();
     notice.value = result.message || (result.success ? '操作成功' : '操作未完成');
     noticeType.value = result.success ? 'success' : 'warning';
-    if (Array.isArray(result.items)) rows.value = result.success ? result.items : [];
+    if (Array.isArray(result.items)) {
+      rows.value = result.success ? result.items : [];
+      emit("inspection-results", rows.value);
+    }
   } catch (error: any) {
     rows.value = [];
+    emit("inspection-results", []);
     notice.value = error?.message || 'U8请求失败，请稍后重试';
     noticeType.value = 'error';
   } finally { busy.value = false; }
 }
+
+/** 到货数量来自ASN，不以组盘作为前提。 */
+function arrival() { return run(() => createU8Arrival(code.value)); }
 
 /** 人工审核在U8完成，不在PDA伪造审核状态。 */
 function report() {
@@ -68,7 +79,7 @@ function purchase(row: U8InspectionLine) {
   if (busy.value || !row.canPurchase || row.isPurchasePushed) return;
   createConfirm({
     title: '采购入库',
-    content: '确认全部抽检样品已放回托盘，按检验单生成采购入库单？',
+    content: '确认整张ASN已逐箱组盘并校验完成，按对应检验单推送采购入库？',
     onOk: () => run(async () => {
       const result = await retryU8Purchase(row.asnLineId);
       if (result.success) row.isPurchasePushed = true;

@@ -247,8 +247,9 @@ namespace TuTa.Wms.Erp
                 return new PuArrVouchAddResponseDto { Success = true, Message = "已生成到货单，无需重复推送" };
             if (lines.Any(x => x.IsPushedToErp))
                 return new PuArrVouchAddResponseDto { Success = false, Message = "历史推送状态不一致，请核对U8单据后处理，禁止重复生单" };
-            if (lines.Any(x => x.InWarehouseQuantity <= 0 || (x.AlreadyStockInQuantity ?? 0) != x.InWarehouseQuantity))
-                return new PuArrVouchAddResponseDto { Success = false, Message = "ASN尚未全部组盘完成" };
+            // 新流程先按已保存ASN生成到货，检验合格后才逐箱组盘。
+            if (lines.Any(x => x.InWarehouseQuantity <= 0))
+                return new PuArrVouchAddResponseDto { Success = false, Message = "ASN到货数量必须大于0" };
             var first = lines[0];
             if (lines.Any(x => x.SupplierCode != first.SupplierCode))
                 return new PuArrVouchAddResponseDto { Success = false, Message = "同一ASN供应商不一致" };
@@ -262,7 +263,7 @@ namespace TuTa.Wms.Erp
                 Data = lines.Select(x => new PuArrVouchDetailRequestDto {
                     CInvCode = x.MaterialCode, CBatch = x.BatchCode, Cordercode = x.OrderCode,
                     IPoDetailId = x.PoDetailId, WarehouseCode = x.WarehouseCode, Bgsp = x.IsGsp ? 1 : 0,
-                    IQuantity = x.InWarehouseQuantity, FRealQuantity = x.AlreadyStockInQuantity ?? 0,
+                    IQuantity = x.InWarehouseQuantity, FRealQuantity = x.InWarehouseQuantity,
                     INum = 1, FRealNumy = 1, CFree2 = x.Free2, CFree3 = x.Free3, CFree5 = x.Free5
                 }).ToList()
             };
@@ -342,9 +343,9 @@ namespace TuTa.Wms.Erp
                     Maker = lines[0].Maker ?? "WMS",
                     Data = lines.GroupBy(x => x.ArrivalVoucherCode).Select(g => new LLBJDDataItem {
                         AddType = 1, CSourceCode = g.Key, CInspectDepCode = lines[0].DepartmentCode,
-                        CMemo = "ASN组盘完成报检", Details = g.Select(x => new LLBJDDetail {
+                        CMemo = "WMS到货审核后报检", Details = g.Select(x => new LLBJDDetail {
                             SourceAutoId = x.ArrivalDetailId.Value, CInvCode = x.MaterialCode,
-                            CBatch = x.BatchCode, FQuantity = x.AlreadyStockInQuantity ?? 0
+                            CBatch = x.BatchCode, FQuantity = x.InWarehouseQuantity
                         }).ToList()
                     }).ToList()
                 });

@@ -60,6 +60,7 @@ using Volo.Abp.Domain.Repositories;
 using Volo.Abp.EventBus.Local;
 using Volo.Abp.Identity;
 using Volo.Abp.Uow;
+using Volo.Abp.DistributedLocking;
 using Wms.LogTool;
 using TuTa.Wms.Boxes;
 
@@ -95,6 +96,8 @@ namespace TuTa.Wms.Stocks
         private readonly ILogger<StockService> _logger;
         private readonly AGVOptions _aGVOptions;
         private readonly IRepository<ErpOutboundRecord, string> _erpOutboundRecordRepository;
+        /// <summary>与U8生单共享ASN锁，防止并发扫码重复入账。</summary>
+        private readonly IAbpDistributedLock _u8GroupingLock;
 
 
         public StockService(
@@ -126,7 +129,7 @@ namespace TuTa.Wms.Stocks
             LocalEventBus localEventBus,
             ILogger<StockService> logger,
             IOptionsSnapshot<AGVOptions> aGVOptions,
-            IRepository<ErpOutboundRecord, string> erpOutboundRecordRepository)
+            IRepository<ErpOutboundRecord, string> erpOutboundRecordRepository, IAbpDistributedLock u8GroupingLock = null)
         {
             _stockRepository = stockRepository;
             _stocksManager = stocksManager;
@@ -156,6 +159,7 @@ namespace TuTa.Wms.Stocks
             _logger = logger;
             _aGVOptions = aGVOptions.Value;
             _erpOutboundRecordRepository = erpOutboundRecordRepository;
+            _u8GroupingLock = u8GroupingLock;
         }
         
 
@@ -186,56 +190,92 @@ namespace TuTa.Wms.Stocks
         /// <summary>
         /// 容器组盘（关联ASN订单号，更新已入库数量）
         /// </summary>
-        [UnitOfWork]
+        [UnitOfWork(IsDisabled = true)]
         public async Task<ResponseDto> CreateStockAndBindBoxWithAsnAsync(List<StockCreateDto> paras, string boxCode, string orderCode)
         {
-            using (var uow = UnitOfWorkManager.Begin(true, true))
+            if (paras == null || paras.Count == 0 || paras.Any(x => string.IsNullOrWhiteSpace(x.AsnCode)))
+                return new ResponseDto { success = false, message = "请选择ASN并按箱扫码组盘" };
+            var asnCodes = paras.Select(x => x.AsnCode).Distinct().ToList();
+            if (asnCodes.Count != 1) return new ResponseDto { success = false, message = "一次只能组盘一张ASN" };
+            // 先查U8检验结果，网络调用期间不持有库存写事务。
+            var checks = await _erpAsnAppService.GetAsnInspectionResultsAsync(asnCodes[0]);
+            if (checks == null || !checks.Success)
+                return new ResponseDto { success = false, message = checks?.Message ?? "请先完成U8检验并查询结果" };
+            ResponseDto result = null;
+            var localCommitted = false;
+            try
             {
+                await ErpAsnAppService.LocalPushLock.WaitAsync();
                 try
                 {
+                    await using var handle = _u8GroupingLock == null ? null :
+                        await _u8GroupingLock.TryAcquireAsync("U8:ASN:" + asnCodes[0]);
+                    if (_u8GroupingLock != null && handle == null)
+                        return new ResponseDto { success = false, message = "该ASN正在处理，请稍后重试" };
+                    using (var uow = UnitOfWorkManager.Begin(true, true))
+                    {
                     var asnLines = await ResolveU8AsnLinesAsync(orderCode, paras);
-                    var result = await CreateStockAndBindBoxCoreAsync(paras, boxCode, asnLines).ConfigureAwait(false);
+                    foreach (var pair in asnLines)
+                    {
+                        var check = checks.Items?.SingleOrDefault(x => x.AsnLineId == pair.Value.Id);
+                        if (check == null || !check.CanGroup)
+                            return new ResponseDto { success = false, message = check?.Message ?? "该ASN明细尚无匹配的合格检验单" };
+                    }
+                    result = await CreateStockAndBindBoxCoreAsync(paras, boxCode, asnLines).ConfigureAwait(false);
                     if (!result.success) return result;
                     foreach (var group in asnLines.GroupBy(x => x.Value.Id))
                     {
                         var line = group.First().Value;
+                        foreach (var pair in group) line.RecordGroupedBox(GetAsnBoxKey(pair.Key));
                         line.ApplyAlreadyStockInQuantity(group.Sum(x => x.Key.TotalCount));
                         await _erpAsnRepository.UpdateAsync(line);
                     }
-                    var asnCode = asnLines.Values.First().AsnCode;
                     await uow.CompleteAsync().ConfigureAwait(false);
-
-                    // 本地作业已提交；U8失败保留结果，允许管理页重试。
-                    if (!string.IsNullOrWhiteSpace(asnCode))
+                    localCommitted = true;
+                    }
+                }
+                finally { ErpAsnAppService.LocalPushLock.Release(); }
+                // 本地组盘只记账一次；整单全部校验通过后再生采购入库，失败可独立重试。
+                List<ErpAsn> lines;
+                using (var read = UnitOfWorkManager.Begin(true, false))
+                {
+                    lines = (await _erpAsnRepository.GetListByAsnCodeAsync(asnCodes[0]))
+                        .Where(x => x.Status != AsnStatus.Cancelled).ToList();
+                    await read.CompleteAsync();
+                }
+                if (lines.Count > 0 && lines.All(x => x.InWarehouseQuantity > 0 &&
+                    (x.AlreadyStockInQuantity ?? 0) == x.InWarehouseQuantity))
+                {
+                    foreach (var line in lines)
                     {
                         try
                         {
-                            var push = await _erpAsnAppService.TryPushPuArrVouchIfAllLinesCompletedAsync(asnCode);
-                            if (push != null)
-                            {
-                                result.message += push.Success ? "，" + push.Message : "，U8到货单推送失败，可在ASN管理重试：" + push.Message;
-                                if (push.Success)
-                                {
-                                    result.message += "，请仓管员在U8审核到货单后，通过PDA推送来料报检单";
-                                }
-                            }
+                            var push = await _erpAsnAppService.PushInspectionPurchaseAsync(line.Id);
+                            result.message += push?.Success == true ? "，采购入库已推送U8" :
+                                "，本地组盘已保存，U8采购入库待重试：" + (push?.Message ?? "接口无返回");
                         }
-                        catch (Exception ex)
-                        {
-                            _logger.Warn($"ASN {asnCode} 本地组盘完成，U8同步异常：{ex.Message}");
-                            result.message += "，本地组盘完成，U8同步待重试";
-                        }
+                        catch (Exception ex) { result.message += "，本地组盘已保存，U8采购入库待重试：" + ex.Message; }
                     }
-
+                }
+                else result.message += "，待整张ASN全部逐箱组盘后推送采购入库";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex.Message);
+                if (localCommitted && result != null)
+                {
+                    result.message += "，本地组盘已保存，U8采购入库待重试：" + ex.Message;
                     return result;
                 }
-                catch (Exception ex)
-                {
-                    _logger.Error(ex.Message);
-                    return new ResponseDto() { success = false, message = ex.Message };
-                }
+                return new ResponseDto { success = false, message = ex.Message };
             }
         }
+
+        /// <summary>箱号优先用于去重；无箱号时使用PDA为本次物理扫码生成的稳定标识。</summary>
+        private static string GetAsnBoxKey(StockCreateDto input)
+            => !string.IsNullOrWhiteSpace(input.BoxNumber) ? "box:" + input.BoxNumber.Trim() : "scan:" + input.AsnBoxScanId;
+
         /// <summary>
         /// 容器组盘, 创建库存和容器绑定
         /// </summary>
@@ -356,7 +396,13 @@ namespace TuTa.Wms.Stocks
                     null,
                     null);
 
-                if (u8Lines != null) stock.BindU8AsnLine(u8Lines[para].Id);
+                if (u8Lines != null)
+                {
+                    stock.BindU8AsnLine(u8Lines[para].Id);
+                    stock.InspectionStatus = InspectionStatus.InspectionQualified;
+                    // 采购入库成功前仅作组盘登记，禁止提前用于销售出库。
+                    stock.SetStatus(StockStatus.Waiting);
+                }
 
                 // 设置生产日期
                 if (para.SupplierProductionDate.HasValue)
@@ -433,11 +479,20 @@ namespace TuTa.Wms.Stocks
                 var stockExist = await _stockRepository.FindByBoxIdAndBarcodeAsync(box.Id, materialCode).ConfigureAwait(false);
                 // 仅U8库存按来源区分，普通组盘仍沿用原有按物料合并规则。
                 if (u8Lines != null && stockExist != null &&
-                    (stockExist.U8AsnLineId != stock.U8AsnLineId || stockExist.BatchCode != stock.BatchCode || stockExist.Grade != stock.Grade))
+                    (stockExist.U8AsnLineId != stock.U8AsnLineId || stockExist.BatchCode != stock.BatchCode || stockExist.Grade != stock.Grade ||
+                     stockExist.ReceiveCount?.CountInOnePkgOrBox != stock.ReceiveCount?.CountInOnePkgOrBox ||
+                     stockExist.BoxData?.BoxNumber != para.BoxNumber))
                     stockExist = null;
                 if (stockExist != null)
                 {
                     stockExist.CombineStock(stock);
+                    // ERP逐箱组盘必须同步当前箱数，不修改普通组盘的历史合并规则。
+                    if (u8Lines != null)
+                    {
+                        stockExist.TotalPagOrBox = (stockExist.TotalPagOrBox ?? 0) + (stock.TotalPagOrBox ?? 0);
+                        stockExist.InspectionStatus = InspectionStatus.InspectionQualified;
+                        stockExist.SetStatus(StockStatus.Waiting);
+                    }
                     await _stockRepository.UpdateAsync(stockExist).ConfigureAwait(false);
                 }
                 else
@@ -521,8 +576,15 @@ namespace TuTa.Wms.Stocks
                     (!string.IsNullOrWhiteSpace(para.AsnCode) && line.AsnCode != para.AsnCode) ||
                     (!string.IsNullOrWhiteSpace(para.BatchCode) && para.BatchCode != line.BatchCode) ||
                     (!string.IsNullOrWhiteSpace(para.Grade) && para.Grade != line.Free5) ||
-                    line.Status == AsnStatus.Cancelled || line.IsPushedToErp || para.TotalCount <= 0)
+                    line.Status == AsnStatus.Cancelled || !line.IsPushedToErp || !line.IsInspectionReportPushed || line.IsPurchasePushed || para.TotalCount <= 0)
                     throw new BusinessException("所选ASN明细与物料、订单、批次、等级或数量不匹配");
+                if (para.ReceivePkgOrBoxCount != 1 || para.CountInOnePkgOrBox <= 0 || !para.CountInOnePkgOrBox.HasValue ||
+                    para.TotalCount != para.CountInOnePkgOrBox.Value ||
+                    (string.IsNullOrWhiteSpace(para.BoxNumber) && string.IsNullOrWhiteSpace(para.AsnBoxScanId)))
+                    throw new BusinessException("ERP组盘必须一箱一扫，提供真实每箱数量和箱号或扫码标识，请更新PDA后重试");
+                var key = GetAsnBoxKey(para);
+                if (line.HasGroupedBox(key) || result.Any(x => x.Value.Id == line.Id && GetAsnBoxKey(x.Key) == key))
+                    throw new BusinessException("该箱已组盘或本次重复扫描，不能重复入账");
                 para.BatchCode = line.BatchCode;
                 para.AsnCode = line.AsnCode;
                 result.Add(para, line);
@@ -755,12 +817,16 @@ namespace TuTa.Wms.Stocks
                         return new ResponseDto() { success = false, message = $"未找到发货单 {deliveryOrderNo} 下存货编码 {materialCode} 的出库记录，请先扫描出库单保存" };
                     }
 
+                    if (!record.IsDeliveryScanCompleted)
+                        return new ResponseDto { success = false, message = "请先确认整张发货单扫码及库存校验完成" };
                     if (actualOutboundQuantity <= 0 || actualOutboundQuantity > record.Quantity - (record.ActualOutboundQuantity ?? 0))
                         return new ResponseDto { success = false, message = "出库数量必须大于0且不得超过U8发货剩余数量" };
                     var box = await _boxRepository.FindByBoxCodeAsync(boxCode);
                     if (box == null) return new ResponseDto { success = false, message = "出库容器不存在" };
                     var selected = (await _stockRepository.GetByBoxIdAsync(box.Id))
-                        .Where(x => x.Material.MaterialCode == materialCode && x.Grade == record.Grade).ToList();
+                        .Where(x => x.Material.MaterialCode == materialCode && x.Grade == record.Grade &&
+                            x.Status == StockStatus.Available && (!x.U8AsnLineId.HasValue ||
+                            x.InspectionStatus == InspectionStatus.InspectionQualified)).ToList();
                     if (selected.Count == 0 || selected.Sum(x => x.TotalCountInTime) < actualOutboundQuantity)
                         return new ResponseDto { success = false, message = "容器库存与U8物料、等级或数量不匹配" };
                     if (selected.Any(x => !string.IsNullOrWhiteSpace(x.U8OutboundRecordId) && x.U8OutboundRecordId != record.Id))
@@ -4535,7 +4601,7 @@ namespace TuTa.Wms.Stocks
             {
                 var checks = await _erpAsnAppService.GetAsnInspectionResultsAsync(sourceAsn);
                 var check = checks.Items?.SingleOrDefault(x => x.AsnLineId == sourceLineId.Value);
-                if (!checks.Success || check == null || !check.CanPurchase)
+                if (!checks.Success || check == null || !check.CanGroup)
                     return new ResponseDto { success = false, message = check?.Message ?? checks.Message ?? "U8检验结果尚未确认" };
             }
             using (var uow = UnitOfWorkManager.Begin(true, true))

@@ -27,6 +27,9 @@ namespace TuTa.Wms.Erp
                 var lines = (await ReadAsnLinesAsync(asnCode.Trim())).Where(x => x.Status != AsnStatus.Cancelled).ToList();
                 if (lines.Count == 0) { result.Message = "未找到ASN明细"; return result; }
                 foreach (var line in lines) result.Items.Add(await QueryInspectionLineAsync(line));
+                // 查询检验在组盘前即可进行，采购入库仍需整张ASN全部组盘校验完成。
+                if (lines.Any(x => x.InWarehouseQuantity <= 0 || (x.AlreadyStockInQuantity ?? 0) != x.InWarehouseQuantity))
+                    foreach (var row in result.Items) row.CanPurchase = false;
                 result.Success = true;
                 result.Message = "查询完成；仅来源匹配、已审核且整批合格的检验单可采购入库";
             }
@@ -122,11 +125,15 @@ namespace TuTa.Wms.Erp
             var rejected = string.Equals(InspectionField(check, "BREJFLAG")?.ToString(), "true", StringComparison.OrdinalIgnoreCase)
                 || InspectionField(check, "BREJFLAG")?.ToString() == "1";
             var disqualified = InspectionQuantity(check, "FDISQUANTITY");
-            result.CanPurchase = result.CheckId.HasValue && !string.IsNullOrWhiteSpace(result.CheckCode) && verified &&
+            result.CanGroup = result.CheckId.HasValue && !string.IsNullOrWhiteSpace(result.CheckCode) && verified &&
                 !rejected && disqualified == 0 && result.QualifiedQuantity > 0 &&
-                result.QualifiedQuantity == (line.AlreadyStockInQuantity ?? 0);
-            result.Message = result.CanPurchase ? line.PurchasePushError ?? (line.IsPurchasePushed ? "采购入库已推送" : "检验已审核且整批合格")
-                : "检验单未审核、非整批合格或数量不一致，禁止自动确认合格及采购入库；部分合格请人工处理";
+                result.QualifiedQuantity == line.InWarehouseQuantity;
+            result.GroupedQuantity = line.AlreadyStockInQuantity ?? 0;
+            result.PendingGroupingQuantity = Math.Max(0, line.InWarehouseQuantity - result.GroupedQuantity);
+            result.CanPurchase = result.CanGroup && result.GroupedQuantity == line.InWarehouseQuantity;
+            result.Message = result.CanGroup ? line.PurchasePushError ?? (line.IsPurchasePushed ? "采购入库已推送" :
+                result.PendingGroupingQuantity > 0 ? "检验已合格，请一箱一扫组盘" : "组盘完成，可推送采购入库")
+                : "检验单未审核、非整批合格或数量不一致，禁止组盘及采购入库；部分合格请人工处理";
             return result;
         }
 
@@ -146,11 +153,15 @@ namespace TuTa.Wms.Erp
                 await using var handle = _u8Lock == null ? null : await _u8Lock.TryAcquireAsync("U8:ASN:" + snapshot.AsnCode);
                 if (_u8Lock != null && handle == null)
                     return new CGRKDAddResponseDto { Success = false, Message = "该ASN正在处理，请稍后重试" };
-                var line = (await ReadAsnLinesAsync(snapshot.AsnCode)).Single(x => x.Id == asnLineId);
+                var asnLines = (await ReadAsnLinesAsync(snapshot.AsnCode)).Where(x => x.Status != AsnStatus.Cancelled).ToList();
+                var line = asnLines.SingleOrDefault(x => x.Id == asnLineId);
+                if (line == null) return new CGRKDAddResponseDto { Success = false, Message = "ASN已取消或不存在" };
                 if (line.IsPurchasePushed) return new CGRKDAddResponseDto { Success = true, Message = "采购入库已推送，无需重复生成" };
                 if (line.Status == AsnStatus.Cancelled) return new CGRKDAddResponseDto { Success = false, Message = "ASN已取消" };
                 try
                 {
+                    if (asnLines.Any(x => x.InWarehouseQuantity <= 0 || (x.AlreadyStockInQuantity ?? 0) != x.InWarehouseQuantity))
+                        return new CGRKDAddResponseDto { Success = false, Message = "整张ASN尚未全部组盘及校验完成，不能采购入库" };
                     var check = await QueryInspectionLineAsync(line);
                     if (!check.CanPurchase) return new CGRKDAddResponseDto { Success = false, Message = check.Message };
                     if (_u8StockRepository == null)
@@ -158,9 +169,9 @@ namespace TuTa.Wms.Erp
                     using (var read = UnitOfWorkManager.Begin(true, false))
                     {
                         var stocks = await _u8StockRepository.GetListAsync(x => x.U8AsnLineId == line.Id);
-                        if (stocks.Count == 0 || !stocks.Any(x => x.InspectionStatus == Stocks.InspectionStatus.InspectionQualified) ||
-                            stocks.Any(x => (x.InspectionCount ?? 0) > 0 || x.InspectionStatus == Stocks.InspectionStatus.InspectionNotQualified))
-                            return new CGRKDAddResponseDto { Success = false, Message = "请先归还全部抽检样品并确认合格；剩余抽检或不合格库存不能采购入库" };
+                        if (stocks.Count == 0 || stocks.Sum(x => x.TotalCountInTime) != line.InWarehouseQuantity ||
+                            stocks.Any(x => (x.InspectionCount ?? 0) > 0 || x.InspectionStatus != Stocks.InspectionStatus.InspectionQualified))
+                            return new CGRKDAddResponseDto { Success = false, Message = "组盘数量或合格状态不一致，请确认全部箱料及抽检样品已回盘" };
                         await read.CompleteAsync();
                     }
                     var payload = new JArray(new JObject {
@@ -180,8 +191,21 @@ namespace TuTa.Wms.Erp
                     var result = await PushCGRKDAddAsync(new CGRKDAddRequestDto { Cmd = "CGRKDAdd",
                         Taskid = line.PurchaseTaskId, Id = check.CheckId.Value,
                         Maker = line.Maker ?? "WMS", Data = line.PurchasePayload });
-                    line.RecordPurchasePush(result.Success, result.Message, result.Data);
-                    await SaveU8LinesAsync(new List<ErpAsn> { line });
+                    using (var write = UnitOfWorkManager.Begin(true, true))
+                    {
+                        line.RecordPurchasePush(result.Success, result.Message, result.Data);
+                        if (result.Success)
+                        {
+                            var stocks = await _u8StockRepository.GetListAsync(x => x.U8AsnLineId == line.Id);
+                            foreach (var stock in stocks)
+                            {
+                                stock.ReturnToAvailable();
+                                await _u8StockRepository.UpdateAsync(stock);
+                            }
+                        }
+                        await _erpAsnRepository.UpdateAsync(line, autoSave: true);
+                        await write.CompleteAsync();
+                    }
                     return result;
                 }
                 catch (Exception ex)

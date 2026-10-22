@@ -1,6 +1,6 @@
 import { defHttp } from '/@/utils/http/axios';
 
-/** U8检验结果，仅CanPurchase=true时允许采购入库；业务错误保留原始响应。 */
+/** U8检验结果：CanGroup表示可逐箱组盘，CanPurchase表示整单组盘后可采购入库。 */
 export interface U8InspectionLine {
   asnLineId: string;
   materialCode: string;
@@ -8,6 +8,9 @@ export interface U8InspectionLine {
   checkCode?: string;
   qualifiedQuantity: number;
   canPurchase: boolean;
+  canGroup: boolean;
+  groupedQuantity?: number;
+  pendingGroupingQuantity?: number;
   isPurchasePushed: boolean;
   message?: string;
 }
@@ -36,3 +39,11 @@ export function retryU8Purchase(asnLineId: string) {
   );
 }
 
+
+/** 保存ASN后生成到货单，未组盘也可推送；失败时独立重试。 */
+export function createU8Arrival(asnCode: string) {
+  return defHttp.post<{ success: boolean; message?: string }>(
+    { url: '/erp/asn/push-arrival-by-asn?asnCode=' + encodeURIComponent(asnCode.trim()) },
+    { isTransformResponse: false },
+  );
+}

@@ -1,6 +1,7 @@
 <template>
     <div class="scan-asn-container">
         <Header numb="扫描ASN"></Header>
+        <U8InboundActions :asn-code="asnCode" :show-asn-input="false" />
         
         <a-row class="input-row">
             <a-col :span="6">
@@ -84,6 +85,8 @@
 </template>
 
 <script lang="ts" setup>
+import U8InboundActions from "../../components/U8InboundActions.vue";
+import { createU8Arrival } from "../U8InboundApi";
 import { ref, onMounted } from 'vue';
 import { ScanOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
@@ -159,6 +162,13 @@ async function saveAsnInfo() {
         if (result.success) {
             message.success(result.message);
             showSaveSuccess.value = true;
+            try {
+                const arrival = await createU8Arrival(asnCode.value.trim());
+                if (arrival.success) message.success(arrival.message || '到货单已生成，请在U8审核后推送报检');
+                else message.warning('ASN已保存，到货单待重试：' + (arrival.message || 'U8未确认成功'));
+            } catch (error: any) {
+                message.warning('ASN已保存，到货单请求失败，请点击生成或重试到货单');
+            }
         } else {
             message.error(result.message || '保存失败');
         }
@@ -234,7 +244,7 @@ async function saveAsnInfo() {
     font-size: 14px;
     font-weight: 700;
     letter-spacing: 0.3px;
-    overflow: hidden;
+    overflow: auto;
     text-overflow: ellipsis;
     white-space: nowrap;
 }

@@ -1,7 +1,7 @@
 <template>
     <div class="box-disk-container">
         <Header numb="组盘(ASN)"></Header>
-        <U8InboundActions :asn-code="asnCodeValidated || asnCode" />
+        <U8InboundActions :asn-code="asnCodeValidated || asnCode" :show-asn-input="false" @inspection-results="inspectionChecks = $event" />
         <a-row class="input-row">
             <a-col :span="6">
                 <div class="htext">
@@ -9,7 +9,7 @@
                 </div>
             </a-col>
             <a-col :span="17">
-                <a-input v-model:value="boxCode" placeholder="扫描库位" @keyup.enter="scanboxCode" ref="focus1"
+                <a-input v-model:value="boxCode" :disabled="submitting" placeholder="扫描库位" @keyup.enter="scanboxCode" ref="focus1"
                     :allowClear="true" @focus="focusFn" class="modern-input" autofocus>
                     <template #suffix>
                         <scan-outlined class="scan-icon" />
@@ -25,7 +25,7 @@
                 </div>
             </a-col>
             <a-col :span="17">
-                <a-input v-model:value="asnCode" placeholder="输入ASN码" @keyup.enter="loadAsnData" :allowClear="true"
+                <a-input v-model:value="asnCode" :disabled="submitting" placeholder="输入ASN码" @keyup.enter="loadAsnData" :allowClear="true"
                     @focus="focusFn" class="modern-input" ref="asnInputRef">
                     <template #suffix>
                         <search-outlined class="scan-icon" @click="loadAsnData" />
@@ -41,14 +41,20 @@
                 <div style="overflow-x: auto; white-space: nowrap;">
                 <a-table :columns="asnOrderColumns" :dataSource="group.items" :pagination="false"
                     size="small" bordered rowKey="rowKey" :scroll="{ x: 500 }">
-                    <template #action>
-                        <a-button type="primary" size="small" @click="selectAsnOrder(group)">选择</a-button>
+                    <template #action="{ record }">
+                        <a-button type="primary" size="small" @click="selectAsnLine(record)">选该明细</a-button>
                     </template>
                 </a-table>
                 </div>
             </div>
         </div>
 
+        <a-row class="input-row">
+            <a-col :span="6"><div class="htext"><h1>收料箱码:</h1></div></a-col>
+            <a-col :span="17"><a-input v-model:value="QRcode" :disabled="submitting" ref="focus2"
+                placeholder="检验合格后一箱一扫" @keyup.enter="scangoodsCode" :allowClear="true" /></a-col>
+        </a-row>
+        <p style="margin-left: 20px">一箱一扫，每次保存一箱；{{ selectedLineId ? '已选择来源明细' : '自动匹配唯一来源明细' }}</p>
         <p style="margin-left: 20px">收料码数量:{{ goods.length }}</p>
         <div style="overflow:auto;" :style="{ height: goodheight + 'vh' }">
             <a-card style="margin: 10px 5px 20px 5px" v-for="(i, index) in goods">
@@ -69,13 +75,13 @@
                         <a-col :span="12">
                             <a-row align="middle">
                                 <a-col :span="9"><p>入库包数:</p></a-col>
-                                <a-col :span="9"><a-input-number v-model:value="i.baoshu" :min="0" @change="scanbaoshu(index)" /></a-col>
+                                <a-col :span="9"><a-input-number v-model:value="i.baoshu" :disabled="true" /></a-col>
                             </a-row>
                         </a-col>
                         <a-col :span="12">
                             <a-row align="middle">
                                 <a-col :span="9"><p>散件数量:</p></a-col>
-                                <a-col :span="9"><a-input-number v-model:value="i.sanjianshu" :min="0" @change="scanbaoshu(index)" /></a-col>
+                                <a-col :span="9"><a-input-number v-model:value="i.sanjianshu" :disabled="true" /></a-col>
                             </a-row>
                         </a-col>
                     </a-row>
@@ -83,7 +89,7 @@
                         <a-col :span="12">
                             <a-row align="middle">
                                 <a-col :span="9"><p>入库数量:</p></a-col>
-                                <a-col :span="9"><a-input-number size="large" v-model:value="i.incellshu" :min="0" @change="scanincellshu(index)" /></a-col>
+                                <a-col :span="9"><a-input-number size="large" v-model:value="i.incellshu" :disabled="true" /></a-col>
                             </a-row>
                         </a-col>
                     </a-row>
@@ -102,18 +108,20 @@
             </a-table>
             <div class="tab-bar">
                 <a-button @click="openCancelModal" type="primary" class="modern-btn">组盘取消</a-button>
-                <a-button @click="incell" type="primary" class="modern-btn">组盘确认</a-button>
+                <a-button @click="incell" :loading="submitting" type="primary" class="modern-btn">组盘确认</a-button>
             </div>
         </div>
     </div>
 </template>
 <script lang="ts" setup>
 import U8InboundActions from "../components/U8InboundActions.vue";
-import { ref, h, onMounted, computed } from 'vue';
+import { ref, h, onMounted } from 'vue';
 import { SearchOutlined, ScanOutlined, DeleteOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 import { useMessage } from '/@/hooks/web/useMessage';
-import { materialsWithCodeTipGet, DataItem, stockCreateAndBindBox, validateAsn } from '/@/views/mobile/views/Material';
+import { validateAsn } from '/@/views/mobile/views/Material';
+import { createAsnBoxItem } from './AsnBoxGrouping';
+import { queryU8Inspection, U8InspectionLine } from './U8InboundApi';
 import { stockCreateAndBindBoxWithAsn } from './BoxDiskWithAsn';
 import { stocksGetInBox, columns, stocksDisBindBox, stockRemoveDirect, stocksQuery } from '../views/Stock';
 import { getLaneCellStatusByCellCode } from '/@/views/warehouse/cells/Cell';
@@ -134,6 +142,9 @@ let loadingAsn = ref(false);
 let asnCodeValidated = ref('');
 // 保留完整来源行，收料扫码时按物料、批次、等级匹配采购订单明细。
 const loadedAsnLines = ref<any[]>([]);
+const inspectionChecks = ref<U8InspectionLine[]>([]);
+const selectedLineId = ref<string>();
+const submitting = ref(false);
 const laneCellStatusList = ref<CellLaneStatusDto[]>([]);
 
 const fetchLaneCellStatus = async () => {
@@ -153,12 +164,21 @@ const asnOrderColumns = [
 ];
 
 async function loadAsnData() {
-    if (!asnCode.value.trim()) return;
+    const code = asnCode.value.trim() || asnCodeValidated.value;
+    if (!code) return;
+    if (code !== asnCodeValidated.value) selectedLineId.value = undefined;
+    if (goods.value.length && code !== asnCodeValidated.value) {
+        message.warning('请先提交或删除当前 ASN 已扫描的箱码'); return;
+    }
     loadingAsn.value = true;
     try {
-        const res = await validateAsn(asnCode.value.trim());
+        const res = await validateAsn(code);
         if (res && res.success && res.data && res.data.length > 0) {
             loadedAsnLines.value = res.data.filter((item: any) => item.status !== 4);
+            inspectionChecks.value = [];
+            const inspection = await queryU8Inspection(code);
+            inspectionChecks.value = inspection?.items || [];
+            if (!inspection?.success) message.warning(inspection?.message || '未查询到合格检验结果，暂不能组盘');
             const groupMap = new Map<string, AsnOrderItem[]>();
             res.data.forEach((item: any) => {
                 // 过滤已入库数量 >= 应入库数量的已完成项
@@ -169,7 +189,7 @@ async function loadAsnData() {
                 const orderCode = item.cordercode || item.ccode || 'default';
                 if (!groupMap.has(orderCode)) groupMap.set(orderCode, []);
                 groupMap.get(orderCode)!.push({
-                    rowKey: `${orderCode}_${item.cinvcode}_${Date.now()}`,
+                    rowKey: item.autoid,
                     materialCode: item.cinvcode || '',
                     materialName: item.cinvname || '',
                     specs: item.cinvstd || '',
@@ -178,31 +198,42 @@ async function loadAsnData() {
                 });
             });
             asnOrderGroups.value = Array.from(groupMap.entries()).map(([orderCode, items]) => ({ orderCode, items }));
-            asnCodeValidated.value = asnCode.value.trim();
-            message.success(`ASN ${asnCode.value.trim()} 已加载，共 ${asnOrderGroups.value.length} 单`);
+            asnCodeValidated.value = code;
+            message.success(`ASN ${code} 已加载，共 ${asnOrderGroups.value.length} 单`);
             asnCode.value = '';
-        } else { message.warning(res?.message || '未找到ASN数据'); }
+        } else {
+            inspectionChecks.value = []; loadedAsnLines.value = []; asnOrderGroups.value = [];
+            asnCodeValidated.value = ''; selectedLineId.value = undefined;
+            message.warning(res?.message || '未找到ASN数据');
+        }
+    } catch (error: any) {
+        inspectionChecks.value = [];
+        message.error(error.message || 'ASN或检验结果加载失败');
     } finally { loadingAsn.value = false; }
 }
 
-function selectAsnOrder(group: AsnOrderGroup) {
-    group.items.forEach((item) => {
-        const g = new DataItem();
-        g.materialCode = item.materialCode;
-        g.materialName = item.materialName;
-        g.goodsSpec = item.specs;
-        g.quantity = item.quantity;
-        g.incellshu = item.quantity;
-        g.baoshu = 0; g.sanjianshu = 0;
-        g.countInOnePkgOrBox = item.quantity;
-        g.dataCode = `ASN_${item.asnLineId}`;
-        g.goodsBatchNo = item.batchCode;
-        (g as any).orderCode = group.orderCode;
-        (g as any).asnLineId = item.asnLineId;
-        (g as any).grade = item.grade;
-        (goods.value as any[]).push(g);
-    });
-    asnOrderGroups.value = asnOrderGroups.value.filter(g => g.orderCode !== group.orderCode);
+/** 多个来源行匹配同一物料时，由操作员明确选择来源行，数量仍以箱码为准。 */
+function selectAsnLine(item: AsnOrderItem) {
+    if (submitting.value) return;
+    selectedLineId.value = item.asnLineId;
+    message.info('已选择来源明细，请扫描每箱收料码');
+    focus2.value?.focus();
+}
+
+/** 每个物理箱生成稳定提交标识，网络重试沿用原标识。 */
+function scangoodsCode() {
+    if (submitting.value) return;
+    if (!boxCode.value || !asnCodeValidated.value) {
+        message.warning('请先扫描库位并加载 ASN'); return;
+    }
+    try {
+        const scanId = globalThis.crypto?.randomUUID?.() ||
+            Date.now().toString(36) + Math.random().toString(36).slice(2);
+        goods.value.push(createAsnBoxItem(QRcode.value, loadedAsnLines.value,
+            inspectionChecks.value, goods.value, scanId, selectedLineId.value));
+        QRcode.value = '';
+        focus2.value?.focus();
+    } catch (error: any) { message.error(error.message || '箱码校验失败'); }
 }
 
 var goods = ref<any[]>([]);
@@ -232,75 +263,48 @@ const scanboxCode = async () => {
     setTimeout(() => { if (focus2.value) focus2.value.focus(); }, 100);
 }
 
-function scanbaoshu(index: number) {
-    if (goods.value[index].countInOnePkgOrBox) { goods.value[index].incellshu = goods.value[index].baoshu * goods.value[index].countInOnePkgOrBox + goods.value[index].sanjianshu }
-}
-function scanincellshu(index: number) {
-    if (goods.value[index].countInOnePkgOrBox) { goods.value[index].sanjianshu = goods.value[index].incellshu % goods.value[index].countInOnePkgOrBox; goods.value[index].baoshu = (goods.value[index].incellshu - goods.value[index].sanjianshu) / goods.value[index].countInOnePkgOrBox; }
-}
-const deletegood = (index: number) => goods.value.splice(index, 1)
+const deletegood = (index: number) => { if (!submitting.value) goods.value.splice(index, 1); }
 const deleteStock = async (record: any, index: number) => {
     createConfirm({ title: '确认删除', content: `删除物料 ${record.materialName} 的库存？`, okText: '确定', cancelText: '取消',
         onOk: async () => { try { await stockRemoveDirect(record.id); message.success('删除成功'); dataSource.value.splice(index, 1); if (boxCode.value) await scanboxCode(); } catch { message.error('删除失败'); } } });
 };
 
+/** 按订单顺序提交；成功箱码移出队列，失败箱码保留原标识用于重试。 */
 const incell = async () => {
-    let stockCreateDto: StockCreateDto[] = [];
-    if (goods.value.length == 0) { message.error("没有物料信息"); return; }
-    if (boxCode.value == '') { message.error("没有容器信息"); return; }
-    if (asnCodeValidated.value) {
-        for (const item of goods.value) {
-            if (item.asnLineId) continue;
-            const matches = loadedAsnLines.value.filter((line: any) =>
-                line.cinvcode === item.materialCode && line.cbatch === item.goodsBatchNo &&
-                (!item.grade || line.cfree5 === item.grade) &&
-                Number(line.alreadyStockInQuantity || 0) < Number(line.iquantity));
-            if (matches.length !== 1) {
-                message.error('收料物料与ASN来源不匹配或存在多条订单明细，请选择对应ASN明细');
-                return;
-            }
-            item.asnLineId = matches[0].autoid;
-            item.orderCode = matches[0].cordercode;
-        }
+    if (submitting.value) return;
+    if (!goods.value.length || !boxCode.value || !asnCodeValidated.value) {
+        message.error('请扫描库位、加载 ASN 并逐箱扫码'); return;
     }
-    goods.value.forEach((e: any) => {
-        let p = new StockCreateDto(); p.totalCount = e.incellshu; p.barcode = e.materialCode; p.materialCode = e.materialCode;
-        p.boxNumber = e.boxNumber || undefined; p.receivePkgOrBoxCount = e.baoshu || undefined;
-        p.countInOnePkgOrBox = e.countInOnePkgOrBox || undefined; p.batchCode = e.goodsBatchNo || '';
-        p.grade = e.grade || ''; p.processNo = e.processNo || '';
-        if (asnCodeValidated.value) {
-            p.asnCode = asnCodeValidated.value;
-            (p as any).asnLineId = e.asnLineId;
-            (p as any).orderCode = e.orderCode;
-        }
-        stockCreateDto.push(p);
-    });
+    submitting.value = true;
     try {
-        if (asnCodeValidated.value) {
-            const grouped = new Map<string, StockCreateDto[]>();
-            stockCreateDto.forEach(dto => {
-                const oc = (dto as any).orderCode || '';
-                if (!grouped.has(oc)) grouped.set(oc, []);
-                grouped.get(oc)!.push(dto);
-            });
-            let ok = true;
-            for (const [oc, dtos] of grouped) {
-                const res = await stockCreateAndBindBoxWithAsn(boxCode.value, oc, dtos);
-                if (!res || res.success !== true) { ok = false; message.error(res?.message || '组盘失败'); }
-                else {
-                    const ids = new Set(dtos.map((dto: any) => dto.asnLineId));
-                    goods.value = goods.value.filter((g: any) => !ids.has(g.asnLineId));
-                    message.success(res.message || '组盘完成');
-                }
-            }
-            if (ok) { message.success('组盘完成，ASN已更新'); goods.value.length = 0; QRcode.value = ''; laneCellStatusList.value = []; setTimeout(() => { if (focus1.value) focus1.value.focus(); }, 100); }
-        } else {
-            await stockCreateAndBindBox(boxCode.value, stockCreateDto).then((res) => {
-                if (res.success == true) { message.success(res.message); goods.value.length = 0; QRcode.value = ''; boxCode.value = ''; laneCellStatusList.value = []; setTimeout(() => { if (focus1.value) focus1.value.focus(); }, 100); }
-                else { message.error(res.message || '入库失败'); }
-            }).catch((error) => { message.error(error.message || '操作失败'); });
+        const grouped = new Map<string, any[]>();
+        for (const item of goods.value) {
+            if (!grouped.has(item.orderCode)) grouped.set(item.orderCode, []);
+            grouped.get(item.orderCode)!.push(item);
         }
-    } catch (err) { message.error(err); }
+        for (const [orderCode, boxes] of grouped) {
+            const dtos = boxes.map(e => {
+                const p = new StockCreateDto();
+                p.totalCount = e.incellshu; p.barcode = e.materialCode; p.materialCode = e.materialCode;
+                p.boxNumber = e.boxNumber || undefined; p.receivePkgOrBoxCount = 1;
+                p.countInOnePkgOrBox = e.countInOnePkgOrBox;
+                p.batchCode = e.goodsBatchNo || ''; p.grade = e.grade || ''; p.processNo = e.processNo || '';
+                p.asnCode = asnCodeValidated.value;
+                (p as any).asnLineId = e.asnLineId;
+                (p as any).asnBoxScanId = e.asnBoxScanId;
+                return p;
+            });
+            const res = await stockCreateAndBindBoxWithAsn(boxCode.value, orderCode, dtos);
+            if (!res?.success) { message.error(res?.message || '组盘失败'); break; }
+            const saved = new Set(boxes.map(e => e.asnBoxScanId));
+            goods.value = goods.value.filter(e => !saved.has(e.asnBoxScanId));
+            message.success(res.message || '组盘已保存');
+        }
+        await scanboxCode();
+        await loadAsnData();
+    } catch (error: any) {
+        message.error(error.message || '提交失败，请核对已组盘信息后重试');
+    } finally { submitting.value = false; }
 }
 
 const openCancelModal = () => {

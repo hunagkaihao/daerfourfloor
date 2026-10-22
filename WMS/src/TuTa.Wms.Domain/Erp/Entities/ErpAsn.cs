@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Volo.Abp;
@@ -304,6 +306,22 @@ namespace TuTa.Wms.Erp.Entities
             InspectionPushUid = uid;
             IsInspectionReportPushed = success;
             InspectionPushError = success ? null : LimitError(error);
+        }
+
+        /// <summary>已提交箱码台账，同一箱重复提交不得重复入账；数据使用既有扩展属性保存。</summary>
+        public bool HasGroupedBox(string boxKey)
+        {
+            var data = this.GetProperty<string>("U8GroupedBoxes");
+            return data != null && (JsonConvert.DeserializeObject<HashSet<string>>(data) ?? new HashSet<string>()).Contains(boxKey);
+        }
+
+        /// <summary>登记已完成组盘的箱标识，与组盘数量在同一事务提交。</summary>
+        public void RecordGroupedBox(string boxKey)
+        {
+            var data = this.GetProperty<string>("U8GroupedBoxes");
+            var boxes = data == null ? new HashSet<string>() : JsonConvert.DeserializeObject<HashSet<string>>(data) ?? new HashSet<string>();
+            if (!boxes.Add(boxKey)) throw new BusinessException("该箱已组盘，不能重复入账");
+            this.SetProperty("U8GroupedBoxes", JsonConvert.SerializeObject(boxes));
         }
 
         // 复用已映射的ExtraProperties持久化采购推送信息，兼容已有ASN记录，无需增加数据库列。

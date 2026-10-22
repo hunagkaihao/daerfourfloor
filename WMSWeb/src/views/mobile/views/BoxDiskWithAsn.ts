@@ -129,7 +129,7 @@ export async function materialsWithCodeTipGet(params: any): Promise<any> {
 export async function stockCreateAndBindBoxWithAsn(boxcode: string, orderCode: string, params: any): Promise<any> {
   return defHttp.post({ url: '/wms/stock/stockCreateAndBindBoxWithAsn',
     params: { boxcode, orderCode },
-    data: params.map((item: any) => ({ ...item.toJSON(), asnLineId: item.asnLineId })) },
+    data: params.map((item: any) => ({ ...item.toJSON(), asnLineId: item.asnLineId, asnBoxScanId: item.asnBoxScanId })) },
     { isTransformResponse: false });
 }
 
