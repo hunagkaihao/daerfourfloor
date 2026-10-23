@@ -45,7 +45,7 @@ namespace TuTa.Wms.Erp.Dto
         public string ProcessTypeCode { get; set; }
         /// <summary>币种名称。</summary>
         public string ExchangeName { get; set; }
-        /// <summary>税率，百分比。</summary>
+        /// <summary>税率，百分比；到货接口只接受Int32范围的整数值，保留decimal接收ASN精度，发送前校验。</summary>
         public decimal TaxRate { get; set; }
         /// <summary>汇率。</summary>
         public decimal ExchangeRate { get; set; }

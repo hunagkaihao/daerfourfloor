@@ -96,10 +96,7 @@ namespace TuTa.Wms.Erp
                         appSecret = _erpSettings.AppSecret
                     };
 
-                    var loginContent = new StringContent(
-                        System.Text.Json.JsonSerializer.Serialize(loginData),
-                        Encoding.UTF8,
-                        "application/json");
+                    var loginContent = new StringContent(System.Text.Json.JsonSerializer.Serialize(loginData),Encoding.UTF8,"application/json");
 
                     _logger.LogInformation($"请求ERP登录接口，URL：{_erpSettings.LoginUrl}，请求参数：{System.Text.Json.JsonSerializer.Serialize(loginData)}");
                     var loginResponse = await loginClient.PostAsync(_erpSettings.LoginUrl, loginContent);
@@ -805,6 +802,17 @@ namespace TuTa.Wms.Erp
                     }
                 }
 
+                // U8的itaxrate按Int32绑定，先验证数学整数及范围，禁止截断或舍入税率。
+                if (input.TaxRate != decimal.Truncate(input.TaxRate) ||
+                    input.TaxRate < int.MinValue || input.TaxRate > int.MaxValue)
+                {
+                    return new PuArrVouchAddResponseDto
+                    {
+                        Success = false,
+                        Message = $"税率itaxrate必须为Int32范围内的整数，当前税率：{input.TaxRate}，请核对ASN税率后重试"
+                    };
+                }
+
                 var token = await GetErpTokenAsync(operationId);
                 if (string.IsNullOrEmpty(token))
                 {
@@ -1070,6 +1078,10 @@ namespace TuTa.Wms.Erp
             return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         }
 
+        /// <summary>构造U8到货报文，已验证的税率以JSON整数发送，兼容接口Int32绑定。</summary>
+        /// <param name="input">已通过必填项、税率整数和Int32范围校验的到货请求。</param>
+        /// <param name="uid">本次到货推送标识，失败重试时沿用。</param>
+        /// <returns>用于序列化的U8到货报文。</returns>
         private static object BuildPuArrVouchPayload(PuArrVouchAddRequestDto input, long uid)
         {
             return new
@@ -1083,7 +1095,7 @@ namespace TuTa.Wms.Erp
                 cexch_name = input.ExchangeName,
                 cpocode = input.Cpocode,
                 cPtCode = input.ProcessTypeCode,
-                itaxrate = input.TaxRate,
+                itaxrate = decimal.ToInt32(input.TaxRate),
                 iexchrate = input.ExchangeRate,
                 cMemo = "",
                 Data = input.Data.Select((item, index) => new
