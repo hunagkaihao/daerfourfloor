@@ -62,6 +62,9 @@ namespace TuTa.Wms.Erp.Dto
         [Required]
         public string CInvCode { get; set; }
 
+        /// <summary>U8单位标识cunitid；保留源编码，未提供时显式发送空字符串。</summary>
+        public string CUnitId { get; set; } = string.Empty;
+
         /// <summary>
         /// 入库数量；向U8发送时须为Int32范围内的整数，保留decimal源值。
         /// </summary>

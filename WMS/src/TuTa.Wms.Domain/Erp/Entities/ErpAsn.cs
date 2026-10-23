@@ -141,6 +141,17 @@ namespace TuTa.Wms.Erp.Entities
         [StringLength(10)]
         public virtual string Unit { get; private set; }
 
+        /// <summary>U8到货单单位标识cunitid；使用已有扩展属性持久化，历史记录缺失时为空。</summary>
+        [NotMapped]
+        public string UnitId => this.GetProperty<string>("U8UnitId") ?? string.Empty;
+
+        /// <summary>保存ASN源单位标识，不使用单位名称或示例编码替代。</summary>
+        /// <param name="unitId">ASN的cunitid原值；null按未提供处理，保存为空字符串。</param>
+        public void SetUnitId(string unitId)
+        {
+            this.SetProperty("U8UnitId", unitId ?? string.Empty);
+        }
+
         public virtual decimal PlanQuantity { get; private set; }
 
         [StringLength(50)]

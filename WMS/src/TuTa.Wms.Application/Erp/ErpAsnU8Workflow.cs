@@ -261,7 +261,7 @@ namespace TuTa.Wms.Erp
                 DepartmentCode = first.DepartmentCode, Maker = first.Maker, ProcessTypeCode = first.ProcessTypeCode,
                 ExchangeName = first.ExchangeName, TaxRate = first.TaxRate, ExchangeRate = first.ExchangeRate,
                 Data = lines.Select(x => new PuArrVouchDetailRequestDto {
-                    CInvCode = x.MaterialCode, CBatch = x.BatchCode, Cordercode = x.OrderCode,
+                    CInvCode = x.MaterialCode, CUnitId = x.UnitId, CBatch = x.BatchCode, Cordercode = x.OrderCode,
                     IPoDetailId = x.PoDetailId, WarehouseCode = x.WarehouseCode, Bgsp = x.IsGsp ? 1 : 0,
                     IQuantity = x.InWarehouseQuantity, FRealQuantity = x.InWarehouseQuantity,
                     INum = 1, FRealNumy = 1, CFree2 = x.Free2, CFree3 = x.Free3, CFree5 = x.Free5

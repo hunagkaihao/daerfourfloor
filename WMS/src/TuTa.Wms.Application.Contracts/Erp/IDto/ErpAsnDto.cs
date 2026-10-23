@@ -69,6 +69,9 @@ namespace TuTa.Wms.Erp.Dto
         /// </summary>
         public string Cinfvm_unit { get; set; }
 
+        /// <summary>ASN源字段cunitid，保留U8单位标识；未提供时为空，与单位名称分开保存。</summary>
+        public string Cunitid { get; set; } = string.Empty;
+
         /// <summary>
         /// 计划数量
         /// </summary>

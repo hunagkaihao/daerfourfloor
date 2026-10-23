@@ -265,6 +265,13 @@ namespace TuTa.Wms.Erp
                     var existingAsn = FindExistingAsn(existingAsns, asnInfo);
                     if (existingAsn != null)
                     {
+                        // 重扫时仅补齐尚未生成到货单的历史单位标识，保留其他已保存业务数据。
+                        if (!existingAsn.IsPushedToErp && string.IsNullOrWhiteSpace(existingAsn.UnitId) &&
+                            !string.IsNullOrWhiteSpace(asnInfo.Cunitid))
+                        {
+                            existingAsn.SetUnitId(asnInfo.Cunitid);
+                            await _erpAsnRepository.UpdateAsync(existingAsn);
+                        }
                         savedIds.Add(existingAsn.Id);
                         continue;
                     }
@@ -375,6 +382,7 @@ namespace TuTa.Wms.Erp
                 asnInfo.Cinvaddcode,
                 asnInfo.Wdhsl);
 
+            newAsn.SetUnitId(asnInfo.Cunitid);
             newAsn.UpdateQuantity(
                 asnInfo.Farrqty,
                 asnInfo.Foutquantity,
@@ -477,6 +485,7 @@ namespace TuTa.Wms.Erp
                 Cinvname = item["cinvname"]?.ToString(),
                 Cinvstd = item["cinvstd"]?.ToString(),
                 Cinfvm_unit = item["cinvm_unit"]?.ToString(),
+                Cunitid = item["cunitid"]?.ToString() ?? string.Empty,
                 Ipoquantity = decimal.TryParse(item["ipoquantity"]?.ToString(), out var ipoqty) ? ipoqty : 0,
                 Cbatch = item["cbatch"]?.ToString(),
                 Farrqty = decimal.TryParse(item["farrqty"]?.ToString(), out var farrqty) ? farrqty : 0,
@@ -1135,6 +1144,7 @@ namespace TuTa.Wms.Erp
                     ivouchrowno = index + 1,
                     cWhCode = item.WarehouseCode,
                     cInvCode = item.CInvCode,
+                    cunitid = item.CUnitId ?? string.Empty,
                     iQuantity = decimal.ToInt32(item.IQuantity),
                     iNum = decimal.ToInt32(Math.Round(item.INum, 0)),
                     fRealQuantity = decimal.ToInt32(item.FRealQuantity),
@@ -1308,6 +1318,7 @@ namespace TuTa.Wms.Erp
                 Cinvname = asn.MaterialName,
                 Cinvstd = asn.Specs,
                 Cinfvm_unit = asn.Unit,
+                Cunitid = asn.UnitId,
                 Ipoquantity = asn.PlanQuantity,
                 Cbatch = asn.BatchCode,
                 Farrqty = asn.ArrivedQuantity,
