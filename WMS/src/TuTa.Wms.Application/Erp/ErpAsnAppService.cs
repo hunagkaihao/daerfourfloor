@@ -813,6 +813,17 @@ namespace TuTa.Wms.Erp
                     };
                 }
 
+                // 当前U8到货接口的iexchrate按Int32绑定，保留源汇率，不对真实小数汇率取整。
+                if (input.ExchangeRate != decimal.Truncate(input.ExchangeRate) ||
+                    input.ExchangeRate < int.MinValue || input.ExchangeRate > int.MaxValue)
+                {
+                    return new PuArrVouchAddResponseDto
+                    {
+                        Success = false,
+                        Message = $"汇率iexchrate必须为Int32范围内的整数，当前汇率：{input.ExchangeRate}，请核对ASN汇率或U8接口字段类型后重试"
+                    };
+                }
+
                 var token = await GetErpTokenAsync(operationId);
                 if (string.IsNullOrEmpty(token))
                 {
@@ -1078,8 +1089,8 @@ namespace TuTa.Wms.Erp
             return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         }
 
-        /// <summary>构造U8到货报文，已验证的税率以JSON整数发送，兼容接口Int32绑定。</summary>
-        /// <param name="input">已通过必填项、税率整数和Int32范围校验的到货请求。</param>
+        /// <summary>构造U8到货报文，已验证的税率及汇率以JSON整数发送，兼容接口Int32绑定。</summary>
+        /// <param name="input">已通过必填项、税率和汇率整数及Int32范围校验的到货请求。</param>
         /// <param name="uid">本次到货推送标识，失败重试时沿用。</param>
         /// <returns>用于序列化的U8到货报文。</returns>
         private static object BuildPuArrVouchPayload(PuArrVouchAddRequestDto input, long uid)
@@ -1096,7 +1107,7 @@ namespace TuTa.Wms.Erp
                 cpocode = input.Cpocode,
                 cPtCode = input.ProcessTypeCode,
                 itaxrate = decimal.ToInt32(input.TaxRate),
-                iexchrate = input.ExchangeRate,
+                iexchrate = decimal.ToInt32(input.ExchangeRate),
                 cMemo = "",
                 Data = input.Data.Select((item, index) => new
                 {
