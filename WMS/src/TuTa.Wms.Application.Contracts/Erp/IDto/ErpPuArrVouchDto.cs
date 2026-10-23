@@ -26,7 +26,7 @@ namespace TuTa.Wms.Erp.Dto
         public string CVenCode { get; set; }
 
         /// <summary>
-        /// 订单号
+        /// 本张到货单的采购订单号；同一送货单按采购订单拆分，表体仅包含该订单的明细。
         /// </summary>
         [Required]
         public string Cpocode { get; set; }
@@ -96,13 +96,13 @@ namespace TuTa.Wms.Erp.Dto
         public string CBatch { get; set; }
 
         /// <summary>
-        /// 订单号
+        /// ASN明细的来源采购订单号；须与本张到货单主表Cpocode一致，不得改写为其他订单号。
         /// </summary>
         [Required]
         public string Cordercode { get; set; }
 
         /// <summary>
-        /// 采购订单行ID（推送ERP时使用，不传则使用默认值）
+        /// 来源采购订单明细ID；按采购订单分组推送时逐行保留ASN原值。
         /// </summary>
         public long? IPoDetailId { get; set; }
 

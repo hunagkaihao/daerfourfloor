@@ -257,7 +257,7 @@ namespace TuTa.Wms.Erp.Entities
 
         public virtual DateTime? PushTime { get; private set; }
 
-        /// <summary>到货单推送任务UID，失败重试沿用，避免U8重复生单。</summary>
+        /// <summary>同一ASN、同一采购订单的到货推送UID；不同订单独立分配，失败重试沿用。</summary>
         public virtual long? ArrivalPushUid { get; private set; }
 
         /// <summary>U8到货单主表ID；历史未关联数据为空。</summary>
@@ -287,7 +287,7 @@ namespace TuTa.Wms.Erp.Entities
         [StringLength(2000)]
         public virtual string InspectionPushError { get; private set; }
 
-        /// <summary>在网络请求前保留整单推送UID。</summary>
+        /// <summary>在网络请求前保留本采购订单的推送UID。</summary>
         public void BeginArrivalPush(long uid)
         {
             ArrivalPushUid = uid;

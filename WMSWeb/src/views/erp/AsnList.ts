@@ -358,10 +358,10 @@ function groupAsnListItems(items: AsnWorkflowLine[] = []): AsnGroupRow[] {
       totalPendingStockInQuantity,
       lineCount: lines.length,
       asnItems: lines,
-      canPushArrival: activeLines.length > 0 && activeLines.every(line => Number(line.iquantity) > 0) && !anyPushed,
+      canPushArrival: activeLines.length > 0 && activeLines.every(line => Number(line.iquantity) > 0) && !allPushed,
       canPushInspection: allPushed && !anyReported && activeLines.every((line) =>
         !!line.arrivalVoucherId && !!line.arrivalVoucherCode && !!line.arrivalDetailId),
-      arrivalStatus: allPushed ? '已推送' : anyPushed ? '状态异常' : arrivalPushError ? '推送失败' : '待推送',
+      arrivalStatus: allPushed ? '已推送' : anyPushed ? '部分已推送' : arrivalPushError ? '推送失败' : '待推送',
       arrivalVoucherCode: [...new Set(activeLines.map((line) => line.arrivalVoucherCode).filter(Boolean))].join('、'),
       pushTime: activeLines.find((line) => line.pushTime)?.pushTime,
       arrivalPushError,

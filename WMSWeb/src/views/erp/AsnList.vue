@@ -1,6 +1,6 @@
 <template>
   <div class="asn-list">
-    <a-alert type="info" show-icon message="保存ASN后生成到货单；U8审核后由PDA报检，检验合格后逐箱组盘，整单完成后生成采购入库单。" style="margin-bottom: 12px" />
+    <a-alert type="info" show-icon message="保存ASN后按采购订单分别生成到货单；U8审核后由PDA报检，检验合格后逐箱组盘，整单完成后生成采购入库单。" style="margin-bottom: 12px" />
     <BasicTable @register="registerTable" size="small" :clickToRowSelect="false">
       <template #expandedRowRender="{ record }">
         <div class="expanded-row">
@@ -21,7 +21,7 @@
       <template #action="{ record }">
         <Button type="link" :disabled="!record.canPushArrival || !!pushing[record.ccode]"
           :loading="pushing[record.ccode] === 'arrival'" @click="handlePush(record, 'arrival')">
-          {{ record.arrivalPushError ? '重试到货单' : '生成到货单' }}
+          {{ record.arrivalPushError || record.arrivalStatus === '部分已推送' ? '重试到货单' : '生成到货单' }}
         </Button>
         <Button type="link" :disabled="!record.canPushInspection || !!pushing[record.ccode]"
           :loading="pushing[record.ccode] === 'inspection'" @click="handlePush(record, 'inspection')">

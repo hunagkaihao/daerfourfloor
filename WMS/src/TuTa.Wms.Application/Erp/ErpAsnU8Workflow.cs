@@ -218,7 +218,7 @@ namespace TuTa.Wms.Erp
             }
         }
 
-        /// <summary>按完整ASN推送到货单；本地组盘成功后独立执行，失败可在管理页重试。</summary>
+        /// <summary>按送货单内的采购订单分别生成到货单；失败可在管理页重试未成功的订单。</summary>
         [UnitOfWork(IsDisabled = true)]
         public async Task<PuArrVouchAddResponseDto> PushAsnArrivalAsync(string asnCode)
         {
@@ -236,7 +236,7 @@ namespace TuTa.Wms.Erp
             finally { LocalPushLock.Release(); }
         }
 
-        /// <summary>校验实际组盘数量、保存稳定UID、生成到货单并持久化U8关联。</summary>
+        /// <summary>按采购订单拆分ASN明细，分别记录推送结果，成功订单不重复生单。</summary>
         private async Task<PuArrVouchAddResponseDto> PushAsnArrivalCoreAsync(string asnCode)
         {
             var lines = (await ReadAsnLinesAsync(asnCode))
@@ -245,19 +245,73 @@ namespace TuTa.Wms.Erp
                 return new PuArrVouchAddResponseDto { Success = false, Message = "没有可推送的ASN明细" };
             if (lines.All(x => x.IsPushedToErp))
                 return new PuArrVouchAddResponseDto { Success = true, Message = "已生成到货单，无需重复推送" };
-            if (lines.Any(x => x.IsPushedToErp))
-                return new PuArrVouchAddResponseDto { Success = false, Message = "历史推送状态不一致，请核对U8单据后处理，禁止重复生单" };
             // 新流程先按已保存ASN生成到货，检验合格后才逐箱组盘。
             if (lines.Any(x => x.InWarehouseQuantity <= 0))
                 return new PuArrVouchAddResponseDto { Success = false, Message = "ASN到货数量必须大于0" };
+            if (lines.Any(x => string.IsNullOrWhiteSpace(x.OrderCode)))
+                return new PuArrVouchAddResponseDto { Success = false, Message = "ASN明细缺少采购订单号，无法分别生成到货单" };
             var first = lines[0];
             if (lines.Any(x => x.SupplierCode != first.SupplierCode))
                 return new PuArrVouchAddResponseDto { Success = false, Message = "同一ASN供应商不一致" };
-            var uid = lines.Select(x => x.ArrivalPushUid).FirstOrDefault(x => x.HasValue) ?? GeneratePuArrVouchUid();
+
+            // 旧版本可能给多个订单保存同一UID。仅在ERP明确以HTTP 400拒绝时重新分配，结果不明时禁止换UID重建。
+            var sharedUidGroups = lines.Where(x => x.ArrivalPushUid > 0).GroupBy(x => x.ArrivalPushUid.Value)
+                .Where(g => g.Select(x => x.OrderCode).Distinct(StringComparer.Ordinal).Count() > 1).ToList();
+            if (sharedUidGroups.Any(g => g.Any(x => x.IsPushedToErp ||
+                x.ArrivalPushError?.Contains("(HTTP 400)", StringComparison.Ordinal) != true)))
+                return new PuArrVouchAddResponseDto { Success = false,
+                    Message = "历史到货推送UID被多个采购订单共用，且生单结果未明确，请先核对U8单据，禁止更换UID重复生单" };
+            var sharedUids = new HashSet<long>(sharedUidGroups.Select(g => g.Key));
+            var reservedUids = new HashSet<long>(lines.Where(x => x.ArrivalPushUid > 0).Select(x => x.ArrivalPushUid.Value));
+            var results = new List<(string OrderCode, PuArrVouchAddResponseDto Result)>();
+            foreach (var group in lines.GroupBy(x => x.OrderCode, StringComparer.Ordinal))
+            {
+                var orderLines = group.ToList();
+                PuArrVouchAddResponseDto result;
+                var existingUids = orderLines.Where(x => x.ArrivalPushUid > 0)
+                    .Select(x => x.ArrivalPushUid.Value).Distinct().ToList();
+                if (orderLines.All(x => x.IsPushedToErp))
+                    result = new PuArrVouchAddResponseDto { Success = true, Message = "已生成到货单，无需重复推送" };
+                else if (orderLines.Any(x => x.IsPushedToErp) || existingUids.Count > 1)
+                    result = new PuArrVouchAddResponseDto { Success = false,
+                        Message = "该采购订单的历史推送状态或UID不一致，请核对U8单据，禁止重复生单" };
+                else
+                {
+                    long uid;
+                    if (existingUids.Count == 1 && !sharedUids.Contains(existingUids[0]))
+                        uid = existingUids[0];
+                    else
+                    {
+                        uid = GeneratePuArrVouchUid();
+                        while (!reservedUids.Add(uid)) uid++;
+                    }
+                    result = await PushAsnOrderArrivalAsync(asnCode, group.Key, orderLines, uid);
+                }
+                results.Add((group.Key, result));
+            }
+            // 单订单保持原响应结构；多订单汇总结果，并保留各订单的独立回执。
+            if (results.Count == 1) return results[0].Result;
+            return new PuArrVouchAddResponseDto {
+                Success = results.All(x => x.Result.Success),
+                Message = string.Join("；", results.Select(x => $"采购订单{x.OrderCode}：{x.Result.Message}")),
+                ErpData = results.Select(x => new { x.OrderCode, x.Result.Success, x.Result.Message, x.Result.ErpData }).ToList()
+            };
+        }
+
+        /// <summary>推送同一送货单、同一采购订单的完整明细，并独立持久化UID及U8来源关联。</summary>
+        /// <param name="asnCode">送货单对应的ASN单号。</param>
+        /// <param name="orderCode">本张到货单的采购订单号，须与全部明细的来源订单号一致。</param>
+        /// <param name="lines">该采购订单尚未成功推送的完整ASN明细。</param>
+        /// <param name="uid">该订单的推送标识；网络请求前保存，失败重试沿用。</param>
+        /// <returns>本采购订单的到货单生成结果及U8回执。</returns>
+        private async Task<PuArrVouchAddResponseDto> PushAsnOrderArrivalAsync(
+            string asnCode, string orderCode, List<ErpAsn> lines, long uid)
+        {
+            var first = lines[0];
             foreach (var line in lines) line.BeginArrivalPush(uid);
             await SaveU8LinesAsync(lines);
             var request = new PuArrVouchAddRequestDto {
-                Uid = uid, CAsnCode = asnCode, CVenCode = first.SupplierCode, Cpocode = first.OrderCode,
+                Uid = uid, CAsnCode = asnCode, CVenCode = first.SupplierCode, Cpocode = orderCode,
                 DepartmentCode = first.DepartmentCode, Maker = first.Maker, ProcessTypeCode = first.ProcessTypeCode,
                 ExchangeName = first.ExchangeName, TaxRate = first.TaxRate, ExchangeRate = first.ExchangeRate,
                 Data = lines.Select(x => new PuArrVouchDetailRequestDto {

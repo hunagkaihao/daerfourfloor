@@ -810,6 +810,15 @@ namespace TuTa.Wms.Erp
                         };
                     }
 
+                    if (!string.Equals(detail.Cordercode, input.Cpocode, StringComparison.Ordinal))
+                    {
+                        return new PuArrVouchAddResponseDto
+                        {
+                            Success = false,
+                            Message = $"第{i + 1}行采购订单号{detail.Cordercode}与主表订单号{input.Cpocode}不一致，请按采购订单分别推送到货单"
+                        };
+                    }
+
                     // 数量以JSON整数发送；iNum沿用原有取整规则，其余数量禁止截断或舍入。
                     var quantities = new[]
                     {
@@ -1119,7 +1128,7 @@ namespace TuTa.Wms.Erp
             return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         }
 
-        /// <summary>构造U8到货报文，税率、汇率及数量以JSON整数发送，兼容接口Int32绑定。</summary>
+        /// <summary>构造同一采购订单的U8到货报文，保留明细来源，税率、汇率及数量以JSON整数发送。</summary>
         /// <param name="input">已通过必填项及数值整数、Int32范围校验的到货请求，箱数iNum沿用原有取整规则。</param>
         /// <param name="uid">本次到货推送标识，失败重试时沿用。</param>
         /// <returns>用于序列化的U8到货报文。</returns>
