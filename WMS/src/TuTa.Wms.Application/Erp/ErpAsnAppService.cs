@@ -800,6 +800,27 @@ namespace TuTa.Wms.Erp
                             Message = $"第{i + 1}行订单号不能为空"
                         };
                     }
+
+                    // 数量以JSON整数发送；iNum沿用原有取整规则，其余数量禁止截断或舍入。
+                    var quantities = new[]
+                    {
+                        (Name: "iQuantity", Value: detail.IQuantity),
+                        (Name: "iNum", Value: Math.Round(detail.INum, 0)),
+                        (Name: "fRealQuantity", Value: detail.FRealQuantity),
+                        (Name: "fRealNumy", Value: detail.FRealNumy)
+                    };
+                    foreach (var quantity in quantities)
+                    {
+                        if (quantity.Value != decimal.Truncate(quantity.Value) ||
+                            quantity.Value < int.MinValue || quantity.Value > int.MaxValue)
+                        {
+                            return new PuArrVouchAddResponseDto
+                            {
+                                Success = false,
+                                Message = $"第{i + 1}行数量字段{quantity.Name}必须为Int32范围内的整数，当前值：{quantity.Value}，请核对ASN数量后重试"
+                            };
+                        }
+                    }
                 }
 
                 // U8的itaxrate按Int32绑定，先验证数学整数及范围，禁止截断或舍入税率。
@@ -1089,8 +1110,8 @@ namespace TuTa.Wms.Erp
             return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         }
 
-        /// <summary>构造U8到货报文，已验证的税率及汇率以JSON整数发送，兼容接口Int32绑定。</summary>
-        /// <param name="input">已通过必填项、税率和汇率整数及Int32范围校验的到货请求。</param>
+        /// <summary>构造U8到货报文，税率、汇率及数量以JSON整数发送，兼容接口Int32绑定。</summary>
+        /// <param name="input">已通过必填项及数值整数、Int32范围校验的到货请求，箱数iNum沿用原有取整规则。</param>
         /// <param name="uid">本次到货推送标识，失败重试时沿用。</param>
         /// <returns>用于序列化的U8到货报文。</returns>
         private static object BuildPuArrVouchPayload(PuArrVouchAddRequestDto input, long uid)
@@ -1114,10 +1135,10 @@ namespace TuTa.Wms.Erp
                     ivouchrowno = index + 1,
                     cWhCode = item.WarehouseCode,
                     cInvCode = item.CInvCode,
-                    iQuantity = item.IQuantity,
-                    iNum = Math.Round(item.INum, 0),
-                    fRealQuantity = item.FRealQuantity,
-                    fRealNumy = item.FRealNumy,
+                    iQuantity = decimal.ToInt32(item.IQuantity),
+                    iNum = decimal.ToInt32(Math.Round(item.INum, 0)),
+                    fRealQuantity = decimal.ToInt32(item.FRealQuantity),
+                    fRealNumy = decimal.ToInt32(item.FRealNumy),
                     bGsp = item.Bgsp,
                     cBatch = item.CBatch,
                     iPOsID = item.IPoDetailId,

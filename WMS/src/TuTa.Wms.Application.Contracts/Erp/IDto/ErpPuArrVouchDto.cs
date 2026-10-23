@@ -63,25 +63,25 @@ namespace TuTa.Wms.Erp.Dto
         public string CInvCode { get; set; }
 
         /// <summary>
-        /// 入库数量
+        /// 入库数量；向U8发送时须为Int32范围内的整数，保留decimal源值。
         /// </summary>
         [Required]
         public decimal IQuantity { get; set; }
 
         /// <summary>
-        /// 入库箱数
+        /// 入库箱数；沿用Math.Round(..., 0)取整规则，结果按Int32发送。
         /// </summary>
         [Required]
         public decimal INum { get; set; }
 
         /// <summary>
-        /// 实际入库数量
+        /// 实际入库数量；向U8发送时须为Int32范围内的整数，保留decimal源值。
         /// </summary>
         [Required]
         public decimal FRealQuantity { get; set; }
 
         /// <summary>
-        /// 实际入库箱数
+        /// 实际入库箱数；向U8发送时须为Int32范围内的整数，保留decimal源值。
         /// </summary>
         [Required]
         public decimal FRealNumy { get; set; }
