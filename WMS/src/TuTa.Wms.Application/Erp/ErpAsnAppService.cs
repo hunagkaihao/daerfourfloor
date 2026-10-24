@@ -947,6 +947,13 @@ namespace TuTa.Wms.Erp
                 return new LLBJDAddResponseDto { Success = false, Message = "请求参数无效" };
             }
 
+            // U8仅支持单张报检单，一个表头下仍可包含多条来源于同一到货单的明细。
+            if (input.Data == null || input.Data.Count != 1)
+            {
+                return new LLBJDAddResponseDto { Success = false,
+                    Message = "U8来料报检接口每次只支持一张单据，请按到货单分别推送" };
+            }
+
             try
             {
                 _logger.LogInformation($"开始推送来料报检单，指令：{input.Cmd}，制单人：{input.Maker}");

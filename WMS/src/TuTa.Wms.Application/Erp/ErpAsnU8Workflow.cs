@@ -367,7 +367,7 @@ namespace TuTa.Wms.Erp
             }
         }
 
-        /// <summary>仓管员在U8审核到货单后主动报检；未审核错误保留失败状态供后续重试。</summary>
+        /// <summary>仓管员在U8审核到货单后逐单报检；各到货单独立保存结果，失败单据可重试。</summary>
         [UnitOfWork(IsDisabled = true)]
         public async Task<LLBJDAddResponseDto> PushAsnInspectionReportAsync(string asnCode)
         {
@@ -387,30 +387,98 @@ namespace TuTa.Wms.Erp
                     return new LLBJDAddResponseDto { Success = false, Message = "请先生成并关联完整U8到货单" };
                 if (lines.All(x => x.IsInspectionReportPushed))
                     return new LLBJDAddResponseDto { Success = true, Message = "来料报检单已推送" };
-                if (lines.Any(x => x.IsInspectionReportPushed))
-                    return new LLBJDAddResponseDto { Success = false, Message = "历史报检状态不一致，请核对U8单据" };
-                var uid = lines.Select(x => x.InspectionPushUid).FirstOrDefault(x => x.HasValue) ?? GeneratePuArrVouchUid();
-                foreach (var line in lines) line.RecordInspectionPush(uid, false, line.InspectionPushError);
-                await SaveU8LinesAsync(lines);
-                var result = await PushLLBJDAddAsync(new LLBJDAddRequestDto {
-                    Cmd = "LLBJDAdd", TaskId = uid.ToString(), Id = lines[0].ArrivalVoucherId.Value,
-                    Maker = lines[0].Maker ?? "WMS",
-                    Data = lines.GroupBy(x => x.ArrivalVoucherCode).Select(g => new LLBJDDataItem {
-                        AddType = 1, CSourceCode = g.Key, CInspectDepCode = lines[0].DepartmentCode,
-                        CMemo = "WMS到货审核后报检", Details = g.Select(x => new LLBJDDetail {
-                            SourceAutoId = x.ArrivalDetailId.Value, CInvCode = x.MaterialCode,
-                            CBatch = x.BatchCode, FQuantity = x.InWarehouseQuantity
-                        }).ToList()
-                    }).ToList()
-                });
-                // 按现场业务约定：U8用该错误表示到货单尚未审核；保留失败状态和任务号供审核后重试。
-                if (!result.Success && result.Message?.Contains("到货单信息为空", StringComparison.Ordinal) == true)
-                    result.Message = "到货单尚未由仓管员在U8审核，请等待审核通过后重新推送来料报检单。U8返回：" + result.Message;
-                foreach (var line in lines) line.RecordInspectionPush(uid, result.Success, result.Message);
-                await SaveU8LinesAsync(lines);
-                return result;
+
+                var groups = lines.GroupBy(x => x.ArrivalVoucherId.Value).ToList();
+                var sharedUidGroups = lines.Where(x => x.InspectionPushUid > 0).GroupBy(x => x.InspectionPushUid.Value)
+                    .Where(g => g.Select(x => x.ArrivalVoucherId.Value).Distinct().Count() > 1).ToList();
+                // 旧批量请求被U8明确拒绝后，才能将共用Taskid拆分；超时等结果不明的记录须先核对U8。
+                if (sharedUidGroups.Any(g => g.Any(x => x.IsInspectionReportPushed ||
+                    x.InspectionPushError?.Contains("接口只支持单张单据操作", StringComparison.Ordinal) != true)))
+                    return new LLBJDAddResponseDto { Success = false,
+                        Message = "历史报检Taskid被多张到货单共用，且生单结果未明确，请先核对U8报检单，禁止更换Taskid重复生单" };
+                var sharedUids = new HashSet<long>(sharedUidGroups.Select(g => g.Key));
+                var reservedUids = new HashSet<long>(lines.Where(x => x.InspectionPushUid > 0).Select(x => x.InspectionPushUid.Value));
+                // 将已明确失败的旧批量Taskid一次性迁移，避免中途退出后剩余单据继续沿用旧批量任务。
+                var migratedLines = new List<ErpAsn>();
+                foreach (var group in groups.Where(g => g.Any(x => x.InspectionPushUid.HasValue && sharedUids.Contains(x.InspectionPushUid.Value))))
+                {
+                    if (group.Any(x => x.IsInspectionReportPushed) ||
+                        group.Where(x => x.InspectionPushUid > 0).Select(x => x.InspectionPushUid.Value).Distinct().Count() > 1)
+                        return new LLBJDAddResponseDto { Success = false,
+                            Message = $"到货单{group.First().ArrivalVoucherCode}的历史报检状态或Taskid不一致，请核对U8报检单" };
+                    var uid = GeneratePuArrVouchUid();
+                    while (!reservedUids.Add(uid)) uid++;
+                    foreach (var line in group) line.RecordInspectionPush(uid, false, line.InspectionPushError);
+                    migratedLines.AddRange(group);
+                }
+                if (migratedLines.Count > 0) await SaveU8LinesAsync(migratedLines);
+
+                var results = new List<(string ArrivalCode, LLBJDAddResponseDto Result)>();
+                foreach (var group in groups)
+                {
+                    var arrivalLines = group.ToList();
+                    var first = arrivalLines[0];
+                    var existingUids = arrivalLines.Where(x => x.InspectionPushUid > 0)
+                        .Select(x => x.InspectionPushUid.Value).Distinct().ToList();
+                    LLBJDAddResponseDto result;
+                    if (arrivalLines.All(x => x.IsInspectionReportPushed))
+                        result = new LLBJDAddResponseDto { Success = true, Code = 1, Message = "来料报检单已推送，无需重复生成" };
+                    else if (arrivalLines.Any(x => x.IsInspectionReportPushed) || existingUids.Count > 1 ||
+                        arrivalLines.Any(x => x.ArrivalVoucherCode != first.ArrivalVoucherCode))
+                        result = new LLBJDAddResponseDto { Success = false,
+                            Message = "该到货单的历史报检状态、Taskid或来源单号不一致，请核对U8单据，禁止重复生单" };
+                    else
+                    {
+                        long uid;
+                        if (existingUids.Count == 1) uid = existingUids[0];
+                        else
+                        {
+                            uid = GeneratePuArrVouchUid();
+                            while (!reservedUids.Add(uid)) uid++;
+                        }
+                        result = await PushArrivalInspectionReportAsync(arrivalLines, uid);
+                    }
+                    results.Add((first.ArrivalVoucherCode, result));
+                }
+                if (results.Count == 1) return results[0].Result;
+                var success = results.All(x => x.Result.Success);
+                return new LLBJDAddResponseDto {
+                    Success = success, Code = success ? 1 : -1,
+                    Message = string.Join("；", results.Select(x => $"到货单{x.ArrivalCode}：{x.Result.Message}")),
+                    Data = Newtonsoft.Json.JsonConvert.SerializeObject(results.Select(x => new {
+                        ArrivalVoucherCode = x.ArrivalCode, x.Result.Success, x.Result.Code, x.Result.Message, x.Result.Data
+                    }))
+                };
             }
             finally { LocalPushLock.Release(); }
+        }
+
+        /// <summary>为一张U8到货单生成来料报检单，单次Data只包含一个报检表头。</summary>
+        /// <param name="lines">同一到货单尚未报检成功的完整ASN明细，须包含真实来源主表及明细ID。</param>
+        /// <param name="uid">本张到货单的独立报检Taskid，失败重试沿用。</param>
+        /// <returns>本张到货单的报检结果；未审核时返回等待审核提示。</returns>
+        private async Task<LLBJDAddResponseDto> PushArrivalInspectionReportAsync(List<ErpAsn> lines, long uid)
+        {
+            var first = lines[0];
+            foreach (var line in lines) line.RecordInspectionPush(uid, false, line.InspectionPushError);
+            await SaveU8LinesAsync(lines);
+            var result = await PushLLBJDAddAsync(new LLBJDAddRequestDto {
+                Cmd = "LLBJDAdd", TaskId = uid.ToString(), Id = first.ArrivalVoucherId.Value,
+                Maker = first.Maker ?? "WMS",
+                Data = new List<LLBJDDataItem> { new LLBJDDataItem {
+                    AddType = 1, CSourceCode = first.ArrivalVoucherCode, CInspectDepCode = first.DepartmentCode,
+                    CMemo = "WMS到货审核后报检", Details = lines.Select(x => new LLBJDDetail {
+                        SourceAutoId = x.ArrivalDetailId.Value, CInvCode = x.MaterialCode,
+                        CBatch = x.BatchCode, FQuantity = x.InWarehouseQuantity
+                    }).ToList()
+                } }
+            });
+            // 按现场业务约定，U8用该错误表示对应到货单尚未审核；不影响其他到货单独立报检。
+            if (!result.Success && result.Message?.Contains("到货单信息为空", StringComparison.Ordinal) == true)
+                result.Message = "到货单尚未由仓管员在U8审核，请等待审核通过后重新推送来料报检单。U8返回：" + result.Message;
+            foreach (var line in lines) line.RecordInspectionPush(uid, result.Success, result.Message);
+            await SaveU8LinesAsync(lines);
+            return result;
         }
     }
 }

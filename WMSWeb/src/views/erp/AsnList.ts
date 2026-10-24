@@ -359,13 +359,13 @@ function groupAsnListItems(items: AsnWorkflowLine[] = []): AsnGroupRow[] {
       lineCount: lines.length,
       asnItems: lines,
       canPushArrival: activeLines.length > 0 && activeLines.every(line => Number(line.iquantity) > 0) && !allPushed,
-      canPushInspection: allPushed && !anyReported && activeLines.every((line) =>
+      canPushInspection: allPushed && !allReported && activeLines.every((line) =>
         !!line.arrivalVoucherId && !!line.arrivalVoucherCode && !!line.arrivalDetailId),
       arrivalStatus: allPushed ? '已推送' : anyPushed ? '部分已推送' : arrivalPushError ? '推送失败' : '待推送',
       arrivalVoucherCode: [...new Set(activeLines.map((line) => line.arrivalVoucherCode).filter(Boolean))].join('、'),
       pushTime: activeLines.find((line) => line.pushTime)?.pushTime,
       arrivalPushError,
-      inspectionStatus: allReported ? '已推送' : anyReported ? '状态异常' : inspectionPushError ? '推送失败' : '待推送',
+      inspectionStatus: allReported ? '已推送' : anyReported ? '部分已推送' : inspectionPushError ? '推送失败' : '待推送',
       inspectionPushError,
     };
   });

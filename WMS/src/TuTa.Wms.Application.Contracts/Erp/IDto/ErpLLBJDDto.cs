@@ -14,7 +14,7 @@ namespace TuTa.Wms.Erp.IDto
         public string Cmd { get; set; }
 
         /// <summary>
-        /// 任务ID
+        /// 本张到货单的独立报检任务ID，失败重试沿用，不与其他到货单共用。
         /// </summary>
         public string TaskId { get; set; }
 
@@ -24,17 +24,17 @@ namespace TuTa.Wms.Erp.IDto
         public string Maker { get; set; }
 
         /// <summary>
-        /// 主键ID
+        /// 本次报检来源到货单的主表ID。
         /// </summary>
         public long Id { get; set; }
 
         /// <summary>
-        /// 报检单数据（序列化后会自动转换为 JSON 字符串）
+        /// 报检单数据；每次只允许一个表头，可包含多条明细，发送时转换为JSON字符串。
         /// </summary>
         public List<LLBJDDataItem> Data { get; set; }
     }
     /// <summary>
-    /// Data 数组中的报检单明细对象
+    /// Data 数组中的单张报检单表头及明细。
     /// </summary>
     public class LLBJDDataItem
     {

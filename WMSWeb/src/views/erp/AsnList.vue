@@ -25,7 +25,7 @@
         </Button>
         <Button type="link" :disabled="!record.canPushInspection || !!pushing[record.ccode]"
           :loading="pushing[record.ccode] === 'inspection'" @click="handlePush(record, 'inspection')">
-          {{ record.inspectionPushError ? '重试报检单' : '生成报检单' }}
+          {{ record.inspectionPushError || record.inspectionStatus === '部分已推送' ? '重试报检单' : '生成报检单' }}
         </Button>
       </template>
     </BasicTable>

@@ -65,7 +65,7 @@ namespace TuTa.Wms.Erp
 
         /// <summary>完整ASN到货单生成/失败重试，保留来源单据关联。</summary>
         Task<PuArrVouchAddResponseDto> PushAsnArrivalAsync(string asnCode);
-        /// <summary>到货成功后生成来料报检单，不查询来料检验单。</summary>
+        /// <summary>到货成功后按到货单分别生成来料报检单，失败重试仅处理尚未成功的单据。</summary>
         Task<LLBJDAddResponseDto> PushAsnInspectionReportAsync(string asnCode);
 
         /// <summary>从U8查询当前ASN的来料检验单，严格校验来源和审核、合格数量。</summary>
