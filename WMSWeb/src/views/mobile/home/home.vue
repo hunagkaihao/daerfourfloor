@@ -167,12 +167,12 @@
         </a-row> 
         <a-row justify="center" style="margin-top: 20px; margin-bottom: 20px">
           <a-col :span="8">
-<!--             <div class="menu-item-card" @click="materialSampling">
-               <div class="menu-item-icon-wrapper">
-                 <AppstoreOutlined class="menu-item-icon" />
-               </div>
-               <div class="menu-item-text">物料抽检</div>
-             </div>-->
+            <div class="menu-item-card" @click="remainderCabinetEntry">
+              <div class="menu-item-icon-wrapper">
+                <DatabaseOutlined class="menu-item-icon" />
+              </div>
+              <div class="menu-item-text">零头柜</div>
+            </div>
            </a-col>
           <a-col :span="8">
               <div class="menu-item-card" @click="materialOut">
@@ -384,6 +384,10 @@ const inboundReturn = async () => {
 };
 const boxdiskWithAsn = async () => {
   await router.replace('/boxDiskWithAsn');
+};
+/** ASN管理直接进入零头柜录入，不要求先扫描组盘库位或容器。 */
+const remainderCabinetEntry = async () => {
+  await router.replace('/asnRemainderCabinet');
 };
 const scanAsn = async () => {
   await router.replace('/scanAsn');

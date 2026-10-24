@@ -8,6 +8,10 @@ export interface AsnMaterialInspectionLine {
   cinvcode?: string;
   cinvname?: string;
   cbatch?: string;
+  /** ASN等级，与零头柜标识卡第4段匹配。 */
+  cfree5?: string;
+  /** ASN物料计量单位。 */
+  cinfvm_unit?: string;
   iquantity?: number;
   alreadyStockInQuantity?: number;
   status?: number;

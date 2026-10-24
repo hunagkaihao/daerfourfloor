@@ -176,6 +176,17 @@ export const BoxDiskWithAsn: AppRouteRecordRaw = {
     ignoreAuth: true,
   },
 };
+/** PDA零头柜独立入口，复用ASN合格零头登记，不参与托盘搬运。 */
+export const AsnRemainderCabinet: AppRouteRecordRaw = {
+  path: '/asnRemainderCabinet',
+  name: 'AsnRemainderCabinet',
+  component: () => import('/@/views/mobile/views/asn/AsnRemainderCabinet.vue'),
+  meta: {
+    title: t('零头柜录入'),
+    ignoreKeepAlive: true,
+    ignoreAuth: true,
+  },
+};
 //容器入库
 export const BoxIncell: AppRouteRecordRaw = {
   path: '/boxIncell',
@@ -431,6 +442,7 @@ export const basicRoutes = [
   BoxDisk,
   InboundReturn,
   BoxDiskWithAsn,
+  AsnRemainderCabinet,
   BoxIncell,
   ContainerUnbind,
   AgvTaskManage,

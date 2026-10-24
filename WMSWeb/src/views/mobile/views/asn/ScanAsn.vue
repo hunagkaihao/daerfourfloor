@@ -2,6 +2,9 @@
     <div class="scan-asn-container">
         <Header numb="扫描ASN"></Header>
         <U8InboundActions :asn-code="asnCode" :show-asn-input="false" @workflow-completed="refreshLocalAsn" />
+        <div class="remainder-action">
+            <a-button :disabled="loading || saving" @click="openRemainderCabinet">零头柜管理</a-button>
+        </div>
         
         <a-row class="input-row">
             <a-col :span="6">
@@ -96,6 +99,7 @@ import { ref, onMounted } from 'vue';
 import { ScanOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 import Header from '../../header/Header.vue';
+import { router } from '/@/router';
 import { ERP_ASNServiceProxy, ErpAsnDto, ErpAsnSaveResponseDto } from '/@/services/ServiceProxies';
 
 const asnInput = ref<any>();
@@ -108,6 +112,12 @@ const saving = ref(false);
 const showSaveSuccess = ref(false);
 
 const asnService = new ERP_ASNServiceProxy();
+
+/** 进入独立零头柜管理，不关联当前ASN单号。 */
+function openRemainderCabinet() {
+    if (loading.value || saving.value) return;
+    return router.push('/asnRemainderCabinet');
+}
 
 onMounted(() => {
     setTimeout(() => {
@@ -205,6 +215,10 @@ async function saveAsnInfo() {
 </script>
 
 <style scoped lang="less">
+.remainder-action {
+    margin: 10px 16px;
+}
+
 .scan-asn-container {
     min-height: 100vh;
     background: #ffffff;

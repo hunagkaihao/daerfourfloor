@@ -25,6 +25,24 @@ namespace TuTa.Wms.Stocks
         /// 物料绑定容器（组盘入库），并更新ASN已入库数量
         /// </summary>
         Task<ResponseDto> CreateStockAndBindBoxWithAsnAsync(List<StockCreateDto> paras, string boxCode, string orderCode);
+
+        /// <summary>查询4楼叉车库零头柜格位、固定物料等级及现有库存。</summary>
+        Task<RemainderCabinetDto> GetRemainderCabinetAsync(string cellCode);
+
+        /// <summary>将检验合格的ASN剩余零头计入统一库存，重试沿用原RequestId，不创建AGV任务。</summary>
+        Task<ResponseDto> StoreAsnRemainderAsync(RemainderCabinetEntryDto input);
+
+        /// <summary>独立寄存存货、等级、柜位及数量，不关联ASN。</summary>
+        Task<ResponseDto> DepositRemainderAsync(RemainderCabinetDepositDto input);
+
+        /// <summary>查询零头柜统一库存，支持扫描存货或柜位及分页。</summary>
+        Task<PagedResultDto<RemainderCabinetBalanceDto>> GetRemainderStocksAsync(RemainderCabinetQueryDto input);
+
+        /// <summary>按存货、货位、等级及日期模糊查询寄存、领用流水。</summary>
+        Task<PagedResultDto<RemainderCabinetHistoryDto>> GetRemainderHistoriesAsync(RemainderCabinetQueryDto input);
+
+        /// <summary>按存货、等级及实际柜位领用，同事务扣减可用数量并记录流水。</summary>
+        Task<ResponseDto> WithdrawRemainderAsync(RemainderCabinetWithdrawDto input);
         //创建托盘搬运任务
         Task<ResponseDto> CreateStockTask(string boxCode, string startCellCode, string endCellCode);
 

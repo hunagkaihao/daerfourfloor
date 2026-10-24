@@ -1,6 +1,11 @@
 <template>
     <div class="box-disk-container">
         <Header numb="组盘(ASN)"></Header>
+        <div style="margin: 8px 12px">
+            <a-button :disabled="submitting || !!pendingTransport || goods.length > 0"
+                @click="openRemainderCabinet">零头柜管理</a-button>
+            <span style="margin-left: 8px">零头柜独立登记存货、等级、柜位及数量。</span>
+        </div>
         <U8InboundActions :asn-code="asnCodeValidated || asnCode" :show-asn-input="false" @inspection-results="inspectionChecks = $event" />
         <a-row class="input-row">
             <a-col :span="6">
@@ -126,6 +131,7 @@ import { useMessage } from '/@/hooks/web/useMessage';
 import { validateAsn } from '/@/views/mobile/views/Material';
 import { createAsnBoxItem } from './AsnBoxGrouping';
 import { queryAsnGroupingInspection, U8InspectionLine } from './U8InboundApi';
+import { router } from '/@/router';
 import { stockCreateAndBindBoxWithAsn } from './BoxDiskWithAsn';
 import { stocksGetInBox, columns, stocksDisBindBox, stockRemoveDirect, stocksQuery, stocksGetInCell, createStockTask } from '../views/Stock';
 import { getLaneCellStatusByCellCode } from '/@/views/warehouse/cells/Cell';
@@ -151,6 +157,12 @@ const selectedLineId = ref<string>();
 const submitting = ref(false);
 /** 组盘已提交但AGV任务尚未确认成功时，只重试搬运，不再次提交箱码。 */
 const pendingTransport = ref<{ cellCode: string; boxCode?: string } | null>(null);
+
+/** 零头柜独立管理，不携带ASN，也不改写当前组盘的ASN数量。 */
+function openRemainderCabinet() {
+    if (submitting.value || pendingTransport.value || goods.value.length > 0) return;
+    return router.push('/asnRemainderCabinet');
+}
 const laneCellStatusList = ref<CellLaneStatusDto[]>([]);
 
 const fetchLaneCellStatus = async () => {

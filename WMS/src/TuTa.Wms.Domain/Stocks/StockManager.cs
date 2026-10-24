@@ -22,6 +22,35 @@ namespace TuTa.Wms.Stocks
             _materialRepository = materialRepository;
         }
 
+        /// <summary>创建零头柜平库库存，以提交标识作为库存主键，避免网络重试生成重复库存。</summary>
+        /// <param name="requestId">稳定提交标识，同时用作新库存ID。</param>
+        /// <param name="quantity">实际入柜数量，单位同物料。</param>
+        /// <param name="material">真实物料主数据。</param>
+        /// <param name="supplier">ASN供应商及批次信息。</param>
+        /// <param name="batchCode">ASN来源批号。</param>
+        /// <returns>等待U8采购入库确认的库存；不绑定托盘或虚构满箱数量。</returns>
+        public Stock CreateRemainderCabinetStock(Guid requestId, decimal quantity,
+            MaterialInfoOfStock material, SupplierInfoOfStock supplier, string batchCode)
+        {
+            if (requestId == Guid.Empty) throw new ArgumentException("零头入柜提交标识不能为空", nameof(requestId));
+            return new Stock(requestId, material.MaterialCode, quantity, material,
+                new CountInfoOfStock(quantity, 0, null), supplier, StockInType.PurchaseStockIn,
+                StockStatus.Waiting, batchCode, null, null);
+        }
+
+
+        /// <summary>创建独立零头柜寄存库存，物料等级由调用方设置，不关联ASN、不虚构采购或检验单。</summary>
+        /// <param name="requestId">稳定提交标识，同时为库存主键。</param>
+        /// <param name="quantity">实际寄存数量，单位同物料。</param>
+        /// <param name="material">已有物料主数据。</param>
+        /// <returns>可领用的平库库存，无托盘、批次、供应商及单据关联。</returns>
+        public Stock CreateRemainderDepositStock(Guid requestId, decimal quantity, MaterialInfoOfStock material)
+        {
+            if (requestId == Guid.Empty) throw new ArgumentException("寄存提交标识不能为空", nameof(requestId));
+            return new Stock(requestId, material.MaterialCode, quantity, material,
+                new CountInfoOfStock(quantity, 0, null), new SupplierInfoOfStock(null, null, null),
+                StockInType.RemainderDeposit, StockStatus.Available, null, null, null);
+        }
 
         public async Task<Stock> CreateStockAsync(
             string barcode,

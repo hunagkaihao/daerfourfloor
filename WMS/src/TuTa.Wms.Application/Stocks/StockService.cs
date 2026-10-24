@@ -236,28 +236,7 @@ namespace TuTa.Wms.Stocks
                 }
                 finally { ErpAsnAppService.LocalPushLock.Release(); }
                 // 本地组盘只记账一次；整单全部校验通过后再生采购入库，失败可独立重试。
-                List<ErpAsn> lines;
-                using (var read = UnitOfWorkManager.Begin(true, false))
-                {
-                    lines = (await _erpAsnRepository.GetListByAsnCodeAsync(asnCodes[0]))
-                        .Where(x => x.Status != AsnStatus.Cancelled).ToList();
-                    await read.CompleteAsync();
-                }
-                if (lines.Count > 0 && lines.All(x => x.InWarehouseQuantity > 0 &&
-                    (x.AlreadyStockInQuantity ?? 0) == x.InWarehouseQuantity))
-                {
-                    foreach (var line in lines)
-                    {
-                        try
-                        {
-                            var push = await _erpAsnAppService.PushInspectionPurchaseAsync(line.Id);
-                            result.message += push?.Success == true ? "，采购入库已推送U8" :
-                                "，本地组盘已保存，U8采购入库待重试：" + (push?.Message ?? "接口无返回");
-                        }
-                        catch (Exception ex) { result.message += "，本地组盘已保存，U8采购入库待重试：" + ex.Message; }
-                    }
-                }
-                else result.message += "，待整张ASN全部逐箱组盘后推送采购入库";
+                result.message += await TryPushPurchaseAfterAsnStoredAsync(asnCodes[0]);
                 return result;
             }
             catch (Exception ex)

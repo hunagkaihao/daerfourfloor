@@ -42,7 +42,10 @@ namespace TuTa.Wms.Stocks
         /// <summary>
         /// 调整库存入库，用于不正确出库时，重新入库时用
         /// </summary>
-        AdjustStockIn = 20
+        AdjustStockIn = 20,
+
+        /// <summary>零头柜独立寄存，不关联ASN或U8单据。</summary>
+        RemainderDeposit = 21
     }
 
     public static class StockInTypeHelper
@@ -67,6 +70,8 @@ namespace TuTa.Wms.Stocks
                     return "调整库存入库";
                 case StockInType.OpeningStockIn:
                     return "期初入库";
+                case StockInType.RemainderDeposit:
+                    return "零头柜寄存";
                 default: throw new Exception($"无效的入库类型：{type.ToString()}");
             }
         }
@@ -91,6 +96,8 @@ namespace TuTa.Wms.Stocks
                     return StockInType.AdjustStockIn;
                 case "期初入库":
                     return StockInType.OpeningStockIn;
+                case "零头柜寄存":
+                    return StockInType.RemainderDeposit;
                 default: throw new Exception($"无效的入库类型：{chinese}");
             }
         }

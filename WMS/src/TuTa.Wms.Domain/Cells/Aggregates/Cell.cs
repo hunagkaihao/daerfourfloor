@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using TuTa.Wms.Cells.Entities;
 using Volo.Abp;
+using Volo.Abp.Data;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace TuTa.Wms.Cells.Aggregates
@@ -143,6 +145,62 @@ namespace TuTa.Wms.Cells.Aggregates
         public void SetCellStatus(CellStatus status)
         {
             CellStatus = status;
+        }
+
+        /// <summary>零头格位固定物料，保存在现有ExtraProperties中，不随库存清空而释放。</summary>
+        [NotMapped]
+        public string RemainderMaterialCode => this.GetProperty<string>("RemainderMaterialCode");
+
+        /// <summary>零头格位固定等级，未首次绑定时为空。</summary>
+        [NotMapped]
+        public string RemainderGrade => this.GetProperty<string>("RemainderGrade");
+
+        /// <summary>首次入柜绑定物料和等级；以后只允许相同物料、相同等级入柜。</summary>
+        /// <param name="materialCode">标识卡物料编码。</param>
+        /// <param name="grade">标识卡等级，不能为空。</param>
+        public void BindRemainderMaterial(string materialCode, string grade)
+        {
+            Check.NotNullOrWhiteSpace(materialCode, nameof(materialCode));
+            Check.NotNullOrWhiteSpace(grade, nameof(grade));
+            if ((!string.IsNullOrEmpty(RemainderMaterialCode) && RemainderMaterialCode != materialCode) ||
+                (!string.IsNullOrEmpty(RemainderGrade) && RemainderGrade != grade))
+                throw new UserFriendlyException($"柜位{CellCode}固定存放{RemainderMaterialCode}/{RemainderGrade}，不能混放其他物料或等级");
+            this.SetProperty("RemainderMaterialCode", materialCode);
+            this.SetProperty("RemainderGrade", grade);
+        }
+
+        /// <summary>读取独立寄存摘要，库存取空后仍可确认原请求，防止重复增加库存。</summary>
+        public string GetRemainderDepositFingerprint(Guid requestId)
+            => this.GetProperty<string>("RemainderDeposit:" + requestId.ToString("N"));
+
+        /// <summary>与寄存库存及入库流水在同一事务内记录请求摘要。</summary>
+        /// <param name="requestId">稳定寄存标识。</param>
+        /// <param name="fingerprint">存货、等级、柜位及数量摘要。</param>
+        public void RecordRemainderDeposit(Guid requestId, string fingerprint)
+        {
+            if (requestId == Guid.Empty) throw new UserFriendlyException("寄存提交标识不能为空");
+            Check.NotNullOrWhiteSpace(fingerprint, nameof(fingerprint));
+            var previous = GetRemainderDepositFingerprint(requestId);
+            if (previous != null && previous != fingerprint)
+                throw new UserFriendlyException("寄存提交标识已用于其他数据，请核对原记录");
+            this.SetProperty("RemainderDeposit:" + requestId.ToString("N"), fingerprint);
+        }
+
+        /// <summary>读取领用请求摘要，库存取空删除后仍可确认原请求，防止重试重复扣减。</summary>
+        public string GetRemainderWithdrawalFingerprint(Guid requestId)
+            => this.GetProperty<string>("RemainderWithdrawal:" + requestId.ToString("N"));
+
+        /// <summary>与库存扣减、领用流水在同一事务内登记请求摘要，不解除固定物料和等级绑定。</summary>
+        /// <param name="requestId">本次领用的稳定标识。</param>
+        /// <param name="fingerprint">原柜位、库存、扫码和数量的摘要。</param>
+        public void RecordRemainderWithdrawal(Guid requestId, string fingerprint)
+        {
+            if (requestId == Guid.Empty) throw new UserFriendlyException("领用提交标识不能为空");
+            Check.NotNullOrWhiteSpace(fingerprint, nameof(fingerprint));
+            var previous = GetRemainderWithdrawalFingerprint(requestId);
+            if (previous != null && previous != fingerprint)
+                throw new UserFriendlyException("领用提交标识已用于其他数据，请核对原记录");
+            this.SetProperty("RemainderWithdrawal:" + requestId.ToString("N"), fingerprint);
         }
 
         /// <summary>

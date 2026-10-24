@@ -32,6 +32,36 @@ namespace TuTa.Wms.Controllers.Stocks
             _stockService = stockService;
         }
 
+        /// <summary>查询零头柜格位固定物料、等级及统一库存。</summary>
+        [HttpGet("remainder-cabinet")]
+        public Task<RemainderCabinetDto> GetRemainderCabinetAsync(string cellCode)
+            => _stockService.GetRemainderCabinetAsync(cellCode);
+
+        /// <summary>ASN合格零头人工入柜，独立记录来源、批次和数量。</summary>
+        [HttpPost("asn-remainder-entry")]
+        public Task<ResponseDto> StoreAsnRemainderAsync([FromBody] RemainderCabinetEntryDto input)
+            => _stockService.StoreAsnRemainderAsync(input);
+
+        /// <summary>零头柜独立寄存，不关联ASN或U8单据。</summary>
+        [HttpPost("remainder-deposit")]
+        public Task<ResponseDto> DepositRemainderAsync([FromBody] RemainderCabinetDepositDto input)
+            => _stockService.DepositRemainderAsync(input);
+
+        /// <summary>零头柜统一库存分页查询。</summary>
+        [HttpGet("remainder-stocks")]
+        public Task<PagedResultDto<RemainderCabinetBalanceDto>> GetRemainderStocksAsync([FromQuery] RemainderCabinetQueryDto input)
+            => _stockService.GetRemainderStocksAsync(input);
+
+        /// <summary>零头柜寄存及领用流水分页查询。</summary>
+        [HttpGet("remainder-histories")]
+        public Task<PagedResultDto<RemainderCabinetHistoryDto>> GetRemainderHistoriesAsync([FromQuery] RemainderCabinetQueryDto input)
+            => _stockService.GetRemainderHistoriesAsync(input);
+
+        /// <summary>零头柜实际库存领用。</summary>
+        [HttpPost("remainder-withdraw")]
+        public Task<ResponseDto> WithdrawRemainderAsync([FromBody] RemainderCabinetWithdrawDto input)
+            => _stockService.WithdrawRemainderAsync(input);
+
         [HttpPost("pagedStocksQuery")]
         public async Task<PagedResultDto<StockDto>> GetPagedStocksAsync(PagedStockQueryDto para)
         {

@@ -364,6 +364,25 @@ namespace TuTa.Wms.Erp.Entities
             this.SetProperty("U8GroupedBoxes", JsonConvert.SerializeObject(boxes));
         }
 
+        /// <summary>读取零头入柜提交摘要，库存出库或删除后仍保留，避免重试重复计入ASN数量。</summary>
+        /// <param name="requestId">本次入柜的稳定提交标识。</param>
+        /// <returns>原请求摘要，未入账时为空。</returns>
+        public string GetRemainderEntryFingerprint(Guid requestId)
+            => this.GetProperty<string>("RemainderEntry:" + requestId.ToString("N"));
+
+        /// <summary>在库存及ASN数量更新的同一事务内登记零头入柜摘要。</summary>
+        /// <param name="requestId">稳定提交标识，不能为空GUID。</param>
+        /// <param name="fingerprint">原始请求摘要，重试不得更换柜位、物料、来源或数量。</param>
+        public void RecordRemainderEntry(Guid requestId, string fingerprint)
+        {
+            if (requestId == Guid.Empty) throw new UserFriendlyException("零头入柜提交标识不能为空");
+            Check.NotNullOrWhiteSpace(fingerprint, nameof(fingerprint));
+            var previous = GetRemainderEntryFingerprint(requestId);
+            if (previous != null && previous != fingerprint)
+                throw new UserFriendlyException("该提交标识已用于其他零头入柜数据，请核对原入库记录");
+            this.SetProperty("RemainderEntry:" + requestId.ToString("N"), fingerprint);
+        }
+
         // 复用已映射的ExtraProperties持久化采购推送信息，兼容已有ASN记录，无需增加数据库列。
         /// <summary>采购推送任务号，首次生成后失败重试保持不变。</summary>
         [NotMapped]
