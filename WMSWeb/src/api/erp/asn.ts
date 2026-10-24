@@ -34,6 +34,9 @@ export type AsnWorkflowLine = ErpAsnDto & {
   arrivalPushAttemptTime?: string;
   isInspectionReportPushed?: boolean;
   inspectionPushError?: string;
+  /** 物料人工检验状态，与报检接口推送结果分开。 */
+  materialInspectionStatus?: number;
+  materialInspectionStatusName?: string;
 };
 
 /** U8推送响应，message保留客户接口的具体失败原因。 */

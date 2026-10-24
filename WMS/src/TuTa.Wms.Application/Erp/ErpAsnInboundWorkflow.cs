@@ -31,7 +31,7 @@ namespace TuTa.Wms.Erp
                 if (lines.Any(x => x.InWarehouseQuantity <= 0 || (x.AlreadyStockInQuantity ?? 0) != x.InWarehouseQuantity))
                     foreach (var row in result.Items) row.CanPurchase = false;
                 result.Success = true;
-                result.Message = "查询完成；仅来源匹配、已审核且整批合格的检验单可采购入库";
+                result.Message = "查询完成；组盘以本地人工检验合格为准，采购入库仍需U8检验单来源完整、已审核且整批合格";
             }
             catch (Exception ex) { result.Message = "U8检验单查询失败：" + ex.Message; }
             return result;
@@ -62,7 +62,10 @@ namespace TuTa.Wms.Erp
         private async Task<U8InspectionLineDto> QueryInspectionLineAsync(ErpAsn line)
         {
             var result = new U8InspectionLineDto { AsnLineId = line.Id, MaterialCode = line.MaterialCode,
-                BatchCode = line.BatchCode, IsPurchasePushed = line.IsPurchasePushed };
+                BatchCode = line.BatchCode, IsPurchasePushed = line.IsPurchasePushed,
+                CanGroup = line.IsInspectionReportPushed && line.MaterialInspectionStatus == Stocks.InspectionStatus.InspectionQualified,
+                GroupedQuantity = line.AlreadyStockInQuantity ?? 0,
+                PendingGroupingQuantity = Math.Max(0, line.InWarehouseQuantity - (line.AlreadyStockInQuantity ?? 0)) };
             if (!line.IsInspectionReportPushed || string.IsNullOrWhiteSpace(line.ArrivalVoucherCode) || !line.ArrivalDetailId.HasValue)
             {
                 result.Message = "请先完成到货单审核及来料报检"; return result;
@@ -112,8 +115,9 @@ namespace TuTa.Wms.Erp
             // 重复行和多张检验单都需人工核对，不能自行选择第一条。
             if (matches.Count != 1)
             {
-                result.Message = matches.Count == 0 ? "未找到与当前到货单、明细、物料及批次匹配的来料检验单，请等待检验完成"
-                    : "存在多条匹配检验记录，请核对U8，暂不自动采购入库";
+                result.Message = (result.CanGroup ? "本地已确认合格，可组盘；" : "请在物料状态变更页确认合格；") +
+                    (matches.Count == 0 ? "未找到匹配的U8来料检验单，暂不能采购入库"
+                    : "存在多条匹配检验记录，请核对U8，暂不自动采购入库");
                 return result;
             }
             var check = matches[0];
@@ -125,15 +129,15 @@ namespace TuTa.Wms.Erp
             var rejected = string.Equals(InspectionField(check, "BREJFLAG")?.ToString(), "true", StringComparison.OrdinalIgnoreCase)
                 || InspectionField(check, "BREJFLAG")?.ToString() == "1";
             var disqualified = InspectionQuantity(check, "FDISQUANTITY");
-            result.CanGroup = result.CheckId.HasValue && !string.IsNullOrWhiteSpace(result.CheckCode) && verified &&
+            var u8Qualified = result.CheckId.HasValue && !string.IsNullOrWhiteSpace(result.CheckCode) && verified &&
                 !rejected && disqualified == 0 && result.QualifiedQuantity > 0 &&
                 result.QualifiedQuantity == line.InWarehouseQuantity;
-            result.GroupedQuantity = line.AlreadyStockInQuantity ?? 0;
-            result.PendingGroupingQuantity = Math.Max(0, line.InWarehouseQuantity - result.GroupedQuantity);
-            result.CanPurchase = result.CanGroup && result.GroupedQuantity == line.InWarehouseQuantity;
-            result.Message = result.CanGroup ? line.PurchasePushError ?? (line.IsPurchasePushed ? "采购入库已推送" :
-                result.PendingGroupingQuantity > 0 ? "检验已合格，请一箱一扫组盘" : "组盘完成，可推送采购入库")
-                : "检验单未审核、非整批合格或数量不一致，禁止组盘及采购入库；部分合格请人工处理";
+            result.CanPurchase = result.CanGroup && u8Qualified && result.GroupedQuantity == line.InWarehouseQuantity;
+            result.Message = !result.CanGroup
+                ? $"当前{GetMaterialInspectionStatusName(line.MaterialInspectionStatus)}，请在物料状态变更页确认合格后组盘"
+                : !u8Qualified ? "本地已确认合格，可逐箱组盘；U8检验单未审核、非整批合格或数量不一致，暂不能采购入库"
+                : line.PurchasePushError ?? (line.IsPurchasePushed ? "采购入库已推送" :
+                    result.PendingGroupingQuantity > 0 ? "人工检验已合格，请一箱一扫组盘" : "组盘完成，可推送采购入库");
             return result;
         }
 

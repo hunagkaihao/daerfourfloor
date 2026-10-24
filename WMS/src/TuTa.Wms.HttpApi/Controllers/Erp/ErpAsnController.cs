@@ -117,6 +117,13 @@ namespace TuTa.Wms.Controllers.Erp
             return _erpAsnAppService.PushAsnInspectionReportAsync(asnCode);
         }
 
+        /// <summary>按ASN和采购订单人工确认物料检验结果：2合格、3不合格。</summary>
+        [HttpPost("material-inspection-status")]
+        public Task<ErpAsnValidateResponseDto> SetAsnOrderInspectionStatusAsync(string asnCode, string orderCode, int inspectionStatus)
+        {
+            return _erpAsnAppService.SetAsnOrderInspectionStatusAsync(asnCode, orderCode, inspectionStatus);
+        }
+
         /// <summary>查询ASN对应来料检验单，未匹配或未审核时返回等待原因。</summary>
         [HttpGet("inspection-results")]
         public Task<U8InspectionResultsDto> GetAsnInspectionResultsAsync(string asnCode)

@@ -275,6 +275,11 @@ namespace TuTa.Wms.Erp.Dto
         public bool IsInspectionReportPushed { get; set; }
         /// <summary>来料报检单失败原因。</summary>
         public string InspectionPushError { get; set; }
+
+        /// <summary>物料检验状态：0待检、1检验中、2合格、3不合格，与单据推送状态分开。</summary>
+        public int MaterialInspectionStatus { get; set; }
+        /// <summary>物料检验状态名称，初次获取ASN时默认为待检。</summary>
+        public string MaterialInspectionStatusName { get; set; } = "待检";
     }
 
     /// <summary>

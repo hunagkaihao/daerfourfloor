@@ -197,10 +197,6 @@ namespace TuTa.Wms.Stocks
                 return new ResponseDto { success = false, message = "请选择ASN并按箱扫码组盘" };
             var asnCodes = paras.Select(x => x.AsnCode).Distinct().ToList();
             if (asnCodes.Count != 1) return new ResponseDto { success = false, message = "一次只能组盘一张ASN" };
-            // 先查U8检验结果，网络调用期间不持有库存写事务。
-            var checks = await _erpAsnAppService.GetAsnInspectionResultsAsync(asnCodes[0]);
-            if (checks == null || !checks.Success)
-                return new ResponseDto { success = false, message = checks?.Message ?? "请先完成U8检验并查询结果" };
             ResponseDto result = null;
             var localCommitted = false;
             try
@@ -221,9 +217,9 @@ namespace TuTa.Wms.Stocks
                     var asnLines = await ResolveU8AsnLinesAsync(orderCode, paras);
                     foreach (var pair in asnLines)
                     {
-                        var check = checks.Items?.SingleOrDefault(x => x.AsnLineId == pair.Value.Id);
-                        if (check == null || !check.CanGroup)
-                            return new ResponseDto { success = false, message = check?.Message ?? "该ASN明细尚无匹配的合格检验单" };
+                        // 在写事务内核对最新人工检验结果，待检、检验中和不合格均禁止组盘。
+                        if (!pair.Value.IsInspectionReportPushed || pair.Value.MaterialInspectionStatus != InspectionStatus.InspectionQualified)
+                            return new ResponseDto { success = false, message = "请先成功报检，并在物料状态变更页确认该订单合格后组盘" };
                     }
                     result = await CreateStockAndBindBoxCoreAsync(paras, boxCode, asnLines).ConfigureAwait(false);
                     if (!result.success) return result;
@@ -4594,23 +4590,12 @@ namespace TuTa.Wms.Stocks
         public async Task<ResponseDto> ConfirmInspectionQualifiedAsync(Guid stockId, decimal qualifiedQty)
         {
             Guid? sourceLineId;
-            string sourceAsn = null;
             using (var read = UnitOfWorkManager.Begin(true, false))
             {
                 var snapshot = await _stockRepository.FindAsync(stockId);
                 if (snapshot == null) return new ResponseDto { success = false, message = $"库存{stockId}不存在" };
                 sourceLineId = snapshot.U8AsnLineId;
-                if (sourceLineId.HasValue)
-                    sourceAsn = (await _erpAsnRepository.GetAsync(sourceLineId.Value)).AsnCode;
                 await read.CompleteAsync();
-            }
-            // U8查询在本地写事务外执行；普通库存不受新增检验流程影响。
-            if (sourceLineId.HasValue)
-            {
-                var checks = await _erpAsnAppService.GetAsnInspectionResultsAsync(sourceAsn);
-                var check = checks.Items?.SingleOrDefault(x => x.AsnLineId == sourceLineId.Value);
-                if (!checks.Success || check == null || !check.CanGroup)
-                    return new ResponseDto { success = false, message = check?.Message ?? checks.Message ?? "U8检验结果尚未确认" };
             }
             using (var uow = UnitOfWorkManager.Begin(true, true))
             {
@@ -4625,6 +4610,16 @@ namespace TuTa.Wms.Stocks
                     if (stock.InspectionStatus != InspectionStatus.InProgressInspection)
                         return new ResponseDto { success = false, message = "当前不处于抽检状态" };
 
+                    ErpAsn sourceLine = null;
+                    if (sourceLineId.HasValue)
+                    {
+                        sourceLine = await _erpAsnRepository.GetAsync(sourceLineId.Value);
+                        if (sourceLine.Status == AsnStatus.Cancelled || !sourceLine.IsInspectionReportPushed ||
+                            (sourceLine.MaterialInspectionStatus != InspectionStatus.InProgressInspection &&
+                             sourceLine.MaterialInspectionStatus != InspectionStatus.InspectionQualified))
+                            return new ResponseDto { success = false, message = "ASN须成功报检且处于检验中，已不合格的结果不能覆盖" };
+                    }
+
                     if (qualifiedQty <= 0)
                         return new ResponseDto { success = false, message = "合格数量必须大于0" };
 
@@ -4632,7 +4627,7 @@ namespace TuTa.Wms.Stocks
                     if (qualifiedQty > inspectionCount)
                         return new ResponseDto { success = false, message = $"合格数量({qualifiedQty})不能超过抽检数量({inspectionCount})" };
                     if (sourceLineId.HasValue && qualifiedQty != inspectionCount)
-                        return new ResponseDto { success = false, message = "U8整批合格后请归还该库存全部抽检样品，再确认合格" };
+                        return new ResponseDto { success = false, message = "请归还该库存全部抽检样品，再确认合格" };
 
                     var pagOrBoxDelta = stock.ReceiveCount?.CountInOnePkgOrBox > 0
                         ? (int)(qualifiedQty / stock.ReceiveCount.CountInOnePkgOrBox.Value)
@@ -4642,6 +4637,18 @@ namespace TuTa.Wms.Stocks
                     stock.InspectionStatus = InspectionStatus.InspectionQualified;
 
                     await _stockRepository.UpdateAsync(stock).ConfigureAwait(false);
+
+                    // 旧库存抽检入口同样维护ASN物料状态；同一来源的全部库存确认后才判该明细合格。
+                    if (sourceLine != null && sourceLine.MaterialInspectionStatus == InspectionStatus.InProgressInspection)
+                    {
+                        var related = await _stockRepository.GetListAsync(x => x.U8AsnLineId == sourceLine.Id);
+                        if (related.Count > 0 && related.All(x => x.InspectionStatus == InspectionStatus.InspectionQualified &&
+                            (x.InspectionCount ?? 0) == 0))
+                        {
+                            sourceLine.CompleteMaterialInspection(InspectionStatus.InspectionQualified);
+                            await _erpAsnRepository.UpdateAsync(sourceLine);
+                        }
+                    }
 
                     var material = stock.Material;
                     var cellData = stock.CellData;
@@ -4706,6 +4713,14 @@ namespace TuTa.Wms.Stocks
                     if (stock.InspectionStatus != InspectionStatus.InProgressInspection)
                         return new ResponseDto { success = false, message = "当前不处于抽检状态" };
 
+                    if (stock.U8AsnLineId.HasValue)
+                    {
+                        var sourceLine = await _erpAsnRepository.GetAsync(stock.U8AsnLineId.Value);
+                        if (sourceLine.Status == AsnStatus.Cancelled)
+                            return new ResponseDto { success = false, message = "对应ASN已取消" };
+                        sourceLine.CompleteMaterialInspection(InspectionStatus.InspectionNotQualified);
+                        await _erpAsnRepository.UpdateAsync(sourceLine);
+                    }
                     stock.InspectionStatus = InspectionStatus.InspectionNotQualified;
                     await _stockRepository.UpdateAsync(stock).ConfigureAwait(false);
                     await uow.CompleteAsync().ConfigureAwait(false);

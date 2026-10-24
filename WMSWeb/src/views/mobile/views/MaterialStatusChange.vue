@@ -1,6 +1,7 @@
 <template>
     <div class="box-disk-container">
         <Header numb="物料状态变更"></Header>
+        <AsnMaterialInspection />
         <a-row class="input-row">
             <a-col :span="6">
                 <div class="htext">
@@ -138,6 +139,7 @@
     </div>
 </template>
 <script lang="ts" setup>
+import AsnMaterialInspection from "../components/AsnMaterialInspection.vue";
 import U8InboundActions from "../components/U8InboundActions.vue";
 import { ref, h, onMounted, Ref} from 'vue';
 import { ScanOutlined } from '@ant-design/icons-vue';

@@ -7,7 +7,7 @@
       <a-button :loading="busy" :disabled="!code.trim() || busy" @click="report">推送来料报检单</a-button>
       <a-button :loading="busy" :disabled="!code.trim() || busy" @click="query">查询U8检验结果</a-button>
     </div>
-    <p>先保存ASN并生成到货单，由仓管员在U8审核后报检；检验合格后逐箱扫码组盘，全部完成后推送采购入库。</p>
+    <p>先保存ASN并生成到货单，U8审核后报检进入检验中；在物料状态变更页人工确认合格后逐箱组盘，采购入库另需U8检验单来源。</p>
     <a-alert v-if="notice" :message="notice" :type="noticeType" show-icon />
     <div v-for="row in rows" :key="row.asnLineId" class="inspection-row">
       <div>{{ row.materialCode }} / {{ row.batchCode || '-' }}</div>
@@ -26,7 +26,10 @@ import { ref, watch } from 'vue';
 import { useMessage } from '/@/hooks/web/useMessage';
 import { createU8Arrival, queryU8Inspection, reportU8Inspection, retryU8Purchase, U8InspectionLine } from '../views/U8InboundApi';
 
-const emit = defineEmits<{ (event: 'inspection-results', rows: U8InspectionLine[]): void }>();
+const emit = defineEmits<{
+  (event: 'inspection-results', rows: U8InspectionLine[]): void;
+  (event: 'workflow-completed', asnCode: string): void;
+}>();
 const props = defineProps<{ asnCode?: string; showAsnInput?: boolean }>();
 const { createConfirm } = useMessage();
 const code = ref(props.asnCode || '');
@@ -42,6 +45,7 @@ watch(code, () => { rows.value = []; notice.value = ''; });
 /** 执行单次业务操作，失败说明持续显示，避免仅用短暂消息掩盖待审核状态。 */
 async function run(action: () => Promise<any>) {
   if (busy.value || !code.value.trim()) return;
+  const operationCode = code.value.trim();
   busy.value = true;
   try {
     const result = await action();
@@ -51,6 +55,8 @@ async function run(action: () => Promise<any>) {
       rows.value = result.success ? result.items : [];
       emit("inspection-results", rows.value);
     }
+    // 部分单据成功时也刷新父页，让检验中的订单及时显示最新状态。
+    emit('workflow-completed', operationCode);
   } catch (error: any) {
     rows.value = [];
     emit("inspection-results", []);

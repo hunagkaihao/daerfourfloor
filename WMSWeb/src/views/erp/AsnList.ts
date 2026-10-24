@@ -87,6 +87,8 @@ export interface AsnGroupRow {
   /** 来料报检单推送状态及最近失败原因。 */
   inspectionStatus: string;
   inspectionPushError: string;
+  /** 当前送货单各采购订单的物料检验状态汇总。 */
+  materialInspectionStatusName?: string;
 }
 
 export const parentTableColumns: BasicColumn[] = [
@@ -171,6 +173,7 @@ parentTableColumns.splice(9, 0,
   { title: '到货推送时间', dataIndex: 'pushTime', width: 170 },
   { title: '到货失败原因', dataIndex: 'arrivalPushError', width: 240, ...wrapTextCell },
   { title: '报检单状态', dataIndex: 'inspectionStatus', width: 130 },
+  { title: '物料检验状态', dataIndex: 'materialInspectionStatusName', width: 160 },
   { title: '报检失败原因', dataIndex: 'inspectionPushError', width: 240, ...wrapTextCell },
 );
 
@@ -254,6 +257,7 @@ export const detailTableColumns: BasicColumn[] = [
 ];
 
 detailTableColumns.push(
+  { title: '物料检验状态', dataIndex: 'materialInspectionStatusName', width: 120 },
   { title: 'U8到货单号', dataIndex: 'arrivalVoucherCode', width: 180 },
   { title: 'U8到货明细ID', dataIndex: 'arrivalDetailId', width: 140 },
 );
@@ -367,6 +371,7 @@ function groupAsnListItems(items: AsnWorkflowLine[] = []): AsnGroupRow[] {
       arrivalPushError,
       inspectionStatus: allReported ? '已推送' : anyReported ? '部分已推送' : inspectionPushError ? '推送失败' : '待推送',
       inspectionPushError,
+      materialInspectionStatusName: [...new Set(activeLines.map(line => line.materialInspectionStatusName || '待检'))].join('、'),
     };
   });
 }

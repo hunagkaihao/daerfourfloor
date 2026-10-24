@@ -178,6 +178,16 @@ namespace TuTa.Wms.Erp
                         .Select(item => MapToErpAsnDto(item))
                         .ToList();
 
+                    // 重扫ASN时保留本地已推进的检验状态，新明细仍默认为待检。
+                    var existing = await _erpAsnRepository.GetListByAsnCodeAsync(asnCode.Trim());
+                    foreach (var item in items)
+                    {
+                        var saved = FindExistingAsn(existing, item);
+                        if (saved == null) continue;
+                        item.MaterialInspectionStatus = (int)saved.MaterialInspectionStatus;
+                        item.MaterialInspectionStatusName = GetMaterialInspectionStatusName(saved.MaterialInspectionStatus);
+                    }
+
                     return new ErpAsnValidateResponseDto
                     {
                         Success = true,
@@ -1377,7 +1387,9 @@ namespace TuTa.Wms.Erp
                 ArrivalDetailId = asn.ArrivalDetailId, ArrivalPushError = asn.ArrivalPushError,
                 ArrivalPushAttemptTime = asn.ArrivalPushAttemptTime,
                 IsInspectionReportPushed = asn.IsInspectionReportPushed,
-                InspectionPushError = asn.InspectionPushError
+                InspectionPushError = asn.InspectionPushError,
+                MaterialInspectionStatus = (int)asn.MaterialInspectionStatus,
+                MaterialInspectionStatusName = GetMaterialInspectionStatusName(asn.MaterialInspectionStatus)
             };
         }
 

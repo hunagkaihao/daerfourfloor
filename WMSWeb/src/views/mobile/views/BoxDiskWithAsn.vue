@@ -125,7 +125,7 @@ import { message } from 'ant-design-vue';
 import { useMessage } from '/@/hooks/web/useMessage';
 import { validateAsn } from '/@/views/mobile/views/Material';
 import { createAsnBoxItem } from './AsnBoxGrouping';
-import { queryU8Inspection, U8InspectionLine } from './U8InboundApi';
+import { queryAsnGroupingInspection, U8InspectionLine } from './U8InboundApi';
 import { stockCreateAndBindBoxWithAsn } from './BoxDiskWithAsn';
 import { stocksGetInBox, columns, stocksDisBindBox, stockRemoveDirect, stocksQuery, stocksGetInCell, createStockTask } from '../views/Stock';
 import { getLaneCellStatusByCellCode } from '/@/views/warehouse/cells/Cell';
@@ -182,9 +182,9 @@ async function loadAsnData() {
         if (res && res.success && res.data && res.data.length > 0) {
             loadedAsnLines.value = res.data.filter((item: any) => item.status !== 4);
             inspectionChecks.value = [];
-            const inspection = await queryU8Inspection(code);
+            const inspection = await queryAsnGroupingInspection(code);
             inspectionChecks.value = inspection?.items || [];
-            if (!inspection?.success) message.warning(inspection?.message || '未查询到合格检验结果，暂不能组盘');
+            if (!inspection?.success) message.warning(inspection?.message || '未查询到本地检验状态，暂不能组盘');
             const groupMap = new Map<string, AsnOrderItem[]>();
             res.data.forEach((item: any) => {
                 // 过滤已入库数量 >= 应入库数量的已完成项

@@ -107,6 +107,8 @@ namespace TuTa.Wms.Erp.Entities
                 NotArrivedQuantity = notArrivedQuantity
             };
 
+            // ASN首次获取后为待检；检验状态独立于收货生命周期，使用既有扩展属性保存。
+            asn.SetProperty("U8MaterialInspectionStatus", "0");
             return asn;
         }
 
@@ -287,6 +289,29 @@ namespace TuTa.Wms.Erp.Entities
         [StringLength(2000)]
         public virtual string InspectionPushError { get; private set; }
 
+        /// <summary>物料检验状态：0待检、1检验中、2合格、3不合格；历史已报检记录默认为检验中。</summary>
+        [NotMapped]
+        public Stocks.InspectionStatus MaterialInspectionStatus =>
+            int.TryParse(this.GetProperty<string>("U8MaterialInspectionStatus"), out var value)
+                ? (Stocks.InspectionStatus)value
+                : IsPurchasePushed ? Stocks.InspectionStatus.InspectionQualified
+                : IsInspectionReportPushed ? Stocks.InspectionStatus.InProgressInspection
+                : Stocks.InspectionStatus.AwaitingInspection;
+
+        /// <summary>人工确认检验结果，仅允许检验中转为合格或不合格；重复提交相同结果保持幂等。</summary>
+        /// <param name="result">检验结果，只允许合格(2)或不合格(3)。</param>
+        public void CompleteMaterialInspection(Stocks.InspectionStatus result)
+        {
+            if (result != Stocks.InspectionStatus.InspectionQualified && result != Stocks.InspectionStatus.InspectionNotQualified)
+                throw new UserFriendlyException("检验结果只能选择合格或不合格");
+            if (!IsInspectionReportPushed) throw new UserFriendlyException("请先成功推送来料报检单");
+            if (MaterialInspectionStatus == result) return;
+            if (MaterialInspectionStatus != Stocks.InspectionStatus.InProgressInspection)
+                throw new UserFriendlyException("仅检验中的物料允许确认合格或不合格");
+            if (IsPurchasePushed) throw new UserFriendlyException("已采购入库的物料不能重新判定检验结果");
+            this.SetProperty("U8MaterialInspectionStatus", ((int)result).ToString());
+        }
+
         /// <summary>在网络请求前保留本采购订单的推送UID。</summary>
         public void BeginArrivalPush(long uid)
         {
@@ -314,9 +339,13 @@ namespace TuTa.Wms.Erp.Entities
         /// <summary>记录来料报检结果；失败时保留UID，成功后禁止重复生单。</summary>
         public void RecordInspectionPush(long uid, bool success, string error)
         {
+            var previousStatus = MaterialInspectionStatus;
             InspectionPushUid = uid;
             IsInspectionReportPushed = success;
             InspectionPushError = success ? null : LimitError(error);
+            // 只在U8明确报检成功后进入检验中，失败及重试不覆盖人工检验结果。
+            if (success && previousStatus == Stocks.InspectionStatus.AwaitingInspection)
+                this.SetProperty("U8MaterialInspectionStatus", "1");
         }
 
         /// <summary>已提交箱码台账，同一箱重复提交不得重复入账；数据使用既有扩展属性保存。</summary>

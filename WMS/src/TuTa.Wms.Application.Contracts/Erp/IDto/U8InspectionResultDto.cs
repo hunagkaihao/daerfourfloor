@@ -33,7 +33,7 @@ namespace TuTa.Wms.Erp.IDto
         public decimal QualifiedQuantity { get; set; }
         /// <summary>已审核且整批合格、来源完整时为true。</summary>
         public bool CanPurchase { get; set; }
-        /// <summary>来源匹配且检验合格，可在检验后执行一箱一扫组盘。</summary>
+        /// <summary>已成功报检且本地人工确认为合格，可逐箱组盘；与U8采购入库条件分开判断。</summary>
         public bool CanGroup { get; set; }
         /// <summary>本地累计已组盘件数。</summary>
         public decimal GroupedQuantity { get; set; }

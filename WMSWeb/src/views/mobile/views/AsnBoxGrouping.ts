@@ -15,7 +15,7 @@ export function createAsnBoxItem(
   if (candidates.length !== 1) throw new Error('箱码与ASN不匹配或来源不唯一，请选择对应ASN明细');
   const line = candidates[0];
   const check = checks.find(row => row.asnLineId === line.autoid);
-  if (!check?.canGroup) throw new Error(check?.message || '尚无匹配的合格检验单，请检验完成后重新查询');
+  if (!check?.canGroup) throw new Error(check?.message || '请在物料状态变更页确认该订单合格后重新查询');
   if (boxNumber && queued.some(row => row.asnLineId === line.autoid && row.boxNumber === boxNumber))
     throw new Error('该箱已扫描，不能重复添加');
   const pending = queued.filter(row => row.asnLineId === line.autoid).reduce((sum, row) => sum + Number(row.incellshu), 0);

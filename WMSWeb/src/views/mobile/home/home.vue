@@ -130,13 +130,14 @@
         </a-row>
         <a-row justify="center" style="margin-top: 20px; margin-bottom: 20px">
           <a-col :span="8">
-            <div class="menu-item-card" @click="materialSampling">
+            <div class="menu-item-card" @click="materialStatusChange">
               <div class="menu-item-icon-wrapper">
                 <AppstoreOutlined class="menu-item-icon" />
               </div>
-              <div class="menu-item-text">物料抽检</div>
+              <div class="menu-item-text">物料状态变更</div>
             </div>
           </a-col>
+
           <a-col :span="8">
             <div class="menu-item-card" @click="createOutboundTaskFromBarcode">
               <div class="menu-item-icon-wrapper">
@@ -148,11 +149,11 @@
         </a-row>
         <a-row justify="center" style="margin-top: 20px; margin-bottom: 20px">
           <a-col :span="8">
-            <div class="menu-item-card" @click="materialStatusChange">
+            <div class="menu-item-card" @click="boxdiskWithAsn">
               <div class="menu-item-icon-wrapper">
                 <AppstoreOutlined class="menu-item-icon" />
               </div>
-              <div class="menu-item-text">物料状态变更</div>
+              <div class="menu-item-text">ASN组盘</div>
             </div>
           </a-col>
           <a-col :span="8">
@@ -166,13 +167,13 @@
         </a-row> 
         <a-row justify="center" style="margin-top: 20px; margin-bottom: 20px">
           <a-col :span="8">
-            <div class="menu-item-card" @click="boxdiskWithAsn">
-              <div class="menu-item-icon-wrapper">
-                <AppstoreOutlined class="menu-item-icon" />
-              </div>
-              <div class="menu-item-text">ASN组盘</div>
-            </div>
-          </a-col>
+<!--             <div class="menu-item-card" @click="materialSampling">
+               <div class="menu-item-icon-wrapper">
+                 <AppstoreOutlined class="menu-item-icon" />
+               </div>
+               <div class="menu-item-text">物料抽检</div>
+             </div>-->
+           </a-col>
           <a-col :span="8">
               <div class="menu-item-card" @click="materialOut">
                 <div class="menu-item-icon-wrapper">

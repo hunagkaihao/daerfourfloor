@@ -476,8 +476,28 @@ namespace TuTa.Wms.Erp
             // 按现场业务约定，U8用该错误表示对应到货单尚未审核；不影响其他到货单独立报检。
             if (!result.Success && result.Message?.Contains("到货单信息为空", StringComparison.Ordinal) == true)
                 result.Message = "到货单尚未由仓管员在U8审核，请等待审核通过后重新推送来料报检单。U8返回：" + result.Message;
-            foreach (var line in lines) line.RecordInspectionPush(uid, result.Success, result.Message);
-            await SaveU8LinesAsync(lines);
+            // 报检结果与物料状态在同一事务保存；仅成功报检的对应来源库存由待检进入检验中。
+            using (var uow = UnitOfWorkManager.Begin(true, true))
+            {
+                foreach (var line in lines)
+                {
+                    line.RecordInspectionPush(uid, result.Success, result.Message);
+                    await _erpAsnRepository.UpdateAsync(line, autoSave: true);
+                }
+                if (result.Success && _u8StockRepository != null)
+                {
+                    var lineIds = lines.Select(x => x.Id).ToList();
+                    var stocks = await _u8StockRepository.GetListAsync(x =>
+                        x.U8AsnLineId.HasValue && lineIds.Contains(x.U8AsnLineId.Value));
+                    foreach (var stock in stocks.Where(x => x.InspectionStatus == null ||
+                        x.InspectionStatus == Stocks.InspectionStatus.AwaitingInspection))
+                    {
+                        stock.InspectionStatus = Stocks.InspectionStatus.InProgressInspection;
+                        await _u8StockRepository.UpdateAsync(stock);
+                    }
+                }
+                await uow.CompleteAsync();
+            }
             return result;
         }
     }

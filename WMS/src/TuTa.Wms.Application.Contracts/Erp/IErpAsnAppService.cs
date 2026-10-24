@@ -68,6 +68,13 @@ namespace TuTa.Wms.Erp
         /// <summary>到货成功后按到货单分别生成来料报检单，失败重试仅处理尚未成功的单据。</summary>
         Task<LLBJDAddResponseDto> PushAsnInspectionReportAsync(string asnCode);
 
+        /// <summary>物料状态变更页按ASN和采购订单确认检验结果，只允许检验中转为合格或不合格。</summary>
+        /// <param name="asnCode">送货单对应ASN号。</param>
+        /// <param name="orderCode">当前ASN下的采购订单号。</param>
+        /// <param name="inspectionStatus">检验结果：2合格、3不合格。</param>
+        /// <returns>更新结果及该订单最新ASN明细。</returns>
+        Task<ErpAsnValidateResponseDto> SetAsnOrderInspectionStatusAsync(string asnCode, string orderCode, int inspectionStatus);
+
         /// <summary>从U8查询当前ASN的来料检验单，严格校验来源和审核、合格数量。</summary>
         Task<U8InspectionResultsDto> GetAsnInspectionResultsAsync(string asnCode);
         /// <summary>根据一条ASN对应的已审核合格检验单生成采购入库；失败独立重试。</summary>

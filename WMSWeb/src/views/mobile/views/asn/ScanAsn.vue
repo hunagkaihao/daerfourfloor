@@ -1,7 +1,7 @@
 <template>
     <div class="scan-asn-container">
         <Header numb="扫描ASN"></Header>
-        <U8InboundActions :asn-code="asnCode" :show-asn-input="false" />
+        <U8InboundActions :asn-code="asnCode" :show-asn-input="false" @workflow-completed="refreshLocalAsn" />
         
         <a-row class="input-row">
             <a-col :span="6">
@@ -65,6 +65,10 @@
                         <span class="asn-label">等级</span>
                         <span class="asn-value">{{ item.cfree5 || '-' }}</span>
                     </div>
+                    <div class="asn-field">
+                        <span class="asn-label">物料检验状态</span>
+                        <span class="asn-value">{{ item.materialInspectionStatusName || '待检' }}</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -86,16 +90,19 @@
 
 <script lang="ts" setup>
 import U8InboundActions from "../../components/U8InboundActions.vue";
-import { createU8Arrival } from "../U8InboundApi";
+import { createU8Arrival, queryAsnMaterialInspection } from "../U8InboundApi";
+import type { AsnMaterialInspectionLine } from "../U8InboundApi";
 import { ref, onMounted } from 'vue';
 import { ScanOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 import Header from '../../header/Header.vue';
-import { ERP_ASNServiceProxy, ErpAsnDto, ErpAsnValidateResponseDto, ErpAsnSaveResponseDto } from '/@/services/ServiceProxies';
+import { ERP_ASNServiceProxy, ErpAsnDto, ErpAsnSaveResponseDto } from '/@/services/ServiceProxies';
 
 const asnInput = ref<any>();
 const asnCode = ref<string>('');
-const asnDataList = ref<ErpAsnDto[]>([]);
+/** 扫码展示保留完整ASN信息及人工检验状态，不经过旧代理丢弃新增字段。 */
+type AsnDisplayLine = Partial<ErpAsnDto> & AsnMaterialInspectionLine;
+const asnDataList = ref<AsnDisplayLine[]>([]);
 const loading = ref(false);
 const saving = ref(false);
 const showSaveSuccess = ref(false);
@@ -117,6 +124,19 @@ const focusFn = (e: any) => {
     }, 200);
 };
 
+/** 推送结束后按当前ASN刷新本地状态，忽略已经切换到其他ASN的旧请求。 */
+async function refreshLocalAsn(code: string) {
+    if (code !== asnCode.value.trim()) return;
+    try {
+        const result = await queryAsnMaterialInspection(code);
+        if (code !== asnCode.value.trim()) return;
+        if (result.success && result.data?.length) asnDataList.value = result.data;
+        else if (!result.success) message.warning(result.message || '检验状态刷新失败，请重新查询');
+    } catch (error: any) {
+        if (code === asnCode.value.trim()) message.warning(error?.message || '检验状态刷新失败，请重新查询');
+    }
+}
+
 async function scanAsn() {
     if (!asnCode.value || asnCode.value.trim() === '') {
         message.error('请输入ASN码');
@@ -127,7 +147,9 @@ async function scanAsn() {
     showSaveSuccess.value = false;
 
     try {
-        const result: ErpAsnValidateResponseDto = await asnService.getFromErp(asnCode.value.trim());
+        const code = asnCode.value.trim();
+        const result = await queryAsnMaterialInspection(code, true);
+        if (code !== asnCode.value.trim()) return;
         if (result.success && result.data?.length) {
             message.success(`获取ASN信息成功，共 ${result.data.length} 条明细`);
             asnDataList.value = result.data;
@@ -169,6 +191,7 @@ async function saveAsnInfo() {
             } catch (error: any) {
                 message.warning('ASN已保存，到货单请求失败，请点击生成或重试到货单');
             }
+            await refreshLocalAsn(asnCode.value.trim());
         } else {
             message.error(result.message || '保存失败');
         }
