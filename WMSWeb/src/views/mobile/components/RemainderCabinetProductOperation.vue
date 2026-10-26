@@ -4,7 +4,6 @@
     <label>扫描柜门上的存货编码</label>
     <a-input v-model:value="scanCode" :disabled="locked" placeholder="存货码、622550001,,,Z1,,,或柜门A15-08"
       allow-clear @pressEnter="recognize" />
-    <a-button :disabled="locked || !scanCode.trim()" @click="recognize">识别并查询柜位</a-button>
     <p>存货编码：{{ materialCode || '-' }}</p>
     <label>等级</label>
     <a-input v-model:value="grade" :disabled="locked" placeholder="卡码自动识别等级；纯存货码可手动填写" />
@@ -17,7 +16,6 @@
     <label>{{ operationName }}数量</label>
     <a-input-number v-model:value="quantity" :disabled="locked" :min="0" :precision="6"
       :max="operation === 'withdraw' ? availableQuantity : undefined" placeholder="输入实际数量" style="width: 100%" />
-    <p>每格固定同存货、同等级。数量按存货的计量单位填写。</p>
     <a-alert v-if="notice" :type="noticeType" :message="notice" show-icon />
     <a-button type="primary" block :loading="busy" :disabled="busy" @click="submit">
       {{ uncertain ? '重试确认原请求' : `确认${operationName}` }}

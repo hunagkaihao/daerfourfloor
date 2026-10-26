@@ -182,7 +182,7 @@ export const AsnRemainderCabinet: AppRouteRecordRaw = {
   name: 'AsnRemainderCabinet',
   component: () => import('/@/views/mobile/views/asn/AsnRemainderCabinet.vue'),
   meta: {
-    title: t('零头柜录入'),
+    title: t('零头柜'),
     ignoreKeepAlive: true,
     ignoreAuth: true,
   },

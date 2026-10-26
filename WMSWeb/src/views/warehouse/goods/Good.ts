@@ -247,9 +247,14 @@ export const searchFormSchema: FormSchema[] = [
     label: t('库区名称'),
     component: 'Select',
     colProps: { span: 4 },
-    defaultValue: '正常区',
+    // 库存默认包含全部库区，零头柜等平库库存也参与统一查询。
+    defaultValue: '',
     componentProps: {
       options: [
+        {
+          label: '全部库区',
+          value: '',
+        },
         {
           label: '正常区',
           value: '正常区',
@@ -266,6 +271,10 @@ export const searchFormSchema: FormSchema[] = [
         {
           label: '待处理区',
           value: '待处理区',
+        },
+        {
+          label: '零头柜区',
+          value: '零头柜区',
         },
       ]
     }
@@ -497,7 +506,9 @@ export const searchFormSchema: FormSchema[] = [
 export async function gettable(params) {
   openFullLoading();
   try {
-    const res = await _StockServiceProxy.stocksQuery(params);
+    // 空选项表示不限制库区，避免将空字符串作为库区名称传入后端等值过滤。
+    const query = { ...params, warehouseAreaName: params?.warehouseAreaName || undefined };
+    const res = await _StockServiceProxy.stocksQuery(query);
     closeFullLoading();
     return res;
   } catch (error) {

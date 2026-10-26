@@ -23,6 +23,23 @@ export function parseRemainderScan(value: string) {
   return { cellCode: '', materialCode: fields[0], grade: fields[3] || '' };
 }
 
+/** 流水的存货条件允许部分编码；整段物料卡取第1段，发货条码取第5段，不附加隐藏等级条件。 */
+export function normalizeRemainderHistoryMaterial(value: string) {
+  const raw = value.trim();
+  if (!raw) return '';
+  if (raw.includes('@')) {
+    const code = raw.split('@')[4]?.trim();
+    if (!code) throw new Error('条码第5段存货编码为空，请重新扫码');
+    return code;
+  }
+  if (raw.includes(',')) {
+    const code = raw.split(',')[0].trim();
+    if (!code) throw new Error('物料卡第1段存货编码为空，请重新扫码');
+    return code;
+  }
+  return raw;
+}
+
 /** 首次提交生成标识，网络异常后沿用原标识，避免重复加减库存。 */
 export function newRemainderRequestId() {
   const browserCrypto = window.crypto as Crypto & { randomUUID?: () => string };

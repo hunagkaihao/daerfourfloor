@@ -3,7 +3,8 @@
     <label>扫描存货编码或柜门</label>
     <a-input v-model:value="scanCode" placeholder="存货码、物料等级卡或柜门A15-08" allow-clear @pressEnter="search" />
     <label>货位（可选）</label>
-    <a-input v-model:value="cellCode" placeholder="支持输入部分货位，例如A15" allow-clear @pressEnter="search" />
+    <a-select :value="cellCode || undefined" :options="remainderCellOptions" show-search allow-clear
+      option-filter-prop="label" placeholder="全部货位，可搜索A15-08" style="width: 100%" @change="cellCode = $event || ''" />
     <label>等级（可选）</label>
     <a-input v-model:value="grade" placeholder="支持等级片段" allow-clear @pressEnter="search" />
     <a-button type="primary" block :loading="loading" @click="search">查询库存</a-button>
@@ -28,6 +29,7 @@
 import { ref } from 'vue';
 import { queryRemainderStocks } from '../views/RemainderCabinetApi';
 import type { RemainderBalance, RemainderQuery } from '../views/RemainderCabinetApi';
+import { remainderCellOptions } from '../views/RemainderCabinetHelpers';
 
 const scanCode = ref('');
 const cellCode = ref('');

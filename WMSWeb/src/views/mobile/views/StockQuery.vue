@@ -9,7 +9,7 @@
       <a-col :span="17">
         <a-input
           v-model:value="queryForm.materialCode"
-          placeholder="输入物料编号或扫描发货条码"
+          placeholder="输入物料编号或扫描发货条码、物料卡"
           :allowClear="true"
           class="search-input"
           @keyup.enter="handleSearch"
@@ -167,6 +167,13 @@ async function queryStocks() {
     materialCode = materialCode.split('@')[4]?.trim() || '';
     if (!materialCode) {
       message.warning('条码第5段物料编码为空，请重新扫码');
+      return;
+    }
+  } else if (materialCode.includes(',')) {
+    // 零头柜物料卡第1段是存货编码，不能将包含等级等信息的整段卡码作为物料条件。
+    materialCode = materialCode.split(',')[0].trim();
+    if (!materialCode) {
+      message.warning('物料卡第1段存货编码为空，请重新扫码');
       return;
     }
   }

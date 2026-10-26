@@ -149,27 +149,28 @@ namespace TuTa.Wms.Repositories.Stocks
             CancellationToken cancellationToken = default)
         {
             var dbSet = await GetDbSetAsync().ConfigureAwait(false);
+            // 空白文本表示未筛选，避免清空条件后排除没有容器号、检验号等信息的零头柜库存。
             IQueryable<Stock> querable = dbSet.TrackIf(isTrack)
                 .Where(o => 
-                (boxCode == null ? true : o.BoxData.BoxCode == boxCode) &&
-                (cellCode == null ? true : o.CellData.CellCode == cellCode) &&
-                (warehouseAreaName == null ? true : o.Warehouse.AreaName == warehouseAreaName)&&
-                (warehouseName == null ? true : o.Warehouse.HouseName == warehouseName) &&
-                (materialCode == null ? true : o.Material.MaterialCode.StartsWith(materialCode)) &&
-                (materialNameTip == null ? true : o.Material.MaterialName.Contains(materialNameTip)) &&
-                (materialSpecsTip == null ? true : o.Material.Specs.Contains(materialSpecsTip)) &&
-                (barcode == null ? true : o.Barcode == barcode) &&
-                (receivingMaterialBarcode == null ? true : o.ReceivingMaterialBarcode == receivingMaterialBarcode) &&
+                (string.IsNullOrWhiteSpace(boxCode) ? true : o.BoxData.BoxCode == boxCode) &&
+                (string.IsNullOrWhiteSpace(cellCode) ? true : o.CellData.CellCode == cellCode) &&
+                (string.IsNullOrWhiteSpace(warehouseAreaName) ? true : o.Warehouse.AreaName == warehouseAreaName)&&
+                (string.IsNullOrWhiteSpace(warehouseName) ? true : o.Warehouse.HouseName == warehouseName) &&
+                (string.IsNullOrWhiteSpace(materialCode) ? true : o.Material.MaterialCode.StartsWith(materialCode)) &&
+                (string.IsNullOrWhiteSpace(materialNameTip) ? true : o.Material.MaterialName.Contains(materialNameTip)) &&
+                (string.IsNullOrWhiteSpace(materialSpecsTip) ? true : o.Material.Specs.Contains(materialSpecsTip)) &&
+                (string.IsNullOrWhiteSpace(barcode) ? true : o.Barcode == barcode) &&
+                (string.IsNullOrWhiteSpace(receivingMaterialBarcode) ? true : o.ReceivingMaterialBarcode == receivingMaterialBarcode) &&
                 (status == null ? true : o.Status == status) &&
                 (stockInType == null ? true : o.StockInType == stockInType) &&
                 (stockInDateStart == null || stockInDateEnd == null ? true : o.StockInDate >= stockInDateStart && o.StockInDate <= stockInDateEnd) &&
                 (checkType == null ? true : o.CheckData.CheckType == checkType) &&
                 (checkResult == null ? true : o.CheckData.CheckResult == checkResult) &&
-                (checkNoTip == null ? true : o.CheckData.CheckNo.Contains(checkNoTip)) &&
+                (string.IsNullOrWhiteSpace(checkNoTip) ? true : o.CheckData.CheckNo.Contains(checkNoTip)) &&
                 (fullRateStart == null ? true :o.BoxData.FullRate >= fullRateStart) &&
                 (fullRateEnd == null ? true : o.BoxData.FullRate <= fullRateEnd) &&
                 (cellType == 0 ? true : o.CellData.CellType == (CellType)CellType.ToObject(typeof(CellType), cellType)) &&
-                (finGoods == null ? true : o.Material.FinGoodsList.Contains(finGoods))
+                (string.IsNullOrWhiteSpace(finGoods) ? true : o.Material.FinGoodsList.Contains(finGoods))
                 );
 
             return new QueryDataInPage<Stock>()
@@ -197,27 +198,28 @@ namespace TuTa.Wms.Repositories.Stocks
             CancellationToken cancellationToken = default)
         {
             var dbSet = await GetDbSetAsync().ConfigureAwait(false);
+            // 与分页查询保持一致：空白文本不参与过滤，统一库存查询应包含零头柜库存。
             List<Stock> stocks = dbSet.TrackIf(isTrack)
                 .Where(o =>
-                (boxCode == null ? true : o.BoxData.BoxCode == boxCode) &&
-                (cellCode == null ? true : o.CellData.CellCode == cellCode) &&
-                (warehouseAreaName == null ? true : o.Warehouse.AreaName == warehouseAreaName) &&
-                (warehouseName == null ? true : o.Warehouse.HouseName == warehouseName) &&
-                (materialCode == null ? true : o.Material.MaterialCode.StartsWith(materialCode)) &&
-                (materialNameTip == null ? true : o.Material.MaterialName.Contains(materialNameTip)) &&
-                (materialSpecsTip == null ? true : o.Material.Specs.Contains(materialSpecsTip)) &&
-                (barcode == null ? true : o.Barcode == barcode) &&
-                (receivingMaterialBarcode == null ? true : o.ReceivingMaterialBarcode == receivingMaterialBarcode) &&
+                (string.IsNullOrWhiteSpace(boxCode) ? true : o.BoxData.BoxCode == boxCode) &&
+                (string.IsNullOrWhiteSpace(cellCode) ? true : o.CellData.CellCode == cellCode) &&
+                (string.IsNullOrWhiteSpace(warehouseAreaName) ? true : o.Warehouse.AreaName == warehouseAreaName) &&
+                (string.IsNullOrWhiteSpace(warehouseName) ? true : o.Warehouse.HouseName == warehouseName) &&
+                (string.IsNullOrWhiteSpace(materialCode) ? true : o.Material.MaterialCode.StartsWith(materialCode)) &&
+                (string.IsNullOrWhiteSpace(materialNameTip) ? true : o.Material.MaterialName.Contains(materialNameTip)) &&
+                (string.IsNullOrWhiteSpace(materialSpecsTip) ? true : o.Material.Specs.Contains(materialSpecsTip)) &&
+                (string.IsNullOrWhiteSpace(barcode) ? true : o.Barcode == barcode) &&
+                (string.IsNullOrWhiteSpace(receivingMaterialBarcode) ? true : o.ReceivingMaterialBarcode == receivingMaterialBarcode) &&
                 (status == null ? true : o.Status == status) &&
                 (stockInType == null ? true : o.StockInType == stockInType) &&
                 (stockInDateStart == null || stockInDateEnd == null ? true : o.StockInDate >= stockInDateStart && o.StockInDate <= stockInDateEnd) &&
                 (checkType == null ? true : o.CheckData.CheckType == checkType) &&
                 (checkResult == null ? true : o.CheckData.CheckResult == checkResult) &&
-                (checkNoTip == null ? true : o.CheckData.CheckNo.Contains(checkNoTip)) &&
+                (string.IsNullOrWhiteSpace(checkNoTip) ? true : o.CheckData.CheckNo.Contains(checkNoTip)) &&
                 (fullRateStart == null ? true : o.BoxData.FullRate >= fullRateStart) &&
                 (fullRateEnd == null ? true : o.BoxData.FullRate <= fullRateEnd) &&
                 (cellType == 0 ? true : o.CellData.CellType == (CellType)CellType.ToObject(typeof(CellType), cellType)) &&
-                (finGoods == null ? true : o.Material.FinGoodsList.Contains(finGoods))
+                (string.IsNullOrWhiteSpace(finGoods) ? true : o.Material.FinGoodsList.Contains(finGoods))
                 ).ToList();
             return stocks;
         }
