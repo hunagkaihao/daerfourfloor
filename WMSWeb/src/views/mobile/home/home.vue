@@ -277,6 +277,16 @@
         </a-row>
       </a-tab-pane>
      
+      <a-tab-pane key="6" tab="盘点">
+        <a-row justify="center" style="margin-top: 20px; margin-bottom: 20px">
+          <a-col :span="12">
+            <div class="menu-item-card" @click="inventoryCount">
+              <div class="menu-item-icon-wrapper"><AuditOutlined class="menu-item-icon" /></div>
+              <div class="menu-item-text">盘点</div>
+            </div>
+          </a-col>
+        </a-row>
+      </a-tab-pane>
     </a-tabs>
 
 
@@ -333,7 +343,7 @@ const getUserInfo = computed(() => {
 const activeKey = ref('1');
 console.log(viewStore.getTab)
 // 确保tab值有效
-const validTabs = ['1', '2', '3', '4', '5'];
+const validTabs = ['1', '2', '3', '4', '5', '6'];
 activeKey.value = validTabs.includes(viewStore.getTab) ? viewStore.getTab : '1'
 function tabclick(key) {
   viewStore.setTab(key)
@@ -343,6 +353,11 @@ function tabclick(key) {
 // 进入WMS内部库存整理页面，不再跳转外置服务。
 function stockConsolidation() {
   router.replace('/stockConsolidation');
+}
+
+/** 进入独立实物盘点，录入实盘数量并按保存日期导出。 */
+function inventoryCount() {
+  router.replace('/inventoryCount');
 }
 
 const handleLoginOut = async () => {

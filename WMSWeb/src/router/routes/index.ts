@@ -422,6 +422,14 @@ export const CreateOutStockTaskSummary: AppRouteRecordRaw = {
   },
 };
 
+/** PDA独立盘点录入及按日导出入口。 */
+export const InventoryCount: AppRouteRecordRaw = {
+  path: '/inventoryCount',
+  name: 'InventoryCount',
+  component: () => import('/@/views/mobile/views/InventoryCount.vue'),
+  meta: { title: t('盘点'), ignoreKeepAlive: true, ignoreAuth: true },
+};
+
 // Basic routing without permission
 export const basicRoutes = [
   LoginRoute,
@@ -443,6 +451,7 @@ export const basicRoutes = [
   InboundReturn,
   BoxDiskWithAsn,
   AsnRemainderCabinet,
+  InventoryCount,
   BoxIncell,
   ContainerUnbind,
   AgvTaskManage,

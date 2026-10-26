@@ -115,11 +115,15 @@ const mobileFrame = ref<HTMLIFrameElement>();
 const isFullscreen = ref(false);
 const canGoBack = ref(false);
 const canGoForward = ref(false);
-const currentUrl = ref('http://localhost:4200/#/mobilehome');
+// 通过当前路由生成同站点地址，自动沿用部署目录、域名、协议及端口。
+const currentUrl = ref(router.resolve('/mobilehome').href);
 
 // 计算属性
 const iframeUrl = computed(() => {
   let url = currentUrl.value;
+
+  // Hash路由直接相对当前页面加载，保留服务器上的部署子目录。
+  if (url.startsWith('#')) return url;
   
   // 如果是外部网址（包含 . 或 :），直接使用
   if (url.includes('.') || url.includes(':')) {

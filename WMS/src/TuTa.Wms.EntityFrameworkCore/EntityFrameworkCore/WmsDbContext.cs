@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using TuTa.Wms.InventoryCounts;
 using TuTa.Wms.AgvTasks.Aggregaes;
 using TuTa.Wms.BarcodeChecks.Aggregates;
 using TuTa.Wms.BarcodeLists.Aggregates;
@@ -83,6 +84,9 @@ public class WmsDbContext :
 
     public DbSet<Stock> Stocks { get; set; }
 
+    /// <summary>PDA实物盘点明细，独立保存扫码及实盘数量。</summary>
+    public DbSet<InventoryCount> InventoryCounts { get; set; }
+
     public DbSet<StockInHistory> StockInHistories { get; set; }
 
     public DbSet<StockOutHistory> StockOutHistories { get; set; }
@@ -150,6 +154,23 @@ public class WmsDbContext :
         builder.ConfigureIdentity();
         builder.ConfigureOpenIddict();
         builder.ConfigureTenantManagement();
+
+        builder.Entity<InventoryCount>(b =>
+        {
+            b.ToTable("InventoryCounts", WmsConsts.DbSchema, t => t.HasComment("PDA实物盘点明细"));
+            b.ConfigureByConvention();
+            b.Property(x => x.Id).ValueGeneratedNever().HasComment("提交标识，网络重试去重");
+            b.Property(x => x.Barcode).IsRequired().HasMaxLength(500).HasComment("物料码扫码原文");
+            b.Property(x => x.MaterialCode).IsRequired().HasMaxLength(50).HasComment("物料编码，条码第1段");
+            b.Property(x => x.ManufacturerCode).IsRequired(false).HasMaxLength(50).HasComment("产商代号，批次去掉六位日期，可为空");
+            b.Property(x => x.Grade).IsRequired(false).HasMaxLength(20).HasComment("等级，条码第4段，可为空");
+            b.Property(x => x.QuantityPerBox).HasComment("整箱数量，单位只/箱，未填为空");
+            b.Property(x => x.ActualBoxes).HasComment("实际整箱数，单位箱，未填为空");
+            b.Property(x => x.RemainderQuantity).HasComment("实际零头，单位只，未填为空");
+            b.Property(x => x.TotalQuantity).HasComment("实际总数，单位只，三项数量未齐时为空");
+            b.Property(x => x.RecordedAt).HasComment("服务器本地保存时间，按此日期导出");
+            b.HasIndex(x => x.RecordedAt);
+        });
 
         /* Configure your own tables/entities inside here */
 
