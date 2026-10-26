@@ -73,6 +73,8 @@ export interface RemainderProductOperation {
   cellCode: string;
   /** 实际操作数量，单位同物料。 */
   quantity: number;
+  /** 箱码批次，仅寄存时写入流水；新领用请求不传此项，服务端忽略旧客户端的兼容字段。 */
+  batchCode?: string;
 }
 
 /** 同存货、同等级、同柜位的当前库存合计。 */
@@ -111,6 +113,8 @@ export interface RemainderHistory {
   cellCode: string;
   /** 等级。 */
   grade?: string;
+  /** 寄存箱码中的批次号；领用和历史未采集批次的寄存记录为空。 */
+  batchCode?: string;
   /** 本次操作的正数量，方向由operation区分。 */
   quantity: number;
   /** 计量单位。 */
@@ -131,6 +135,8 @@ export interface RemainderQuery {
   grade?: string;
   /** yyyy、yyyy-MM或yyyy-MM-dd。 */
   dateKeyword?: string;
+  /** 仅过滤寄存流水的批次号片段，填写后不返回领用流水。 */
+  batchCode?: string;
   /** 分页偏移。 */
   skipCount?: number;
   /** 单页条数，最多200。 */
@@ -162,5 +168,34 @@ export function queryRemainderStocks(input: RemainderQuery) {
 export function queryRemainderHistories(input: RemainderQuery) {
   return defHttp.get<{ items: RemainderHistory[]; totalCount: number }>(
     { url: '/wms/stock/remainder-histories', params: input }, { isTransformResponse: false },
+  );
+}
+
+/** 按固定绑定查柜位，尚无库存的位置同样返回；不按批次筛选。 */
+export function getRemainderLocations(materialCode: string) {
+  return defHttp.get<RemainderCabinet[]>(
+    { url: '/wms/stock/remainder-locations', params: { materialCode } }, { isTransformResponse: false },
+  );
+}
+
+/** 固定物料与库位的对应关系，解绑时提交页面读取的原物料编码。 */
+export interface RemainderLocationBinding {
+  /** A至L柜的大写标准格位。 */
+  cellCode: string;
+  /** 绑定的新编码，或解绑前的原编码。 */
+  materialCode: string;
+}
+
+/** 绑定物料；已存在其他物料时须先解绑，标准格位缺失时在零头柜区补建。 */
+export function bindRemainderLocation(input: RemainderLocationBinding) {
+  return defHttp.post<{ success: boolean; message?: string }>(
+    { url: '/wms/stock/remainder-location-bind', data: input }, { isTransformResponse: false },
+  );
+}
+
+/** 只解绑空柜位，服务端校验现存库存与占用。 */
+export function unbindRemainderLocation(input: RemainderLocationBinding) {
+  return defHttp.post<{ success: boolean; message?: string }>(
+    { url: '/wms/stock/remainder-location-unbind', data: input }, { isTransformResponse: false },
   );
 }

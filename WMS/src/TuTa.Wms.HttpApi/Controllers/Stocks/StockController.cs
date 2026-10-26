@@ -37,6 +37,21 @@ namespace TuTa.Wms.Controllers.Stocks
         public Task<RemainderCabinetDto> GetRemainderCabinetAsync(string cellCode)
             => _stockService.GetRemainderCabinetAsync(cellCode);
 
+        /// <summary>按物料读取已绑定的零头柜位，包含尚无库存的格位。</summary>
+        [HttpGet("remainder-locations")]
+        public Task<List<RemainderCabinetDto>> GetRemainderLocationsAsync(string materialCode)
+            => _stockService.GetRemainderLocationsAsync(materialCode);
+
+        /// <summary>绑定物料与零头柜位，标准格位缺失时补建。</summary>
+        [HttpPost("remainder-location-bind")]
+        public Task<ResponseDto> BindRemainderLocationAsync([FromBody] RemainderCabinetBindingDto input)
+            => _stockService.BindRemainderLocationAsync(input);
+
+        /// <summary>解绑空柜位固定物料及等级，不改写历史流水。</summary>
+        [HttpPost("remainder-location-unbind")]
+        public Task<ResponseDto> UnbindRemainderLocationAsync([FromBody] RemainderCabinetBindingDto input)
+            => _stockService.UnbindRemainderLocationAsync(input);
+
         /// <summary>ASN合格零头人工入柜，独立记录来源、批次和数量。</summary>
         [HttpPost("asn-remainder-entry")]
         public Task<ResponseDto> StoreAsnRemainderAsync([FromBody] RemainderCabinetEntryDto input)

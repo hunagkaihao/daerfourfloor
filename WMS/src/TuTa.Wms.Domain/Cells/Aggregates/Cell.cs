@@ -155,6 +155,20 @@ namespace TuTa.Wms.Cells.Aggregates
         [NotMapped]
         public string RemainderGrade => this.GetProperty<string>("RemainderGrade");
 
+        /// <summary>维护柜位固定物料；仅在应用层确认空柜且无占用后调用，首笔寄存再绑定等级。</summary>
+        /// <param name="materialCode">已有物料编码；传null清除物料及等级，保留全部操作重试摘要。</param>
+        public void ConfigureRemainderMaterial(string materialCode)
+        {
+            CellCode = CellCode.Trim().ToUpperInvariant();
+            if (!string.IsNullOrWhiteSpace(materialCode))
+            {
+                if (RemainderMaterialCode == materialCode.Trim()) return;
+                this.SetProperty("RemainderMaterialCode", materialCode.Trim());
+            }
+            else ExtraProperties.Remove("RemainderMaterialCode");
+            ExtraProperties.Remove("RemainderGrade");
+        }
+
         /// <summary>首次入柜绑定物料和等级；以后只允许相同物料、相同等级入柜。</summary>
         /// <param name="materialCode">标识卡物料编码。</param>
         /// <param name="grade">标识卡等级，不能为空。</param>
@@ -167,6 +181,7 @@ namespace TuTa.Wms.Cells.Aggregates
                 throw new UserFriendlyException($"柜位{CellCode}固定存放{RemainderMaterialCode}/{RemainderGrade}，不能混放其他物料或等级");
             this.SetProperty("RemainderMaterialCode", materialCode);
             this.SetProperty("RemainderGrade", grade);
+            CellCode = CellCode.Trim().ToUpperInvariant();
         }
 
         /// <summary>读取独立寄存摘要，库存取空后仍可确认原请求，防止重复增加库存。</summary>

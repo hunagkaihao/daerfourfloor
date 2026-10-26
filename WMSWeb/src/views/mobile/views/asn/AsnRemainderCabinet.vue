@@ -15,6 +15,9 @@
       <a-tab-pane key="stock" tab="库存查询" :disabled="operationLocked && activeTab !== 'stock'">
         <RemainderCabinetStockQuery />
       </a-tab-pane>
+      <a-tab-pane key="binding" tab="库位绑定" :disabled="operationLocked && activeTab !== 'binding'">
+        <RemainderCabinetBinding @lock-change="operationLocked = $event" />
+      </a-tab-pane>
     </a-tabs>
   </div>
 </template>
@@ -25,8 +28,9 @@ import Header from '../../header/Header.vue';
 import RemainderCabinetProductOperation from '../../components/RemainderCabinetProductOperation.vue';
 import RemainderCabinetHistoryQuery from '../../components/RemainderCabinetHistoryQuery.vue';
 import RemainderCabinetStockQuery from '../../components/RemainderCabinetStockQuery.vue';
+import RemainderCabinetBinding from '../../components/RemainderCabinetBinding.vue';
 
-/** 四个子页面直接显示；寄存、领用结果未确认时保持当前操作页，防止重复记账。 */
+/** 五个子页面直接显示；寄存、领用结果未确认及绑定提交时保持当前操作页。 */
 const activeTab = ref('deposit');
 const operationLocked = ref(false);
 /** 仅在当前可见标签页查找扫码框，避免缓存子页面争抢焦点。 */

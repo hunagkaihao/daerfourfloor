@@ -45,7 +45,7 @@ namespace TuTa.Wms.Stocks
             var cells = await _cellRepository.GetListAsync(x => x.CellType == CellType.HandCell &&
                 x.WarehouseAreaId.HasValue && areaIds.Contains(x.WarehouseAreaId.Value));
             return cells.Where(x => areas.Any(a => a.Id == x.WarehouseAreaId && a.WarehouseId == x.WarehouseId) &&
-                Regex.IsMatch(x.CellCode, @"^[A-L](0[1-9]|1[0-5])-0[1-8]$")).ToList();
+                Regex.IsMatch(x.CellCode, @"^[A-L](0[1-9]|1[0-5])-0[1-8]$", RegexOptions.IgnoreCase)).ToList();
         }
 
         /// <summary>独立寄存直接可用；历史报检入库仍保留原检验约束，冻结及占用库存不能领用。</summary>
@@ -55,18 +55,29 @@ namespace TuTa.Wms.Stocks
                string.IsNullOrWhiteSpace(stock.U8OutboundRecordId) && !stock.BoxData.BoxId.HasValue &&
                (stock.InspectionCount ?? 0) == 0;
 
-        /// <summary>寄存与领用均要求有效的存货、等级、柜位及正数量，按既有decimal(18,6)精度校验。</summary>
-        private static bool IsValidRemainderOperation(RemainderCabinetDepositDto input)
+        /// <summary>校验存货、等级、柜位及正数量，按既有decimal(18,6)精度校验；批次仅在寄存时校验。</summary>
+        /// <param name="input">本次柜位操作内容。</param>
+        /// <param name="validateBatch">寄存校验流水批次长度；领用传false，忽略批次。</param>
+        private static bool IsValidRemainderOperation(RemainderCabinetDepositDto input, bool validateBatch = true)
             => input != null && input.RequestId != Guid.Empty && !string.IsNullOrWhiteSpace(input.MaterialCode) &&
                input.MaterialCode.Trim().Length <= 20 && !string.IsNullOrWhiteSpace(input.Grade) &&
                input.Grade.Trim().Length <= 20 && !string.IsNullOrWhiteSpace(input.CellCode) &&
+               (!validateBatch || (input.BatchCode?.Trim().Length ?? 0) <= 30) &&
                input.Quantity > 0 && input.Quantity <= 999999999999.999999m && input.Quantity == decimal.Round(input.Quantity, 6);
 
         /// <summary>规范同一次操作的内容摘要，用于事务内登记及网络重试核实。</summary>
-        private static string GetRemainderOperationFingerprint(RemainderCabinetDepositDto input, string cellCode)
-            => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new {
+        /// <param name="input">原操作内容。</param>
+        /// <param name="cellCode">大写标准库位编码。</param>
+        /// <param name="includeBatch">仅寄存锁定追溯批次，新的领用摘要忽略批次。</param>
+        private static string GetRemainderOperationFingerprint(RemainderCabinetDepositDto input, string cellCode, bool includeBatch = true)
+        {
+            var content = JsonConvert.SerializeObject(new {
                 CellCode = cellCode, MaterialCode = input.MaterialCode.Trim(), Grade = input.Grade.Trim(), input.Quantity
-            }))));
+            });
+            // 无批次的旧待确认请求保持原摘要；有批次时锁定原追溯信息，重试不能更改流水批次。
+            if (includeBatch && !string.IsNullOrWhiteSpace(input.BatchCode)) content += "\nBatchCode:" + input.BatchCode.Trim();
+            return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(content)));
+        }
 
         /// <summary>独立寄存仅写入统一库存、固定格位和入库流水，不查询或改写ASN，不调用U8。</summary>
         [UnitOfWork(IsDisabled = true)]
@@ -95,6 +106,8 @@ namespace TuTa.Wms.Stocks
                     if (await _stockRepository.FindAsync(input.RequestId) != null)
                         return new ResponseDto { success = false, message = "该提交标识已有关联库存，请核对原记录" };
                     var materialCode = input.MaterialCode.Trim(); var grade = input.Grade.Trim();
+                    if (location.Cell.RemainderMaterialCode != materialCode)
+                        return new ResponseDto { success = false, message = "物料与柜位未绑定或绑定已变化，请先在库位绑定页面维护后重新扫码" };
                     var material = await _materialRepository.FindByMaterialCodeAsync(materialCode);
                     if (material == null) return new ResponseDto { success = false, message = "存货主数据不存在，请先同步物料" };
                     var existing = await _stockRepository.GetByCellIdAsync(location.Cell.Id);
@@ -110,7 +123,8 @@ namespace TuTa.Wms.Stocks
                     var history = new StockInHistory(materialCode, materialCode, material.MaterialName, material.Specs,
                         material.Unit, location.Warehouse.WarehouseCode, location.Warehouse.WarehouseName,
                         location.Area.WarehouseAreaCode, location.Area.WarehouseAreaName, cellCode, location.Cell.CellName,
-                        null, null, "零头柜寄存", input.Quantity, DateTime.Now, CurrentUser.UserName);
+                        null, null, "零头柜寄存", input.Quantity, DateTime.Now, CurrentUser.UserName,
+                        batchNo: string.IsNullOrWhiteSpace(input.BatchCode) ? null : input.BatchCode.Trim());
                     history.SetProperty("Grade", grade);
                     history.SetProperty("RemainderDepositId", input.RequestId.ToString("N"));
                     location.Cell.RecordRemainderDeposit(input.RequestId, fingerprint);
@@ -136,14 +150,14 @@ namespace TuTa.Wms.Stocks
             {
                 var cells = await GetRemainderCellsAsync();
                 var cellFilter = input.CellCode?.Trim().ToUpperInvariant();
-                if (!string.IsNullOrEmpty(cellFilter)) cells = cells.Where(x => x.CellCode.Contains(cellFilter)).ToList();
+                if (!string.IsNullOrEmpty(cellFilter)) cells = cells.Where(x => x.CellCode.ToUpperInvariant().Contains(cellFilter)).ToList();
                 (string Material, string Batch, string Grade)? scan = null;
                 if (!string.IsNullOrWhiteSpace(input.ScanCode))
                 {
                     if (Regex.IsMatch(input.ScanCode.Trim().ToUpperInvariant(), @"^[A-L][0-9]{1,2}-[0-9]{1,2}$"))
                     {
                         var exactCell = NormalizeRemainderCellCode(input.ScanCode);
-                        cells = cells.Where(x => x.CellCode == exactCell).ToList();
+                        cells = cells.Where(x => string.Equals(x.CellCode, exactCell, StringComparison.OrdinalIgnoreCase)).ToList();
                     }
                     else scan = ParseRemainderMaterialScan(input.ScanCode);
                 }
@@ -180,9 +194,13 @@ namespace TuTa.Wms.Stocks
                 var count = await AsyncExecuter.CountAsync(balances);
                 var items = await AsyncExecuter.ToListAsync(balances.OrderBy(x => x.CellCode).ThenBy(x => x.MaterialCode).ThenBy(x => x.Grade)
                     .Skip(Math.Max(input.SkipCount, 0)).Take(Math.Clamp(input.MaxResultCount, 1, 200)));
-                var enabledCodes = cells.Where(x => x.RunStatus == CellRunStatus.Enable).Select(x => x.CellCode).ToHashSet();
+                var enabledCodes = cells.Where(x => x.RunStatus == CellRunStatus.Enable)
+                    .Select(x => NormalizeRemainderCellCode(x.CellCode)).ToHashSet();
                 foreach (var item in items)
+                {
+                    item.CellCode = NormalizeRemainderCellCode(item.CellCode);
                     if (!enabledCodes.Contains(item.CellCode)) item.AvailableQuantity = 0;
+                }
                 await read.CompleteAsync();
                 return new PagedResultDto<RemainderCabinetBalanceDto>(count, items);
             }
@@ -201,7 +219,7 @@ namespace TuTa.Wms.Stocks
             return (start, keyword.Length == 4 ? start.AddYears(1) : keyword.Length == 7 ? start.AddMonths(1) : start.AddDays(1));
         }
 
-        /// <summary>在数据库内合并并分页寄存、领用流水，固定格位等级兼容此前未记录Grade扩展项的流水。</summary>
+        /// <summary>合并并分页寄存、领用流水，批次仅展示及筛选寄存流水，等级取操作时记录。</summary>
         [UnitOfWork(IsDisabled = true)]
         public async Task<PagedResultDto<RemainderCabinetHistoryDto>> GetRemainderHistoriesAsync(RemainderCabinetQueryDto input)
         {
@@ -211,7 +229,7 @@ namespace TuTa.Wms.Stocks
             {
                 var cells = await GetRemainderCellsAsync();
                 if (!string.IsNullOrWhiteSpace(input.CellCode))
-                    cells = cells.Where(x => x.CellCode.Contains(input.CellCode.Trim().ToUpperInvariant())).ToList();
+                    cells = cells.Where(x => x.CellCode.ToUpperInvariant().Contains(input.CellCode.Trim().ToUpperInvariant())).ToList();
                 if (!string.IsNullOrWhiteSpace(input.Grade))
                     cells = cells.Where(x => (x.RemainderGrade ?? "").Contains(input.Grade.Trim(), StringComparison.OrdinalIgnoreCase)).ToList();
                 var codes = cells.Select(x => x.CellCode).ToList();
@@ -228,7 +246,7 @@ namespace TuTa.Wms.Stocks
                     .Where(x => x.StockOutType == "零头柜领用" && codes.Contains(x.CellCode))
                     .Select(x => new RemainderCabinetHistoryDto {
                         HistoryId = x.Id, Operation = "领用", OperationTime = x.OutTime, MaterialCode = x.MaterialCode,
-                        MaterialName = x.MaterialName, CellCode = x.CellCode, BatchCode = x.BatchNo,
+                        MaterialName = x.MaterialName, CellCode = x.CellCode, BatchCode = null,
                         Quantity = x.OutCount, Unit = x.MaterialUnit, OperatorName = x.OperatorName
                     });
                 var query = incoming.Concat(outgoing);
@@ -237,14 +255,31 @@ namespace TuTa.Wms.Stocks
                     var material = input.MaterialCode.Trim();
                     query = query.Where(x => x.MaterialCode.Contains(material));
                 }
+                if (!string.IsNullOrWhiteSpace(input.BatchCode))
+                {
+                    var batch = input.BatchCode.Trim();
+                    query = query.Where(x => x.Operation == "寄存" && x.BatchCode != null && x.BatchCode.Contains(batch));
+                }
                 if (dates.Start.HasValue) query = query.Where(x => x.OperationTime >= dates.Start.Value);
                 if (dates.End.HasValue) query = query.Where(x => x.OperationTime < dates.End.Value);
                 var count = await AsyncExecuter.CountAsync(query);
                 var rows = await AsyncExecuter.ToListAsync(query.OrderByDescending(x => x.OperationTime)
                     .ThenByDescending(x => x.HistoryId).ThenBy(x => x.Operation)
                     .Skip(Math.Max(input.SkipCount, 0)).Take(Math.Clamp(input.MaxResultCount, 1, 200)));
-                var grades = cells.ToDictionary(x => x.CellCode, x => x.RemainderGrade);
-                foreach (var row in rows) row.Grade = grades[row.CellCode];
+                // 优先使用操作时保存的等级；解绑或更换物料后，旧流水仍展示原等级。
+                var incomingIds = rows.Where(x => x.Operation == "寄存").Select(x => x.HistoryId).ToList();
+                var outgoingIds = rows.Where(x => x.Operation == "领用").Select(x => x.HistoryId).ToList();
+                var incomingGrades = incomingIds.Count == 0 ? new Dictionary<int, string>() :
+                    (await _stockInHistoryRepository.GetListAsync(x => incomingIds.Contains(x.Id)))
+                        .ToDictionary(x => x.Id, x => x.GetProperty<string>("Grade"));
+                var outgoingGrades = outgoingIds.Count == 0 ? new Dictionary<int, string>() :
+                    (await _stockOutHistoryRepository.GetListAsync(x => outgoingIds.Contains(x.Id)))
+                        .ToDictionary(x => x.Id, x => x.GetProperty<string>("Grade"));
+                foreach (var row in rows)
+                {
+                    row.Grade = (row.Operation == "寄存" ? incomingGrades : outgoingGrades).GetValueOrDefault(row.HistoryId);
+                    row.CellCode = NormalizeRemainderCellCode(row.CellCode);
+                }
                 await read.CompleteAsync();
                 return new PagedResultDto<RemainderCabinetHistoryDto>(count, rows);
             }
@@ -254,7 +289,7 @@ namespace TuTa.Wms.Stocks
         [UnitOfWork(IsDisabled = true)]
         public async Task<ResponseDto> WithdrawRemainderAsync(RemainderCabinetWithdrawDto input)
         {
-            if (!IsValidRemainderOperation(input))
+            if (!IsValidRemainderOperation(input, validateBatch: false))
                 return new ResponseDto { success = false, message = "请提供存货编码、等级、柜位及有效的正数量，数量最多6位小数" };
             var written = false;
             await ErpAsnAppService.LocalPushLock.WaitAsync();
@@ -267,11 +302,15 @@ namespace TuTa.Wms.Stocks
                 using (var uow = UnitOfWorkManager.Begin(true, true))
                 {
                     var location = await ResolveRemainderCellAsync(cellCode);
-                    var fingerprint = GetRemainderOperationFingerprint(input, cellCode);
+                    var fingerprint = GetRemainderOperationFingerprint(input, cellCode, includeBatch: false);
                     var previous = location.Cell.GetRemainderWithdrawalFingerprint(input.RequestId);
                     if (previous != null)
-                        return new ResponseDto { success = previous == fingerprint, message = previous == fingerprint
+                    {
+                        // 兼容升级前携带批次的待确认原请求，仍只确认既有结果，不能再次扣减库存。
+                        var sameRequest = previous == fingerprint || previous == GetRemainderOperationFingerprint(input, cellCode);
+                        return new ResponseDto { success = sameRequest, message = sameRequest
                             ? "该次领用已完成，无需重复扣减库存" : "该提交标识已用于其他领用数据，请核对原请求" };
+                    }
                     if (location.Cell.RunStatus != CellRunStatus.Enable)
                         return new ResponseDto { success = false, message = "该柜位已禁用，不能领用" };
                     var materialCode = input.MaterialCode.Trim(); var grade = input.Grade.Trim();

@@ -17,9 +17,11 @@ namespace TuTa.Wms.Stocks.Dtos
         public string Grade { get; set; }
         /// <summary>流水日期，支持yyyy、yyyy-MM、yyyy-MM-dd，包含该年、月或日的全部记录。</summary>
         public string DateKeyword { get; set; }
+        /// <summary>寄存流水批次号片段；填写后仅查询寄存流水，不参与库存查询或领用匹配。</summary>
+        public string BatchCode { get; set; }
     }
 
-    /// <summary>独立寄存请求，仅记录存货、等级、柜位和数量，不关联ASN或U8单据。</summary>
+    /// <summary>独立寄存请求，按存货、等级、柜位和数量记账；箱码批次仅记录流水，不关联ASN或U8。</summary>
     public class RemainderCabinetDepositDto
     {
         /// <summary>本次操作唯一提交标识，重试保持不变，成功后下一笔才更换。</summary>
@@ -35,9 +37,22 @@ namespace TuTa.Wms.Stocks.Dtos
         public string Grade { get; set; }
         /// <summary>实际数量，单位同物料，须大于0，最多6位小数。</summary>
         public decimal Quantity { get; set; }
+        /// <summary>箱码第2段批次号，仅寄存时校验最多30字符并写入寄存流水；领用忽略该兼容字段。</summary>
+        public string BatchCode { get; set; }
     }
 
-    /// <summary>按存货、等级及柜位领用；数量不能超过该格可领用合计，重试沿用原请求。</summary>
+    /// <summary>零头柜物料与库位绑定；解绑时MaterialCode为页面读取的原编码，防止误解绑。</summary>
+    public class RemainderCabinetBindingDto
+    {
+        /// <summary>A至L柜的实际格位，服务端统一为大写，例如K01-01。</summary>
+        [Required]
+        public string CellCode { get; set; }
+        /// <summary>绑定的新物料编码或解绑前的原物料编码，必须是已有物料。</summary>
+        [Required, StringLength(20)]
+        public string MaterialCode { get; set; }
+    }
+
+    /// <summary>按存货、等级及柜位领用，忽略批次；数量不能超过该格可领用合计，重试沿用原请求。</summary>
     public class RemainderCabinetWithdrawDto : RemainderCabinetDepositDto { }
 
     /// <summary>按存货、等级和实际柜位汇总的零头库存，不关联ASN。</summary>
@@ -78,9 +93,9 @@ namespace TuTa.Wms.Stocks.Dtos
         public string MaterialName { get; set; }
         /// <summary>实际货位。</summary>
         public string CellCode { get; set; }
-        /// <summary>固定格位等级，空库后仍可追溯。</summary>
+        /// <summary>操作时记录的等级；解绑或更换物料不改写旧流水，未记录时为空。</summary>
         public string Grade { get; set; }
-        /// <summary>实际批号。</summary>
+        /// <summary>寄存扫描箱码的追溯批次；领用及历史未采集批次的寄存流水为空。</summary>
         public string BatchCode { get; set; }
         /// <summary>本次寄存或领用数量，始终为正数，由Operation区分方向。</summary>
         public decimal Quantity { get; set; }

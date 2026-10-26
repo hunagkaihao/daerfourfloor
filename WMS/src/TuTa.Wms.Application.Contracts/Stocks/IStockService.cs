@@ -29,6 +29,15 @@ namespace TuTa.Wms.Stocks
         /// <summary>查询4楼叉车库零头柜格位、固定物料等级及现有库存。</summary>
         Task<RemainderCabinetDto> GetRemainderCabinetAsync(string cellCode);
 
+        /// <summary>按物料查询固定绑定的所有零头柜位，空库存格位仍返回，不按批次筛选。</summary>
+        Task<List<RemainderCabinetDto>> GetRemainderLocationsAsync(string materialCode);
+
+        /// <summary>绑定零头柜物料；缺失的标准格位可在已有零头柜区中创建，更换物料须先解绑。</summary>
+        Task<ResponseDto> BindRemainderLocationAsync(RemainderCabinetBindingDto input);
+
+        /// <summary>解绑空柜位的物料及等级；有库存或占用时禁止解绑。</summary>
+        Task<ResponseDto> UnbindRemainderLocationAsync(RemainderCabinetBindingDto input);
+
         /// <summary>将检验合格的ASN剩余零头计入统一库存，重试沿用原RequestId，不创建AGV任务。</summary>
         Task<ResponseDto> StoreAsnRemainderAsync(RemainderCabinetEntryDto input);
 

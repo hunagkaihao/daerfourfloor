@@ -2,6 +2,8 @@
   <div class="cabinet-query">
     <label>存货编码</label>
     <a-input v-model:value="materialCode" placeholder="输入全部或部分存货编码，也可扫描物料卡" allow-clear @pressEnter="search" />
+    <label>批次号（寄存）</label>
+    <a-input v-model:value="batchCode" placeholder="输入全部或部分批次号，也可扫描箱码自动带入" allow-clear @pressEnter="search" />
     <label>货位</label>
     <a-select :value="cellCode || undefined" :options="remainderCellOptions" show-search allow-clear
       option-filter-prop="label" placeholder="全部货位，可搜索A15-08" style="width: 100%" @change="cellCode = $event || ''" />
@@ -16,6 +18,7 @@
       :title="`${row.operation} / ${row.materialCode}`" :head-style="historyHeaderStyles[row.operation]">
       <p>{{ row.materialName || '-' }}</p>
       <p>货位：{{ row.cellCode }}；等级：{{ row.grade || '-' }}</p>
+      <p v-if="row.operation === '寄存'">批次号：{{ row.batchCode || '-' }}</p>
       <p>{{ row.operation }}数量：{{ row.quantity }} {{ row.unit || '' }}</p>
       <p>时间：{{ displayRemainderTime(row.operationTime) }}</p>
       <p>操作人员：{{ row.operatorName || '-' }}</p>
@@ -37,6 +40,8 @@ import type { RemainderHistory, RemainderQuery } from '../views/RemainderCabinet
 import { displayRemainderTime, normalizeRemainderHistoryMaterial, remainderCellOptions } from '../views/RemainderCabinetHelpers';
 
 const materialCode = ref('');
+/** 仅筛选寄存流水中的箱码批次，不影响领用与库存余额。 */
+const batchCode = ref('');
 const cellCode = ref('');
 /** 日历选择结果以本地日期字符串传入后端，清空时取消日期过滤。 */
 const dateKeyword = ref('');
@@ -61,8 +66,9 @@ function search() {
   try {
     // 查询按钮与扫码回车共用编码提取，避免把等级等卡码内容一起传给存货条件。
     const code = normalizeRemainderHistoryMaterial(materialCode.value);
+    if (materialCode.value.includes(',')) batchCode.value = materialCode.value.split(',')[1]?.trim() || '';
     materialCode.value = code;
-    filters = { materialCode: code, cellCode: cellCode.value.trim(), dateKeyword: dateKeyword.value };
+    filters = { materialCode: code, batchCode: batchCode.value.trim(), cellCode: cellCode.value.trim().toUpperCase(), dateKeyword: dateKeyword.value };
   } catch (cause: any) {
     rows.value = []; total.value = 0;
     error.value = cause?.message || '请提供有效的存货编码';
