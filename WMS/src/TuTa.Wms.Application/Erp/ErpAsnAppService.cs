@@ -184,6 +184,16 @@ namespace TuTa.Wms.Erp
                     {
                         var saved = FindExistingAsn(existing, item);
                         if (saved == null) continue;
+                        // 明细操作按钮依据本地推送及取消状态；重扫ERP信息时不能丢弃已保存的U8关联。
+                        item.Status = (int)saved.Status;
+                        item.IsPushedToErp = saved.IsPushedToErp;
+                        item.PushTime = saved.PushTime;
+                        item.ArrivalVoucherId = saved.ArrivalVoucherId;
+                        item.ArrivalVoucherCode = saved.ArrivalVoucherCode;
+                        item.ArrivalDetailId = saved.ArrivalDetailId;
+                        item.ArrivalPushError = saved.ArrivalPushError;
+                        item.IsInspectionReportPushed = saved.IsInspectionReportPushed;
+                        item.InspectionPushError = saved.InspectionPushError;
                         item.MaterialInspectionStatus = (int)saved.MaterialInspectionStatus;
                         item.MaterialInspectionStatusName = GetMaterialInspectionStatusName(saved.MaterialInspectionStatus);
                     }

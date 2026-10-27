@@ -18,6 +18,13 @@ export interface AsnMaterialInspectionLine {
   materialInspectionStatus?: number;
   materialInspectionStatusName?: string;
   isInspectionReportPushed?: boolean;
+  /** 本地到货推送状态及真实U8来源关联，用于明细入口判断是否可报检。 */
+  isPushedToErp?: boolean;
+  arrivalVoucherId?: number;
+  arrivalVoucherCode?: string;
+  arrivalDetailId?: number;
+  arrivalPushError?: string;
+  inspectionPushError?: string;
 }
 
 /** 查询ASN检验状态；fromErp用于首次扫码获取ERP明细，保留代理尚未包含的状态字段。 */

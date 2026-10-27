@@ -65,8 +65,12 @@ namespace TuTa.Wms.Erp
 
         /// <summary>完整ASN到货单生成/失败重试，保留来源单据关联。</summary>
         Task<PuArrVouchAddResponseDto> PushAsnArrivalAsync(string asnCode);
+        /// <summary>按当前ASN中的指定采购订单生成完整到货单，供明细入口独立推送和重试。</summary>
+        Task<PuArrVouchAddResponseDto> PushAsnOrderArrivalAsync(string asnCode, string orderCode);
         /// <summary>到货成功后按到货单分别生成来料报检单，失败重试仅处理尚未成功的单据。</summary>
         Task<LLBJDAddResponseDto> PushAsnInspectionReportAsync(string asnCode);
+        /// <summary>按指定采购订单对应的U8到货单报检，不依赖其他采购订单的到货推送结果。</summary>
+        Task<LLBJDAddResponseDto> PushAsnOrderInspectionReportAsync(string asnCode, string orderCode);
 
         /// <summary>物料状态变更页按ASN和采购订单确认检验结果，只允许检验中转为合格或不合格。</summary>
         /// <param name="asnCode">送货单对应ASN号。</param>

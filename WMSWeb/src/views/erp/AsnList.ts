@@ -1,4 +1,4 @@
-import { getAsnList, pushReceipt, pushAsnArrival, pushAsnInspection } from '/@/api/erp/asn';
+import { getAsnList, pushReceipt, pushAsnArrival, pushAsnInspection, pushAsnOrderArrival, pushAsnOrderInspection } from '/@/api/erp/asn';
 import type { AsnWorkflowLine } from '/@/api/erp/asn';
 import { BasicColumn } from '/@/components/Table';
 import { Tag } from 'ant-design-vue';
@@ -428,9 +428,9 @@ export async function pushErpReceiptAsync(asnCode: string) {
 }
 
 /** 展示U8具体结果，网络错误也保留失败语义供页面决定是否刷新。 */
-async function pushAsnDocument(asnCode: string, api: typeof pushAsnArrival) {
+async function pushAsnDocument(action: () => ReturnType<typeof pushAsnArrival>) {
   try {
-    const result = await api(asnCode);
+    const result = await action();
     if (result.success) message.success(result.message || '推送成功');
     else message.error(result.message || '推送失败');
     return result;
@@ -440,12 +440,12 @@ async function pushAsnDocument(asnCode: string, api: typeof pushAsnArrival) {
   }
 }
 
-/** 完整ASN到货单推送，与组盘后的自动推送共用后端入口。 */
-export function pushAsnArrivalAsync(asnCode: string) {
-  return pushAsnDocument(asnCode, pushAsnArrival);
+/** 不传订单时推送整张ASN；明细入口限定所属采购订单。 */
+export function pushAsnArrivalAsync(asnCode: string, orderCode?: string) {
+  return pushAsnDocument(() => orderCode ? pushAsnOrderArrival(asnCode, orderCode) : pushAsnArrival(asnCode));
 }
 
-/** 到货单来源关联齐全后推送来料报检单。 */
-export function pushAsnInspectionAsync(asnCode: string) {
-  return pushAsnDocument(asnCode, pushAsnInspection);
+/** 来源关联齐全后报检，明细入口只处理所属订单对应的到货单。 */
+export function pushAsnInspectionAsync(asnCode: string, orderCode?: string) {
+  return pushAsnDocument(() => orderCode ? pushAsnOrderInspection(asnCode, orderCode) : pushAsnInspection(asnCode));
 }

@@ -110,12 +110,22 @@ namespace TuTa.Wms.Controllers.Erp
             return _erpAsnAppService.PushAsnArrivalAsync(asnCode);
         }
 
+        /// <summary>从ASN明细入口推送所属采购订单的完整到货单。</summary>
+        [HttpPost("push-arrival-by-order")]
+        public Task<PuArrVouchAddResponseDto> PushAsnOrderArrivalAsync(string asnCode, string orderCode)
+            => _erpAsnAppService.PushAsnOrderArrivalAsync(asnCode, orderCode);
+
         /// <summary>生成ASN来料报检单，或重试失败的报检推送。</summary>
         [HttpPost("push-inspection-by-asn")]
         public Task<LLBJDAddResponseDto> PushAsnInspectionReportAsync(string asnCode)
         {
             return _erpAsnAppService.PushAsnInspectionReportAsync(asnCode);
         }
+
+        /// <summary>从ASN明细入口推送所属采购订单对应到货单的来料报检单。</summary>
+        [HttpPost("push-inspection-by-order")]
+        public Task<LLBJDAddResponseDto> PushAsnOrderInspectionReportAsync(string asnCode, string orderCode)
+            => _erpAsnAppService.PushAsnOrderInspectionReportAsync(asnCode, orderCode);
 
         /// <summary>按ASN和采购订单人工确认物料检验结果：2合格、3不合格。</summary>
         [HttpPost("material-inspection-status")]

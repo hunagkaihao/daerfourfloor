@@ -1,9 +1,10 @@
 <template>
     <div class="scan-asn-container">
         <Header numb="扫描ASN"></Header>
-        <U8InboundActions :asn-code="asnCode" :show-asn-input="false" @workflow-completed="refreshLocalAsn" />
+        <U8InboundActions :asn-code="asnCode" :show-asn-input="false" :disabled="loading || saving || !!linePushing"
+            @busy-change="documentBusy = $event" @workflow-completed="refreshLocalAsn" />
         <div class="remainder-action">
-            <a-button :disabled="loading || saving" @click="openRemainderCabinet">零头柜管理</a-button>
+            <a-button :disabled="workflowLocked" @click="openRemainderCabinet">零头柜管理</a-button>
         </div>
         
         <a-row class="input-row">
@@ -14,7 +15,7 @@
             </a-col>
             <a-col :span="17">
                 <a-input v-model:value="asnCode" placeholder="扫描ASN码" @keyup.enter="scanAsn" 
-                    :allowClear="true" @focus="focusFn" class="modern-input" autofocus ref="asnInput">
+                    :allowClear="true" :disabled="workflowLocked" @focus="focusFn" class="modern-input" autofocus ref="asnInput">
                     <template #suffix>
                         <scan-outlined class="scan-icon" />
                     </template>
@@ -73,6 +74,18 @@
                         <span class="asn-value">{{ item.materialInspectionStatusName || '待检' }}</span>
                     </div>
                 </div>
+                <div class="asn-line-actions">
+                    <a-button :disabled="!canPushLine(item, 'arrival')"
+                        :loading="linePushing === 'arrival:' + item.cordercode" @click="pushLine(item, 'arrival')">
+                        {{ item.isPushedToErp ? '到货单已推送' : '推送到货单' }}
+                    </a-button>
+                    <a-button :disabled="!canPushLine(item, 'inspection')"
+                        :loading="linePushing === 'inspection:' + item.cordercode" @click="pushLine(item, 'inspection')">
+                        {{ item.isInspectionReportPushed ? '报检单已推送' : '推送来料报检单' }}
+                    </a-button>
+                    <a-alert v-if="item.cordercode && lineNotices[item.cordercode]"
+                        :message="lineNotices[item.cordercode].message" :type="lineNotices[item.cordercode].type" show-icon />
+                </div>
             </div>
         </div>
 
@@ -81,10 +94,10 @@
         </div>
 
         <div class="bottom-action-bar">
-            <a-button type="primary" @click="scanAsn" class="modern-btn" :loading="loading">
+            <a-button type="primary" @click="scanAsn" class="modern-btn" :loading="loading" :disabled="workflowLocked">
                 查询ASN信息
             </a-button>
-            <a-button type="default" @click="saveAsnInfo" class="modern-btn" :loading="saving">
+            <a-button type="default" @click="saveAsnInfo" class="modern-btn" :loading="saving" :disabled="workflowLocked">
                 保存ASN信息
             </a-button>
         </div>
@@ -95,12 +108,14 @@
 import U8InboundActions from "../../components/U8InboundActions.vue";
 import { createU8Arrival, queryAsnMaterialInspection } from "../U8InboundApi";
 import type { AsnMaterialInspectionLine } from "../U8InboundApi";
-import { ref, onMounted } from 'vue';
+import { computed, reactive, ref, onMounted, watch } from 'vue';
 import { ScanOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 import Header from '../../header/Header.vue';
 import { router } from '/@/router';
 import { ERP_ASNServiceProxy, ErpAsnDto, ErpAsnSaveResponseDto } from '/@/services/ServiceProxies';
+import { getAsnOrderPushState, pushAsnOrderArrival, pushAsnOrderInspection } from '/@/api/erp/asn';
+import { useMessage } from '/@/hooks/web/useMessage';
 
 const asnInput = ref<any>();
 const asnCode = ref<string>('');
@@ -110,12 +125,20 @@ const asnDataList = ref<AsnDisplayLine[]>([]);
 const loading = ref(false);
 const saving = ref(false);
 const showSaveSuccess = ref(false);
+/** 整单和明细推送共用操作锁，推送期间不能切换ASN或再次保存。 */
+const documentBusy = ref(false);
+const linePushing = ref('');
+const workflowLocked = computed(() => loading.value || saving.value || documentBusy.value || !!linePushing.value);
+/** 各采购订单保留最近一次明细推送回执，重复物料明细共享对应单据结果。 */
+const lineNotices = reactive<Record<string, { message: string; type: 'success' | 'warning' | 'error' }>>({});
+const { createConfirm } = useMessage();
+watch(asnCode, () => Object.keys(lineNotices).forEach(key => delete lineNotices[key]));
 
 const asnService = new ERP_ASNServiceProxy();
 
 /** 进入独立零头柜管理，不关联当前ASN单号。 */
 function openRemainderCabinet() {
-    if (loading.value || saving.value) return;
+    if (workflowLocked.value) return;
     return router.push('/asnRemainderCabinet');
 }
 
@@ -147,7 +170,40 @@ async function refreshLocalAsn(code: string) {
     }
 }
 
+/** 明细按钮按当前ASN下的完整采购订单判断条件，旧ASN卡片及取消行不能推送。 */
+function canPushLine(line: AsnDisplayLine, kind: 'arrival' | 'inspection') {
+    if (workflowLocked.value || line.status === 4 || line.ccode !== asnCode.value.trim()) return false;
+    const state = getAsnOrderPushState(asnDataList.value, line.cordercode);
+    return kind === 'arrival' ? state.canPushArrival : state.canPushInspection;
+}
+
+/** 明细入口仅处理所属采购订单，回执和状态刷新不会影响其他ASN。 */
+function pushLine(line: AsnDisplayLine, kind: 'arrival' | 'inspection') {
+    if (!canPushLine(line, kind) || !line.cordercode) return;
+    const code = asnCode.value.trim();
+    const order = line.cordercode;
+    createConfirm({
+        title: kind === 'arrival' ? '推送到货单' : '推送来料报检单',
+        content: `将推送采购订单 ${order} 的完整${kind === 'arrival' ? '到货单' : '来料报检单'}，其他采购订单不受影响。${kind === 'inspection' ? '请先确认仓管员已在U8审核对应到货单。' : ''}`,
+        onOk: async () => {
+            if (code !== asnCode.value.trim() || !canPushLine(line, kind)) return;
+            linePushing.value = kind + ':' + order;
+            try {
+                const result = await (kind === 'arrival' ? pushAsnOrderArrival : pushAsnOrderInspection)(code, order);
+                if (code === asnCode.value.trim()) lineNotices[order] = {
+                    message: result.message || (result.success ? '推送成功' : '推送未完成'),
+                    type: result.success ? 'success' : 'warning',
+                };
+                await refreshLocalAsn(code);
+            } catch (error: any) {
+                if (code === asnCode.value.trim()) lineNotices[order] = { message: error?.message || '推送结果未确认，请刷新后重试', type: 'error' };
+            } finally { linePushing.value = ''; }
+        },
+    });
+}
+
 async function scanAsn() {
+    if (workflowLocked.value) return;
     if (!asnCode.value || asnCode.value.trim() === '') {
         message.error('请输入ASN码');
         return;
@@ -177,6 +233,7 @@ async function scanAsn() {
 }
 
 async function saveAsnInfo() {
+    if (workflowLocked.value) return;
     if (!asnCode.value || asnCode.value.trim() === '') {
         message.error('请先输入ASN码');
         return;
@@ -218,6 +275,14 @@ async function saveAsnInfo() {
 .remainder-action {
     margin: 10px 16px;
 }
+
+.asn-line-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 12px;
+}
+.asn-line-actions .ant-alert { width: 100%; }
 
 .scan-asn-container {
     min-height: 100vh;

@@ -1,11 +1,11 @@
 <template>
   <div class="u8-inbound-actions">
-    <a-input v-if="showAsnInput !== false" v-model:value="code" placeholder="扫描或输入ASN单号" :allowClear="true" :disabled="busy" />
+    <a-input v-if="showAsnInput !== false" v-model:value="code" placeholder="扫描或输入ASN单号" :allowClear="true" :disabled="busy || disabled" />
     <p v-else>当前ASN：{{ code || '请先输入ASN单号' }}</p>
     <div class="actions">
-      <a-button :loading="busy" :disabled="!code.trim() || busy" @click="arrival">生成或重试到货单</a-button>
-      <a-button :loading="busy" :disabled="!code.trim() || busy" @click="report">推送来料报检单</a-button>
-      <a-button :loading="busy" :disabled="!code.trim() || busy" @click="query">查询U8检验结果</a-button>
+      <a-button :loading="busy" :disabled="!code.trim() || busy || disabled" @click="arrival">生成或重试到货单</a-button>
+      <a-button :loading="busy" :disabled="!code.trim() || busy || disabled" @click="report">推送来料报检单</a-button>
+      <a-button :loading="busy" :disabled="!code.trim() || busy || disabled" @click="query">查询U8检验结果</a-button>
     </div>
     <p>先保存ASN并生成到货单，U8审核后报检进入检验中；在物料状态变更页人工确认合格后逐箱组盘，采购入库另需U8检验单来源。</p>
     <a-alert v-if="notice" :message="notice" :type="noticeType" show-icon />
@@ -14,7 +14,7 @@
       <div>检验单：{{ row.checkCode || '待检验' }}；合格数量：{{ row.qualifiedQuantity }}</div>
       <div>已组盘：{{ row.groupedQuantity || 0 }}；待组盘：{{ row.pendingGroupingQuantity || 0 }}</div>
       <div>{{ row.message }}</div>
-      <a-button :disabled="busy || !row.canPurchase || row.isPurchasePushed" @click="purchase(row)">
+      <a-button :disabled="busy || disabled || !row.canPurchase || row.isPurchasePushed" @click="purchase(row)">
         {{ row.isPurchasePushed ? '采购入库已推送' : '推送或重试采购入库' }}
       </a-button>
     </div>
@@ -29,8 +29,9 @@ import { createU8Arrival, queryU8Inspection, reportU8Inspection, retryU8Purchase
 const emit = defineEmits<{
   (event: 'inspection-results', rows: U8InspectionLine[]): void;
   (event: 'workflow-completed', asnCode: string): void;
+  (event: 'busy-change', busy: boolean): void;
 }>();
-const props = defineProps<{ asnCode?: string; showAsnInput?: boolean }>();
+const props = defineProps<{ asnCode?: string; showAsnInput?: boolean; disabled?: boolean }>();
 const { createConfirm } = useMessage();
 const code = ref(props.asnCode || '');
 const busy = ref(false);
@@ -38,13 +39,16 @@ const notice = ref('');
 const noticeType = ref<'success' | 'warning' | 'error'>('warning');
 const rows = ref<U8InspectionLine[]>([]);
 
+/** 同步整单请求状态，父页可与明细推送、保存和扫码互斥。 */
+watch(busy, value => emit('busy-change', value), { immediate: true, flush: 'sync' });
+
 /** 当前ASN变化时清除旧检验结果，避免使用上一次查询的来源行操作。 */
 watch(() => props.asnCode, value => { code.value = value || ''; });
 watch(code, () => { rows.value = []; notice.value = ''; });
 
 /** 执行单次业务操作，失败说明持续显示，避免仅用短暂消息掩盖待审核状态。 */
 async function run(action: () => Promise<any>) {
-  if (busy.value || !code.value.trim()) return;
+  if (busy.value || props.disabled || !code.value.trim()) return;
   const operationCode = code.value.trim();
   busy.value = true;
   try {
@@ -70,6 +74,7 @@ function arrival() { return run(() => createU8Arrival(code.value)); }
 
 /** 人工审核在U8完成，不在PDA伪造审核状态。 */
 function report() {
+  if (busy.value || props.disabled) return;
   createConfirm({
     title: '推送来料报检单',
     content: '请先确认仓管员已在U8审核到货单。未审核时需等待审核后重试。',
@@ -82,7 +87,7 @@ function query() { return run(() => queryU8Inspection(code.value)); }
 
 /** 采购重试只调用生单接口，不再次修改本地抽检数量。 */
 function purchase(row: U8InspectionLine) {
-  if (busy.value || !row.canPurchase || row.isPurchasePushed) return;
+  if (busy.value || props.disabled || !row.canPurchase || row.isPurchasePushed) return;
   createConfirm({
     title: '采购入库',
     content: '确认整张ASN已逐箱组盘并校验完成，按对应检验单推送采购入库？',

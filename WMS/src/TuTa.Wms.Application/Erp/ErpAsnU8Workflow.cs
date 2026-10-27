@@ -220,7 +220,18 @@ namespace TuTa.Wms.Erp
 
         /// <summary>按送货单内的采购订单分别生成到货单；失败可在管理页重试未成功的订单。</summary>
         [UnitOfWork(IsDisabled = true)]
-        public async Task<PuArrVouchAddResponseDto> PushAsnArrivalAsync(string asnCode)
+        public Task<PuArrVouchAddResponseDto> PushAsnArrivalAsync(string asnCode)
+            => PushAsnArrivalScopeAsync(asnCode, null);
+
+        /// <summary>从明细入口推送所属采购订单的完整到货单，不处理当前ASN中的其他订单。</summary>
+        [UnitOfWork(IsDisabled = true)]
+        public Task<PuArrVouchAddResponseDto> PushAsnOrderArrivalAsync(string asnCode, string orderCode)
+            => string.IsNullOrWhiteSpace(orderCode)
+                ? Task.FromResult(new PuArrVouchAddResponseDto { Success = false, Message = "采购订单号不能为空" })
+                : PushAsnArrivalScopeAsync(asnCode, orderCode.Trim());
+
+        /// <summary>整单和明细入口共用ASN锁；orderCode为空表示整张ASN，否则限定一个采购订单。</summary>
+        private async Task<PuArrVouchAddResponseDto> PushAsnArrivalScopeAsync(string asnCode, string orderCode)
         {
             if (string.IsNullOrWhiteSpace(asnCode))
                 return new PuArrVouchAddResponseDto { Success = false, Message = "ASN码不能为空" };
@@ -231,18 +242,20 @@ namespace TuTa.Wms.Erp
                 await using var handle = _u8Lock == null ? null : await _u8Lock.TryAcquireAsync("U8:ASN:" + asnCode);
                 if (_u8Lock != null && handle == null)
                     return new PuArrVouchAddResponseDto { Success = false, Message = "该ASN正在推送，请稍后刷新" };
-                return await PushAsnArrivalCoreAsync(asnCode);
+                return await PushAsnArrivalCoreAsync(asnCode, orderCode);
             }
             finally { LocalPushLock.Release(); }
         }
 
         /// <summary>按采购订单拆分ASN明细，分别记录推送结果，成功订单不重复生单。</summary>
-        private async Task<PuArrVouchAddResponseDto> PushAsnArrivalCoreAsync(string asnCode)
+        private async Task<PuArrVouchAddResponseDto> PushAsnArrivalCoreAsync(string asnCode, string orderCode = null)
         {
-            var lines = (await ReadAsnLinesAsync(asnCode))
+            var allLines = (await ReadAsnLinesAsync(asnCode))
                 .Where(x => x.Status != AsnStatus.Cancelled).ToList();
+            var lines = orderCode == null ? allLines : allLines.Where(x => x.OrderCode == orderCode).ToList();
             if (lines.Count == 0)
-                return new PuArrVouchAddResponseDto { Success = false, Message = "没有可推送的ASN明细" };
+                return new PuArrVouchAddResponseDto { Success = false, Message = orderCode == null
+                    ? "没有可推送的ASN明细" : "当前ASN没有该采购订单的有效已保存明细，请先核对并保存ASN" };
             if (lines.All(x => x.IsPushedToErp))
                 return new PuArrVouchAddResponseDto { Success = true, Message = "已生成到货单，无需重复推送" };
             // 新流程先按已保存ASN生成到货，检验合格后才逐箱组盘。
@@ -255,14 +268,16 @@ namespace TuTa.Wms.Erp
                 return new PuArrVouchAddResponseDto { Success = false, Message = "同一ASN供应商不一致" };
 
             // 旧版本可能给多个订单保存同一UID。仅在ERP明确以HTTP 400拒绝时重新分配，结果不明时禁止换UID重建。
-            var sharedUidGroups = lines.Where(x => x.ArrivalPushUid > 0).GroupBy(x => x.ArrivalPushUid.Value)
-                .Where(g => g.Select(x => x.OrderCode).Distinct(StringComparer.Ordinal).Count() > 1).ToList();
+            // 明细入口仍检查整张ASN的UID归属，防止漏掉与其他订单共用的历史推送标识。
+            var sharedUidGroups = allLines.Where(x => x.ArrivalPushUid > 0).GroupBy(x => x.ArrivalPushUid.Value)
+                .Where(g => g.Select(x => x.OrderCode).Distinct(StringComparer.Ordinal).Count() > 1 &&
+                    (orderCode == null || g.Any(x => x.OrderCode == orderCode))).ToList();
             if (sharedUidGroups.Any(g => g.Any(x => x.IsPushedToErp ||
                 x.ArrivalPushError?.Contains("(HTTP 400)", StringComparison.Ordinal) != true)))
                 return new PuArrVouchAddResponseDto { Success = false,
                     Message = "历史到货推送UID被多个采购订单共用，且生单结果未明确，请先核对U8单据，禁止更换UID重复生单" };
             var sharedUids = new HashSet<long>(sharedUidGroups.Select(g => g.Key));
-            var reservedUids = new HashSet<long>(lines.Where(x => x.ArrivalPushUid > 0).Select(x => x.ArrivalPushUid.Value));
+            var reservedUids = new HashSet<long>(allLines.Where(x => x.ArrivalPushUid > 0).Select(x => x.ArrivalPushUid.Value));
             var results = new List<(string OrderCode, PuArrVouchAddResponseDto Result)>();
             foreach (var group in lines.GroupBy(x => x.OrderCode, StringComparer.Ordinal))
             {
@@ -369,7 +384,18 @@ namespace TuTa.Wms.Erp
 
         /// <summary>仓管员在U8审核到货单后逐单报检；各到货单独立保存结果，失败单据可重试。</summary>
         [UnitOfWork(IsDisabled = true)]
-        public async Task<LLBJDAddResponseDto> PushAsnInspectionReportAsync(string asnCode)
+        public Task<LLBJDAddResponseDto> PushAsnInspectionReportAsync(string asnCode)
+            => PushAsnInspectionReportScopeAsync(asnCode, null);
+
+        /// <summary>从明细入口推送所属采购订单对应的完整到货单报检，不要求其他采购订单先到货。</summary>
+        [UnitOfWork(IsDisabled = true)]
+        public Task<LLBJDAddResponseDto> PushAsnOrderInspectionReportAsync(string asnCode, string orderCode)
+            => string.IsNullOrWhiteSpace(orderCode)
+                ? Task.FromResult(new LLBJDAddResponseDto { Success = false, Message = "采购订单号不能为空" })
+                : PushAsnInspectionReportScopeAsync(asnCode, orderCode.Trim());
+
+        /// <summary>整单和明细报检共用来源校验及幂等逻辑；orderCode为空表示整张ASN。</summary>
+        private async Task<LLBJDAddResponseDto> PushAsnInspectionReportScopeAsync(string asnCode, string orderCode)
         {
             if (string.IsNullOrWhiteSpace(asnCode))
                 return new LLBJDAddResponseDto { Success = false, Message = "ASN码不能为空" };
@@ -380,24 +406,33 @@ namespace TuTa.Wms.Erp
                 await using var handle = _u8Lock == null ? null : await _u8Lock.TryAcquireAsync("U8:ASN:" + asnCode);
                 if (_u8Lock != null && handle == null)
                     return new LLBJDAddResponseDto { Success = false, Message = "该ASN正在推送，请稍后刷新" };
-                var lines = (await ReadAsnLinesAsync(asnCode))
+                var allLines = (await ReadAsnLinesAsync(asnCode))
                     .Where(x => x.Status != AsnStatus.Cancelled).ToList();
+                var lines = orderCode == null ? allLines : allLines.Where(x => x.OrderCode == orderCode).ToList();
                 if (lines.Count == 0 || lines.Any(x => !x.IsPushedToErp || x.ArrivalVoucherId == null ||
                     string.IsNullOrWhiteSpace(x.ArrivalVoucherCode) || !x.ArrivalDetailId.HasValue))
                     return new LLBJDAddResponseDto { Success = false, Message = "请先生成并关联完整U8到货单" };
                 if (lines.All(x => x.IsInspectionReportPushed))
                     return new LLBJDAddResponseDto { Success = true, Message = "来料报检单已推送" };
 
+                // 历史到货单若混有其他采购订单，不能从某一订单入口只提交部分来源明细。
+                if (orderCode != null && allLines.Any(x => x.OrderCode != orderCode && x.ArrivalVoucherId.HasValue &&
+                    lines.Any(selected => selected.ArrivalVoucherId == x.ArrivalVoucherId)))
+                    return new LLBJDAddResponseDto { Success = false,
+                        Message = "该U8到货单关联多个采购订单，请核对单据后使用整张ASN报检入口" };
+
                 var groups = lines.GroupBy(x => x.ArrivalVoucherId.Value).ToList();
-                var sharedUidGroups = lines.Where(x => x.InspectionPushUid > 0).GroupBy(x => x.InspectionPushUid.Value)
-                    .Where(g => g.Select(x => x.ArrivalVoucherId.Value).Distinct().Count() > 1).ToList();
+                var sharedUidGroups = allLines.Where(x => x.InspectionPushUid > 0)
+                    .GroupBy(x => x.InspectionPushUid.Value)
+                    .Where(g => g.Select(x => x.ArrivalVoucherId).Distinct().Count() > 1 &&
+                        (orderCode == null || g.Any(x => x.OrderCode == orderCode))).ToList();
                 // 旧批量请求被U8明确拒绝后，才能将共用Taskid拆分；超时等结果不明的记录须先核对U8。
                 if (sharedUidGroups.Any(g => g.Any(x => x.IsInspectionReportPushed ||
                     x.InspectionPushError?.Contains("接口只支持单张单据操作", StringComparison.Ordinal) != true)))
                     return new LLBJDAddResponseDto { Success = false,
                         Message = "历史报检Taskid被多张到货单共用，且生单结果未明确，请先核对U8报检单，禁止更换Taskid重复生单" };
                 var sharedUids = new HashSet<long>(sharedUidGroups.Select(g => g.Key));
-                var reservedUids = new HashSet<long>(lines.Where(x => x.InspectionPushUid > 0).Select(x => x.InspectionPushUid.Value));
+                var reservedUids = new HashSet<long>(allLines.Where(x => x.InspectionPushUid > 0).Select(x => x.InspectionPushUid.Value));
                 // 将已明确失败的旧批量Taskid一次性迁移，避免中途退出后剩余单据继续沿用旧批量任务。
                 var migratedLines = new List<ErpAsn>();
                 foreach (var group in groups.Where(g => g.Any(x => x.InspectionPushUid.HasValue && sharedUids.Contains(x.InspectionPushUid.Value))))
