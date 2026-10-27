@@ -24,7 +24,6 @@
             <a-space direction="vertical" style="width: 100%">
               <a-button type="primary" block>物料管理</a-button>
               <a-button block>库存查询</a-button>
-              <a-button block>报表统计</a-button>
             </a-space>
           </a-card>
         </a-col>

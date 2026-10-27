@@ -45,39 +45,6 @@ const warehouse: AppRouteModule = {
         icon: 'ant-design:inbox-outlined',
       },
     },
-    {
-      path: 'outstock',
-      name: 'Outstock',
-      component: () => import('/@/views/warehouse/outstock/Outstock.vue'),
-      meta: {
-        title: '出库管理',
-        policy: 'Wms.Read',
-        icon: 'ant-design:export-outlined',
-        ignoreAuth: true,
-      },
-    },
-    {
-      path: 'outbound-order',
-      name: 'OutboundOrder',
-      component: () => import('/@/views/warehouse/outbound-order/OutboundOrder.vue'),
-      meta: {
-        title: '出库单管理',
-        policy: 'Wms.Read',
-        icon: 'ant-design:file-text-outlined',
-        ignoreAuth: true,
-      },
-    },
-    {
-      path: 'stockQuery',
-      name: 'WarehouseStockQuery',
-      component: () => import('/@/views/warehouse/goods/YdStockQuery.vue'),
-      meta: {
-        title: '库存查询',
-        policy: 'Wms.Read',
-        icon: 'ant-design:search-outlined',
-        ignoreAuth: true,
-      },
-    },
   ],
 };
 

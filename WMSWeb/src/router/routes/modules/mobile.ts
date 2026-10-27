@@ -24,15 +24,6 @@ const mobile: AppRouteModule = {
         ignoreAuth: true,
       },
     },
-    {
-      path: 'stockQuery',
-      name: 'StockQuery',
-      component: () => import('/@/views/mobile/views/StockQuery.vue'),
-      meta: {
-        title: '库存查询',
-        ignoreAuth: true,
-      },
-    },
   ],
 };
 
