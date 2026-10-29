@@ -1,4 +1,4 @@
-/** 将一张实物箱标签转换为ASN组盘项。数量来自箱标签，不能用ASN总量代替。 */
+/** 将实物箱标签关联到唯一或人工选定的ASN明细；允许反包改变批号，按逐箱数量核对来源总量。 */
 export function createAsnBoxItem(
   barcode: string, lines: any[], checks: any[], queued: any[], scanId: string, selectedLineId?: string,
 ) {
@@ -8,16 +8,20 @@ export function createAsnBoxItem(
   if (fields.length < 5 || !materialCode || !Number.isFinite(quantity) || quantity <= 0)
     throw new Error('收料码缺少有效物料或每箱数量');
   const boxNumber = fields.length >= 8 ? fields[7] : '';
+  // 反包会改变箱码批号中的日期，来源按物料、等级及明细ID确定，不按箱码批号排除。
   const candidates = lines.filter(line => line.status !== 4 && line.cinvcode === materialCode &&
-    (line.cbatch || '') === (batchCode || '') && (!grade || line.cfree5 === grade) &&
+    (!grade || line.cfree5 === grade) &&
     (!selectedLineId || line.autoid === selectedLineId) &&
     Number(line.alreadyStockInQuantity || 0) < Number(line.iquantity));
-  if (candidates.length !== 1) throw new Error('箱码与ASN不匹配或来源不唯一，请选择对应ASN明细');
+  if (!candidates.length) throw new Error('箱码物料、等级或剩余数量与当前ASN明细不匹配，请核对组盘来源');
+  if (candidates.length > 1) throw new Error('同物料、等级的ASN来源不唯一，请重新选择检验单来源或核对ASN明细');
   const line = candidates[0];
   const check = checks.find(row => row.asnLineId === line.autoid);
-  if (!check?.canGroup) throw new Error(check?.message || '请在物料状态变更页确认该订单合格后重新查询');
-  if (boxNumber && queued.some(row => row.asnLineId === line.autoid && row.boxNumber === boxNumber))
-    throw new Error('该箱已扫描，不能重复添加');
+  if (!check?.canGroup) throw new Error(check?.message || '该来源尚未确认检验合格，请核对检验状态后重新查询');
+  // 同一种物料的箱贴可完全相同，每次物理扫码生成独立标识，箱号仅作为标签信息展示。
+  if (!scanId?.trim()) throw new Error('本次扫码缺少记录标识，请重新扫描');
+  if (queued.some(row => row.asnBoxScanId === scanId))
+    throw new Error('该扫码记录已添加，不能重复处理同一条记录');
   const pending = queued.filter(row => row.asnLineId === line.autoid).reduce((sum, row) => sum + Number(row.incellshu), 0);
   if (Number(line.alreadyStockInQuantity || 0) + pending + quantity > Number(line.iquantity))
     throw new Error('本次扫码数量超过ASN剩余待组盘数量');
@@ -25,6 +29,8 @@ export function createAsnBoxItem(
     materialCode, materialName: line.cinvname || '', goodsSpec: line.cinvstd || '',
     cartonType: line.cfree3 || '',
     goodsBatchNo: batchCode || '', grade: grade || line.cfree5 || '', processNo,
+    // 原批号仅用于显示追溯，实际库存采用箱码批号，来源由asnLineId关联。
+    asnBatchCode: line.cbatch || '',
     quantity, countInOnePkgOrBox: quantity, incellshu: quantity,
     baoshu: 1, sanjianshu: 0, boxNumber: boxNumber || undefined,
     dataCode: barcode.trim(), asnLineId: line.autoid, orderCode: line.cordercode,

@@ -1,11 +1,8 @@
 <template>
     <div class="scan-asn-container">
         <Header numb="扫描ASN"></Header>
-        <U8InboundActions :asn-code="asnCode" :show-asn-input="false" :disabled="loading || saving || !!linePushing"
+        <U8InboundActions :asn-code="asnCode" :show-asn-input="false" :show-inspection-query="false" :disabled="loading || saving || !!linePushing"
             @busy-change="documentBusy = $event" @workflow-completed="refreshLocalAsn" />
-        <div class="remainder-action">
-            <a-button :disabled="workflowLocked" @click="openRemainderCabinet">零头柜管理</a-button>
-        </div>
         
         <a-row class="input-row">
             <a-col :span="6">
@@ -112,7 +109,6 @@ import { computed, reactive, ref, onMounted, watch } from 'vue';
 import { ScanOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 import Header from '../../header/Header.vue';
-import { router } from '/@/router';
 import { ERP_ASNServiceProxy, ErpAsnDto, ErpAsnSaveResponseDto } from '/@/services/ServiceProxies';
 import { getAsnOrderPushState, pushAsnOrderArrival, pushAsnOrderInspection } from '/@/api/erp/asn';
 import { useMessage } from '/@/hooks/web/useMessage';
@@ -135,12 +131,6 @@ const { createConfirm } = useMessage();
 watch(asnCode, () => Object.keys(lineNotices).forEach(key => delete lineNotices[key]));
 
 const asnService = new ERP_ASNServiceProxy();
-
-/** 进入独立零头柜管理，不关联当前ASN单号。 */
-function openRemainderCabinet() {
-    if (workflowLocked.value) return;
-    return router.push('/asnRemainderCabinet');
-}
 
 onMounted(() => {
     setTimeout(() => {
@@ -272,10 +262,6 @@ async function saveAsnInfo() {
 </script>
 
 <style scoped lang="less">
-.remainder-action {
-    margin: 10px 16px;
-}
-
 .asn-line-actions {
     display: flex;
     gap: 8px;

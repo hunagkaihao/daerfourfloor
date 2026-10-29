@@ -186,34 +186,47 @@ namespace TuTa.Wms.Stocks
                 return new ResponseDto { success = false, message = ex.Message };
             }
             finally { ErpAsnAppService.LocalPushLock.Release(); }
-            try { result.message += await TryPushPurchaseAfterAsnStoredAsync(input.AsnCode.Trim()); }
+            try { result.message += await TryPushPurchaseForConfirmedLinesAsync(input.AsnCode.Trim(), new[] { input.AsnLineId }); }
             catch (Exception ex) { result.message += "，零头库存已保存，U8采购入库待处理：" + ex.Message; }
             return result;
         }
 
-        /// <summary>整箱与零头共用ASN完成条件；采购生单在库存提交及释放本地锁之后执行。</summary>
+        /// <summary>整箱与零头均按本次确认的来源明细逐单采购入库；库存提交并释放本地锁后执行，不等待整张ASN。</summary>
         /// <param name="asnCode">当前送货单对应ASN号。</param>
+        /// <param name="confirmedLineIds">本次已成功登记库存的ASN来源明细，其他明细不参与本次自动推送。</param>
         /// <returns>采购结果或剩余数量提示，不回滚已经保存的本地库存。</returns>
-        private async Task<string> TryPushPurchaseAfterAsnStoredAsync(string asnCode)
+        private async Task<string> TryPushPurchaseForConfirmedLinesAsync(string asnCode, IReadOnlyCollection<Guid> confirmedLineIds)
         {
             List<ErpAsn> lines;
             using (var read = UnitOfWorkManager.Begin(true, false))
             {
-                lines = (await _erpAsnRepository.GetListByAsnCodeAsync(asnCode)).Where(x => x.Status != AsnStatus.Cancelled).ToList();
+                lines = (await _erpAsnRepository.GetListByAsnCodeAsync(asnCode))
+                    .Where(x => x.Status != AsnStatus.Cancelled && confirmedLineIds.Contains(x.Id)).ToList();
                 await read.CompleteAsync();
             }
-            if (lines.Count == 0 || lines.Any(x => x.InWarehouseQuantity <= 0 || (x.AlreadyStockInQuantity ?? 0) != x.InWarehouseQuantity))
-                return "，待整张ASN的整箱和零头全部入库后推送采购入库";
+            if (lines.Count == 0)
+                return "，本地库存已保存，未找到本次单据的有效ASN来源，请核对采购入库状态";
             var message = new StringBuilder();
             foreach (var line in lines)
             {
+                var source = $"订单{line.OrderCode}、物料{line.MaterialCode}、批号{line.BatchCode}";
+                if (line.IsPurchasePushed)
+                {
+                    message.Append($"，{source}采购入库已推送，无需重复生成");
+                    continue;
+                }
+                if (line.InWarehouseQuantity <= 0 || (line.AlreadyStockInQuantity ?? 0) != line.InWarehouseQuantity)
+                {
+                    message.Append($"，{source}待本单据数量与应收数量一致后推送采购入库");
+                    continue;
+                }
                 try
                 {
                     var push = await _erpAsnAppService.PushInspectionPurchaseAsync(line.Id);
-                    message.Append(push?.Success == true ? "，采购入库已推送U8" :
-                        "，本地库存已保存，U8采购入库待重试：" + (push?.Message ?? "接口无返回"));
+                    message.Append(push?.Success == true ? $"，{source}采购入库已推送U8" :
+                        $"，{source}本地库存已保存，U8采购入库待重试：" + (push?.Message ?? "接口无返回"));
                 }
-                catch (Exception ex) { message.Append("，本地库存已保存，U8采购入库待重试：" + ex.Message); }
+                catch (Exception ex) { message.Append($"，{source}本地库存已保存，U8采购入库待重试：" + ex.Message); }
             }
             return message.ToString();
         }

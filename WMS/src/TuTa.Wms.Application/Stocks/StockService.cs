@@ -199,6 +199,8 @@ namespace TuTa.Wms.Stocks
             if (asnCodes.Count != 1) return new ResponseDto { success = false, message = "一次只能组盘一张ASN" };
             ResponseDto result = null;
             var localCommitted = false;
+            // 自动采购仅处理本次已确认组盘的来源，其他单据的进度不影响本次推送。
+            var confirmedLineIds = new List<Guid>();
             try
             {
                 await ErpAsnAppService.LocalPushLock.WaitAsync();
@@ -230,13 +232,14 @@ namespace TuTa.Wms.Stocks
                         line.ApplyAlreadyStockInQuantity(group.Sum(x => x.Key.TotalCount));
                         await _erpAsnRepository.UpdateAsync(line);
                     }
+                    confirmedLineIds = asnLines.Values.Select(line => line.Id).Distinct().ToList();
                     await uow.CompleteAsync().ConfigureAwait(false);
                     localCommitted = true;
                     }
                 }
                 finally { ErpAsnAppService.LocalPushLock.Release(); }
-                // 本地组盘只记账一次；整单全部校验通过后再生采购入库，失败可独立重试。
-                result.message += await TryPushPurchaseAfterAsnStoredAsync(asnCodes[0]);
+                // 本地组盘只记账一次；本次各单据独立核对账实后逐单采购入库，失败可独立重试。
+                result.message += await TryPushPurchaseForConfirmedLinesAsync(asnCodes[0], confirmedLineIds);
                 return result;
             }
             catch (Exception ex)
@@ -251,9 +254,9 @@ namespace TuTa.Wms.Stocks
             }
         }
 
-        /// <summary>箱号优先用于去重；无箱号时使用PDA为本次物理扫码生成的稳定标识。</summary>
+        /// <summary>按每次物理扫码的稳定标识去重，允许多箱使用相同箱贴；旧客户端无标识时兼容按箱号去重。</summary>
         private static string GetAsnBoxKey(StockCreateDto input)
-            => !string.IsNullOrWhiteSpace(input.BoxNumber) ? "box:" + input.BoxNumber.Trim() : "scan:" + input.AsnBoxScanId;
+            => !string.IsNullOrWhiteSpace(input.AsnBoxScanId) ? "scan:" + input.AsnBoxScanId.Trim() : "box:" + input.BoxNumber?.Trim();
 
         /// <summary>
         /// 容器组盘, 创建库存和容器绑定
@@ -531,7 +534,7 @@ namespace TuTa.Wms.Stocks
             return new ResponseDto() { success = true, message = "创建库存并绑定容器成功" };
         }
 
-        /// <summary>解析PDA选中的ASN明细，按来源合计校验组盘数量；旧客户端来源不唯一时拒绝猜测。</summary>
+        /// <summary>按选定ASN明细核对逐箱数量；明确来源时允许反包批号变化，旧客户端仍须唯一匹配。</summary>
         private async Task<Dictionary<StockCreateDto, ErpAsn>> ResolveU8AsnLinesAsync(string orderCode, List<StockCreateDto> paras)
         {
             if (string.IsNullOrWhiteSpace(orderCode) || paras == null || paras.Count == 0)
@@ -555,18 +558,19 @@ namespace TuTa.Wms.Stocks
                 }
                 if (line.OrderCode != orderCode || line.MaterialCode != material ||
                     (!string.IsNullOrWhiteSpace(para.AsnCode) && line.AsnCode != para.AsnCode) ||
-                    (!string.IsNullOrWhiteSpace(para.BatchCode) && para.BatchCode != line.BatchCode) ||
+                    (!para.AsnLineId.HasValue && !string.IsNullOrWhiteSpace(para.BatchCode) && para.BatchCode != line.BatchCode) ||
                     (!string.IsNullOrWhiteSpace(para.Grade) && para.Grade != line.Free5) ||
                     line.Status == AsnStatus.Cancelled || !line.IsPushedToErp || !line.IsInspectionReportPushed || line.IsPurchasePushed || para.TotalCount <= 0)
-                    throw new BusinessException("所选ASN明细与物料、订单、批次、等级或数量不匹配");
+                    throw new BusinessException("所选ASN明细与物料、订单、等级、组盘状态或数量不匹配；未指定明细时还需核对来源批号");
                 if (para.ReceivePkgOrBoxCount != 1 || para.CountInOnePkgOrBox <= 0 || !para.CountInOnePkgOrBox.HasValue ||
                     para.TotalCount != para.CountInOnePkgOrBox.Value ||
                     (string.IsNullOrWhiteSpace(para.BoxNumber) && string.IsNullOrWhiteSpace(para.AsnBoxScanId)))
                     throw new BusinessException("ERP组盘必须一箱一扫，提供真实每箱数量和箱号或扫码标识，请更新PDA后重试");
                 var key = GetAsnBoxKey(para);
                 if (line.HasGroupedBox(key) || result.Any(x => x.Value.Id == line.Id && GetAsnBoxKey(x.Key) == key))
-                    throw new BusinessException("该箱已组盘或本次重复扫描，不能重复入账");
-                para.BatchCode = line.BatchCode;
+                    throw new BusinessException("该扫码记录已组盘或本次重复提交，不能重复入账");
+                // 反包后的箱码批号作为实际库存批号保存；ASN原批号通过来源明细ID保留追溯。
+                para.BatchCode = string.IsNullOrWhiteSpace(para.BatchCode) ? line.BatchCode : para.BatchCode.Trim();
                 para.AsnCode = line.AsnCode;
                 // 箱码未携带等级时补齐来源等级，防止后续校验将空值视为未知等级。
                 if (string.IsNullOrWhiteSpace(para.Grade)) para.Grade = line.Free5;
@@ -954,8 +958,62 @@ namespace TuTa.Wms.Stocks
             return new ResponseDto() { success = true, message = "任务创建成功" };
         }
 
-        [UnitOfWork]
+        /// <summary>取消容器组盘，与ASN组盘及采购推送互斥，并在同一事务中回退本托盘数量。</summary>
+        /// <param name="boxCode">需要取消组盘的容器编码。</param>
+        /// <returns>取消结果；失败时保留库存和ASN累计数量。</returns>
+        [UnitOfWork(IsDisabled = true)]
         public async Task<ResponseDto> StockDisBindBox(string boxCode)
+        {
+            await ErpAsnAppService.LocalPushLock.WaitAsync();
+            var sourceLocks = new List<IAsyncDisposable>();
+            try
+            {
+                await using var palletLock = _u8GroupingLock == null ? null :
+                    await _u8GroupingLock.TryAcquireAsync("U8:PALLET:" + boxCode?.Trim());
+                if (_u8GroupingLock != null && palletLock == null)
+                    return new ResponseDto { success = false, message = "该托盘正在处理，请稍后重试" };
+
+                var sources = new Dictionary<Guid, string>();
+                using (var read = UnitOfWorkManager.Begin(true, false))
+                {
+                    var box = await _boxRepository.FindByBoxCodeAsync(boxCode);
+                    if (box == null)
+                        return new ResponseDto { success = false, message = $"容器码为{boxCode}的容器不存在" };
+                    var stocks = await _stockRepository.GetByBoxIdAsync(box.Id);
+                    foreach (var id in (stocks ?? new List<Stock>()).Where(x => x.U8AsnLineId.HasValue)
+                        .Select(x => x.U8AsnLineId.Value).Distinct())
+                        sources.Add(id, (await _erpAsnRepository.GetAsync(id)).AsnCode);
+                    await read.CompleteAsync();
+                }
+                // 先锁定涉及的全部ASN，再在写事务内重读，避免使用采购推送前的旧状态取消库存。
+                if (_u8GroupingLock != null)
+                {
+                    foreach (var code in sources.Values.Distinct().OrderBy(x => x, StringComparer.Ordinal))
+                    {
+                        var handle = await _u8GroupingLock.TryAcquireAsync("U8:ASN:" + code);
+                        if (handle == null)
+                            return new ResponseDto { success = false, message = "关联ASN正在处理，请稍后重试" };
+                        sourceLocks.Add(handle);
+                    }
+                }
+                return await CancelBoxGroupingCoreAsync(boxCode, sources.Keys.ToList());
+            }
+            finally
+            {
+                try
+                {
+                    for (var index = sourceLocks.Count - 1; index >= 0; index--)
+                        await sourceLocks[index].DisposeAsync();
+                }
+                finally { ErpAsnAppService.LocalPushLock.Release(); }
+            }
+        }
+
+        /// <summary>在取消锁内删除托盘库存，按实际ASN来源回退数量；其他托盘的数量及扫码防重台账保留。</summary>
+        /// <param name="boxCode">当前容器编码。</param>
+        /// <param name="lockedSourceIds">已取得取消锁的ASN明细集合，写入前核对来源未变化。</param>
+        /// <returns>库存删除和数量回退的事务结果。</returns>
+        private async Task<ResponseDto> CancelBoxGroupingCoreAsync(string boxCode, IReadOnlyCollection<Guid> lockedSourceIds)
         {
             using (var uow = UnitOfWorkManager.Begin(true, true))
             {
@@ -970,6 +1028,22 @@ namespace TuTa.Wms.Stocks
                     List<Stock> stocks = await _stockRepository.GetByBoxIdAsync(box.Id);
                     if (stocks == null || stocks.Count == 0)
                         return new ResponseDto() { success = false, message = "容器中没有库存" };
+
+                    var sourceGroups = stocks.Where(x => x.U8AsnLineId.HasValue).GroupBy(x => x.U8AsnLineId.Value).ToList();
+                    if (!new HashSet<Guid>(lockedSourceIds).SetEquals(sourceGroups.Select(x => x.Key)))
+                        return new ResponseDto { success = false, message = "托盘ASN来源已变化，请重新查询后取消" };
+                    if (sourceGroups.Count > 0 && await _agvTaskManager.IsExistBoxTask(boxCode))
+                        return new ResponseDto { success = false, message = "当前托盘已有搬运任务，请先处理任务后再取消组盘" };
+                    foreach (var group in sourceGroups)
+                    {
+                        var source = await _erpAsnRepository.GetAsync(group.Key);
+                        if (source.IsPurchasePushed || !string.IsNullOrWhiteSpace(source.PurchaseTaskId))
+                            return new ResponseDto { success = false, message = "该物料已发起采购入库，请先核对U8并处理采购单据，不能直接取消组盘" };
+                        // 仅扣回当前托盘的库存及暂借抽检量，不清空同来源在其他托盘上已保存的数量。
+                        var quantity = group.Sum(stock => stock.TotalCountInTime + (stock.InspectionCount ?? 0));
+                        if (quantity > 0) source.RevertAlreadyStockInQuantity(quantity);
+                        await _erpAsnRepository.UpdateAsync(source);
+                    }
 
                     Guid? cellId = box.CellData.CellId;
 
@@ -999,8 +1073,8 @@ namespace TuTa.Wms.Stocks
                         await _stockRepository.DeleteAsync(stock);
                     }
 
-                    // 重置关联的ASN已入库数量
-                    foreach (Stock stock in stocks)
+                    // 未关联U8明细的历史库存沿用原有重置方式，已关联来源的数量已在上面准确回退。
+                    foreach (Stock stock in stocks.Where(x => !x.U8AsnLineId.HasValue))
                     {
                         var orderCode = stock.BatchCode;
                         var materialCode = stock.Material?.MaterialCode;

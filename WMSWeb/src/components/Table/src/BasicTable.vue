@@ -236,6 +236,7 @@
           expandIcon: slots.expandIcon ? null : expandIcon(),
           ...unref(getProps),
           ...unref(getHeaderProps),
+          // 展开明细也保留完整滚动配置，避免固定高度内的剩余明细无法向下查看。
           scroll: unref(getScrollRef),
           loading: unref(getLoading),
           tableLayout: 'fixed',
@@ -247,10 +248,6 @@
           footer: unref(getFooterProps),
           ...unref(getExpandOption),
         };
-        if (slots.expandedRowRender) {
-          propsData = omit(propsData, 'scroll');
-        }
-
         propsData = omit(propsData, ['class', 'onChange']);
         return propsData;
       });

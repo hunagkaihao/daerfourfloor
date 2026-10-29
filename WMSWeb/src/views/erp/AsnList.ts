@@ -137,7 +137,8 @@ export const parentTableColumns: BasicColumn[] = [
   {
     title: '待组盘总数',
     dataIndex: 'totalPendingStockInQuantity',
-    width: 110,
+    width: 130,
+    ellipsis: false,
     customRender: ({ record }) => formatQuantity(record.totalPendingStockInQuantity),
   },
   {
@@ -267,7 +268,7 @@ export const searchFormSchema = [
     field: 'asnCode',
     label: 'ASN码',
     component: 'Input',
-    colProps: { span: 5 },
+    colProps: { xs: 24, sm: 12, xl: 6 },
     componentProps: {
       placeholder: '请输入ASN码',
     },
@@ -276,16 +277,26 @@ export const searchFormSchema = [
     field: 'supplierName',
     label: '供应商名称',
     component: 'Input',
-    colProps: { span: 5 },
+    colProps: { xs: 24, sm: 12, xl: 6 },
     componentProps: {
       placeholder: '请输入供应商名称',
+    },
+  },
+  {
+    field: 'supplierCode',
+    label: '供应商编码',
+    component: 'Input',
+    colProps: { xs: 24, sm: 12, xl: 6 },
+    componentProps: {
+      placeholder: '请输入供应商编码',
+      allowClear: true,
     },
   },
   {
     field: 'status',
     label: '状态',
     component: 'Select',
-    colProps: { span: 4 },
+    colProps: { xs: 24, sm: 12, xl: 6 },
     componentProps: {
       allowClear: true,
       placeholder: '请选择状态',
@@ -301,7 +312,7 @@ export const searchFormSchema = [
     field: 'dateRange',
     label: '日期范围',
     component: 'RangePicker',
-    colProps: { span: 6 },
+    colProps: { xs: 24, sm: 24, xl: 12 },
     defaultValue: [moment().subtract(7, 'days'), moment().add(1, 'days')],
   },
 ];
@@ -378,7 +389,7 @@ function groupAsnListItems(items: AsnWorkflowLine[] = []): AsnGroupRow[] {
 
 export async function getAsnListAsync(params: any) {
   try {
-    const { page, pageSize, asnCode, supplierName, status, dateRange } = params;
+    const { page, pageSize, asnCode, supplierName, supplierCode, status, dateRange } = params;
 
     let startDate = '';
     let endDate = '';
@@ -392,6 +403,7 @@ export async function getAsnListAsync(params: any) {
       pageSize,
       asnCode,
       supplierName,
+      supplierCode: supplierCode?.trim() || undefined,
       status,
       startDate,
       endDate,

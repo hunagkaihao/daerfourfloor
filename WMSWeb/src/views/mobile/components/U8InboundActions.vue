@@ -5,9 +5,9 @@
     <div class="actions">
       <a-button :loading="busy" :disabled="!code.trim() || busy || disabled" @click="arrival">生成或重试到货单</a-button>
       <a-button :loading="busy" :disabled="!code.trim() || busy || disabled" @click="report">推送来料报检单</a-button>
-      <a-button :loading="busy" :disabled="!code.trim() || busy || disabled" @click="query">查询U8检验结果</a-button>
+      <a-button v-if="showInspectionQuery !== false" :loading="busy" :disabled="!code.trim() || busy || disabled" @click="query">查询U8检验结果</a-button>
     </div>
-    <p>先保存ASN并生成到货单，U8审核后报检进入检验中；在物料状态变更页人工确认合格后逐箱组盘，采购入库另需U8检验单来源。</p>
+    <p>先保存ASN并生成到货单，U8审核后报检进入检验中；检验合格后在物料组盘页逐箱组盘，采购入库另需U8检验单来源。</p>
     <a-alert v-if="notice" :message="notice" :type="noticeType" show-icon />
     <div v-for="row in rows" :key="row.asnLineId" class="inspection-row">
       <div>{{ row.materialCode }} / {{ row.batchCode || '-' }}</div>
@@ -31,7 +31,13 @@ const emit = defineEmits<{
   (event: 'workflow-completed', asnCode: string): void;
   (event: 'busy-change', busy: boolean): void;
 }>();
-const props = defineProps<{ asnCode?: string; showAsnInput?: boolean; disabled?: boolean }>();
+const props = withDefaults(defineProps<{
+  asnCode?: string;
+  showAsnInput?: boolean;
+  /** 是否显示U8检验结果查询按钮；未传时显示，扫描ASN页传false隐藏。 */
+  showInspectionQuery?: boolean;
+  disabled?: boolean;
+}>(), { showInspectionQuery: true });
 const { createConfirm } = useMessage();
 const code = ref(props.asnCode || '');
 const busy = ref(false);
@@ -90,7 +96,7 @@ function purchase(row: U8InspectionLine) {
   if (busy.value || props.disabled || !row.canPurchase || row.isPurchasePushed) return;
   createConfirm({
     title: '采购入库',
-    content: '确认整张ASN已逐箱组盘并校验完成，按对应检验单推送采购入库？',
+    content: '确认当前单据对应的组盘数量与实物一致，按该检验单推送采购入库？',
     onOk: () => run(async () => {
       const result = await retryU8Purchase(row.asnLineId);
       if (result.success) row.isPurchasePushed = true;

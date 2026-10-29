@@ -3,8 +3,8 @@
     <h3>ASN订单检验状态</h3>
     <p>报检成功后进入检验中，检验完成后按采购订单确认合格或不合格。</p>
     <div class="search">
-      <a-input v-model:value="asnCode" placeholder="扫描或输入ASN送货单号" :disabled="busy" allow-clear @pressEnter="load" />
-      <a-button :disabled="busy || !asnCode.trim()" :loading="busy" @click="load">查询状态</a-button>
+      <a-input v-model:value="asnCode" placeholder="扫描或输入ASN送货单号" :disabled="busy || disabled" allow-clear @pressEnter="load()" />
+      <a-button :disabled="busy || disabled || !asnCode.trim()" :loading="busy" @click="load()">查询状态</a-button>
     </div>
     <a-alert v-if="notice" :message="notice" :type="noticeType" show-icon />
     <a-card v-for="group in groups" :key="group.orderCode" :title="`订单：${group.orderCode}`" size="small">
@@ -14,8 +14,8 @@
         <div>检验状态：{{ line.materialInspectionStatusName || '待检' }}</div>
       </div>
       <div class="actions">
-        <a-button type="primary" :disabled="busy || !canConfirm(group.lines, 2)" @click="confirm(group.orderCode, 2)">确认合格</a-button>
-        <a-button danger :disabled="busy || !canConfirm(group.lines, 3)" @click="confirm(group.orderCode, 3)">确认不合格</a-button>
+        <a-button type="primary" :disabled="busy || disabled || !canConfirm(group.lines, 2)" @click="confirm(group.orderCode, 2)">确认合格</a-button>
+        <a-button danger :disabled="busy || disabled || !canConfirm(group.lines, 3)" @click="confirm(group.orderCode, 3)">确认不合格</a-button>
       </div>
     </a-card>
   </section>
@@ -27,6 +27,16 @@ import { useMessage } from '/@/hooks/web/useMessage';
 import { queryAsnMaterialInspection, setAsnOrderInspectionStatus } from '../views/U8InboundApi';
 import type { AsnMaterialInspectionLine } from '../views/U8InboundApi';
 
+const props = defineProps<{
+  /** 组盘提交或已有待提交箱码时锁定查询和人工判定，避免切换来源。 */
+  disabled?: boolean;
+}>();
+const emit = defineEmits<{
+  /** 查询或人工确认后的本地ASN明细，空单号表示原查询已失效。 */
+  (event: 'loaded', asnCode: string, lines: AsnMaterialInspectionLine[]): void;
+  /** 将查询与人工判定状态同步给父页，与组盘及搬运互斥。 */
+  (event: 'busy-change', busy: boolean): void;
+}>();
 const { createConfirm } = useMessage();
 const asnCode = ref('');
 const loadedCode = ref('');
@@ -36,7 +46,11 @@ const notice = ref('');
 const noticeType = ref<'success' | 'warning' | 'error'>('warning');
 
 /** 查询条件变化后清除旧订单，避免把旧结果确认到另一个ASN。 */
-watch(asnCode, () => { lines.value = []; loadedCode.value = ''; notice.value = ''; });
+watch(asnCode, () => {
+  lines.value = []; loadedCode.value = ''; notice.value = '';
+  emit('loaded', '', []);
+}, { flush: 'sync' });
+watch(busy, value => emit('busy-change', value), { flush: 'sync' });
 
 /** 同一送货单内按真实采购订单显示物料，已取消的明细不参与确认。 */
 const groups = computed(() => {
@@ -56,32 +70,43 @@ function canConfirm(orderLines: AsnMaterialInspectionLine[], target: 2 | 3) {
 }
 
 /** 刷新本地状态，人工确认无需等待U8检验单查询。 */
-async function load() {
-  if (busy.value || !asnCode.value.trim()) return;
+async function load(force = false) {
+  if (busy.value || (props.disabled && !force) || !asnCode.value.trim()) return;
+  const code = asnCode.value.trim();
   busy.value = true;
   lines.value = [];
+  loadedCode.value = '';
+  emit('loaded', '', []);
   try {
-    const result = await queryAsnMaterialInspection(asnCode.value);
-    loadedCode.value = result.success ? asnCode.value.trim() : '';
+    const result = await queryAsnMaterialInspection(code);
+    if (code !== asnCode.value.trim()) return;
+    loadedCode.value = result.success ? code : '';
     lines.value = result.success ? result.data || [] : [];
     notice.value = result.message || '查询完成';
     noticeType.value = result.success ? 'success' : 'warning';
   } catch (error: any) {
     notice.value = error?.message || '查询检验状态失败';
     noticeType.value = 'error';
-  } finally { busy.value = false; }
+  } finally {
+    emit('loaded', loadedCode.value, lines.value);
+    busy.value = false;
+  }
 }
+
+/** 父页组盘或取消成功后刷新剩余数量，允许在父页提交锁内调用。 */
+function reload() { return load(true); }
+defineExpose({ reload });
 
 /** 按送货单和采购订单确认结果，服务端再次校验状态并在一个事务内保存。 */
 function confirm(orderCode: string, target: 2 | 3) {
-  if (busy.value || !loadedCode.value || loadedCode.value !== asnCode.value.trim()) return;
+  if (busy.value || props.disabled || !loadedCode.value || loadedCode.value !== asnCode.value.trim()) return;
   const code = loadedCode.value;
   const label = target === 2 ? '合格' : '不合格';
   createConfirm({
     title: `确认${label}`,
     content: `确认将送货单${code}中采购订单${orderCode}的检验中物料判定为${label}？`,
     onOk: async () => {
-      if (busy.value || code !== loadedCode.value) return;
+      if (busy.value || props.disabled || code !== loadedCode.value) return;
       busy.value = true;
       let text = '';
       let type: 'success' | 'warning' | 'error' = 'warning';

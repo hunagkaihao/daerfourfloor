@@ -298,6 +298,36 @@ namespace TuTa.Wms.Erp.Entities
                 : IsInspectionReportPushed ? Stocks.InspectionStatus.InProgressInspection
                 : Stocks.InspectionStatus.AwaitingInspection;
 
+        /// <summary>已由服务端重新查询并核对来源的U8检验单主键；历史记录未保存时为空。</summary>
+        [NotMapped]
+        public long? VerifiedInspectionId => long.TryParse(this.GetProperty<string>("U8VerifiedInspectionId"), out var id) && id > 0 ? id : (long?)null;
+
+        /// <summary>与已核实检验单主键配套的真实单号，用于采购前精确复核所选单据。</summary>
+        [NotMapped]
+        public string VerifiedInspectionCode => this.GetProperty<string>("U8VerifiedInspectionCode");
+
+        /// <summary>同步已核实的U8检验单对应报检状态；仅待检进入检验中，保留已确认结论及原推送UID。</summary>
+        /// <param name="checkId">服务端重新查询且确认已审核、来源严格匹配的U8检验单主键，必须为正数。</param>
+        /// <param name="checkCode">同一检验单的真实单号；记录在扩展属性中作为状态同步来源。</param>
+        public void SynchronizeVerifiedInspectionReport(long checkId, string checkCode)
+        {
+            if (checkId <= 0 || string.IsNullOrWhiteSpace(checkCode))
+                throw new UserFriendlyException("同步报检状态需要有效的U8检验单主键和单号");
+            if (string.IsNullOrWhiteSpace(ArrivalVoucherCode) || !ArrivalDetailId.HasValue)
+                throw new UserFriendlyException("缺少来源到货单关联，不能同步报检状态");
+            var previousStatus = MaterialInspectionStatus;
+            if (IsPurchasePushed && (previousStatus == Stocks.InspectionStatus.AwaitingInspection ||
+                previousStatus == Stocks.InspectionStatus.InProgressInspection))
+                throw new UserFriendlyException("已采购入库的物料不能重新开始检验");
+            IsInspectionReportPushed = true;
+            InspectionPushError = null;
+            // 已审核检验单证明U8已完成报检，不再生成报检单，也不伪造WMS推送UID。
+            if (previousStatus == Stocks.InspectionStatus.AwaitingInspection)
+                this.SetProperty("U8MaterialInspectionStatus", "1");
+            this.SetProperty("U8VerifiedInspectionId", checkId.ToString());
+            this.SetProperty("U8VerifiedInspectionCode", checkCode);
+        }
+
         /// <summary>人工确认检验结果，仅允许检验中转为合格或不合格；重复提交相同结果保持幂等。</summary>
         /// <param name="result">检验结果，只允许合格(2)或不合格(3)。</param>
         public void CompleteMaterialInspection(Stocks.InspectionStatus result)

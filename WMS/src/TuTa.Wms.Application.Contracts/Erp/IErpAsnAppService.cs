@@ -81,7 +81,16 @@ namespace TuTa.Wms.Erp
 
         /// <summary>从U8查询当前ASN的来料检验单，严格校验来源和审核、合格数量。</summary>
         Task<U8InspectionResultsDto> GetAsnInspectionResultsAsync(string asnCode);
-        /// <summary>根据一条ASN对应的已审核合格检验单生成采购入库；失败独立重试。</summary>
+        /// <summary>分页查询U8来料检验单，可选按物料、来源到货单及制单开始日期筛选，包含开始日期当天。</summary>
+        /// <param name="input">全部筛选留空时按U8默认条件查询；页码从1开始，不修改本地检验结论。</param>
+        /// <returns>当前页匹配单据及是否有后续页，不将存在单据视为合格。</returns>
+        Task<U8MaterialInspectionResultDto> GetMaterialInspectionResultsAsync(U8MaterialInspectionQueryDto input);
+
+        /// <summary>重新核对所选U8检验单已审核后，只确认该记录对应ASN明细的合格或不合格结果。</summary>
+        /// <param name="input">检验单身份、原查询分页条件及人工检验结论。</param>
+        /// <returns>确认结果及该检验记录对应的最新ASN明细。</returns>
+        Task<ErpAsnValidateResponseDto> ConfirmMaterialInspectionAsync(U8MaterialInspectionConfirmDto input);
+        /// <summary>按指定ASN明细对应的已审核合格检验单逐单生成采购入库；该明细账实一致即可，不等待整张ASN，失败独立重试。</summary>
         Task<CGRKDAddResponseDto> PushInspectionPurchaseAsync(Guid asnLineId);
 
         /// <summary>整张发货单实际完成后推送/重试U8销售出库单。</summary>
@@ -103,8 +112,9 @@ namespace TuTa.Wms.Erp
         /// <param name="startDate">开始日期</param>
         /// <param name="endDate">结束日期</param>
         /// <param name="status">状态（1=已创建，2=收货中，3=已完成，4=已取消）</param>
+        /// <param name="supplierCode">供应商编码，去除首尾空格后按包含匹配；空值不筛选。</param>
         /// <returns>ASN列表</returns>
-        Task<ErpAsnListResponseDto> GetAsnListAsync(int page, int pageSize, string asnCode = null, string supplierName = null, string startDate = null, string endDate = null, int? status = null);
+        Task<ErpAsnListResponseDto> GetAsnListAsync(int page, int pageSize, string asnCode = null, string supplierName = null, string startDate = null, string endDate = null, int? status = null, string supplierCode = null);
 
         /// <summary>
         /// 通过物料编号获取未完成的ASN单据信息

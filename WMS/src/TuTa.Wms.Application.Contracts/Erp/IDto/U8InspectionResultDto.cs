@@ -31,7 +31,7 @@ namespace TuTa.Wms.Erp.IDto
         public long? SourceAutoId { get; set; }
         /// <summary>检验单合格数量FREGQUANTITY，单位同ASN。</summary>
         public decimal QualifiedQuantity { get; set; }
-        /// <summary>已审核且整批合格、来源完整时为true。</summary>
+        /// <summary>当前明细已组盘完成、人工确认合格且U8检验单已审核、整批合格、来源完整时为true，不受其他ASN明细进度影响。</summary>
         public bool CanPurchase { get; set; }
         /// <summary>已成功报检且本地人工确认为合格，可逐箱组盘；与U8采购入库条件分开判断。</summary>
         public bool CanGroup { get; set; }

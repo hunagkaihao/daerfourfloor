@@ -29,7 +29,7 @@ namespace TuTa.Wms.Stocks.Dtos
         public string BoxNumber { get; set; }
 
         /// <summary>
-        /// 生产批次
+        /// 实际箱码生产批次；指定ASN明细的组盘允许反包后与ASN原批号不同，来源由AsnLineId关联。
         /// </summary>
         public string BatchCode { get; set; }
 
@@ -63,9 +63,9 @@ namespace TuTa.Wms.Stocks.Dtos
         /// </summary>
         public string AsnCode { get; set; }
 
-        /// <summary>U8组盘选择的本地ASN明细ID，普通组盘不填写。</summary>
+        /// <summary>U8组盘选定的本地ASN明细ID，作为订单及原批号的追溯来源；普通组盘不填写。</summary>
         public Guid? AsnLineId { get; set; }
-        /// <summary>一箱一扫的提交标识；无箱号的标签也需提供，重试同一箱必须保持不变。</summary>
+        /// <summary>每次物理扫码的独立标识；相同箱贴扫码不同箱时生成新值，提交重试同一记录时保持不变。</summary>
         public string AsnBoxScanId { get; set; }
 
         /// <summary>

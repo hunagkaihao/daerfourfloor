@@ -21,6 +21,11 @@ namespace TuTa.Wms.Erp
         /// </summary>
         Task<List<ErpAsn>> GetListByAsnCodeAsync(string asnCode);
 
+        /// <summary>按当前页物料读取有效检验来源，兼容旧ASN布尔列为NULL的数据。</summary>
+        /// <param name="materialCodes">U8当前页的物料码；为空时不读取本地ASN。</param>
+        /// <returns>未取消的匹配ASN明细；历史空布尔值按未标记处理。</returns>
+        Task<List<ErpAsn>> GetInspectionSourcesAsync(List<string> materialCodes);
+
         /// <summary>
         /// 检查ASN是否存在
         /// </summary>
@@ -36,8 +41,9 @@ namespace TuTa.Wms.Erp
         /// <param name="startDate">开始日期</param>
         /// <param name="endDate">结束日期</param>
         /// <param name="status">状态（1=已创建，2=收货中，3=已完成，4=已取消）</param>
+        /// <param name="supplierCode">供应商编码，去除首尾空格后按包含匹配；空值不筛选。</param>
         /// <returns>ASN列表和总数</returns>
-        Task<(List<ErpAsn>, int)> GetAsnListAsync(int page, int pageSize, string asnCode = null, string supplierName = null, string startDate = null, string endDate = null, int? status = null);
+        Task<(List<ErpAsn>, int)> GetAsnListAsync(int page, int pageSize, string asnCode = null, string supplierName = null, string startDate = null, string endDate = null, int? status = null, string supplierCode = null);
 
         /// <summary>
         /// 根据物料编号获取未完成的ASN明细

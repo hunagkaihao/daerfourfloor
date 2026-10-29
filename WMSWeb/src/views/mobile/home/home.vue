@@ -134,7 +134,7 @@
               <div class="menu-item-icon-wrapper">
                 <AppstoreOutlined class="menu-item-icon" />
               </div>
-              <div class="menu-item-text">物料状态变更</div>
+              <div class="menu-item-text">物料组盘</div>
             </div>
           </a-col>
 
@@ -149,11 +149,11 @@
         </a-row>
         <a-row justify="center" style="margin-top: 20px; margin-bottom: 20px">
           <a-col :span="8">
-            <div class="menu-item-card" @click="boxdiskWithAsn">
+            <div class="menu-item-card" @click="remainderCabinetEntry">
               <div class="menu-item-icon-wrapper">
-                <AppstoreOutlined class="menu-item-icon" />
+                <DatabaseOutlined class="menu-item-icon" />
               </div>
-              <div class="menu-item-text">ASN组盘</div>
+              <div class="menu-item-text">零头柜</div>
             </div>
           </a-col>
           <a-col :span="8">
@@ -167,21 +167,15 @@
         </a-row> 
         <a-row justify="center" style="margin-top: 20px; margin-bottom: 20px">
           <a-col :span="8">
-            <div class="menu-item-card" @click="remainderCabinetEntry">
-              <div class="menu-item-icon-wrapper">
-                <DatabaseOutlined class="menu-item-icon" />
-              </div>
-              <div class="menu-item-text">零头柜</div>
-            </div>
-           </a-col>
+          </a-col> 
           <a-col :span="8">
-              <div class="menu-item-card" @click="materialOut">
-                <div class="menu-item-icon-wrapper">
-                  <ExportOutlined class="menu-item-icon" />
-                </div>
-                <div class="menu-item-text">整箱出库</div>
+            <div class="menu-item-card" @click="materialOut">
+              <div class="menu-item-icon-wrapper">
+                <ExportOutlined class="menu-item-icon" />
               </div>
-            </a-col>
+              <div class="menu-item-text">整箱出库</div>
+            </div>
+          </a-col>
         </a-row>
       </a-tab-pane>
 
@@ -396,9 +390,6 @@ const boxdisk = async () => {
 /** 扫描收料码后将已有库存整盘搬运到入库区，供人工继续组盘。 */
 const inboundReturn = async () => {
   await router.replace('/inboundReturn');
-};
-const boxdiskWithAsn = async () => {
-  await router.replace('/boxDiskWithAsn');
 };
 /** ASN管理直接进入零头柜录入，不要求先扫描组盘库位或容器。 */
 const remainderCabinetEntry = async () => {

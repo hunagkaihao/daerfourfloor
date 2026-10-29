@@ -1236,14 +1236,15 @@ namespace TuTa.Wms.Erp
         /// <param name="startDate">开始日期</param>
         /// <param name="endDate">结束日期</param>
         /// <param name="status">状态（1=已创建，2=收货中，3=已完成，4=已取消）</param>
+        /// <param name="supplierCode">供应商编码，去除首尾空格后按包含匹配；空值不筛选。</param>
         /// <returns>ASN列表</returns>
-        public async Task<ErpAsnListResponseDto> GetAsnListAsync(int page, int pageSize, string asnCode = null, string supplierName = null, string startDate = null, string endDate = null, int? status = null)
+        public async Task<ErpAsnListResponseDto> GetAsnListAsync(int page, int pageSize, string asnCode = null, string supplierName = null, string startDate = null, string endDate = null, int? status = null, string supplierCode = null)
         {
             try
             {
                 _logger.LogInformation($"开始获取ASN列表，页码：{page}，每页数量：{pageSize}，状态：{status?.ToString() ?? "全部"}");
 
-                var (asnList, total) = await _erpAsnRepository.GetAsnListAsync(page, pageSize, asnCode, supplierName, startDate, endDate, status);
+                var (asnList, total) = await _erpAsnRepository.GetAsnListAsync(page, pageSize, asnCode, supplierName, startDate, endDate, status, supplierCode);
 
                 var items = asnList.Select(MapToErpAsnDto).ToList();
 

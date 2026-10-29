@@ -207,13 +207,13 @@ export const MaterialSampling: AppRouteRecordRaw = {
     ignoreAuth: true,
   },
 };
-//物料状态变更
+//物料组盘
 export const MaterialStatusChange: AppRouteRecordRaw = {
   path: '/materialStatusChange',
   name: 'MaterialStatusChange',
   component: () => import('/@/views/mobile/views/MaterialStatusChange.vue'),
   meta: {
-    title: t('物料状态变更'),
+    title: t('物料组盘'),
     ignoreAuth: true,
   },
 };

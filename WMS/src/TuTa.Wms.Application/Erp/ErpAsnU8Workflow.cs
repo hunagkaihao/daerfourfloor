@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.Logging;
 using TuTa.Wms.Erp.Dto;
 using TuTa.Wms.Erp.Entities;
 using TuTa.Wms.Erp.IDto;
@@ -166,7 +167,7 @@ namespace TuTa.Wms.Erp
             return root + (string.IsNullOrEmpty(suffix) ? "" : "/" + suffix);
         }
 
-        /// <summary>按新Base协议转发已明确来源的采购入库单，不查询尚未确定的来料检验接口。</summary>
+        /// <summary>按客户Base协议POST采购入库；Data保留JSON数组字符串，外层只发送Cmd、Taskid、Id、Maker、Data。</summary>
         private async Task<CGRKDAddResponseDto> PushPurchaseBaseAsync(CGRKDAddRequestDto input)
         {
             try
@@ -176,17 +177,20 @@ namespace TuTa.Wms.Erp
                 var vouchers = JArray.Parse(input.Data);
                 if (vouchers.Count == 0 || vouchers.Any(x => string.IsNullOrWhiteSpace(x["cARVCode"]?.ToString()) ||
                     (x["Details"] as JArray)?.Count == 0 || x["Details"] == null))
-                    return new CGRKDAddResponseDto { Success = false, Message = "采购入库单缺少来源单号或明细；检验单接口待客户确认，禁止使用本地ASN的GUID代替" };
+                    return new CGRKDAddResponseDto { Success = false, Message = "采购入库单缺少真实来源单号或明细，不能使用本地ASN的GUID代替" };
                 var token = await GetErpTokenAsync(Guid.NewGuid().ToString());
                 if (string.IsNullOrWhiteSpace(token)) return new CGRKDAddResponseDto { Success = false, Message = "U8登录失败" };
                 using var client = CreateU8Client();
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 var body = Newtonsoft.Json.JsonConvert.SerializeObject(new { Cmd = "CGRKDAdd", input.Taskid, input.Id, input.Maker, input.Data });
-                var response = await client.PostAsync(GetU8Endpoint("Base"), new StringContent(body, Encoding.UTF8, "application/json"));
+                var endpoint = GetU8Endpoint("Base");
+                _logger.LogInformation("U8采购入库POST {Endpoint}，Cmd=CGRKDAdd，Taskid={TaskId}，Id={Id}", endpoint, input.Taskid, input.Id);
+                var response = await client.PostAsync(endpoint, new StringContent(body, Encoding.UTF8, "application/json"));
                 var json = await response.Content.ReadAsStringAsync();
                 if (!response.IsSuccessStatusCode)
                     return new CGRKDAddResponseDto { Success = false, Message = $"U8采购入库失败(HTTP {(int)response.StatusCode})：{json}" };
                 var data = JObject.Parse(json);
+                _logger.LogInformation("U8采购入库响应：Taskid={TaskId}，Success={Success}", input.Taskid, data["success"]?.Value<bool>() ?? false);
                 return new CGRKDAddResponseDto { Success = data["success"]?.Value<bool>() ?? false,
                     Message = data["success"]?.Value<bool>() == true ? "采购入库推送成功" : data["data"]?.ToString() ?? data["msg"]?.ToString(),
                     Code = data["code"]?.Value<int>() ?? 0, Data = data["data"]?.ToString() };

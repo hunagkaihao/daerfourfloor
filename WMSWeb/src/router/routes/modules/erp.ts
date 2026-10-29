@@ -23,6 +23,16 @@ const erp: AppRouteModule = {
         ignoreAuth: true,
       },
     },
+    {
+      path: 'materialInspection',
+      name: 'MaterialInspection',
+      component: () => import('/@/views/erp/MaterialInspection.vue'),
+      meta: {
+        title: t('来料检验单'),
+        icon: 'ant-design:check-square-outlined',
+        ignoreAuth: true,
+      },
+    },
   ],
 };
 

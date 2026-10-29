@@ -8,13 +8,15 @@ export async function getAsnList(params: {
   pageSize: number;
   asnCode?: string;
   supplierName?: string;
+  /** 可选供应商编码，按包含匹配；空值不限制供应商。 */
+  supplierCode?: string;
   startDate?: string;
   endDate?: string;
   status?: number;
 }) {
-  const { page, pageSize, asnCode, supplierName, startDate, endDate, status } = params;
+  const { page, pageSize, asnCode, supplierName, supplierCode, startDate, endDate, status } = params;
   return defHttp.get<{ items: AsnWorkflowLine[]; total: number }>(
-    { url: '/erp/asn/list', params: { page, pageSize, asnCode, supplierName, startDate, endDate, status } },
+    { url: '/erp/asn/list', params: { page, pageSize, asnCode, supplierName, supplierCode, startDate, endDate, status } },
     { isTransformResponse: false },
   );
 }

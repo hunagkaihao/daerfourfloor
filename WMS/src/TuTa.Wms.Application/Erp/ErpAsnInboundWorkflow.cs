@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.Logging;
 using TuTa.Wms.Erp.Entities;
 using TuTa.Wms.Erp.IDto;
 using Volo.Abp.Uow;
@@ -27,11 +28,8 @@ namespace TuTa.Wms.Erp
                 var lines = (await ReadAsnLinesAsync(asnCode.Trim())).Where(x => x.Status != AsnStatus.Cancelled).ToList();
                 if (lines.Count == 0) { result.Message = "未找到ASN明细"; return result; }
                 foreach (var line in lines) result.Items.Add(await QueryInspectionLineAsync(line));
-                // 查询检验在组盘前即可进行，采购入库仍需整张ASN全部组盘校验完成。
-                if (lines.Any(x => x.InWarehouseQuantity <= 0 || (x.AlreadyStockInQuantity ?? 0) != x.InWarehouseQuantity))
-                    foreach (var row in result.Items) row.CanPurchase = false;
                 result.Success = true;
-                result.Message = "查询完成；组盘以本地人工检验合格为准，采购入库仍需U8检验单来源完整、已审核且整批合格";
+                result.Message = "查询完成；各单据独立核对组盘数量，账实一致且U8检验单来源完整、已审核合格后可逐单采购入库";
             }
             catch (Exception ex) { result.Message = "U8检验单查询失败：" + ex.Message; }
             return result;
@@ -58,7 +56,7 @@ namespace TuTa.Wms.Erp
             return quantity;
         }
 
-        /// <summary>查询当前到货行；分页总时限30秒，最多20页，未查全不允许自动生单。</summary>
+        /// <summary>复核当前到货行的检验单；已确认来源按主键和单号精确查找，历史未选来源须查全分页以排除歧义。</summary>
         private async Task<U8InspectionLineDto> QueryInspectionLineAsync(ErpAsn line)
         {
             var result = new U8InspectionLineDto { AsnLineId = line.Id, MaterialCode = line.MaterialCode,
@@ -77,6 +75,8 @@ namespace TuTa.Wms.Erp
             using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(30));
             var matches = new List<JToken>();
             var complete = false;
+            var selectedCheckId = line.VerifiedInspectionId;
+            var selectedCheckCode = line.VerifiedInspectionCode;
             const int size = 100;
             for (var page = 1; page <= 20; page++)
             {
@@ -99,7 +99,10 @@ namespace TuTa.Wms.Erp
                     if (InspectionField(row, "SOURCECODE")?.ToString() == line.ArrivalVoucherCode &&
                         ReadU8Id(InspectionField(row, "SOURCEAUTOID")) == line.ArrivalDetailId &&
                         InspectionField(row, "CINVCODE")?.ToString() == line.MaterialCode &&
-                        (InspectionField(row, "CBATCH")?.ToString() ?? "") == (line.BatchCode ?? ""))
+                        (InspectionField(row, "CBATCH")?.ToString() ?? "") == (line.BatchCode ?? "") &&
+                        (!selectedCheckId.HasValue ||
+                            (ReadU8Id(InspectionField(row, "ID")) == selectedCheckId &&
+                             InspectionField(row, "CCHECKCODE")?.ToString() == selectedCheckCode)))
                         matches.Add(row);
                 }
                 var total = InspectionField(data, "total");
@@ -108,11 +111,15 @@ namespace TuTa.Wms.Erp
                 var expected = Math.Min(size, Math.Max(count - (page - 1) * size, 0));
                 if (rows.Count != expected)
                     throw new InvalidOperationException("U8检验列表分页数量与total不一致，不能使用不完整结果");
+                _logger.LogInformation("U8采购前复核检验单：ASN明细{AsnLineId}，目标检验单{CheckId}，第{Page}页，共{Total}条，本页匹配{Matches}条",
+                    line.Id, selectedCheckId, page, count, matches.Count);
+                // 已由PDA确认的主键唯一定位单据；仍严格核对本页完整性、来源及后续最新审核结果。
+                if (selectedCheckId.HasValue && matches.Count > 0) { complete = true; break; }
                 if (page * size >= count) { complete = true; break; }
                 if (rows.Count == 0) throw new InvalidOperationException("检验列表分页不完整，请核对U8查询条件");
             }
             if (!complete) throw new InvalidOperationException("检验列表超过20页，请收窄U8查询条件后重试，未使用不完整结果生单");
-            // 重复行和多张检验单都需人工核对，不能自行选择第一条。
+            // 无明确选择时不得自行取第一张；指定主键后仍拒绝同页重复的记录。
             if (matches.Count != 1)
             {
                 result.Message = (result.CanGroup ? "本地已确认合格，可组盘；" : "请在物料状态变更页确认合格；") +
@@ -141,7 +148,7 @@ namespace TuTa.Wms.Erp
             return result;
         }
 
-        /// <summary>按真实检验单生采购入库；本地样品未归还时不可推送，失败只重试U8。</summary>
+        /// <summary>按当前明细对应的真实检验单独立生成采购入库；只核对该明细账实和样品归还，不等待其他ASN明细。</summary>
         [UnitOfWork(IsDisabled = true)]
         public async Task<CGRKDAddResponseDto> PushInspectionPurchaseAsync(Guid asnLineId)
         {
@@ -164,8 +171,8 @@ namespace TuTa.Wms.Erp
                 if (line.Status == AsnStatus.Cancelled) return new CGRKDAddResponseDto { Success = false, Message = "ASN已取消" };
                 try
                 {
-                    if (asnLines.Any(x => x.InWarehouseQuantity <= 0 || (x.AlreadyStockInQuantity ?? 0) != x.InWarehouseQuantity))
-                        return new CGRKDAddResponseDto { Success = false, Message = "整张ASN尚未全部组盘及校验完成，不能采购入库" };
+                    if (line.InWarehouseQuantity <= 0 || (line.AlreadyStockInQuantity ?? 0) != line.InWarehouseQuantity)
+                        return new CGRKDAddResponseDto { Success = false, Message = "当前单据对应明细尚未组盘完成或数量不一致，不能采购入库" };
                     var check = await QueryInspectionLineAsync(line);
                     if (!check.CanPurchase) return new CGRKDAddResponseDto { Success = false, Message = check.Message };
                     if (_u8StockRepository == null)
@@ -178,18 +185,23 @@ namespace TuTa.Wms.Erp
                             return new CGRKDAddResponseDto { Success = false, Message = "组盘数量或合格状态不一致，请确认全部箱料及抽检样品已回盘" };
                         await read.CompleteAsync();
                     }
+                    var checkCode = check.CheckCode.Trim();
+                    // Base样例的纯数字来源单号按整数发送；含字母或前导零的真实单号保留字符串，避免改写单号。
+                    JToken sourceOrderCode = long.TryParse(checkCode, NumberStyles.None, CultureInfo.InvariantCulture, out var numericCode) &&
+                        numericCode.ToString(CultureInfo.InvariantCulture) == checkCode ? new JValue(numericCode) : new JValue(checkCode);
                     var payload = new JArray(new JObject {
-                        ["AddType"] = 3, ["bIsRedVouch"] = false,
-                        // 测试示例Base协议使用cARVCode；标准AddType=3使用cOrderCode，均指向真实检验单号。
-                        ["cARVCode"] = check.CheckCode, ["cOrderCode"] = check.CheckCode,
-                        ["cMemo"] = "WMS检验合格采购入库", ["cWhCode"] = line.WarehouseCode,
+                        ["AddType"] = 3, ["blsRedVouch"] = false,
+                        ["cARVCode"] = checkCode, ["cOrderCode"] = sourceOrderCode,
+                        ["cpersoncode"] = string.IsNullOrWhiteSpace(line.PersonCode) ? JValue.CreateNull() : new JValue(line.PersonCode),
+                        ["cMemo"] = "Webservice生成", ["cWhCode"] = line.WarehouseCode,
                         ["cRdCode"] = _erpSettings.PurchaseReceiptCategory ?? "301",
                         ["Details"] = new JArray(new JObject { ["iPOsID"] = check.SourceAutoId,
-                            ["cInvCode"] = line.MaterialCode, ["cbatch"] = line.BatchCode,
-                            ["iQuantity"] = check.QualifiedQuantity }) }).ToString(Newtonsoft.Json.Formatting.None);
+                            ["cinvcode"] = line.MaterialCode, ["cbatch"] = line.BatchCode,
+                            ["iQuantity"] = check.QualifiedQuantity.ToString(CultureInfo.InvariantCulture),
+                            ["iUnitCost"] = 0 }) }).ToString(Newtonsoft.Json.Formatting.None);
                     if (string.IsNullOrWhiteSpace(line.WarehouseCode)) throw new InvalidOperationException("ASN未配置入库仓库");
                     if (line.PurchasePayload != null && !JToken.DeepEquals(JToken.Parse(line.PurchasePayload), JToken.Parse(payload)))
-                        throw new InvalidOperationException("重试来源或数量已变更，请先核对U8，禁止更换原任务数据");
+                        throw new InvalidOperationException("当前来源、数量或报文格式与原采购任务不一致，请先核对U8原任务，禁止自动更换任务号或报文");
                     line.BeginPurchasePush(line.PurchaseTaskId ?? Guid.NewGuid().ToString("N"), payload);
                     await SaveU8LinesAsync(new List<ErpAsn> { line });
                     var result = await PushCGRKDAddAsync(new CGRKDAddRequestDto { Cmd = "CGRKDAdd",

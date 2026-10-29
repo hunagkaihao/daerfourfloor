@@ -139,6 +139,16 @@ namespace TuTa.Wms.Controllers.Erp
         public Task<U8InspectionResultsDto> GetAsnInspectionResultsAsync(string asnCode)
             => _erpAsnAppService.GetAsnInspectionResultsAsync(asnCode);
 
+        /// <summary>按物料查询U8来料检验单，由后端登录并通过POST List调用GetLLJYDList。</summary>
+        [HttpPost("material-inspection-results")]
+        public Task<U8MaterialInspectionResultDto> GetMaterialInspectionResultsAsync([FromBody] U8MaterialInspectionQueryDto input)
+            => _erpAsnAppService.GetMaterialInspectionResultsAsync(input);
+
+        /// <summary>按已审核的所选来料检验单，确认对应ASN明细已检验及合格或不合格结论。</summary>
+        [HttpPost("confirm-material-inspection")]
+        public Task<ErpAsnValidateResponseDto> ConfirmMaterialInspectionAsync([FromBody] U8MaterialInspectionConfirmDto input)
+            => _erpAsnAppService.ConfirmMaterialInspectionAsync(input);
+
         /// <summary>根据ASN行的合格检验单生成采购入库，允许失败后独立重试。</summary>
         [HttpPost("push-purchase-by-inspection")]
         public Task<CGRKDAddResponseDto> PushInspectionPurchaseAsync(Guid asnLineId)
@@ -180,12 +190,13 @@ namespace TuTa.Wms.Controllers.Erp
         /// <param name="startDate">开始日期</param>
         /// <param name="endDate">结束日期</param>
         /// <param name="status">状态（1=已创建，2=收货中，3=已完成，4=已取消）</param>
+        /// <param name="supplierCode">供应商编码，去除首尾空格后按包含匹配；空值不筛选。</param>
         /// <returns>ASN列表</returns>
         [HttpGet("list")]
         [SwaggerOperation(summary: "获取ASN列表", Tags = new[] { "ERP ASN" })]
-        public async Task<ErpAsnListResponseDto> GetAsnListAsync(int page = 1, int pageSize = 10, string asnCode = null, string supplierName = null, string startDate = null, string endDate = null, int? status = null)
+        public async Task<ErpAsnListResponseDto> GetAsnListAsync(int page = 1, int pageSize = 10, string asnCode = null, string supplierName = null, string startDate = null, string endDate = null, int? status = null, string supplierCode = null)
         {
-            return await _erpAsnAppService.GetAsnListAsync(page, pageSize, asnCode, supplierName, startDate, endDate, status);
+            return await _erpAsnAppService.GetAsnListAsync(page, pageSize, asnCode, supplierName, startDate, endDate, status, supplierCode);
         }
 
         /// <summary>
