@@ -101,13 +101,13 @@
             </a-table>
 
             <div class="tab-bar">
-                <a-button @click="openCancelModal" :disabled="workflowBusy" type="primary" class="modern-btn">
+                <a-button @click="openCancelModal" :disabled="workflowBusy" :loading="activeOperation === 'cancel'" type="primary" class="modern-btn">
                     组盘取消
                 </a-button>
-                <a-button @click="confirmGrouping" :disabled="workflowBusy" :loading="submitting" type="primary" class="modern-btn">
+                <a-button @click="confirmGrouping" :disabled="workflowBusy" :loading="activeOperation === 'grouping'" type="primary" class="modern-btn">
                     组盘确认
                 </a-button>
-                <a-button @click="createInboundTask" :disabled="workflowBusy || goods.length > 0" :loading="submitting" type="primary" class="modern-btn">
+                <a-button @click="createInboundTask" :disabled="workflowBusy || goods.length > 0" :loading="activeOperation === 'transport'" type="primary" class="modern-btn">
                     创建入库搬运任务
                 </a-button>
             </div>
@@ -156,8 +156,10 @@ const goods = ref<ReturnType<typeof createAsnBoxItem>[]>([]);
 /** 保留各采购订单的组盘与自动推送结果，推送失败不等同于本地组盘失败。 */
 const groupingResultMessages = ref<string[]>([]);
 const dataSource = ref<any[]>([]);
-/** 组盘、取消、删除和搬运共用操作锁，防止重复提交。 */
-const submitting = ref(false);
+/** 当前执行的组盘、取消、搬运或删除操作；仅对应按钮显示加载动画，空值表示空闲。 */
+const activeOperation = ref<'grouping' | 'cancel' | 'transport' | 'delete' | null>(null);
+/** 操作互斥状态，防止执行期间重复提交或修改组盘来源。 */
+const submitting = computed(() => activeOperation.value !== null);
 const inspectionBusy = ref(false);
 const queryingCell = ref(false);
 const workflowBusy = computed(() => submitting.value || inspectionBusy.value || queryingCell.value || barcodeEditorVisible.value);
@@ -329,7 +331,7 @@ function deleteStock(record: any) {
         okText: '确定', cancelText: '取消',
         onOk: async () => {
             if (workflowBusy.value || code !== boxCode.value) return;
-            submitting.value = true;
+            activeOperation.value = 'delete';
             try {
                 const result = await stockRemoveDirect(record.id);
                 if (!result?.success) throw new Error(result?.message || '删除失败');
@@ -338,7 +340,7 @@ function deleteStock(record: any) {
                 await inspectionRef.value?.reload();
             } catch (error: any) {
                 message.error(error?.error?.message || error?.message || '删除失败');
-            } finally { submitting.value = false; }
+            } finally { activeOperation.value = null; }
         },
     });
 }
@@ -349,7 +351,7 @@ async function confirmGrouping() {
     if (!goods.value.length || !boxCode.value.trim()) {
         message.error('请先查询物料检验单、选择来源、扫描库位并逐箱扫码'); return;
     }
-    submitting.value = true;
+    activeOperation.value = 'grouping';
     groupingResultMessages.value = [];
     const code = boxCode.value;
     try {
@@ -399,7 +401,7 @@ async function confirmGrouping() {
         try { await refreshCell(code); }
         catch (error: any) { message.warning(error?.message || '组盘库存刷新失败，请重新扫描库位'); }
         try { await inspectionRef.value?.reload(); }
-        finally { submitting.value = false; }
+        finally { activeOperation.value = null; }
     }
 }
 
@@ -438,7 +440,7 @@ function openCancelModal() {
         okText: '确定', cancelText: '取消',
         onOk: async () => {
             if (workflowBusy.value || code !== boxCode.value) return;
-            submitting.value = true;
+            activeOperation.value = 'cancel';
             try {
                 const box = await getCellBox(code);
                 if (box) {
@@ -453,7 +455,7 @@ function openCancelModal() {
                 catch (error: any) { message.warning(error?.message || '组盘已取消，ASN数量刷新失败，请重新查询'); }
             } catch (error: any) {
                 message.error(error?.error?.message || error?.message || '取消组盘失败');
-            } finally { submitting.value = false; }
+            } finally { activeOperation.value = null; }
         },
     });
 }
@@ -463,7 +465,7 @@ async function createInboundTask() {
     if (workflowBusy.value) return;
     if (!boxCode.value.trim()) { message.error('请先扫描库位'); return; }
     if (goods.value.length) { message.warning('请先确认或移除尚未提交的箱码'); return; }
-    submitting.value = true;
+    activeOperation.value = 'transport';
     const code = boxCode.value;
     try {
         const box = await getCellBox(code);
@@ -477,7 +479,7 @@ async function createInboundTask() {
         resetPallet();
     } catch (error: any) {
         message.error(error?.error?.message || error?.message || '搬运任务创建失败，请核对任务状态后重试');
-    } finally { submitting.value = false; }
+    } finally { activeOperation.value = null; }
 }
 
 /** 扫码输入时临时抑制软键盘弹出。 */

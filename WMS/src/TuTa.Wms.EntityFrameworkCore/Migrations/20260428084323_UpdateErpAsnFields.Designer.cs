@@ -728,7 +728,7 @@ namespace TuTa.Wms.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
 
-                    b.Property<DateTime?>("ActualOutboundDate")
+                    b.Property<DateTime?>("OutboundDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("ConcurrencyStamp")

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -167,35 +168,94 @@ namespace TuTa.Wms.Erp
             return root + (string.IsNullOrEmpty(suffix) ? "" : "/" + suffix);
         }
 
-        /// <summary>按客户Base协议POST采购入库；Data保留JSON数组字符串，外层只发送Cmd、Taskid、Id、Maker、Data。</summary>
+        /// <summary>按客户Base协议POST采购入库，cChkCode和cOrderCode均填写来料检验单号；Data保留JSON数组字符串，外层只发送Cmd、Taskid、Id、Maker、Data。</summary>
         private async Task<CGRKDAddResponseDto> PushPurchaseBaseAsync(CGRKDAddRequestDto input)
         {
+            // 保留原始响应，JSON解析或字段转换异常时也能核对U8实际返回内容。
+            string responseBody = null;
             try
             {
                 if (input.Cmd != "CGRKDAdd" || input.Params != null || string.IsNullOrWhiteSpace(input.Taskid))
+                {
+                    _logger.LogWarning("U8采购入库校验失败：Taskid={TaskId}，原因=必须指定CGRKDAdd、Taskid，且不能混用Params", input.Taskid);
                     return new CGRKDAddResponseDto { Success = false, Message = "新采购入库报文必须指定CGRKDAdd、Taskid，且不能混用Params" };
+                }
                 var vouchers = JArray.Parse(input.Data);
-                if (vouchers.Count == 0 || vouchers.Any(x => string.IsNullOrWhiteSpace(x["cARVCode"]?.ToString()) ||
+                if (vouchers.Count == 0 || vouchers.Any(x => string.IsNullOrWhiteSpace(x["cChkCode"]?.ToString()) ||
+                    string.IsNullOrWhiteSpace(x["cOrderCode"]?.ToString()) ||
                     (x["Details"] as JArray)?.Count == 0 || x["Details"] == null))
-                    return new CGRKDAddResponseDto { Success = false, Message = "采购入库单缺少真实来源单号或明细，不能使用本地ASN的GUID代替" };
+                {
+                    _logger.LogWarning("U8采购入库校验失败：Taskid={TaskId}，原因=缺少检验单来源字段cChkCode、cOrderCode或明细", input.Taskid);
+                    return new CGRKDAddResponseDto { Success = false, Message = "采购入库单缺少检验单来源字段cChkCode、cOrderCode或明细，不能使用本地ASN的GUID代替" };
+                }
+                // 在发送副本中规范数量并补齐价格字段，兼容已冻结的旧任务，保留原任务号及业务数量。
+                foreach (var voucher in vouchers)
+                {
+                    // 保留填写检验单号的两个字段，清除不再使用的旧来源字段。
+                    ((JObject)voucher).Remove("cARVCode");
+                    foreach (var detail in (JArray)voucher["Details"])
+                    {
+                        // U8要求数量为不带小数点的字符串；仅移除整数的末尾小数0，不截断或舍入实物数量。
+                        if (!decimal.TryParse(detail["iQuantity"]?.ToString(), NumberStyles.Number,
+                                CultureInfo.InvariantCulture, out var quantity) || quantity <= 0 || quantity != decimal.Truncate(quantity))
+                        {
+                            _logger.LogWarning("U8采购入库校验失败：Taskid={TaskId}，物料={MaterialCode}，原因=iQuantity必须为正整数，当前值={Quantity}",
+                                input.Taskid, detail["cinvcode"]?.ToString(), detail["iQuantity"]?.ToString());
+                            return new CGRKDAddResponseDto { Success = false,
+                                Message = $"采购入库数量iQuantity必须为正整数，当前值：{detail["iQuantity"]}，请核对数量后重试" };
+                        }
+                        detail["iQuantity"] = quantity.ToString("0", CultureInfo.InvariantCulture);
+                        if (detail["ioricost"] == null)
+                            detail["ioricost"] = detail["iUnitCost"]?.DeepClone() ?? new JValue(0);
+                        // 当前采购报文使用零单价，缺省含税价格及金额字段补0；调用方已提供的值保持不变。
+                        if (detail["ioritaxcost"] == null)
+                            detail["ioritaxcost"] = new JValue(0);
+                        if (detail["iorimoney"] == null)
+                            detail["iorimoney"] = new JValue(0);
+                        if (detail["ioritaxprice"] == null)
+                            detail["ioritaxprice"] = new JValue(0);
+                    }
+                }
                 var token = await GetErpTokenAsync(Guid.NewGuid().ToString());
-                if (string.IsNullOrWhiteSpace(token)) return new CGRKDAddResponseDto { Success = false, Message = "U8登录失败" };
+                if (string.IsNullOrWhiteSpace(token))
+                {
+                    _logger.LogError("U8采购入库失败：Taskid={TaskId}，原因=U8登录失败", input.Taskid);
+                    return new CGRKDAddResponseDto { Success = false, Message = "U8登录失败" };
+                }
                 using var client = CreateU8Client();
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                var body = Newtonsoft.Json.JsonConvert.SerializeObject(new { Cmd = "CGRKDAdd", input.Taskid, input.Id, input.Maker, input.Data });
+                var body = Newtonsoft.Json.JsonConvert.SerializeObject(new { Cmd = "CGRKDAdd", input.Taskid, input.Id, input.Maker,
+                    Data = vouchers.ToString(Newtonsoft.Json.Formatting.None) });
                 var endpoint = GetU8Endpoint("Base");
                 _logger.LogInformation("U8采购入库POST {Endpoint}，Cmd=CGRKDAdd，Taskid={TaskId}，Id={Id}", endpoint, input.Taskid, input.Id);
+                // 打印包含补齐后价格及金额字段的最终发送报文，便于按任务号核对发送内容。
+                _logger.LogInformation("U8采购入库发送数据：Taskid={TaskId}，报文={RequestBody}", input.Taskid, body);
                 var response = await client.PostAsync(endpoint, new StringContent(body, Encoding.UTF8, "application/json"));
-                var json = await response.Content.ReadAsStringAsync();
+                responseBody = await response.Content.ReadAsStringAsync();
                 if (!response.IsSuccessStatusCode)
-                    return new CGRKDAddResponseDto { Success = false, Message = $"U8采购入库失败(HTTP {(int)response.StatusCode})：{json}" };
-                var data = JObject.Parse(json);
-                _logger.LogInformation("U8采购入库响应：Taskid={TaskId}，Success={Success}", input.Taskid, data["success"]?.Value<bool>() ?? false);
-                return new CGRKDAddResponseDto { Success = data["success"]?.Value<bool>() ?? false,
-                    Message = data["success"]?.Value<bool>() == true ? "采购入库推送成功" : data["data"]?.ToString() ?? data["msg"]?.ToString(),
-                    Code = data["code"]?.Value<int>() ?? 0, Data = data["data"]?.ToString() };
+                {
+                    _logger.LogError("U8采购入库HTTP失败：Taskid={TaskId}，Id={Id}，HTTP={StatusCode}，原始响应={ResponseBody}",
+                        input.Taskid, input.Id, (int)response.StatusCode, responseBody);
+                    return new CGRKDAddResponseDto { Success = false, Message = $"U8采购入库失败(HTTP {(int)response.StatusCode})：{responseBody}" };
+                }
+                var data = JObject.Parse(responseBody);
+                var success = data["success"]?.Value<bool>() ?? false;
+                var resultMessage = success ? "采购入库推送成功" : data["data"]?.ToString() ?? data["msg"]?.ToString();
+                _logger.LogInformation("U8采购入库响应：Taskid={TaskId}，Success={Success}", input.Taskid, success);
+                if (!success)
+                    _logger.LogError("U8采购入库业务失败：Taskid={TaskId}，Id={Id}，原因={Reason}，原始响应={ResponseBody}",
+                        input.Taskid, input.Id, resultMessage, responseBody);
+                return new CGRKDAddResponseDto { Success = success, Message = resultMessage,
+                    Code = data["code"]?.Value<int>() ?? 0, Data = data["data"]?.ToString(),
+                    FailureConfirmed = data["success"] != null && data["success"].Type != JTokenType.Null &&
+                        data["success"].Value<bool>() == false };
             }
-            catch (Exception ex) { return new CGRKDAddResponseDto { Success = false, Message = "采购入库推送失败：" + ex.Message }; }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "U8采购入库异常：Taskid={TaskId}，Id={Id}，原因={Reason}，原始响应={ResponseBody}",
+                    input?.Taskid, input?.Id, ex.Message, responseBody);
+                return new CGRKDAddResponseDto { Success = false, Message = "采购入库推送失败：" + ex.Message };
+            }
         }
         // 主机已注册Redis分布式锁；无分布式锁的单机/测试环境串行化整个推送流程。
         internal static readonly SemaphoreSlim LocalPushLock = new SemaphoreSlim(1, 1);

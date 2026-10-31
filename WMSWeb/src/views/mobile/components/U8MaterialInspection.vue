@@ -4,6 +4,7 @@
     <div class="search">
       <a-input
         v-model:value="materialCode"
+        :lazy="false"
         placeholder="扫描箱码或输入物料码"
         :disabled="busy || disabled"
         allow-clear
@@ -149,9 +150,14 @@
     ]);
   }
 
-  /** 查询条件变化时立刻清除旧结果及下方组盘来源。 */
+  /** 提取实际参与查询的物料码，箱码补发或首尾空格变化不视为切换物料。 */
+  function queryMaterialCode() {
+    return materialCode.value.split(',')[0].trim();
+  }
+
+  /** 实际查询条件变化时清除旧来源；输入提交和箱码格式转换不清空同一查询。 */
   watch(
-    [materialCode, beginMakeTime, queryPage, queryPageSize],
+    [queryMaterialCode, beginMakeTime, () => queryPage.value ?? 1, () => queryPageSize.value ?? 100],
     () => {
       items.value = [];
       notice.value = '';
@@ -225,7 +231,7 @@
         notice.value = '';
         try {
           const result = await confirmMaterialInspection({
-            materialCode: materialCode.value.trim(),
+            materialCode: queryMaterialCode(),
             beginMakeTime: beginMakeTime.value || undefined,
             page: itemPages.get(key) || (queryPage.value ?? 1),
             pageSize: queryPageSize.value ?? 100,
@@ -264,7 +270,7 @@
   async function load(force = false, append = false) {
     if (busy.value || (props.disabled && !force) || !materialCode.value.trim()) return;
     // 查询时按箱码逗号协议提取首段，避免扫码枪逐字符输入时提前截断后续内容。
-    const code = materialCode.value.split(',')[0].trim();
+    const code = queryMaterialCode();
     materialCode.value = code;
     if (!code) {
       notice.value = '箱码首段物料码不能为空，请重新扫描或输入物料码';
@@ -293,7 +299,7 @@
       return;
     }
     const isCurrentQuery = () =>
-      code === materialCode.value.trim() &&
+      code === queryMaterialCode() &&
       begin === beginMakeTime.value &&
       startPage === (queryPage.value ?? 1) &&
       pageSize === (queryPageSize.value ?? 100);

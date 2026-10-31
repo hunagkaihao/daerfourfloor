@@ -56,7 +56,7 @@ namespace TuTa.Wms.Erp
             return quantity;
         }
 
-        /// <summary>复核当前到货行的检验单；已确认来源按主键和单号精确查找，历史未选来源须查全分页以排除歧义。</summary>
+        /// <summary>查询当前到货行的检验单供页面查看；采购推送直接使用本地已确认的来源，不调用此分页查询。</summary>
         private async Task<U8InspectionLineDto> QueryInspectionLineAsync(ErpAsn line)
         {
             var result = new U8InspectionLineDto { AsnLineId = line.Id, MaterialCode = line.MaterialCode,
@@ -111,7 +111,7 @@ namespace TuTa.Wms.Erp
                 var expected = Math.Min(size, Math.Max(count - (page - 1) * size, 0));
                 if (rows.Count != expected)
                     throw new InvalidOperationException("U8检验列表分页数量与total不一致，不能使用不完整结果");
-                _logger.LogInformation("U8采购前复核检验单：ASN明细{AsnLineId}，目标检验单{CheckId}，第{Page}页，共{Total}条，本页匹配{Matches}条",
+                _logger.LogInformation("U8检验单查询：ASN明细{AsnLineId}，目标检验单{CheckId}，第{Page}页，共{Total}条，本页匹配{Matches}条",
                     line.Id, selectedCheckId, page, count, matches.Count);
                 // 已由PDA确认的主键唯一定位单据；仍严格核对本页完整性、来源及后续最新审核结果。
                 if (selectedCheckId.HasValue && matches.Count > 0) { complete = true; break; }
@@ -148,7 +148,7 @@ namespace TuTa.Wms.Erp
             return result;
         }
 
-        /// <summary>按当前明细对应的真实检验单独立生成采购入库；只核对该明细账实和样品归还，不等待其他ASN明细。</summary>
+        /// <summary>使用本地已确认的检验单来源独立生成采购入库；核对该明细账实及样品归还，不再查询U8检验单，不等待其他ASN明细。</summary>
         [UnitOfWork(IsDisabled = true)]
         public async Task<CGRKDAddResponseDto> PushInspectionPurchaseAsync(Guid asnLineId)
         {
@@ -173,8 +173,15 @@ namespace TuTa.Wms.Erp
                 {
                     if (line.InWarehouseQuantity <= 0 || (line.AlreadyStockInQuantity ?? 0) != line.InWarehouseQuantity)
                         return new CGRKDAddResponseDto { Success = false, Message = "当前单据对应明细尚未组盘完成或数量不一致，不能采购入库" };
-                    var check = await QueryInspectionLineAsync(line);
-                    if (!check.CanPurchase) return new CGRKDAddResponseDto { Success = false, Message = check.Message };
+                    if (!line.IsInspectionReportPushed || line.MaterialInspectionStatus != Stocks.InspectionStatus.InspectionQualified)
+                        return new CGRKDAddResponseDto { Success = false, Message = "请先在物料组盘页面确认检验合格后再推送采购入库" };
+                    // 检验确认时已核实U8单据并保存来源；推送沿用该关联和本单已确认数量，不再分页复核检验单。
+                    var checkId = line.VerifiedInspectionId;
+                    var checkCode = line.VerifiedInspectionCode?.Trim();
+                    if (!checkId.HasValue || string.IsNullOrWhiteSpace(checkCode) ||
+                        !line.ArrivalDetailId.HasValue || line.ArrivalDetailId.Value <= 0 ||
+                        string.IsNullOrWhiteSpace(line.ArrivalVoucherCode))
+                        return new CGRKDAddResponseDto { Success = false, Message = "缺少已确认的检验单来源，请在物料组盘页面选择对应检验单并确认合格后重试" };
                     if (_u8StockRepository == null)
                         return new CGRKDAddResponseDto { Success = false, Message = "库存校验服务不可用，禁止采购入库" };
                     using (var read = UnitOfWorkManager.Begin(true, false))
@@ -185,31 +192,53 @@ namespace TuTa.Wms.Erp
                             return new CGRKDAddResponseDto { Success = false, Message = "组盘数量或合格状态不一致，请确认全部箱料及抽检样品已回盘" };
                         await read.CompleteAsync();
                     }
-                    var checkCode = check.CheckCode.Trim();
-                    // Base样例的纯数字来源单号按整数发送；含字母或前导零的真实单号保留字符串，避免改写单号。
-                    JToken sourceOrderCode = long.TryParse(checkCode, NumberStyles.None, CultureInfo.InvariantCulture, out var numericCode) &&
-                        numericCode.ToString(CultureInfo.InvariantCulture) == checkCode ? new JValue(numericCode) : new JValue(checkCode);
+                    // cChkCode和cOrderCode均填写已确认的来料检验单号，不发送cARVCode。
                     var payload = new JArray(new JObject {
                         ["AddType"] = 3, ["blsRedVouch"] = false,
-                        ["cARVCode"] = checkCode, ["cOrderCode"] = sourceOrderCode,
+                        ["cChkCode"] = checkCode, ["cOrderCode"] = checkCode,
                         ["cpersoncode"] = string.IsNullOrWhiteSpace(line.PersonCode) ? JValue.CreateNull() : new JValue(line.PersonCode),
                         ["cMemo"] = "Webservice生成", ["cWhCode"] = line.WarehouseCode,
                         ["cRdCode"] = _erpSettings.PurchaseReceiptCategory ?? "301",
-                        ["Details"] = new JArray(new JObject { ["iPOsID"] = check.SourceAutoId,
+                        ["Details"] = new JArray(new JObject { ["iPOsID"] = line.ArrivalDetailId.Value,
                             ["cinvcode"] = line.MaterialCode, ["cbatch"] = line.BatchCode,
-                            ["iQuantity"] = check.QualifiedQuantity.ToString(CultureInfo.InvariantCulture),
+                            ["iQuantity"] = line.InWarehouseQuantity.ToString(CultureInfo.InvariantCulture),
                             ["iUnitCost"] = 0 }) }).ToString(Newtonsoft.Json.Formatting.None);
                     if (string.IsNullOrWhiteSpace(line.WarehouseCode)) throw new InvalidOperationException("ASN未配置入库仓库");
-                    if (line.PurchasePayload != null && !JToken.DeepEquals(JToken.Parse(line.PurchasePayload), JToken.Parse(payload)))
-                        throw new InvalidOperationException("当前来源、数量或报文格式与原采购任务不一致，请先核对U8原任务，禁止自动更换任务号或报文");
+                    if (line.PurchasePayload != null)
+                    {
+                        var previousPayload = JToken.Parse(line.PurchasePayload);
+                        var currentPayload = JToken.Parse(payload);
+                        if (!JToken.DeepEquals(previousPayload, currentPayload))
+                        {
+                            var sourceCorrectionAllowed = false;
+                            // 仅对已明确失败且来源仍一致的旧任务统一检验单号或替换旧来源字段，其他内容必须完全一致。
+                            if (line.IsPurchaseFailureConfirmed && previousPayload is JArray previousVouchers &&
+                                previousVouchers.Count == 1 && previousVouchers[0] is JObject previousVoucher &&
+                                ((previousVoucher["cChkCode"]?.ToString() == checkCode && previousVoucher["cARVCode"] == null) ||
+                                 (previousVoucher["cChkCode"] == null && previousVoucher["cARVCode"]?.ToString() == checkCode)) &&
+                                (previousVoucher["cOrderCode"] == null || previousVoucher["cOrderCode"]?.ToString() == checkCode ||
+                                 (!string.IsNullOrWhiteSpace(line.OrderCode) && previousVoucher["cOrderCode"]?.ToString() == line.OrderCode.Trim()) ||
+                                 previousVoucher["cOrderCode"]?.ToString() == line.ArrivalDetailId.Value.ToString(CultureInfo.InvariantCulture)))
+                            {
+                                previousVoucher.Remove("cARVCode");
+                                previousVoucher["cChkCode"] = checkCode;
+                                previousVoucher["cOrderCode"] = checkCode;
+                                sourceCorrectionAllowed = JToken.DeepEquals(previousPayload, currentPayload);
+                            }
+                            if (!sourceCorrectionAllowed)
+                                throw new InvalidOperationException("当前来源、数量或报文格式与原采购任务不一致，请先核对U8原任务，禁止自动更换任务号或报文");
+                            _logger.LogInformation("采购入库失败任务更新来源字段：Taskid={TaskId}，cChkCode={CheckCode}，cOrderCode={OrderCode}，已移除cARVCode",
+                                line.PurchaseTaskId, checkCode, checkCode);
+                        }
+                    }
                     line.BeginPurchasePush(line.PurchaseTaskId ?? Guid.NewGuid().ToString("N"), payload);
                     await SaveU8LinesAsync(new List<ErpAsn> { line });
                     var result = await PushCGRKDAddAsync(new CGRKDAddRequestDto { Cmd = "CGRKDAdd",
-                        Taskid = line.PurchaseTaskId, Id = check.CheckId.Value,
+                        Taskid = line.PurchaseTaskId, Id = checkId.Value,
                         Maker = line.Maker ?? "WMS", Data = line.PurchasePayload });
                     using (var write = UnitOfWorkManager.Begin(true, true))
                     {
-                        line.RecordPurchasePush(result.Success, result.Message, result.Data);
+                        line.RecordPurchasePush(result.Success, result.Message, result.Data, result.FailureConfirmed);
                         if (result.Success)
                         {
                             var stocks = await _u8StockRepository.GetListAsync(x => x.U8AsnLineId == line.Id);
@@ -226,6 +255,8 @@ namespace TuTa.Wms.Erp
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError(ex, "采购入库处理异常：ASN={AsnCode}，ASN明细={AsnLineId}，Taskid={TaskId}，原因={Reason}",
+                        line.AsnCode, line.Id, line.PurchaseTaskId, ex.Message);
                     line.RecordPurchasePush(false, ex.Message, null);
                     await SaveU8LinesAsync(new List<ErpAsn> { line });
                     return new CGRKDAddResponseDto { Success = false, Message = ex.Message };

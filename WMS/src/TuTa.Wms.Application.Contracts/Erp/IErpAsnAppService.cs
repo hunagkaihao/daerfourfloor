@@ -90,7 +90,7 @@ namespace TuTa.Wms.Erp
         /// <param name="input">检验单身份、原查询分页条件及人工检验结论。</param>
         /// <returns>确认结果及该检验记录对应的最新ASN明细。</returns>
         Task<ErpAsnValidateResponseDto> ConfirmMaterialInspectionAsync(U8MaterialInspectionConfirmDto input);
-        /// <summary>按指定ASN明细对应的已审核合格检验单逐单生成采购入库；该明细账实一致即可，不等待整张ASN，失败独立重试。</summary>
+        /// <summary>按指定ASN明细本地已确认的合格检验单来源逐单生成采购入库，不再查询U8检验单；该明细账实一致即可，不等待整张ASN，失败独立重试。</summary>
         Task<CGRKDAddResponseDto> PushInspectionPurchaseAsync(Guid asnLineId);
 
         /// <summary>整张发货单实际完成后推送/重试U8销售出库单。</summary>

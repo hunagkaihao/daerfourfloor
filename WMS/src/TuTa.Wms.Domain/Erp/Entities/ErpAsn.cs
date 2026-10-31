@@ -302,7 +302,7 @@ namespace TuTa.Wms.Erp.Entities
         [NotMapped]
         public long? VerifiedInspectionId => long.TryParse(this.GetProperty<string>("U8VerifiedInspectionId"), out var id) && id > 0 ? id : (long?)null;
 
-        /// <summary>与已核实检验单主键配套的真实单号，用于采购前精确复核所选单据。</summary>
+        /// <summary>与已核实检验单主键配套的真实单号，采购推送直接使用该已确认来源，不再查询U8检验单。</summary>
         [NotMapped]
         public string VerifiedInspectionCode => this.GetProperty<string>("U8VerifiedInspectionCode");
 
@@ -426,18 +426,41 @@ namespace TuTa.Wms.Erp.Entities
         /// <summary>最近采购推送错误，审核与数量等待提示不计为成功。</summary>
         [NotMapped]
         public string PurchasePushError => this.GetProperty<string>("U8PurchaseError");
+        /// <summary>U8明确返回采购失败时允许取消组盘；兼容旧版已保存的ioricost或ioritaxcost缺列失败，超时及未知结果仍需核对。</summary>
+        [NotMapped]
+        public bool IsPurchaseFailureConfirmed
+        {
+            get
+            {
+                if (IsPurchasePushed) return false;
+                var confirmed = this.GetProperty<string>("U8PurchaseFailureConfirmed");
+                if (confirmed != null) return confirmed == "true";
+                // 旧版本未记录失败类型，仅识别已知的U8缺列业务回执，不泛化到其他异常文本。
+                return this.GetProperty<string>("U8PurchasePushed") == "false" &&
+                    PurchasePushError?.StartsWith("操作失败", StringComparison.Ordinal) == true &&
+                    (PurchasePushError.Contains("ioricost") || PurchasePushError.Contains("ioritaxcost")) &&
+                    PurchasePushError.Contains("不属于表");
+            }
+        }
         /// <summary>冻结首次提交的数据和任务号；返回采购失败时仍保留。</summary>
         public void BeginPurchasePush(string taskId, string payload)
         {
             if (IsPurchasePushed) throw new BusinessException("采购入库已推送");
             this.SetProperty("U8PurchaseTaskId", taskId);
             this.SetProperty("U8PurchasePayload", payload);
+            // 重试开始后结果重新变为未知，防止进程退出或超时后沿用上次失败结论取消库存。
+            this.SetProperty("U8PurchaseFailureConfirmed", "false");
         }
         /// <summary>独立记录采购推送结果及原始回执，避免重复回补样品库存。</summary>
-        public void RecordPurchasePush(bool success, string message, string data)
+        /// <param name="success">U8是否确认采购成功。</param>
+        /// <param name="message">接口回执或异常说明。</param>
+        /// <param name="data">U8成功回执，可为空。</param>
+        /// <param name="failureConfirmed">仅收到U8明确业务失败回执时为true；网络和本地异常使用false。</param>
+        public void RecordPurchasePush(bool success, string message, string data, bool failureConfirmed = false)
         {
             this.SetProperty("U8PurchasePushed", success ? "true" : "false");
             this.SetProperty("U8PurchaseError", success ? null : LimitError(message));
+            this.SetProperty("U8PurchaseFailureConfirmed", !success && failureConfirmed ? "true" : "false");
             if (success) this.SetProperty("U8PurchaseReceipt", data);
         }
 

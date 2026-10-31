@@ -31,5 +31,8 @@ namespace TuTa.Wms.Erp.IDto
         public string Message { get; set; }
         public int Code { get; set; }
         public string Data { get; set; }
+        /// <summary>仅服务端使用：U8已明确返回业务失败；网络异常、超时或缺失结果不能视为确认失败。</summary>
+        [System.Text.Json.Serialization.JsonIgnore]
+        public bool FailureConfirmed { get; set; }
     }
 }

@@ -1037,8 +1037,10 @@ namespace TuTa.Wms.Stocks
                     foreach (var group in sourceGroups)
                     {
                         var source = await _erpAsnRepository.GetAsync(group.Key);
-                        if (source.IsPurchasePushed || !string.IsNullOrWhiteSpace(source.PurchaseTaskId))
-                            return new ResponseDto { success = false, message = "该物料已发起采购入库，请先核对U8并处理采购单据，不能直接取消组盘" };
+                        if (source.IsPurchasePushed)
+                            return new ResponseDto { success = false, message = "该物料采购入库已成功，请先处理U8采购单据，不能直接取消组盘" };
+                        if (!string.IsNullOrWhiteSpace(source.PurchaseTaskId) && !source.IsPurchaseFailureConfirmed)
+                            return new ResponseDto { success = false, message = "该物料采购入库结果尚未确认，请先核对U8采购单据后再取消组盘" };
                         // 仅扣回当前托盘的库存及暂借抽检量，不清空同来源在其他托盘上已保存的数量。
                         var quantity = group.Sum(stock => stock.TotalCountInTime + (stock.InspectionCount ?? 0));
                         if (quantity > 0) source.RevertAlreadyStockInQuantity(quantity);
