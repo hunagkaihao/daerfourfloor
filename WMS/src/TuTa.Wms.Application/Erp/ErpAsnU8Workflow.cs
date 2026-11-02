@@ -168,7 +168,7 @@ namespace TuTa.Wms.Erp
             return root + (string.IsNullOrEmpty(suffix) ? "" : "/" + suffix);
         }
 
-        /// <summary>按客户Base协议POST采购入库，cChkCode和cOrderCode均填写来料检验单号；Data保留JSON数组字符串，外层只发送Cmd、Taskid、Id、Maker、Data。</summary>
+        /// <summary>按客户Base协议POST采购入库，cOrderCode填写来料检验单号；Data保留JSON数组字符串，外层只发送Cmd、Taskid、Id、Maker、Data。</summary>
         private async Task<CGRKDAddResponseDto> PushPurchaseBaseAsync(CGRKDAddRequestDto input)
         {
             // 保留原始响应，JSON解析或字段转换异常时也能核对U8实际返回内容。
@@ -181,21 +181,21 @@ namespace TuTa.Wms.Erp
                     return new CGRKDAddResponseDto { Success = false, Message = "新采购入库报文必须指定CGRKDAdd、Taskid，且不能混用Params" };
                 }
                 var vouchers = JArray.Parse(input.Data);
-                if (vouchers.Count == 0 || vouchers.Any(x => string.IsNullOrWhiteSpace(x["cChkCode"]?.ToString()) ||
-                    string.IsNullOrWhiteSpace(x["cOrderCode"]?.ToString()) ||
+                if (vouchers.Count == 0 || vouchers.Any(x => string.IsNullOrWhiteSpace(x["cOrderCode"]?.ToString()) ||
                     (x["Details"] as JArray)?.Count == 0 || x["Details"] == null))
                 {
-                    _logger.LogWarning("U8采购入库校验失败：Taskid={TaskId}，原因=缺少检验单来源字段cChkCode、cOrderCode或明细", input.Taskid);
-                    return new CGRKDAddResponseDto { Success = false, Message = "采购入库单缺少检验单来源字段cChkCode、cOrderCode或明细，不能使用本地ASN的GUID代替" };
+                    _logger.LogWarning("U8采购入库校验失败：Taskid={TaskId}，原因=缺少检验单来源字段cOrderCode或明细", input.Taskid);
+                    return new CGRKDAddResponseDto { Success = false, Message = "采购入库单缺少检验单来源字段cOrderCode或明细，不能使用本地ASN的GUID代替" };
                 }
                 // 在发送副本中规范数量并补齐价格字段，兼容已冻结的旧任务，保留原任务号及业务数量。
                 foreach (var voucher in vouchers)
                 {
-                    // 保留填写检验单号的两个字段，清除不再使用的旧来源字段。
+                    // Data按二开示例仅保留cOrderCode，兼容旧任务中已冻结的来源字段。
                     ((JObject)voucher).Remove("cARVCode");
+                    ((JObject)voucher).Remove("cChkCode");
                     foreach (var detail in (JArray)voucher["Details"])
                     {
-                        // U8要求数量为不带小数点的字符串；仅移除整数的末尾小数0，不截断或舍入实物数量。
+                        // 二开示例要求JSON整数数值；兼容旧任务的数字字符串，不截断或舍入实物数量。
                         if (!decimal.TryParse(detail["iQuantity"]?.ToString(), NumberStyles.Number,
                                 CultureInfo.InvariantCulture, out var quantity) || quantity <= 0 || quantity != decimal.Truncate(quantity))
                         {
@@ -204,7 +204,7 @@ namespace TuTa.Wms.Erp
                             return new CGRKDAddResponseDto { Success = false,
                                 Message = $"采购入库数量iQuantity必须为正整数，当前值：{detail["iQuantity"]}，请核对数量后重试" };
                         }
-                        detail["iQuantity"] = quantity.ToString("0", CultureInfo.InvariantCulture);
+                        detail["iQuantity"] = JToken.Parse(quantity.ToString("0", CultureInfo.InvariantCulture));
                         if (detail["ioricost"] == null)
                             detail["ioricost"] = detail["iUnitCost"]?.DeepClone() ?? new JValue(0);
                         // 当前采购报文使用零单价，缺省含税价格及金额字段补0；调用方已提供的值保持不变。

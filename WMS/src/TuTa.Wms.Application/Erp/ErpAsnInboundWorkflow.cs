@@ -192,15 +192,16 @@ namespace TuTa.Wms.Erp
                             return new CGRKDAddResponseDto { Success = false, Message = "组盘数量或合格状态不一致，请确认全部箱料及抽检样品已回盘" };
                         await read.CompleteAsync();
                     }
-                    // cChkCode和cOrderCode均填写已确认的来料检验单号，不发送cARVCode。
+                    // 按二开示例仅用cOrderCode填写检验单号，包装、等级沿用对应ASN原值。
                     var payload = new JArray(new JObject {
                         ["AddType"] = 3, ["blsRedVouch"] = false,
-                        ["cChkCode"] = checkCode, ["cOrderCode"] = checkCode,
+                        ["cOrderCode"] = checkCode,
                         ["cpersoncode"] = string.IsNullOrWhiteSpace(line.PersonCode) ? JValue.CreateNull() : new JValue(line.PersonCode),
                         ["cMemo"] = "Webservice生成", ["cWhCode"] = line.WarehouseCode,
                         ["cRdCode"] = _erpSettings.PurchaseReceiptCategory ?? "301",
                         ["Details"] = new JArray(new JObject { ["iPOsID"] = line.ArrivalDetailId.Value,
-                            ["cinvcode"] = line.MaterialCode, ["cbatch"] = line.BatchCode,
+                            ["cinvcode"] = line.MaterialCode, ["cfree3"] = line.Free3 ?? "", ["cfree5"] = line.Free5 ?? "",
+                            ["cbatch"] = line.BatchCode,
                             ["iQuantity"] = line.InWarehouseQuantity.ToString(CultureInfo.InvariantCulture),
                             ["iUnitCost"] = 0 }) }).ToString(Newtonsoft.Json.Formatting.None);
                     if (string.IsNullOrWhiteSpace(line.WarehouseCode)) throw new InvalidOperationException("ASN未配置入库仓库");
@@ -211,24 +212,32 @@ namespace TuTa.Wms.Erp
                         if (!JToken.DeepEquals(previousPayload, currentPayload))
                         {
                             var sourceCorrectionAllowed = false;
-                            // 仅对已明确失败且来源仍一致的旧任务统一检验单号或替换旧来源字段，其他内容必须完全一致。
+                            // 仅对已明确失败且来源一致的旧任务替换来源字段并补齐新增字段，其他内容必须完全一致。
                             if (line.IsPurchaseFailureConfirmed && previousPayload is JArray previousVouchers &&
                                 previousVouchers.Count == 1 && previousVouchers[0] is JObject previousVoucher &&
                                 ((previousVoucher["cChkCode"]?.ToString() == checkCode && previousVoucher["cARVCode"] == null) ||
-                                 (previousVoucher["cChkCode"] == null && previousVoucher["cARVCode"]?.ToString() == checkCode)) &&
+                                 (previousVoucher["cChkCode"] == null && previousVoucher["cARVCode"]?.ToString() == checkCode) ||
+                                 (previousVoucher["cChkCode"] == null && previousVoucher["cARVCode"] == null &&
+                                  previousVoucher["cOrderCode"]?.ToString() == checkCode)) &&
                                 (previousVoucher["cOrderCode"] == null || previousVoucher["cOrderCode"]?.ToString() == checkCode ||
                                  (!string.IsNullOrWhiteSpace(line.OrderCode) && previousVoucher["cOrderCode"]?.ToString() == line.OrderCode.Trim()) ||
                                  previousVoucher["cOrderCode"]?.ToString() == line.ArrivalDetailId.Value.ToString(CultureInfo.InvariantCulture)))
                             {
                                 previousVoucher.Remove("cARVCode");
-                                previousVoucher["cChkCode"] = checkCode;
+                                previousVoucher.Remove("cChkCode");
                                 previousVoucher["cOrderCode"] = checkCode;
+                                if (previousVoucher["Details"] is JArray previousDetails)
+                                    foreach (var detail in previousDetails.OfType<JObject>())
+                                    {
+                                        if (detail["cfree3"] == null) detail["cfree3"] = line.Free3 ?? "";
+                                        if (detail["cfree5"] == null) detail["cfree5"] = line.Free5 ?? "";
+                                    }
                                 sourceCorrectionAllowed = JToken.DeepEquals(previousPayload, currentPayload);
                             }
                             if (!sourceCorrectionAllowed)
                                 throw new InvalidOperationException("当前来源、数量或报文格式与原采购任务不一致，请先核对U8原任务，禁止自动更换任务号或报文");
-                            _logger.LogInformation("采购入库失败任务更新来源字段：Taskid={TaskId}，cChkCode={CheckCode}，cOrderCode={OrderCode}，已移除cARVCode",
-                                line.PurchaseTaskId, checkCode, checkCode);
+                            _logger.LogInformation("采购入库失败任务更新Data字段：Taskid={TaskId}，cOrderCode={CheckCode}，已移除cChkCode、cARVCode并补齐自由项",
+                                line.PurchaseTaskId, checkCode);
                         }
                     }
                     line.BeginPurchasePush(line.PurchaseTaskId ?? Guid.NewGuid().ToString("N"), payload);
