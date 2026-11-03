@@ -23,8 +23,8 @@ namespace TuTa.Wms.Erp
             _ => "未知"
         };
 
-        /// <summary>重新核对已审核的U8检验单，同步已报检状态并确认其来源明细对应的ASN及库存检验结论。</summary>
-        /// <param name="input">所选检验记录、查询页码与每页条数，以及2合格或3不合格的人工结论。</param>
+        /// <summary>核对本地已同步检验单的审核状态，同步已报检状态并确认其来源明细对应的ASN及库存检验结论。</summary>
+        /// <param name="input">所选检验记录身份，以及2合格或3不合格的人工结论；不依赖原查询分页。</param>
         /// <returns>事务保存后的对应ASN明细；查询、审核或来源校验失败时不修改状态。</returns>
         [UnitOfWork(IsDisabled = true)]
         public async Task<ErpAsnValidateResponseDto> ConfirmMaterialInspectionAsync(U8MaterialInspectionConfirmDto input)
@@ -43,22 +43,20 @@ namespace TuTa.Wms.Erp
                 await using var handle = _u8Lock == null ? null : await _u8Lock.TryAcquireAsync("U8:ASN:" + asnCode);
                 if (_u8Lock != null && handle == null)
                     return new ErpAsnValidateResponseDto { Success = false, Message = "该ASN正在处理，请稍后重试" };
-                // 不信任前端传来的审核状态或明细列表，沿原分页条件重新取得真实U8记录。
-                var result = await GetMaterialInspectionResultsAsync(new U8MaterialInspectionQueryDto {
-                    MaterialCode = input.MaterialCode, BeginMakeTime = input.BeginMakeTime,
-                    Page = input.Page, PageSize = input.PageSize
-                });
-                if (!result.Success)
-                    return new ErpAsnValidateResponseDto { Success = false, Message = result.Message };
-                var matches = result.Items.Where(item => item.CheckId == input.CheckId &&
-                    item.CheckCode == input.CheckCode && item.SourceAutoId == input.SourceAutoId &&
-                    item.AsnCode == asnCode).ToList();
-                if (matches.Count != 1)
+                using var uow = UnitOfWorkManager.Begin(true, true);
+                // 按稳定单据身份读取本地审核结果，后台新增记录改变分页时仍能准确确认原检验单。
+                var saved = await _materialInspectionRepository.FindAsync(row => row.CheckId == input.CheckId &&
+                    row.SourceAutoId == input.SourceAutoId && row.CheckCode == input.CheckCode && row.MaterialCode == input.MaterialCode.Trim());
+                if (saved == null)
                     return new ErpAsnValidateResponseDto { Success = false, Message = "所选检验记录或ASN来源已变化，请重新查询并选择" };
-                var selected = matches[0];
+                if (saved.IsPurchaseCompleted)
+                    return new ErpAsnValidateResponseDto { Success = false, Message = "所选检验明细已完成采购入库，无需再次组盘" };
+                var selected = MapSavedMaterialInspection(saved);
+                await AttachInspectionAsnSourcesAsync(new System.Collections.Generic.List<U8MaterialInspectionItemDto> { selected });
+                if (selected.AsnCode != asnCode)
+                    return new ErpAsnValidateResponseDto { Success = false, Message = "所选检验记录或ASN来源已变化，请重新查询并选择" };
                 if (!selected.IsVerified)
                     return new ErpAsnValidateResponseDto { Success = false, Message = "所选来料检验单尚未审核，不能确认检验结果" };
-                using var uow = UnitOfWorkManager.Begin(true, true);
                 var lines = (await _erpAsnRepository.GetListByAsnCodeAsync(asnCode)).Where(line =>
                     line.Status != AsnStatus.Cancelled && line.MaterialCode == selected.MaterialCode &&
                     line.ArrivalVoucherCode == selected.SourceCode && line.ArrivalDetailId == selected.SourceAutoId &&

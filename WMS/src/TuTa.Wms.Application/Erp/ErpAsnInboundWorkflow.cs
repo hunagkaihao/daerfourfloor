@@ -258,6 +258,14 @@ namespace TuTa.Wms.Erp
                             }
                         }
                         await _erpAsnRepository.UpdateAsync(line, autoSave: true);
+                        if (result.Success && _materialInspectionRepository != null)
+                        {
+                            // 与成功回执同事务标记具体检验明细，不按物料码排除其他订单或新批次。
+                            var inspection = await _materialInspectionRepository.FindAsync(row =>
+                                row.CheckId == checkId.Value && row.SourceAutoId == line.ArrivalDetailId.Value);
+                            if (inspection != null)
+                                await MarkInspectionPurchasesCompletedAsync(new List<ErpMaterialInspection> { inspection });
+                        }
                         await write.CompleteAsync();
                     }
                     return result;

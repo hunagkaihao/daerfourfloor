@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using TuTa.Wms.Erp.Repositories;
+using TuTa.Wms.Erp;
+using TuTa.Wms.Erp.Entities;
 using TuTa.Wms.EntityFrameworkCore.Repositories.Erp;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
@@ -36,12 +38,15 @@ public class WmsEntityFrameworkCoreModule : AbpModule
                 /* Remove "includeAllEntities: true" to create
                  * default repositories only for aggregate roots */
             options.AddDefaultRepositories(includeAllEntities: true);
+            options.AddRepository<ErpMaterialInspection, ErpMaterialInspectionRepository>();
         });
 
         context.Services.AddAbpDbContext<ErpDbContext>(options =>
         {
             options.AddDefaultRepositories(includeAllEntities: true);
         });
+
+        context.Services.AddTransient<IErpMaterialInspectionRepository, ErpMaterialInspectionRepository>();
 
         // 注册ERP工位叫料任务仓储
         context.Services.AddTransient<IErpWorkstationMaterialRequestRepository, EfCoreErpWorkstationMaterialRequestRepository>();

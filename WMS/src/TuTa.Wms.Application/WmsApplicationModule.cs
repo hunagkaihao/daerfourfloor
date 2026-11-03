@@ -37,6 +37,8 @@ public class WmsApplicationModule : AbpModule
         context.Services.AddTransient<StockConsolidationWorker>();
         // 每日自动启动服务只负责读取配置并调用单例调度服务；移动端按钮仍调用同一个启动/停止入口。
         context.Services.AddHostedService<StockConsolidationScheduleService>();
+        // 来料检验单定时落库，PDA查询和确认只读取本地记录。
+        context.Services.AddHostedService<MaterialInspectionSyncHostedService>();
         //context.Services.AddHostedService<ErpMaterialSyncJob>(); // 暂时注释掉，等类型问题解决后再启用
         //context.Services.AddHostedService<ErpPickOrderSyncJob>();
         //context.Services.AddHostedService<ErpRecheckNotifierSyncJob>();

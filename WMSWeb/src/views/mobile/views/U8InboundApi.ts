@@ -74,7 +74,8 @@ export interface U8MaterialInspectionResult {
 }
 
 /**
- * 单次只查一页，空筛选不发送；等待45秒以覆盖后端单页30秒时限及登录开销。
+ * 单次查询一页U8记录并由后端同步保存新增或变化的数据，空筛选不发送。
+ * 等待45秒以覆盖后端单页30秒时限、登录及本地保存开销。
  * @param page U8的pagesize，即从1开始的页码。
  * @param pageSize U8的pagecount，即每页条数，范围1至100，默认100。
  */
@@ -90,13 +91,18 @@ export function queryMaterialInspection(materialCode: string, sourceCode?: strin
   );
 }
 
-/** 所选检验单及原查询分页参数；服务端重查审核状态后仅确认对应来源明细。 */
+/** PDA按物料一次查询全部未完成采购入库的本地检验单，不分页、不限制条数。 */
+export function querySavedMaterialInspection(materialCode: string) {
+  return defHttp.post<U8MaterialInspectionResult>(
+    { url: '/erp/asn/saved-material-inspection-results', data: { materialCode: materialCode.trim() } },
+    { isTransformResponse: false },
+  );
+}
+
+/** 所选检验单身份；服务端读取本地已同步的审核状态，仅确认对应来源明细。 */
 export interface U8MaterialInspectionConfirmation {
-  /** 查询物料、制单开始日期及所选记录所在页，分页含义与查询接口一致。 */
+  /** 查询物料编码，确认按单据身份读取本地记录，不依赖列表分页位置。 */
   materialCode: string;
-  beginMakeTime?: string;
-  page: number;
-  pageSize: number;
   /** U8检验单及来源明细身份，不使用前端审核标志作为确认依据。 */
   checkId: number;
   checkCode: string;
@@ -106,7 +112,7 @@ export interface U8MaterialInspectionConfirmation {
   inspectionStatus: 2 | 3;
 }
 
-/** 按已审核的所选检验单持久化对应ASN明细的检验结论，保持单页查询的45秒超时。 */
+/** 按本地已同步且已审核的检验单，持久化对应ASN明细的人工检验结论。 */
 export function confirmMaterialInspection(data: U8MaterialInspectionConfirmation) {
   return defHttp.post<{ success: boolean; message?: string; data?: AsnMaterialInspectionLine[] }>(
     { url: '/erp/asn/confirm-material-inspection', timeout: 45 * 1000, data },

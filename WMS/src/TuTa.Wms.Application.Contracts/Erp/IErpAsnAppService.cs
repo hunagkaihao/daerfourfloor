@@ -81,13 +81,18 @@ namespace TuTa.Wms.Erp
 
         /// <summary>从U8查询当前ASN的来料检验单，严格校验来源和审核、合格数量。</summary>
         Task<U8InspectionResultsDto> GetAsnInspectionResultsAsync(string asnCode);
-        /// <summary>分页查询U8来料检验单，可选按物料、来源到货单及制单开始日期筛选，包含开始日期当天。</summary>
+        /// <summary>分页查询U8来料检验单，并将当前页新增或变化的记录保存到本地；支持物料、来源及制单开始日期筛选。</summary>
         /// <param name="input">全部筛选留空时按U8默认条件查询；页码从1开始，不修改本地检验结论。</param>
-        /// <returns>当前页匹配单据及是否有后续页，不将存在单据视为合格。</returns>
+        /// <returns>当前页已保存的匹配单据及是否有后续页；保存失败明确返回失败，不将存在单据视为合格。</returns>
         Task<U8MaterialInspectionResultDto> GetMaterialInspectionResultsAsync(U8MaterialInspectionQueryDto input);
 
-        /// <summary>重新核对所选U8检验单已审核后，只确认该记录对应ASN明细的合格或不合格结果。</summary>
-        /// <param name="input">检验单身份、原查询分页条件及人工检验结论。</param>
+        /// <summary>PDA按物料读取定时同步保存的来料检验单，不请求U8接口。</summary>
+        /// <param name="input">物料编码，也支持逗号分隔箱码的首段。</param>
+        /// <returns>该物料未完成采购入库的全部本地记录及当前ASN来源，不限制条数。</returns>
+        Task<U8MaterialInspectionResultDto> GetSavedMaterialInspectionResultsAsync(SavedMaterialInspectionQueryDto input);
+
+        /// <summary>核对本地已同步检验单已审核后，只确认该记录对应ASN明细的合格或不合格结果。</summary>
+        /// <param name="input">检验单身份及人工检验结论，兼容保留的分页条件不参与确认。</param>
         /// <returns>确认结果及该检验记录对应的最新ASN明细。</returns>
         Task<ErpAsnValidateResponseDto> ConfirmMaterialInspectionAsync(U8MaterialInspectionConfirmDto input);
         /// <summary>按指定ASN明细本地已确认的合格检验单来源逐单生成采购入库，不再查询U8检验单；该明细账实一致即可，不等待整张ASN，失败独立重试。</summary>

@@ -4,6 +4,13 @@ using TuTa.Wms.Erp.Dto;
 
 namespace TuTa.Wms.Erp.IDto
 {
+    /// <summary>PDA按物料查询本地尚未完成采购入库的全部来料检验单，不分页、不限制返回条数。</summary>
+    public class SavedMaterialInspectionQueryDto
+    {
+        /// <summary>必填物料编码，也兼容取逗号分隔箱码的首段。</summary>
+        public string MaterialCode { get; set; }
+    }
+
     /// <summary>分页查询U8来料检验单；全部筛选留空时沿用U8默认条件，不填入示例单号或日期。</summary>
     public class U8MaterialInspectionQueryDto
     {
@@ -19,12 +26,12 @@ namespace TuTa.Wms.Erp.IDto
         public int PageSize { get; set; } = 100;
     }
 
-    /// <summary>按所选U8检验单确认对应ASN明细；分页条件用于重新核对单据及审核状态。</summary>
+    /// <summary>按本地已同步的U8检验单确认对应ASN明细；沿用原接口字段，确认按单据身份查询，不依赖分页。</summary>
     public class U8MaterialInspectionConfirmDto : U8MaterialInspectionQueryDto
     {
         /// <summary>所选U8检验单主键，必须为正数。</summary>
         public long CheckId { get; set; }
-        /// <summary>所选U8检验单号，必须与重新查询的记录一致。</summary>
+        /// <summary>所选U8检验单号，必须与本地保存的记录一致。</summary>
         public string CheckCode { get; set; }
         /// <summary>所选检验记录的来源到货明细主键，必须为正数。</summary>
         public long SourceAutoId { get; set; }

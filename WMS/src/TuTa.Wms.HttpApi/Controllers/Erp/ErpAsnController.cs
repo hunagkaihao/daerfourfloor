@@ -139,10 +139,15 @@ namespace TuTa.Wms.Controllers.Erp
         public Task<U8InspectionResultsDto> GetAsnInspectionResultsAsync(string asnCode)
             => _erpAsnAppService.GetAsnInspectionResultsAsync(asnCode);
 
-        /// <summary>按物料查询U8来料检验单，由后端登录并通过POST List调用GetLLJYDList。</summary>
+        /// <summary>查询U8来料检验单并将本次新增或变化的记录同步到本地表，相同内容不重复保存。</summary>
         [HttpPost("material-inspection-results")]
         public Task<U8MaterialInspectionResultDto> GetMaterialInspectionResultsAsync([FromBody] U8MaterialInspectionQueryDto input)
             => _erpAsnAppService.GetMaterialInspectionResultsAsync(input);
+
+        /// <summary>PDA读取已定时同步到本地数据库的来料检验单，不调用U8。</summary>
+        [HttpPost("saved-material-inspection-results")]
+        public Task<U8MaterialInspectionResultDto> GetSavedMaterialInspectionResultsAsync([FromBody] SavedMaterialInspectionQueryDto input)
+            => _erpAsnAppService.GetSavedMaterialInspectionResultsAsync(input);
 
         /// <summary>按已审核的所选来料检验单，确认对应ASN明细已检验及合格或不合格结论。</summary>
         [HttpPost("confirm-material-inspection")]

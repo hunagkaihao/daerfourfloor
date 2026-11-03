@@ -113,6 +113,9 @@ public class WmsDbContext :
 
     public DbSet<ErpAsn> ErpAsns { get; set; }
 
+    /// <summary>定时同步的U8来料检验单明细，供PDA查询时直接读取本地数据库。</summary>
+    public DbSet<ErpMaterialInspection> ErpMaterialInspections { get; set; }
+
     public DbSet<ErpMaterial> ErpMaterials { get; set; }
 
     public DbSet<ErpDeliveryStation> ErpDeliveryStations { get; set; }
@@ -374,6 +377,29 @@ public class WmsDbContext :
             b.Property(e => e.SalesPushError).HasComment("U8销售出库最近失败原因");
             b.Property(e => e.IsDeliveryScanCompleted).HasComment("整张U8发货单已确认全部扫码");
             b.HasIndex(e => new { e.DeliveryOrderNo, e.MaterialCode }).IsUnique();
+        });
+
+        builder.Entity<ErpMaterialInspection>(b =>
+        {
+            b.ToTable("ErpMaterialInspections", WmsConsts.DbSchema, t => t.HasComment("U8来料检验单本地同步明细"));
+            b.ConfigureByConvention();
+            b.Property(e => e.Id).ValueGeneratedNever().HasComment("本地记录标识");
+            b.Property(e => e.CheckId).HasComment("U8检验单主键，与来源明细共同去重");
+            b.Property(e => e.SourceAutoId).HasComment("U8来源到货明细主键");
+            b.Property(e => e.CheckCode).IsRequired().HasMaxLength(100).HasComment("来料检验单号CCHECKCODE");
+            b.Property(e => e.SourceCode).HasMaxLength(100).HasComment("来源到货单号SOURCECODE，可为空");
+            b.Property(e => e.MaterialCode).IsRequired().HasMaxLength(100).HasComment("物料编码CINVCODE");
+            b.Property(e => e.BatchCode).HasMaxLength(100).HasComment("原始批号CBATCH，可为空");
+            b.Property(e => e.QualifiedQuantity).HasPrecision(28, 6).HasComment("合格数量FREGQUANTITY，未提供时为空");
+            b.Property(e => e.DisqualifiedQuantity).HasPrecision(28, 6).HasComment("不合格数量FDISQUANTITY，未提供时为空");
+            b.Property(e => e.Verifier).HasMaxLength(100).HasComment("U8审核人CVERIFIER，未审核时为空");
+            b.Property(e => e.IsVerified).HasComment("U8是否已审核，独立于PDA人工确认结果");
+            b.Property(e => e.IsRejected).HasComment("U8拒收标志，未提供时为空");
+            b.Property(e => e.IsPurchaseCompleted).HasDefaultValue(false).HasComment("对应检验明细已全部采购入库成功，U8同步不重置");
+            b.Property(e => e.UpdatedAt).HasComment("最近内容写入UTC时间，一致时不改写");
+            b.HasIndex(e => new { e.CheckId, e.SourceAutoId }).IsUnique();
+            b.HasIndex(e => new { e.MaterialCode, e.IsPurchaseCompleted, e.CheckId })
+                .HasDatabaseName("IX_ErpMaterialInspections_Material_Purchase_Check");
         });
 
         builder.Entity<ErpAsn>(b =>

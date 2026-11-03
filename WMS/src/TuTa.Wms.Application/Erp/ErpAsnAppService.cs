@@ -50,11 +50,14 @@ namespace TuTa.Wms.Erp
         private readonly IRepository<ErpOutboundRecord, string> _u8OutboundRepository;
         /// <summary>校验抽检物料是否已回盘，防止采购入库早于本地作业完成。</summary>
         private readonly TuTa.Wms.Stocks.IStockRepository _u8StockRepository;
+        /// <summary>定时同步的来料检验单仓储，供PDA查询和确认使用。</summary>
+        private readonly IErpMaterialInspectionRepository _materialInspectionRepository;
 
         public ErpAsnAppService(IErpAsnRepository erpAsnRepository, ILogger<ErpAsnAppService> logger, IConfiguration configuration,
             IHttpClientFactory httpClientFactory = null, IAbpDistributedLock u8Lock = null,
             IRepository<ErpOutboundRecord, string> u8OutboundRepository = null,
-            TuTa.Wms.Stocks.IStockRepository u8StockRepository = null)
+            TuTa.Wms.Stocks.IStockRepository u8StockRepository = null,
+            IErpMaterialInspectionRepository materialInspectionRepository = null)
         {
             _logger = logger;
             _erpAsnRepository = erpAsnRepository;
@@ -63,6 +66,7 @@ namespace TuTa.Wms.Erp
             _u8Lock = u8Lock;
             _u8OutboundRepository = u8OutboundRepository;
             _u8StockRepository = u8StockRepository;
+            _materialInspectionRepository = materialInspectionRepository;
         }
 
         /// <summary>创建U8专用HTTP客户端；允许测试隔离真实ERP网络。</summary>
@@ -1196,7 +1200,7 @@ namespace TuTa.Wms.Erp
             };
         }
 
-        private async Task<string> GetErpTokenAsync(string operationId)
+        private async Task<string> GetErpTokenAsync(string operationId, System.Threading.CancellationToken cancellationToken = default)
         {
             using var loginClient = CreateU8Client();
             var loginData = new
@@ -1210,10 +1214,10 @@ namespace TuTa.Wms.Erp
                 Encoding.UTF8,
                 "application/json");
 
-            var loginResponse = await loginClient.PostAsync(_erpSettings.LoginUrl, loginContent);
+            using var loginResponse = await loginClient.PostAsync(_erpSettings.LoginUrl, loginContent, cancellationToken);
             loginResponse.EnsureSuccessStatusCode();
 
-            var loginResult = await loginResponse.Content.ReadAsStringAsync();
+            var loginResult = await loginResponse.Content.ReadAsStringAsync(cancellationToken);
             _logger.LogInformation($"[操作ID: {operationId}] ERP登录响应: {loginResult}");
 
             var loginObj = System.Text.Json.JsonSerializer.Deserialize<ErpLoginResponse>(loginResult);

@@ -14,46 +14,6 @@
         >查询状态</a-button
       >
     </div>
-    <details class="filters">
-      <summary>更多查询条件（选填）</summary>
-      <div class="filter-fields">
-        <label
-          >制单开始日期
-          <input
-            v-model="beginMakeTime"
-            type="date"
-            title="从所选日期00:00:00开始查询"
-            :disabled="busy || disabled"
-          />
-        </label>
-        <label
-          >页码
-          <a-input-number
-            v-model:value="queryPage"
-            :min="1"
-            :max="2147483647"
-            :precision="0"
-            placeholder="默认第1页"
-            title="pagesize：查询页码，从1开始"
-            :disabled="busy || disabled"
-            @pressEnter="load()"
-          />
-        </label>
-        <label
-          >每页条数
-          <a-input-number
-            v-model:value="queryPageSize"
-            :min="1"
-            :max="100"
-            :precision="0"
-            placeholder="默认100条"
-            title="pagecount：每页条数，范围1至100"
-            :disabled="busy || disabled"
-            @pressEnter="load()"
-          />
-        </label>
-      </div>
-    </details>
     <a-alert v-if="notice" :message="notice" :type="noticeType" show-icon />
     <a-card
       v-for="(item, index) in items"
@@ -91,19 +51,13 @@
         <a-button danger @click="confirm(item, 3)">不合格</a-button>
       </div>
     </a-card>
-    <div v-if="hasMore" class="load-more">
-      <a-button :loading="busy" :disabled="busy || disabled" @click="loadMore"
-        >加载更多检验单</a-button
-      >
-      <span>已加载至第{{ currentPage }}页，U8共{{ totalCount }}条记录</span>
-    </div>
   </section>
 </template>
 
 <script setup lang="ts">
   import { ref, watch } from 'vue';
   import { useMessage } from '/@/hooks/web/useMessage';
-  import { confirmMaterialInspection, queryMaterialInspection } from '../views/U8InboundApi';
+  import { confirmMaterialInspection, querySavedMaterialInspection } from '../views/U8InboundApi';
   import type { AsnMaterialInspectionLine, U8MaterialInspectionItem } from '../views/U8InboundApi';
 
   const props = defineProps<{
@@ -117,20 +71,8 @@
     (event: 'busy-change', busy: boolean): void;
   }>();
   const materialCode = ref('');
-  /** 制单开始日期为选填，后端按U8本地日期零点查询当天及之后的检验单。 */
-  const beginMakeTime = ref('');
-  /** U8的pagesize为页码、pagecount为每页条数；留空分别使用1和100。 */
-  const queryPage = ref<number | null>(1);
-  const queryPageSize = ref<number | null>(100);
   const { createConfirm } = useMessage();
   const items = ref<U8MaterialInspectionItem[]>([]);
-  /** 每次只加载一页，后续页由操作员按需请求，避免长时间连续查询。 */
-  const currentPage = ref(0);
-  const totalCount = ref(0);
-  const hasMore = ref(false);
-  /** 保存已选来源所在页，组盘刷新时只重新读取该页。 */
-  const selectedPage = ref(1);
-  const itemPages = new Map<string, number>();
   const busy = ref(false);
   const notice = ref('');
   const noticeType = ref<'success' | 'warning' | 'error'>('warning');
@@ -157,16 +99,11 @@
 
   /** 实际查询条件变化时清除旧来源；输入提交和箱码格式转换不清空同一查询。 */
   watch(
-    [queryMaterialCode, beginMakeTime, () => queryPage.value ?? 1, () => queryPageSize.value ?? 100],
+    queryMaterialCode,
     () => {
       items.value = [];
       notice.value = '';
       selectedKey.value = '';
-      currentPage.value = 0;
-      totalCount.value = 0;
-      hasMore.value = false;
-      selectedPage.value = 1;
-      itemPages.clear();
       emit('loaded', '', []);
     },
     { flush: 'sync' }
@@ -177,7 +114,6 @@
   function applySelection(item: U8MaterialInspectionItem) {
     if (!item.asnCode || !item.asnLines?.length) return;
     selectedKey.value = itemKey(item);
-    selectedPage.value = itemPages.get(selectedKey.value) || (queryPage.value ?? 1);
     emit('loaded', item.asnCode, item.asnLines);
   }
 
@@ -217,7 +153,7 @@
     return false;
   }
 
-  /** 操作员确认所选检验记录；服务端重查审核状态并返回持久化后的本地明细。 */
+  /** 操作员确认所选检验记录；服务端核对本地已同步审核状态并返回持久化后的ASN明细。 */
   function confirm(item: U8MaterialInspectionItem, target: 2 | 3) {
     if (!canSubmitConfirmation(item)) return;
     const key = itemKey(item);
@@ -232,9 +168,6 @@
         try {
           const result = await confirmMaterialInspection({
             materialCode: queryMaterialCode(),
-            beginMakeTime: beginMakeTime.value || undefined,
-            page: itemPages.get(key) || (queryPage.value ?? 1),
-            pageSize: queryPageSize.value ?? 100,
             checkId: item.checkId!,
             checkCode: item.checkCode!,
             sourceAutoId: item.sourceAutoId!,
@@ -266,8 +199,8 @@
     });
   }
 
-  /** POST查询物料检验单，区分未找到和查询失败，并丢弃条件已变化的响应。 */
-  async function load(force = false, append = false) {
+  /** 一次查询该物料全部未完成采购入库的本地检验单，丢弃物料已变化的响应。 */
+  async function load(force = false) {
     if (busy.value || (props.disabled && !force) || !materialCode.value.trim()) return;
     // 查询时按箱码逗号协议提取首段，避免扫码枪逐字符输入时提前截断后续内容。
     const code = queryMaterialCode();
@@ -277,75 +210,26 @@
       noticeType.value = 'warning';
       return;
     }
-    const begin = beginMakeTime.value;
     const previousKey = selectedKey.value;
-    const startPage = queryPage.value ?? 1;
-    const pageSize = queryPageSize.value ?? 100;
-    const page = append
-      ? currentPage.value + 1
-      : force && previousKey
-      ? selectedPage.value
-      : startPage;
-    if (
-      !Number.isInteger(page) ||
-      page < 1 ||
-      page > 2147483647 ||
-      !Number.isInteger(pageSize) ||
-      pageSize < 1 ||
-      pageSize > 100
-    ) {
-      notice.value = '页码须为正整数，每页条数须为1至100的整数';
-      noticeType.value = 'warning';
-      return;
-    }
-    const isCurrentQuery = () =>
-      code === queryMaterialCode() &&
-      begin === beginMakeTime.value &&
-      startPage === (queryPage.value ?? 1) &&
-      pageSize === (queryPageSize.value ?? 100);
+    const isCurrentQuery = () => code === queryMaterialCode();
     busy.value = true;
     notice.value = '';
-    if (!append) {
-      items.value = [];
-      selectedKey.value = '';
-      hasMore.value = false;
-      currentPage.value = 0;
-      totalCount.value = 0;
-      itemPages.clear();
-      emit('loaded', '', []);
-    }
+    items.value = [];
+    selectedKey.value = '';
+    emit('loaded', '', []);
     try {
-      const result = await queryMaterialInspection(
-        code,
-        undefined,
-        begin || undefined,
-        page,
-        pageSize
-      );
+      const result = await querySavedMaterialInspection(code);
       if (!isCurrentQuery()) return;
       if (result.success) {
-        const rows = result.items || [];
-        const existing = new Set(items.value.map(itemKey));
-        // 只追加新来源，U8返回重复行时不重复展示或切换已选来源。
-        for (const item of rows) {
-          const key = itemKey(item);
-          if (!itemPages.has(key)) itemPages.set(key, result.page);
-          if (!existing.has(key)) {
-            items.value.push(item);
-            existing.add(key);
-          }
-        }
-        currentPage.value = result.page;
-        totalCount.value = result.totalCount;
-        hasMore.value = result.hasMore;
+        items.value = result.items || [];
       }
       notice.value =
         result.message ||
         (result.success
           ? result.hasInspection
-            ? '已查询到对应的U8来料检验单'
-            : '未查询到对应的U8来料检验单'
-          : 'U8来料检验单查询失败');
+            ? '已查询到本地保存的来料检验单'
+            : '本地暂无未完成采购入库的来料检验单，已完成记录已跳过'
+          : '本地来料检验单查询失败');
       noticeType.value = result.success ? (items.value.length ? 'success' : 'warning') : 'error';
       const previous = items.value.find((item) => itemKey(item) === previousKey);
       if (previous) applySelection(previous);
@@ -354,20 +238,15 @@
       if (!isCurrentQuery()) return;
       notice.value =
         error?.code === 'ECONNABORTED' || error?.code === 'ETIMEDOUT'
-          ? 'U8来料检验单查询超时，请稍后重试或补充筛选条件'
-          : error?.message || 'U8来料检验单查询失败';
+          ? '本地来料检验单查询超时，请稍后重试'
+          : error?.message || '本地来料检验单查询失败';
       noticeType.value = 'error';
     } finally {
       busy.value = false;
     }
   }
 
-  /** 按需继续读取下一页；失败保留已显示记录及当前选择，允许重新加载该页。 */
-  function loadMore() {
-    if (hasMore.value) return load(false, true);
-  }
-
-  /** 组盘或取消后刷新U8单据与本地剩余数量，内部刷新允许在父页提交锁内调用。 */
+  /** 组盘或取消后刷新本地单据与剩余数量，内部刷新允许在父页提交锁内调用。 */
   function reload() {
     return load(true);
   }
@@ -397,38 +276,6 @@
     flex: 1;
     min-width: 0;
   }
-  .filters {
-    margin: 8px 0;
-  }
-  .filters summary {
-    cursor: pointer;
-    color: #666;
-  }
-  .filter-fields {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 8px;
-  }
-  .filter-fields > * {
-    flex: 1;
-    min-width: 220px;
-  }
-  .filter-fields label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .filter-fields .ant-input-number {
-    flex: 1;
-    min-width: 0;
-  }
-  .filter-fields input[type='date'] {
-    flex: 1;
-    min-width: 0;
-    border: 1px solid #d9d9d9;
-    padding: 4px;
-  }
   .ant-card {
     margin-top: 10px;
     overflow-wrap: anywhere;
@@ -438,16 +285,5 @@
   }
   .inspection-actions .ant-btn + .ant-btn {
     margin-left: 8px;
-  }
-  .load-more {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 12px;
-  }
-  .load-more span {
-    color: #666;
-    font-size: 12px;
   }
 </style>
