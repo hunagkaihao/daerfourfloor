@@ -42,10 +42,10 @@
             <a-input-number
               v-model:value="queryPageSize"
               :min="1"
-              :max="100"
+              :max="2147483647"
               :precision="0"
-              placeholder="默认100条，最多100条"
-              title="pagecount：每页条数，范围1至100"
+              placeholder="默认100条，可输入更大条数"
+              title="pagecount：每页条数，填写正整数"
               :disabled="busy"
               @pressEnter="load()"
             />
@@ -211,8 +211,8 @@
       noticeType.value = 'warning';
       return;
     }
-    if (!Number.isInteger(pageSize) || pageSize < 1 || pageSize > 100) {
-      notice.value = '每页条数须为1至100的整数';
+    if (!Number.isInteger(pageSize) || pageSize < 1 || pageSize > 2147483647) {
+      notice.value = '每页条数须为1至2147483647的整数';
       noticeType.value = 'warning';
       return;
     }

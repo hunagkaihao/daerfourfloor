@@ -34,5 +34,8 @@ namespace TuTa.Wms.Erp.IDto
         /// <summary>仅服务端使用：U8已明确返回业务失败；网络异常、超时或缺失结果不能视为确认失败。</summary>
         [System.Text.Json.Serialization.JsonIgnore]
         public bool FailureConfirmed { get; set; }
+        /// <summary>仅服务端使用：已收到U8成功回执；本地回写失败时也不能提示重新推送采购单。</summary>
+        [System.Text.Json.Serialization.JsonIgnore]
+        public bool U8SuccessConfirmed { get; set; }
     }
 }

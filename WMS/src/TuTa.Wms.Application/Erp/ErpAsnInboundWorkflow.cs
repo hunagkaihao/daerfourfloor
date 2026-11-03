@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using TuTa.Wms.Erp.Entities;
 using TuTa.Wms.Erp.IDto;
 using Volo.Abp.Uow;
+using Volo.Abp.Data;
 
 namespace TuTa.Wms.Erp
 {
@@ -167,8 +168,9 @@ namespace TuTa.Wms.Erp
                 var asnLines = (await ReadAsnLinesAsync(snapshot.AsnCode)).Where(x => x.Status != AsnStatus.Cancelled).ToList();
                 var line = asnLines.SingleOrDefault(x => x.Id == asnLineId);
                 if (line == null) return new CGRKDAddResponseDto { Success = false, Message = "ASN已取消或不存在" };
-                if (line.IsPurchasePushed) return new CGRKDAddResponseDto { Success = true, Message = "采购入库已推送，无需重复生成" };
+                if (line.IsPurchasePushed) return new CGRKDAddResponseDto { Success = true, U8SuccessConfirmed = true, Message = "采购入库已推送，无需重复生成" };
                 if (line.Status == AsnStatus.Cancelled) return new CGRKDAddResponseDto { Success = false, Message = "ASN已取消" };
+                CGRKDAddResponseDto purchaseResponse = null;
                 try
                 {
                     if (line.InWarehouseQuantity <= 0 || (line.AlreadyStockInQuantity ?? 0) != line.InWarehouseQuantity)
@@ -192,12 +194,20 @@ namespace TuTa.Wms.Erp
                             return new CGRKDAddResponseDto { Success = false, Message = "组盘数量或合格状态不一致，请确认全部箱料及抽检样品已回盘" };
                         await read.CompleteAsync();
                     }
+                    // 首次推送以当天日期和ASN号生成备注；重试沿用冻结备注，避免跨天更换原任务报文。
+                    var previousPayload = line.PurchasePayload == null ? null : JToken.Parse(line.PurchasePayload);
+                    var storedVoucher = previousPayload is JArray storedVouchers && storedVouchers.Count == 1
+                        ? storedVouchers[0] as JObject : null;
+                    var storedMemo = storedVoucher?["cMemo"]?.ToString();
+                    var memo = storedMemo;
+                    if (memo == null || (line.IsPurchaseFailureConfirmed && memo == "Webservice生成"))
+                        memo = DateTime.Today.ToString("yyyy年M月d日", CultureInfo.InvariantCulture) + "由ASN单" + line.AsnCode + "生成";
                     // 按二开示例仅用cOrderCode填写检验单号，包装、等级沿用对应ASN原值。
                     var payload = new JArray(new JObject {
                         ["AddType"] = 3, ["blsRedVouch"] = false,
                         ["cOrderCode"] = checkCode,
                         ["cpersoncode"] = string.IsNullOrWhiteSpace(line.PersonCode) ? JValue.CreateNull() : new JValue(line.PersonCode),
-                        ["cMemo"] = "Webservice生成", ["cWhCode"] = line.WarehouseCode,
+                        ["cMemo"] = memo, ["cWhCode"] = line.WarehouseCode,
                         ["cRdCode"] = _erpSettings.PurchaseReceiptCategory ?? "301",
                         ["Details"] = new JArray(new JObject { ["iPOsID"] = line.ArrivalDetailId.Value,
                             ["cinvcode"] = line.MaterialCode, ["cfree3"] = line.Free3 ?? "", ["cfree5"] = line.Free5 ?? "",
@@ -205,14 +215,13 @@ namespace TuTa.Wms.Erp
                             ["iQuantity"] = line.InWarehouseQuantity.ToString(CultureInfo.InvariantCulture),
                             ["iUnitCost"] = 0 }) }).ToString(Newtonsoft.Json.Formatting.None);
                     if (string.IsNullOrWhiteSpace(line.WarehouseCode)) throw new InvalidOperationException("ASN未配置入库仓库");
-                    if (line.PurchasePayload != null)
+                    if (previousPayload != null)
                     {
-                        var previousPayload = JToken.Parse(line.PurchasePayload);
                         var currentPayload = JToken.Parse(payload);
                         if (!JToken.DeepEquals(previousPayload, currentPayload))
                         {
                             var sourceCorrectionAllowed = false;
-                            // 仅对已明确失败且来源一致的旧任务替换来源字段并补齐新增字段，其他内容必须完全一致。
+                            // 仅对已明确失败且来源一致的旧任务调整来源及旧版默认备注，其他内容必须完全一致。
                             if (line.IsPurchaseFailureConfirmed && previousPayload is JArray previousVouchers &&
                                 previousVouchers.Count == 1 && previousVouchers[0] is JObject previousVoucher &&
                                 ((previousVoucher["cChkCode"]?.ToString() == checkCode && previousVoucher["cARVCode"] == null) ||
@@ -226,6 +235,7 @@ namespace TuTa.Wms.Erp
                                 previousVoucher.Remove("cARVCode");
                                 previousVoucher.Remove("cChkCode");
                                 previousVoucher["cOrderCode"] = checkCode;
+                                if (previousVoucher["cMemo"]?.ToString() == "Webservice生成") previousVoucher["cMemo"] = memo;
                                 if (previousVoucher["Details"] is JArray previousDetails)
                                     foreach (var detail in previousDetails.OfType<JObject>())
                                     {
@@ -236,8 +246,8 @@ namespace TuTa.Wms.Erp
                             }
                             if (!sourceCorrectionAllowed)
                                 throw new InvalidOperationException("当前来源、数量或报文格式与原采购任务不一致，请先核对U8原任务，禁止自动更换任务号或报文");
-                            _logger.LogInformation("采购入库失败任务更新Data字段：Taskid={TaskId}，cOrderCode={CheckCode}，已移除cChkCode、cARVCode并补齐自由项",
-                                line.PurchaseTaskId, checkCode);
+                            _logger.LogInformation("采购入库失败任务更新Data字段：Taskid={TaskId}，cOrderCode={CheckCode}，cMemo={Memo}，已移除cChkCode、cARVCode并补齐自由项",
+                                line.PurchaseTaskId, checkCode, memo);
                         }
                     }
                     line.BeginPurchasePush(line.PurchaseTaskId ?? Guid.NewGuid().ToString("N"), payload);
@@ -245,28 +255,27 @@ namespace TuTa.Wms.Erp
                     var result = await PushCGRKDAddAsync(new CGRKDAddRequestDto { Cmd = "CGRKDAdd",
                         Taskid = line.PurchaseTaskId, Id = checkId.Value,
                         Maker = line.Maker ?? "WMS", Data = line.PurchasePayload });
-                    using (var write = UnitOfWorkManager.Begin(true, true))
+                    purchaseResponse = result;
+                    // HTTP调用期间实体可能发生变化；从数据库重新读取并回写结果，只重试本地并发冲突。
+                    line = await SavePurchaseResponseAsync(line.AsnCode, line.Id, line.PurchaseTaskId, result);
+                    if (result.Success && _materialInspectionRepository != null)
                     {
-                        line.RecordPurchasePush(result.Success, result.Message, result.Data, result.FailureConfirmed);
-                        if (result.Success)
+                        try
                         {
-                            var stocks = await _u8StockRepository.GetListAsync(x => x.U8AsnLineId == line.Id);
-                            foreach (var stock in stocks)
-                            {
-                                stock.ReturnToAvailable();
-                                await _u8StockRepository.UpdateAsync(stock);
-                            }
-                        }
-                        await _erpAsnRepository.UpdateAsync(line, autoSave: true);
-                        if (result.Success && _materialInspectionRepository != null)
-                        {
-                            // 与成功回执同事务标记具体检验明细，不按物料码排除其他订单或新批次。
+                            // 成功回执和库存已提交，列表派生标记另行保存；失败由定时同步补齐，不回滚采购成功。
+                            using var markerWrite = UnitOfWorkManager.Begin(true, true);
                             var inspection = await _materialInspectionRepository.FindAsync(row =>
                                 row.CheckId == checkId.Value && row.SourceAutoId == line.ArrivalDetailId.Value);
                             if (inspection != null)
                                 await MarkInspectionPurchasesCompletedAsync(new List<ErpMaterialInspection> { inspection });
+                            await markerWrite.CompleteAsync();
                         }
-                        await write.CompleteAsync();
+                        catch (Exception markerException)
+                        {
+                            _logger.LogError(markerException, "U8采购入库已成功并保存，检验单完成标记更新失败，等待同步补齐：ASN明细={AsnLineId}，Taskid={TaskId}，原因={Reason}",
+                                line.Id, line.PurchaseTaskId, markerException.Message);
+                            result.Message = "采购入库已成功，检验单完成状态等待同步更新，无需重复推送";
+                        }
                     }
                     return result;
                 }
@@ -274,12 +283,72 @@ namespace TuTa.Wms.Erp
                 {
                     _logger.LogError(ex, "采购入库处理异常：ASN={AsnCode}，ASN明细={AsnLineId}，Taskid={TaskId}，原因={Reason}",
                         line.AsnCode, line.Id, line.PurchaseTaskId, ex.Message);
-                    line.RecordPurchasePush(false, ex.Message, null);
-                    await SaveU8LinesAsync(new List<ErpAsn> { line });
+                    if (purchaseResponse?.Success == true)
+                    {
+                        // 不把已收到的U8成功回执覆盖为失败；本地无法回写时明确要求核对原任务。
+                        return new CGRKDAddResponseDto { Success = false, U8SuccessConfirmed = true, Data = purchaseResponse.Data,
+                            Message = $"U8采购入库已成功，但本地状态回写失败；请核对原任务{line.PurchaseTaskId}，勿重复推送。原因：{ex.Message}" };
+                    }
+                    if (purchaseResponse == null)
+                    {
+                        // 尚未取得U8回执的本地异常，也使用最新实体记录错误，不再次保存过期的并发版本。
+                        try
+                        {
+                            await SavePurchaseResponseAsync(line.AsnCode, line.Id, line.PurchaseTaskId,
+                                new CGRKDAddResponseDto { Success = false, Message = ex.Message });
+                        }
+                        catch (Exception saveException)
+                        {
+                            _logger.LogError(saveException, "采购入库异常状态保存失败：ASN明细={AsnLineId}，Taskid={TaskId}，原因={Reason}",
+                                line.Id, line.PurchaseTaskId, saveException.Message);
+                        }
+                    }
                     return new CGRKDAddResponseDto { Success = false, Message = ex.Message };
                 }
             }
             finally { LocalPushLock.Release(); }
+        }
+
+        /// <summary>使用当前数据库版本保存采购回执和库存状态；并发冲突最多重读三次，不重新调用U8。</summary>
+        /// <param name="asnCode">原采购来源的ASN号。</param>
+        /// <param name="lineId">待回写的ASN明细ID。</param>
+        /// <param name="taskId">已冻结的原任务号，必须与数据库一致，不能更换任务覆盖结果。</param>
+        /// <param name="response">本次U8回执或发送前的本地错误；不允许覆盖已经保存的采购成功状态。</param>
+        /// <returns>提交后的最新ASN明细。</returns>
+        private async Task<ErpAsn> SavePurchaseResponseAsync(string asnCode, Guid lineId, string taskId, CGRKDAddResponseDto response)
+        {
+            for (var attempt = 1; ; attempt++)
+            {
+                try
+                {
+                    using var write = UnitOfWorkManager.Begin(true, true);
+                    var current = (await _erpAsnRepository.GetListByAsnCodeAsync(asnCode)).SingleOrDefault(row => row.Id == lineId)
+                        ?? throw new InvalidOperationException("采购入库对应的ASN明细已不存在，无法回写原任务结果");
+                    if (current.PurchaseTaskId != taskId)
+                        throw new InvalidOperationException("采购入库任务号已变化，请核对原任务，禁止覆盖其他任务结果");
+                    if (!current.IsPurchasePushed)
+                    {
+                        current.RecordPurchasePush(response.Success, response.Message, response.Data, response.FailureConfirmed);
+                        if (response.Success)
+                        {
+                            var stocks = await _u8StockRepository.GetListAsync(stock => stock.U8AsnLineId == lineId);
+                            foreach (var stock in stocks)
+                            {
+                                stock.ReturnToAvailable();
+                                await _u8StockRepository.UpdateAsync(stock);
+                            }
+                        }
+                        await _erpAsnRepository.UpdateAsync(current, autoSave: true);
+                    }
+                    await write.CompleteAsync();
+                    return current;
+                }
+                catch (AbpDbConcurrencyException) when (attempt < 3)
+                {
+                    _logger.LogWarning("采购入库本地回写发生并发冲突，重新读取数据库后重试；不会重新调用U8：ASN明细={AsnLineId}，Taskid={TaskId}，尝试={Attempt}/3",
+                        lineId, taskId, attempt);
+                }
+            }
         }
     }
 }

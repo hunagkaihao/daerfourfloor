@@ -22,7 +22,7 @@ namespace TuTa.Wms.Erp.IDto
         public DateTime? BeginMakeTime { get; set; }
         /// <summary>查询页码，从1开始，对应既有U8列表协议的pagesize。</summary>
         public int Page { get; set; } = 1;
-        /// <summary>每页条数，范围1至100，对应U8的pagecount；一次请求只读取一页。</summary>
+        /// <summary>每页条数，为正整数，默认100，对应U8的pagecount；不设100条的业务上限。</summary>
         public int PageSize { get; set; } = 100;
     }
 

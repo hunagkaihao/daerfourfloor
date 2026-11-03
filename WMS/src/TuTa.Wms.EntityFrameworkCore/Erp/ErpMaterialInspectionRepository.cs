@@ -33,8 +33,9 @@ public class ErpMaterialInspectionRepository : EfCoreRepository<WmsDbContext, Er
     /// <inheritdoc />
     public async Task<int> MarkPurchaseCompletedAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
     {
-        var keys = ids.Distinct().ToArray();
-        if (keys.Length == 0) return 0;
+        // 使用List实例Contains，避免数组Contains被绑定为ReadOnlySpan重载，导致EF参数表达式求值失败。
+        var keys = ids.Distinct().ToList();
+        if (keys.Count == 0) return 0;
         var context = await GetDbContextAsync();
         return await context.Set<ErpMaterialInspection>().Where(row => keys.Contains(row.Id) && !row.IsPurchaseCompleted)
             .ExecuteUpdateAsync(setters => setters.SetProperty(row => row.IsPurchaseCompleted, true), cancellationToken);

@@ -77,7 +77,7 @@ export interface U8MaterialInspectionResult {
  * 单次查询一页U8记录并由后端同步保存新增或变化的数据，空筛选不发送。
  * 等待45秒以覆盖后端单页30秒时限、登录及本地保存开销。
  * @param page U8的pagesize，即从1开始的页码。
- * @param pageSize U8的pagecount，即每页条数，范围1至100，默认100。
+ * @param pageSize U8的pagecount，即每页条数，为正整数，默认100，可填写更大值。
  */
 export function queryMaterialInspection(materialCode: string, sourceCode?: string, beginMakeTime?: string, page = 1, pageSize = 100) {
   return defHttp.post<U8MaterialInspectionResult>(

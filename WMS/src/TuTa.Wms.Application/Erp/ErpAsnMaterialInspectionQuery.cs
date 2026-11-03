@@ -24,9 +24,9 @@ namespace TuTa.Wms.Erp
         public async Task<U8MaterialInspectionResultDto> GetMaterialInspectionResultsAsync(U8MaterialInspectionQueryDto input)
         {
             input ??= new U8MaterialInspectionQueryDto();
-            if (input.Page < 1 || input.PageSize < 1 || input.PageSize > 100)
+            if (input.Page < 1 || input.PageSize < 1)
                 return new U8MaterialInspectionResultDto { MaterialCode = input.MaterialCode?.Trim(), Page = input.Page,
-                    PageSize = input.PageSize, Message = "页码必须从1开始，每页条数必须为1至100" };
+                    PageSize = input.PageSize, Message = "页码和每页条数必须为正整数" };
             try
             {
                 var token = await GetErpTokenAsync(Guid.NewGuid().ToString());
@@ -73,9 +73,9 @@ namespace TuTa.Wms.Erp
             var result = new U8MaterialInspectionResultDto {
                 MaterialCode = input.MaterialCode?.Trim(), Page = input.Page, PageSize = input.PageSize
             };
-            if (result.Page < 1 || result.PageSize < 1 || result.PageSize > 100)
+            if (result.Page < 1 || result.PageSize < 1)
             {
-                result.Message = "页码必须从1开始，每页条数必须为1至100";
+                result.Message = "页码和每页条数必须为正整数";
                 return result;
             }
             try

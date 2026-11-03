@@ -223,8 +223,13 @@ namespace TuTa.Wms.Stocks
                 try
                 {
                     var push = await _erpAsnAppService.PushInspectionPurchaseAsync(line.Id);
-                    message.Append(push?.Success == true ? $"，{source}采购入库已推送U8" :
-                        $"，{source}本地库存已保存，U8采购入库待重试：" + (push?.Message ?? "接口无返回"));
+                    if (push?.Success == true)
+                        message.Append($"，{source}采购入库已推送U8");
+                    else if (push?.U8SuccessConfirmed == true)
+                        // U8已成功但本地回写失败时明确要求核对，避免PDA误导操作员再次推送。
+                        message.Append($"，{source}本地库存已保存，" + push.Message);
+                    else
+                        message.Append($"，{source}本地库存已保存，U8采购入库待重试：" + (push?.Message ?? "接口无返回"));
                 }
                 catch (Exception ex) { message.Append($"，{source}本地库存已保存，U8采购入库待重试：" + ex.Message); }
             }

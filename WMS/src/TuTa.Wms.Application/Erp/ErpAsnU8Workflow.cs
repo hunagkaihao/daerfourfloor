@@ -245,7 +245,7 @@ namespace TuTa.Wms.Erp
                 if (!success)
                     _logger.LogError("U8采购入库业务失败：Taskid={TaskId}，Id={Id}，原因={Reason}，原始响应={ResponseBody}",
                         input.Taskid, input.Id, resultMessage, responseBody);
-                return new CGRKDAddResponseDto { Success = success, Message = resultMessage,
+                return new CGRKDAddResponseDto { Success = success, U8SuccessConfirmed = success, Message = resultMessage,
                     Code = data["code"]?.Value<int>() ?? 0, Data = data["data"]?.ToString(),
                     FailureConfirmed = data["success"] != null && data["success"].Type != JTokenType.Null &&
                         data["success"].Value<bool>() == false };
