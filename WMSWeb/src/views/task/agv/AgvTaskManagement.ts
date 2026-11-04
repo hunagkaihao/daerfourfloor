@@ -212,8 +212,8 @@ export const searchFormSchema: FormSchema[] = [
 
 /**
  * 分页获取AGV任务列表
- * @param params
- * @returns
+ * @param params 搜索及分页条件；日期按整天范围处理，空值在请求前清理
+ * @returns 当前页匹配记录及分页信息
  */
 export async function getAgvTaskListAsync(params: any): Promise<any> {
   try {
@@ -251,8 +251,8 @@ export async function getAgvTaskListAsync(params: any): Promise<any> {
 
 /**
  * 获取所有AGV任务（用于导出）
- * @param params
- * @returns
+ * @param params 当前搜索表单条件，日期与列表查询使用相同处理
+ * @returns 首批最多10000条匹配记录及分页信息
  */
 export async function getAllAgvTasksAsync(params: any): Promise<any> {
   try {
@@ -263,7 +263,8 @@ export async function getAllAgvTasksAsync(params: any): Promise<any> {
       pageSize: 10000,
     };
 
-    return await _AgvTaskServiceProxy.pagedList(exportParams);
+    // 复用列表参数处理，统一日期边界、空值清理并保留数值为0的任务状态。
+    return await getAgvTaskListAsync(exportParams);
   } catch (error) {
     console.error('获取所有AGV任务失败:', error);
     throw error;

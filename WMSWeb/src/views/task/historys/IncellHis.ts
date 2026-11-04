@@ -4,6 +4,7 @@ import { SelectItem } from '/@/utils/SelectItem';
 import moment from 'moment';
 import {
     StockInHistoryServiceProxy,
+    StockInHistoryDto,
 } from '/@/services/ServiceProxies';
 import { message } from 'ant-design-vue';
 import { useLoading } from '/@/components/Loading';
@@ -209,20 +210,51 @@ export const searchFormSchema: FormSchema[] = [
 
 /**
  * 分页列表
- * @param params
- * @returns
+ * @param params 查询和分页条件；入库日期包含起止日期整天，空筛选不发送
+ * @returns 当前页记录和匹配总数
  */
 export async function getTableListAsync(
   params
 ): Promise<any> {
 
-  return _StockInHistoryServiceProxy.pagedStockInHistoriesGet(params);
+  const query = { ...params };
+  if (query.time?.length === 2) {
+    [query.stockInTimeStart, query.stockInTimeEnd] = query.time;
+  }
+  delete query.time;
+  if (query.stockInTimeStart) {
+    query.stockInTimeStart = moment(query.stockInTimeStart).startOf('day').format('YYYY-MM-DD HH:mm:ss');
+  }
+  if (query.stockInTimeEnd) {
+    query.stockInTimeEnd = moment(query.stockInTimeEnd).endOf('day').format('YYYY-MM-DD HH:mm:ss');
+  }
+  Object.keys(query).forEach((key) => {
+    if (query[key] === '' || query[key] == null) delete query[key];
+  });
+  return _StockInHistoryServiceProxy.pagedStockInHistoriesGet(query);
 }
 
 
+/**
+ * 按当前时间及物料筛选逐页获取导出记录，不受表格当前页码或每页条数限制。
+ * @param params 当前搜索条件，调用方需提供完整入库时间范围
+ * @returns 所有匹配记录；中途请求失败或分页数据不完整时抛错，避免导出残缺文件
+ */
 export async function allStockInHistoriesGet(
   params
-): Promise<any> {
-
-  return _StockInHistoryServiceProxy.allStockInHistoriesGet(params);
+): Promise<StockInHistoryDto[]> {
+  const query = { ...params, pageIndex: 1, pageSize: 1000 };
+  const records: StockInHistoryDto[] = [];
+  let totalCount = 0;
+  do {
+    const result = await getTableListAsync(query);
+    const items = result.items || [];
+    totalCount = result.totalCount;
+    if (items.length === 0 && records.length < totalCount) {
+      throw new Error('入库历史数据已变化，请重新导出');
+    }
+    records.push(...items);
+    query.pageIndex += 1;
+  } while (records.length < totalCount);
+  return records;
 }

@@ -268,11 +268,11 @@ function defaultHeader({ filename, bookType }: ExportModalResult) {
   });
 }
 
-// 打开导出模态框
+/** 读取当前搜索表单并加载导出数据，非空时打开文件设置弹窗。 */
 async function openModal() {
   try {
     // 获取当前搜索条件
-    const searchParams = registerTable.getFormValues();
+    const searchParams = getForm().getFieldsValue();
     
     // 获取所有数据用于导出
     const result = await getAllAgvTasksAsync(searchParams);
