@@ -988,7 +988,7 @@ namespace TuTa.Wms.PickLists
                                 Warehouse warehouse = await _warehouseRepository.FindByIdAsync(Guid.Parse("3a1336e6-d487-822e-1ec1-ccff2bd9b0f5"));
                                 WarehouseArea warehouseArea = warehouse.GetAreaByAreaId(int.Parse(box.PickOutAreaId));
                                 //出库通知
-                                _pickListManager.StockPickOut(stocks.FirstOrDefault(), pickList, pickItem.UniqueCode, operatorName, warehouseArea, stocks.FirstOrDefault().TotalCountInTime);
+                                await _pickListManager.StockPickOut(stocks.FirstOrDefault(), pickList, pickItem.UniqueCode, operatorName, warehouseArea, stocks.FirstOrDefault().TotalCountInTime);
                             }
                         }
 
@@ -1305,7 +1305,7 @@ namespace TuTa.Wms.PickLists
                                 warehouseArea = warehouse.GetAreaByAreaId(int.Parse(box.PickOutAreaId));
                             }
                             //出库通知
-                            _pickListManager.StockPickOut(stock, pickList, pickItem.UniqueCode, operatorName, warehouseArea ,count);
+                            await _pickListManager.StockPickOut(stock, pickList, pickItem.UniqueCode, operatorName, warehouseArea ,count);
 
 
 
@@ -1545,7 +1545,7 @@ namespace TuTa.Wms.PickLists
                     Warehouse warehouse = await _warehouseRepository.FindByIdAsync(Guid.Parse("3a1336e6-d487-822e-1ec1-ccff2bd9b0f5"));
                     WarehouseArea warehouseArea = warehouse.GetAreaByAreaId(int.Parse(box.PickOutAreaId));
                     //出库通知
-                    _pickListManager.StockPickOut(nextstock, pickList, pickItem.UniqueCode, operatorName, warehouseArea, count);
+                    await _pickListManager.StockPickOut(nextstock, pickList, pickItem.UniqueCode, operatorName, warehouseArea, count);
 
                     await uow.SaveChangesAsync();
                     await _stocksManager.BoxFullRate(box.Id);

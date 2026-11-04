@@ -1,11 +1,17 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using TuTa.Wms.Stocks.ValueObjects;
+using TuTa.Wms.StockOutHistories;
 
 namespace TuTa.Wms.Stocks.Events
 {
     public class StockRecheckOutEvent
     {
+        /// <summary>实际复检领用的库存标识；旧事件未提供时为空。</summary>
+        public Guid? StockId { get; set; }
+        /// <summary>明确关联的已完成出库搬运快照，没有真实目标时为空。</summary>
+        public StockOutHistoryRoute HistoryRoute { get; set; }
+
         public StockRecheckOutEvent(
             string barcode,
             MaterialInfoOfStock materialInfo,

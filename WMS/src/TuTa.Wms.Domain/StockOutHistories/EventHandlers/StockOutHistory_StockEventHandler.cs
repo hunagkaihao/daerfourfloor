@@ -64,6 +64,7 @@ namespace TuTa.Wms.StockOutHistories.EventHandlers
                         eventData.StockOutTime,
                         eventData.OperatorName);
 
+                    stockHistory.RecordLocation(eventData.StockId, eventData.HistoryRoute);
                     await _stockOutHistoryRepository.InsertAsync(stockHistory).ConfigureAwait(false);
 
                     await uow.SaveChangesAsync().ConfigureAwait(false);
@@ -105,6 +106,7 @@ namespace TuTa.Wms.StockOutHistories.EventHandlers
                         eventData.StockOutTime,
                         eventData.OperatorName);
 
+                    stockHistory.RecordLocation(eventData.StockId, eventData.HistoryRoute);
                     await _stockOutHistoryRepository.InsertAsync(stockHistory).ConfigureAwait(false);
 
                     await uow.SaveChangesAsync().ConfigureAwait(false);

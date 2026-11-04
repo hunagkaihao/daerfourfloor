@@ -5,6 +5,7 @@ import moment from 'moment';
 import {
     StockOutHistoryServiceProxy,
     ChkResultListServiceProxy,
+    StockOutHistoryDto,
 } from '/@/services/ServiceProxies';
 import { message } from 'ant-design-vue';
 import { useLoading } from '/@/components/Loading';
@@ -32,6 +33,12 @@ export const cellStatusSelectItem: SelectItem[] = [
         key: 1,
       },
   ];
+/** 只显示明确记录的出库阶段，旧行不按库位或类型推断完成状态。 */
+export function getRecordStageText(stage?: string | null): string {
+  const labels: Record<string, string> = { Completed: '出库完成', Direct: '直接出库' };
+  return stage ? labels[stage] || stage : '历史记录／阶段未区分';
+}
+
 export const tableColumns: BasicColumn[] = [
   {
     title: t('物料编号'),
@@ -72,6 +79,56 @@ export const tableColumns: BasicColumn[] = [
   {
     title: t('容器编号'),
     dataIndex: 'boxCode',
+  },
+  {
+    title: t('记录阶段'),
+    dataIndex: 'recordStage',
+    customRender: ({ text }) => getRecordStageText(text),
+  },
+  {
+    title: t('起始库位编号'),
+    dataIndex: 'startCellCode',
+    customRender: ({ text }) => text || '—',
+  },
+  {
+    title: t('起始库位名称'),
+    dataIndex: 'startCellName',
+    customRender: ({ text }) => text || '—',
+  },
+  {
+    title: t('起始容器编号'),
+    dataIndex: 'startBoxCode',
+    customRender: ({ text }) => text || '—',
+  },
+  {
+    title: t('起始容器名称'),
+    dataIndex: 'startBoxName',
+    customRender: ({ text }) => text || '—',
+  },
+  {
+    title: t('目标库位编号'),
+    dataIndex: 'endCellCode',
+    customRender: ({ text }) => text || '—',
+  },
+  {
+    title: t('目标库位名称'),
+    dataIndex: 'endCellName',
+    customRender: ({ text }) => text || '—',
+  },
+  {
+    title: t('目标容器编号'),
+    dataIndex: 'endBoxCode',
+    customRender: ({ text }) => text || '—',
+  },
+  {
+    title: t('目标容器名称'),
+    dataIndex: 'endBoxName',
+    customRender: ({ text }) => text || '—',
+  },
+  {
+    title: t('关联AGV任务'),
+    dataIndex: 'agvTaskReqCode',
+    customRender: ({ text }) => text || '—',
   },
   {
     title: t('容器名称'),
@@ -253,20 +310,47 @@ export const searchFormSchema: FormSchema[] = [
 
 /**
  * 分页列表
- * @param params
- * @returns
+ * @param params 查询和分页条件；出库日期覆盖起止日期整天，空筛选不发送
+ * @returns 当前页记录和匹配总数
  */
 export async function getTableListAsync(
   params
 ): Promise<any> {
 
-  return _StockOutHistoryServiceProxy.pagedStockOutHistoriesGet(params);
+  const query = { ...params };
+  if (query.time?.length === 2) {
+    [query.stockOutTimeMin, query.stockOutTimeMax] = query.time;
+  }
+  delete query.time;
+  if (query.stockOutTimeMin) {
+    query.stockOutTimeMin = moment(query.stockOutTimeMin).startOf('day').format('YYYY-MM-DD HH:mm:ss');
+  }
+  if (query.stockOutTimeMax) {
+    query.stockOutTimeMax = moment(query.stockOutTimeMax).endOf('day').format('YYYY-MM-DD HH:mm:ss');
+  }
+  Object.keys(query).forEach((key) => {
+    if (query[key] === '' || query[key] == null) delete query[key];
+  });
+  return _StockOutHistoryServiceProxy.pagedStockOutHistoriesGet(query);
 }
+/** 按当前时间及其他筛选逐页取全出库记录；中途失败或分页中断时抛错，避免导出残缺文件。 */
 export async function allStockOutHistoriesGet(
   params
-): Promise<any> {
-
-  return _StockOutHistoryServiceProxy.allStockOutHistoriesGet(params);
+): Promise<StockOutHistoryDto[]> {
+  const query = { ...params, pageIndex: 1, pageSize: 1000 };
+  const records: StockOutHistoryDto[] = [];
+  let totalCount = 0;
+  do {
+    const result = await getTableListAsync(query);
+    const items = result.items || [];
+    totalCount = result.totalCount;
+    if (items.length === 0 && records.length < totalCount) {
+      throw new Error('出库历史数据已变化，请重新导出');
+    }
+    records.push(...items);
+    query.pageIndex += 1;
+  } while (records.length < totalCount);
+  return records;
 }
 //重新入库
 

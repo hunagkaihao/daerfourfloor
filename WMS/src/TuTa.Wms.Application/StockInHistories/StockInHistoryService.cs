@@ -44,6 +44,18 @@ namespace TuTa.Wms.StockInHistories
                     StockInHistoryDto historyDto = new StockInHistoryDto()
                     {
                         Id = stockHistory.Id,
+                        RecordStage = stockHistory.RecordStage,
+                        StockId = stockHistory.StockId,
+                        AgvTaskId = stockHistory.AgvTaskId,
+                        AgvTaskReqCode = stockHistory.AgvTaskReqCode,
+                        StartCellCode = stockHistory.StartCellCode,
+                        StartCellName = stockHistory.StartCellName,
+                        StartBoxCode = stockHistory.StartBoxCode,
+                        StartBoxName = stockHistory.StartBoxName,
+                        EndCellCode = stockHistory.EndCellCode,
+                        EndCellName = stockHistory.EndCellName,
+                        EndBoxCode = stockHistory.EndBoxCode,
+                        EndBoxName = stockHistory.EndBoxName,
                         Barcode = stockHistory.Barcode,
                         BoxCode = stockHistory.BoxCode,
                         BoxName = stockHistory.BoxName,

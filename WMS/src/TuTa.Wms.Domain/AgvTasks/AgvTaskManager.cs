@@ -34,6 +34,11 @@ using Volo.Abp.Identity;
 using TuTa.Wms.PickLists.Events;
 using TuTa.Wms.PickLists.Aggregates;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using TuTa.Wms.StockInHistories;
+using TuTa.Wms.StockInHistories.Aggregates;
+using Volo.Abp.Domain.Repositories;
+using TuTa.Wms.StockOutHistories;
+using TuTa.Wms.StockOutHistories.Aggregates;
 
 namespace TuTa.Wms.AgvTasks
 {
@@ -54,6 +59,10 @@ namespace TuTa.Wms.AgvTasks
         private readonly AGVOptions _aGVOptions;
         private readonly LocalEventBus _localEventBus;
         private readonly ILogger<AgvTaskManager> _logger;
+        /// <summary>入库上架历史独立保存，不改变ERP、检验和出库事件的业务时机。</summary>
+        private readonly IStockInHistoryRepository _stockInHistoryRepository;
+        /// <summary>输送线实际清空库存时保存出库历史，其余搬运只保存路线供后续实际领用使用。</summary>
+        private readonly IStockOutHistoryRepository _stockOutHistoryRepository;
         public AgvTaskManager(IAgvTaskRepository agvTaskRepository,
             RcsApiManager rcsApiManager
             , ICellRepository cellRepository
@@ -70,6 +79,8 @@ namespace TuTa.Wms.AgvTasks
             , PickListManager pickListManager
             , LocalEventBus localEventBus
             , ILogger<AgvTaskManager> logger
+            , IStockInHistoryRepository stockInHistoryRepository
+            , IStockOutHistoryRepository stockOutHistoryRepository
 
             )
         {
@@ -88,6 +99,8 @@ namespace TuTa.Wms.AgvTasks
             _aGVOptions = aGVOptions.Value;
             _localEventBus = localEventBus;
             _logger = logger;
+            _stockInHistoryRepository = stockInHistoryRepository;
+            _stockOutHistoryRepository = stockOutHistoryRepository;
         }
         
         [UnitOfWork]
@@ -357,8 +370,9 @@ namespace TuTa.Wms.AgvTasks
                 var entity = await _agvTaskRepository.FindByReqCodeAsync(reqcode);
                 if (entity == null)
                     throw new UserFriendlyException(message: "AGV任务不存在");
-                // 整理和回库任务忽略重复完成回调，防止把起点后来新增的库存再次搬走。
-                if ((entity.StockTyp == ManageType.StockConsolidation || entity.StockTyp == ManageType.StockReturnToInbound) &&
+                // 入库、整理和回库任务忽略重复完成回调，防止重复记账或搬走起点后来新增的库存。
+                if ((entity.StockTyp == ManageType.StockConsolidation || entity.StockTyp == ManageType.StockReturnToInbound
+                    || IsStockInHistoryTask(entity) || IsStockOutHistoryTask(entity)) &&
                     entity.AgvTaskStatus == AgvTaskStatus.Complete)
                 {
                     _logger.LogInformation($"任务{reqcode}已完成，忽略重复完成回调");
@@ -430,12 +444,21 @@ namespace TuTa.Wms.AgvTasks
 
                 Box box = null;
                 Box endBox = null;
+                // 迁移前冻结本次库存清单，避免把目标容器原有库存误记为本次上架。
+                var inboundStocks = new List<Stock>();
+                // 出库搬运不提前计数量，冻结实际迁移库存，供后续领用关联起终点。
+                var outboundStocks = new List<Stock>();
                 if (!(entity.StockTyp == ManageType.SkipMove || entity.StockTyp == ManageType.SkipCall || entity.StockTyp == ManageType.SkipSend 
                     ))
                 {
                     box = await _boxRepository.FindByBoxCodeAsync(entity.BoxCode);
                     if (box == null)
                         throw new UserFriendlyException(message: "料箱不存在");
+
+                    if (IsStockInHistoryTask(entity))
+                        inboundStocks = await _stockRepository.GetByBoxIdAsync(box.Id);
+                    if (IsStockOutHistoryTask(entity))
+                        outboundStocks = await _stockRepository.GetByBoxIdAsync(box.Id);
 
                     if (entity.StockTyp == ManageType.StockConsolidation)
                     {
@@ -456,6 +479,15 @@ namespace TuTa.Wms.AgvTasks
                 }
 
 
+
+                if (IsStockOutHistoryTask(entity) && endBox != null)
+                {
+                    foreach (var stock in outboundStocks)
+                    {
+                        StockOutHistoryRoute.Capture(stock, entity, startCell, box, endCell, endBox).SaveTo(stock);
+                        await _stockRepository.UpdateAsync(stock);
+                    }
+                }
 
                 if (entity.StockTyp == ManageType.CTUStockIn)
                 {
@@ -513,6 +545,7 @@ namespace TuTa.Wms.AgvTasks
                             //通知检验结论对象更新数据
                             await _localEventBus.PublishAsync(new StockBindBoxAndCellEvent()
                             {
+                                HistoryRecordedSeparately = true,
                                 StockBarcode = stock.Barcode,
                                 BoxId = endBox.Id,
                                 BoxCode = endBox.BoxCode,
@@ -587,6 +620,7 @@ namespace TuTa.Wms.AgvTasks
                             //通知检验结论对象更新数据
                             await _localEventBus.PublishAsync(new StockBindBoxAndCellEvent()
                             {
+                                HistoryRecordedSeparately = true,
                                 StockBarcode = stock.Barcode,
                                 BoxId = endBox.Id,
                                 BoxCode = endBox.BoxCode,
@@ -668,7 +702,7 @@ namespace TuTa.Wms.AgvTasks
                             {
                                 Warehouse warehouse = await _warehouseRepository.FindByIdAsync(startCell.WarehouseId).ConfigureAwait(false);
                                 WarehouseArea warehouseArea = warehouse.GetAreaByAreaId(startCell.WarehouseAreaId.GetValueOrDefault());
-                                _pickListManager.StockPickOut(stock, pickList, entity.UniqueCode, operatorName, warehouseArea,stock.TotalCountInTime);
+                                await _pickListManager.StockPickOut(stock, pickList, entity.UniqueCode, operatorName, warehouseArea,stock.TotalCountInTime);
                             }
                         }
 
@@ -738,6 +772,15 @@ namespace TuTa.Wms.AgvTasks
 
                         foreach (Stock stock in stocks)
                         {
+                            // 输送线离库会实际删除库存，按删除前的真实数量记账；不与普通搬运重复记数量。
+                            var route = StockOutHistoryRoute.Capture(stock, entity, startCell, box, endCell, null);
+                            var history = new StockOutHistory(stock.Barcode, stock.Material.MaterialCode,
+                                stock.Material.MaterialName, stock.Material.Specs, stock.Material.Unit,
+                                stock.Warehouse.HouseCode, stock.Warehouse.HouseName, stock.Warehouse.AreaCode, stock.Warehouse.AreaName,
+                                stock.CellData.CellCode, stock.CellData.CellName, stock.BoxData.BoxCode, stock.BoxData.BoxName,
+                                "输送线出库", stock.TotalCountInTime, DateTime.Now, batchNo: stock.BatchCode);
+                            history.RecordLocation(stock.Id, route);
+                            await _stockOutHistoryRepository.InsertAsync(history);
                             box.RemoveStock(stock.Id);
                             await _stockRepository.DeleteAsync(stock);
                         }
@@ -758,6 +801,9 @@ namespace TuTa.Wms.AgvTasks
                         await _skipRepository.UpdateAsync(skip).ConfigureAwait(false);
                     }
                 }
+                if (IsStockInHistoryTask(entity))
+                    await RecordStockInCompletionAsync(entity, box, startCell, endCell, endBox, inboundStocks);
+
                 _logger.Info($"AGVTask:{reqcode} SetAsCompleted is end");
                 await TryDispatchWaiting4ALaneTaskAsync(entity).ConfigureAwait(false);
                 return await _agvTaskRepository.UpdateAsync(entity, true);
@@ -961,6 +1007,9 @@ namespace TuTa.Wms.AgvTasks
                 var entity = await _agvTaskRepository.FindByReqCodeAsync(rqecode);
                 if (entity == null)
                     throw new UserFriendlyException(message: "AGV任务不存在");
+                // 入库完成后的延迟开始回调不能重置终态，否则后续重复完成回调可能搬走新组盘库存。
+                if ((IsStockInHistoryTask(entity) || IsStockOutHistoryTask(entity)) && entity.AgvTaskStatus == AgvTaskStatus.Complete)
+                    return entity;
                 // 回库任务结束后到达的延迟回调不能重置终态，否则重复完成回调会再次迁移库存。
                 if (entity.StockTyp == ManageType.StockReturnToInbound
                     && (entity.AgvTaskStatus == AgvTaskStatus.Complete || entity.AgvTaskStatus == AgvTaskStatus.Cancel))
@@ -982,6 +1031,9 @@ namespace TuTa.Wms.AgvTasks
                 var entity = await _agvTaskRepository.FindByReqCodeAsync(reqcode);
                 if (entity == null)
                     throw new UserFriendlyException(message: "AGV任务不存在");
+                // 保持已完成入库任务的终态，避免延迟出储位通知导致重复迁移和记账。
+                if ((IsStockInHistoryTask(entity) || IsStockOutHistoryTask(entity)) && entity.AgvTaskStatus == AgvTaskStatus.Complete)
+                    return entity;
                 // 保持回库任务终态，忽略完成或取消后补发的出储位回调。
                 if (entity.StockTyp == ManageType.StockReturnToInbound
                     && (entity.AgvTaskStatus == AgvTaskStatus.Complete || entity.AgvTaskStatus == AgvTaskStatus.Cancel))
@@ -1004,6 +1056,50 @@ namespace TuTa.Wms.AgvTasks
             {
 
                 throw new UserFriendlyException(message: e.Message);
+            }
+        }
+
+        /// <summary>识别入库记账路径；四楼借用出库枚举的4A到4F搬运仍属于实际入库，整理及回库不纳入。</summary>
+        private static bool IsStockInHistoryTask(AgvTask task)
+        {
+            return task.StockTyp == ManageType.CTUStockIn || task.StockTyp == ManageType.LiftStockIn
+                || ((task.StockTyp == ManageType.CTUStockOut || task.StockTyp == ManageType.LiftStockOut)
+                    && task.StartPositionCode?.StartsWith("4A", StringComparison.OrdinalIgnoreCase) == true
+                    && task.EndPositionCode?.StartsWith("4F", StringComparison.OrdinalIgnoreCase) == true);
+        }
+
+        /// <summary>识别真实出库方向，排除借用出库枚举的入库、回库及库存整理。</summary>
+        private static bool IsStockOutHistoryTask(AgvTask task)
+        {
+            return task.StockTyp == ManageType.CTUSSXOut || task.StockTyp == ManageType.LiftSSXOut
+                || ((task.StockTyp == ManageType.CTUStockOut || task.StockTyp == ManageType.LiftStockOut)
+                    && !IsStockInHistoryTask(task));
+        }
+
+        /// <summary>完成回调内保存起终点快照，以任务和库存唯一关联；不发布额外ERP或检验事件。</summary>
+        private async Task RecordStockInCompletionAsync(AgvTask task, Box startBox, Cell startCell,
+            Cell endCell, Box endBox, List<Stock> stocks)
+        {
+            if (stocks.Count == 0) return;
+            var house = await _warehouseRepository.FindByIdAsync(endCell.WarehouseId).ConfigureAwait(false);
+            var area = house.GetAreaByAreaId((int)endCell.WarehouseAreaId);
+            foreach (var stock in stocks)
+            {
+                if (await _stockInHistoryRepository.AnyAsync(h => h.AgvTaskId == task.Id && h.StockId == stock.Id))
+                    continue;
+                string operatorName = null;
+                var operatorId = stock.CreatorId ?? task.CreatorId;
+                if (operatorId.HasValue)
+                    operatorName = (await _userManager.GetByIdAsync(operatorId.Value)).Name;
+                var history = new StockInHistory(stock.Barcode, stock.Material.MaterialCode,
+                    stock.Material.MaterialName, stock.Material.Specs, stock.Material.Unit,
+                    house.WarehouseCode, house.WarehouseName, area.WarehouseAreaCode, area.WarehouseAreaName,
+                    endCell.CellCode, endCell.CellName, endBox.BoxCode, endBox.BoxName,
+                    StockInTypeHelper.StockInTypeToChinese(stock.StockInType), stock.TotalCountInTime,
+                    DateTime.Now, operatorName, stock.BatchCode);
+                history.RecordCompletedLocation(stock.Id, task.Id, task.ReqCode,
+                    startCell.CellCode, startCell.CellName, startBox.BoxCode, startBox.BoxName);
+                await _stockInHistoryRepository.InsertAsync(history).ConfigureAwait(false);
             }
         }
 
@@ -1031,6 +1127,7 @@ namespace TuTa.Wms.AgvTasks
             foreach (var stock in stocks)
             {
                 startBox.RemoveStock(stock.Id);
+                StockOutHistoryRoute.ClearFrom(stock);
                 stock.BindBox(endBox.Id, endBox.BoxCode, endBox.BoxName,
                     preserveBoxNumber ? stock.BoxData?.BoxNumber : null);
                 stock.BindCell(endCell, warehouse, warehouseArea);
@@ -1150,6 +1247,7 @@ namespace TuTa.Wms.AgvTasks
             // 更新成终点，确保“一个容器内多条库存”能够随容器整体到达同一库位。
             foreach (var stock in stocks)
             {
+                StockOutHistoryRoute.ClearFrom(stock);
                 stock.BindCell(endCell, warehouse, warehouseArea);
                 await _stockRepository.UpdateAsync(stock).ConfigureAwait(false);
             }

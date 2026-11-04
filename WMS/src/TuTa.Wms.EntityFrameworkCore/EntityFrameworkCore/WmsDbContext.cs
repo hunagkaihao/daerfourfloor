@@ -240,6 +240,20 @@ public class WmsDbContext :
         {
             b.ToTable("StockInHistories", WmsConsts.DbSchema);
             b.ConfigureByConvention(); //auto configure for the base class props
+            // 新字段可空，不为旧记录推断起终点；同一任务、同一库存仅保存一条上架完成记录。
+            b.Property(o => o.RecordStage).IsRequired(false).HasComment("记录阶段：Grouping组盘登记、Completed上架完成、Direct直接入库；旧记录为空");
+            b.Property(o => o.StockId).IsRequired(false).HasComment("来源库存标识；旧记录或无法明确关联时为空");
+            b.Property(o => o.AgvTaskId).IsRequired(false).HasComment("完成上架的AGV任务主键；非AGV入库和旧记录为空");
+            b.Property(o => o.AgvTaskReqCode).IsRequired(false).HasComment("完成上架的AGV请求编号快照");
+            b.Property(o => o.StartCellCode).IsRequired(false).HasComment("起始库位编号快照；未知来源为空");
+            b.Property(o => o.StartCellName).IsRequired(false).HasComment("起始库位名称快照");
+            b.Property(o => o.StartBoxCode).IsRequired(false).HasComment("起始容器编号快照");
+            b.Property(o => o.StartBoxName).IsRequired(false).HasComment("起始容器名称快照");
+            b.Property(o => o.EndCellCode).IsRequired(false).HasComment("完成入库的目标库位编号快照；组盘阶段为空");
+            b.Property(o => o.EndCellName).IsRequired(false).HasComment("目标库位名称快照");
+            b.Property(o => o.EndBoxCode).IsRequired(false).HasComment("目标容器编号快照");
+            b.Property(o => o.EndBoxName).IsRequired(false).HasComment("目标容器名称快照");
+            b.HasIndex(o => new { o.AgvTaskId, o.StockId }).IsUnique();
             b.HasIndex(o => o.Id);
         });
 
@@ -247,6 +261,20 @@ public class WmsDbContext :
         {
             b.ToTable("StockOutHistories", WmsConsts.DbSchema);
             b.ConfigureByConvention(); //auto configure for the base class props
+            // 允许旧行保留NULL；同一搬运任务可分批实际出库，因此关联索引不设唯一约束。
+            b.Property(o => o.RecordStage).IsRequired(false).HasComment("记录阶段：Completed关联搬运的实际出库、Direct直接出库；旧记录为空");
+            b.Property(o => o.StockId).IsRequired(false).HasComment("本条实际出库对应的库存标识；旧记录或多来源汇总时为空");
+            b.Property(o => o.AgvTaskId).IsRequired(false).HasComment("关联的已完成AGV任务主键；直接出库及旧记录为空");
+            b.Property(o => o.AgvTaskReqCode).IsRequired(false).HasComment("已完成出库搬运任务的请求编号快照");
+            b.Property(o => o.StartCellCode).IsRequired(false).HasComment("实际出库来源库位编号快照；未知来源为空");
+            b.Property(o => o.StartCellName).IsRequired(false).HasComment("实际出库来源库位名称快照");
+            b.Property(o => o.StartBoxCode).IsRequired(false).HasComment("实际出库来源容器编号快照");
+            b.Property(o => o.StartBoxName).IsRequired(false).HasComment("实际出库来源容器名称快照");
+            b.Property(o => o.EndCellCode).IsRequired(false).HasComment("关联搬运的目标库位编号快照；无明确目标时为空");
+            b.Property(o => o.EndCellName).IsRequired(false).HasComment("目标库位名称快照");
+            b.Property(o => o.EndBoxCode).IsRequired(false).HasComment("目标容器编号快照；无实体容器时为空");
+            b.Property(o => o.EndBoxName).IsRequired(false).HasComment("目标容器名称快照");
+            b.HasIndex(o => new { o.AgvTaskId, o.StockId });
             b.HasIndex(o => o.Id);
         });
 

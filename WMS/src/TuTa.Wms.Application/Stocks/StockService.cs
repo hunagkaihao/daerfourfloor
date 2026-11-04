@@ -445,6 +445,7 @@ namespace TuTa.Wms.Stocks
                                 DateTime.Now,
                                 batchNo: para.BatchCode);
 
+                            stockInHistory.RecordGroupingLocation(existingStockByReceivingBarcode.Id);
                             await _stockInHistoryRepository.InsertAsync(stockInHistory).ConfigureAwait(false);
 
                             if (u8Lines == null && !string.IsNullOrWhiteSpace(para.AsnCode))
@@ -509,6 +510,7 @@ namespace TuTa.Wms.Stocks
                             DateTime.Now,
                             batchNo: para.BatchCode);
 
+                        stockInHistory.RecordGroupingLocation(stock.Id);
                         await _stockInHistoryRepository.InsertAsync(stockInHistory).ConfigureAwait(false);
 
                         if (u8Lines == null && !string.IsNullOrWhiteSpace(para.AsnCode))
@@ -1825,6 +1827,7 @@ namespace TuTa.Wms.Stocks
                                 DateTime.Now,
                                 batchNo: barcodeResult.BatchCode);
 
+                            stockInHistory.RecordGroupingLocation(stock.Id);
                             await _stockInHistoryRepository.InsertAsync(stockInHistory).ConfigureAwait(false);
                         }
 
@@ -4474,6 +4477,7 @@ namespace TuTa.Wms.Stocks
                         batchNo: stockExist.BatchCode);
 
                     _logger.Info("StockOutHistory实体创建成功");
+                    stockOutHistory.RecordLocation(stockExist.Id, StockOutHistoryRoute.ReadFrom(stockExist));
 
                     if (_stockOutHistoryRepository == null)
                     {
@@ -4591,6 +4595,8 @@ namespace TuTa.Wms.Stocks
                         outBoundCount,
                         DateTime.Now,
                         batchNo: stockExist.BatchCode);
+
+                    stockOutHistory.RecordLocation(stockExist.Id, null);
 
                     if (_stockOutHistoryRepository != null)
                     {

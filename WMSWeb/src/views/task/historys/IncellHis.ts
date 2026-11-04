@@ -31,6 +31,12 @@ export const cellStatusSelectItem: SelectItem[] = [
         key: 1,
       },
   ];
+/** 显示新记录业务阶段；旧记录保持未区分，不根据库位猜测业务结果。 */
+export function getRecordStageText(stage?: string | null): string {
+  const labels: Record<string, string> = { Grouping: '组盘登记', Completed: '上架完成', Direct: '直接入库' };
+  return stage ? labels[stage] || stage : '历史记录／阶段未区分';
+}
+
 export const tableColumns: BasicColumn[] = [
   {
     title: t('物料编号'),
@@ -71,6 +77,56 @@ export const tableColumns: BasicColumn[] = [
   {
     title: t('容器编号'),
     dataIndex: 'boxCode',
+  },
+  {
+    title: t('记录阶段'),
+    dataIndex: 'recordStage',
+    customRender: ({ text }) => getRecordStageText(text),
+  },
+  {
+    title: t('起始库位编号'),
+    dataIndex: 'startCellCode',
+    customRender: ({ text }) => text || '—',
+  },
+  {
+    title: t('起始库位名称'),
+    dataIndex: 'startCellName',
+    customRender: ({ text }) => text || '—',
+  },
+  {
+    title: t('起始容器编号'),
+    dataIndex: 'startBoxCode',
+    customRender: ({ text }) => text || '—',
+  },
+  {
+    title: t('起始容器名称'),
+    dataIndex: 'startBoxName',
+    customRender: ({ text }) => text || '—',
+  },
+  {
+    title: t('目标库位编号'),
+    dataIndex: 'endCellCode',
+    customRender: ({ text }) => text || '—',
+  },
+  {
+    title: t('目标库位名称'),
+    dataIndex: 'endCellName',
+    customRender: ({ text }) => text || '—',
+  },
+  {
+    title: t('目标容器编号'),
+    dataIndex: 'endBoxCode',
+    customRender: ({ text }) => text || '—',
+  },
+  {
+    title: t('目标容器名称'),
+    dataIndex: 'endBoxName',
+    customRender: ({ text }) => text || '—',
+  },
+  {
+    title: t('关联AGV任务'),
+    dataIndex: 'agvTaskReqCode',
+    customRender: ({ text }) => text || '—',
   },
   {
     title: t('容器名称'),

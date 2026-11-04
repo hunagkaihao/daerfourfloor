@@ -38,6 +38,7 @@ import {
   searchFormSchema,
   getTableListAsync,
   allStockInHistoriesGet,
+  getRecordStageText,
 } from './IncellHis';
 import { useI18n } from '/@/hooks/web/useI18n';
 const [register, { openModal }] = useModal();
@@ -101,6 +102,16 @@ function handleExport({ filename, bookType }: ExportModalResult) {
     收料码: item.barcode,
     容器编号: item.boxCode,
     容器名称: item.boxName,
+    记录阶段: getRecordStageText(item.recordStage),
+    起始库位编号: item.startCellCode || '',
+    起始库位名称: item.startCellName || '',
+    起始容器编号: item.startBoxCode || '',
+    起始容器名称: item.startBoxName || '',
+    目标库位编号: item.endCellCode || '',
+    目标库位名称: item.endCellName || '',
+    目标容器编号: item.endBoxCode || '',
+    目标容器名称: item.endBoxName || '',
+    关联AGV任务: item.agvTaskReqCode || '',
     库位编号: item.cellCode,
     库位名称: item.cellName,
     区域编号: item.areaCode,

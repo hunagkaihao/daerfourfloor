@@ -33091,6 +33091,30 @@ export interface IPagedStockInHistoryQueryDto {
 }
 
 export class StockInHistoryDto implements IStockInHistoryDto {
+    /** 记录阶段：Grouping组盘登记、Completed上架完成、Direct直接入库；旧记录为空。 */
+    recordStage?: string | null;
+    /** 来源库存标识；旧记录或无法明确关联时为空。 */
+    stockId?: string | null;
+    /** 完成上架的AGV任务主键；非AGV入库和旧记录为空。 */
+    agvTaskId?: number | null;
+    /** 完成上架的AGV请求编号快照。 */
+    agvTaskReqCode?: string | null;
+    /** 起始库位编号快照；未知来源为空。 */
+    startCellCode?: string | null;
+    /** 起始库位名称快照。 */
+    startCellName?: string | null;
+    /** 起始容器编号快照。 */
+    startBoxCode?: string | null;
+    /** 起始容器名称快照。 */
+    startBoxName?: string | null;
+    /** 完成入库的目标库位编号快照；组盘阶段为空。 */
+    endCellCode?: string | null;
+    /** 目标库位名称快照。 */
+    endCellName?: string | null;
+    /** 目标容器编号快照。 */
+    endBoxCode?: string | null;
+    /** 目标容器名称快照。 */
+    endBoxName?: string | null;
     id!: number;
     creationTime!: moment.Moment;
     creatorId!: string | undefined;
@@ -33136,6 +33160,18 @@ export class StockInHistoryDto implements IStockInHistoryDto {
 
     init(_data?: any) {
         if (_data) {
+            this.recordStage = _data["recordStage"];
+            this.stockId = _data["stockId"];
+            this.agvTaskId = _data["agvTaskId"];
+            this.agvTaskReqCode = _data["agvTaskReqCode"];
+            this.startCellCode = _data["startCellCode"];
+            this.startCellName = _data["startCellName"];
+            this.startBoxCode = _data["startBoxCode"];
+            this.startBoxName = _data["startBoxName"];
+            this.endCellCode = _data["endCellCode"];
+            this.endCellName = _data["endCellName"];
+            this.endBoxCode = _data["endBoxCode"];
+            this.endBoxName = _data["endBoxName"];
             this.id = _data["id"];
             this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
             this.creatorId = _data["creatorId"];
@@ -33181,6 +33217,18 @@ export class StockInHistoryDto implements IStockInHistoryDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["recordStage"] = this.recordStage;
+        data["stockId"] = this.stockId;
+        data["agvTaskId"] = this.agvTaskId;
+        data["agvTaskReqCode"] = this.agvTaskReqCode;
+        data["startCellCode"] = this.startCellCode;
+        data["startCellName"] = this.startCellName;
+        data["startBoxCode"] = this.startBoxCode;
+        data["startBoxName"] = this.startBoxName;
+        data["endCellCode"] = this.endCellCode;
+        data["endCellName"] = this.endCellName;
+        data["endBoxCode"] = this.endBoxCode;
+        data["endBoxName"] = this.endBoxName;
         data["id"] = this.id;
         data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
         data["creatorId"] = this.creatorId;
@@ -33219,6 +33267,30 @@ export class StockInHistoryDto implements IStockInHistoryDto {
 }
 
 export interface IStockInHistoryDto {
+    /** 记录阶段：Grouping组盘登记、Completed上架完成、Direct直接入库；旧记录为空。 */
+    recordStage?: string | null;
+    /** 来源库存标识；旧记录或无法明确关联时为空。 */
+    stockId?: string | null;
+    /** 完成上架的AGV任务主键；非AGV入库和旧记录为空。 */
+    agvTaskId?: number | null;
+    /** 完成上架的AGV请求编号快照。 */
+    agvTaskReqCode?: string | null;
+    /** 起始库位编号快照；未知来源为空。 */
+    startCellCode?: string | null;
+    /** 起始库位名称快照。 */
+    startCellName?: string | null;
+    /** 起始容器编号快照。 */
+    startBoxCode?: string | null;
+    /** 起始容器名称快照。 */
+    startBoxName?: string | null;
+    /** 完成入库的目标库位编号快照；组盘阶段为空。 */
+    endCellCode?: string | null;
+    /** 目标库位名称快照。 */
+    endCellName?: string | null;
+    /** 目标容器编号快照。 */
+    endBoxCode?: string | null;
+    /** 目标容器名称快照。 */
+    endBoxName?: string | null;
     id: number;
     creationTime: moment.Moment;
     creatorId: string | undefined;
@@ -33339,6 +33411,30 @@ export interface IPagedStockOutHistoryQueryDto {
 }
 
 export class StockOutHistoryDto implements IStockOutHistoryDto {
+    /** 记录阶段：Completed关联搬运的实际出库、Direct直接出库；旧记录为空。 */
+    recordStage?: string | null;
+    /** 本条实际出库对应的库存标识；旧记录或多来源汇总时为空。 */
+    stockId?: string | null;
+    /** 关联的已完成AGV任务主键；直接出库及旧记录为空。 */
+    agvTaskId?: number | null;
+    /** 已完成出库搬运任务的请求编号快照。 */
+    agvTaskReqCode?: string | null;
+    /** 实际出库来源库位编号快照；未知来源为空。 */
+    startCellCode?: string | null;
+    /** 实际出库来源库位名称快照。 */
+    startCellName?: string | null;
+    /** 实际出库来源容器编号快照。 */
+    startBoxCode?: string | null;
+    /** 实际出库来源容器名称快照。 */
+    startBoxName?: string | null;
+    /** 关联搬运的目标库位编号快照；无明确目标时为空。 */
+    endCellCode?: string | null;
+    /** 目标库位名称快照。 */
+    endCellName?: string | null;
+    /** 目标容器编号快照；无实体容器时为空。 */
+    endBoxCode?: string | null;
+    /** 目标容器名称快照。 */
+    endBoxName?: string | null;
     id!: number;
     creationTime!: moment.Moment;
     creatorId!: string | undefined;
@@ -33388,6 +33484,18 @@ export class StockOutHistoryDto implements IStockOutHistoryDto {
 
     init(_data?: any) {
         if (_data) {
+            this.recordStage = _data["recordStage"];
+            this.stockId = _data["stockId"];
+            this.agvTaskId = _data["agvTaskId"];
+            this.agvTaskReqCode = _data["agvTaskReqCode"];
+            this.startCellCode = _data["startCellCode"];
+            this.startCellName = _data["startCellName"];
+            this.startBoxCode = _data["startBoxCode"];
+            this.startBoxName = _data["startBoxName"];
+            this.endCellCode = _data["endCellCode"];
+            this.endCellName = _data["endCellName"];
+            this.endBoxCode = _data["endBoxCode"];
+            this.endBoxName = _data["endBoxName"];
             this.id = _data["id"];
             this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
             this.creatorId = _data["creatorId"];
@@ -33437,6 +33545,18 @@ export class StockOutHistoryDto implements IStockOutHistoryDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["recordStage"] = this.recordStage;
+        data["stockId"] = this.stockId;
+        data["agvTaskId"] = this.agvTaskId;
+        data["agvTaskReqCode"] = this.agvTaskReqCode;
+        data["startCellCode"] = this.startCellCode;
+        data["startCellName"] = this.startCellName;
+        data["startBoxCode"] = this.startBoxCode;
+        data["startBoxName"] = this.startBoxName;
+        data["endCellCode"] = this.endCellCode;
+        data["endCellName"] = this.endCellName;
+        data["endBoxCode"] = this.endBoxCode;
+        data["endBoxName"] = this.endBoxName;
         data["id"] = this.id;
         data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
         data["creatorId"] = this.creatorId;
@@ -33479,6 +33599,30 @@ export class StockOutHistoryDto implements IStockOutHistoryDto {
 }
 
 export interface IStockOutHistoryDto {
+    /** 记录阶段：Completed关联搬运的实际出库、Direct直接出库；旧记录为空。 */
+    recordStage?: string | null;
+    /** 本条实际出库对应的库存标识；旧记录或多来源汇总时为空。 */
+    stockId?: string | null;
+    /** 关联的已完成AGV任务主键；直接出库及旧记录为空。 */
+    agvTaskId?: number | null;
+    /** 已完成出库搬运任务的请求编号快照。 */
+    agvTaskReqCode?: string | null;
+    /** 实际出库来源库位编号快照；未知来源为空。 */
+    startCellCode?: string | null;
+    /** 实际出库来源库位名称快照。 */
+    startCellName?: string | null;
+    /** 实际出库来源容器编号快照。 */
+    startBoxCode?: string | null;
+    /** 实际出库来源容器名称快照。 */
+    startBoxName?: string | null;
+    /** 关联搬运的目标库位编号快照；无明确目标时为空。 */
+    endCellCode?: string | null;
+    /** 目标库位名称快照。 */
+    endCellName?: string | null;
+    /** 目标容器编号快照；无实体容器时为空。 */
+    endBoxCode?: string | null;
+    /** 目标容器名称快照。 */
+    endBoxName?: string | null;
     id: number;
     creationTime: moment.Moment;
     creatorId: string | undefined;

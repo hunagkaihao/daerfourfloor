@@ -11,6 +11,7 @@ using TuTa.Wms.Stocks.ValueObjects;
 using TuTa.Wms.Warehouses.Entities;
 
 using Volo.Abp.EventBus.Local;
+using TuTa.Wms.StockOutHistories;
 
 namespace TuTa.Wms.PickLists
 {
@@ -127,7 +128,8 @@ namespace TuTa.Wms.PickLists
             return ret;
         }
 
-        public async void StockPickOut(Stock stock,PickList pickList,string uniqueCode,string operatorName,WarehouseArea area,decimal count)
+        /// <summary>发布本次实际领用数量及已完成搬运快照；由调用方等待历史和ERP订阅完成。</summary>
+        public async Task StockPickOut(Stock stock,PickList pickList,string uniqueCode,string operatorName,WarehouseArea area,decimal count)
         {
 
             StockPickOutEvent pickOutEvent = new StockPickOutEvent(
@@ -144,6 +146,8 @@ namespace TuTa.Wms.PickLists
                 stock.Warehouse.AreaId, stock.Warehouse.AreaCode, stock.Warehouse.AreaName),
                 PickTypeHelper.PickTypeToChinese(pickList.Type), (short)pickList.Type, pickList.PickBatch, uniqueCode, count, DateTime.Now, operatorName,
                 area.WarehouseAreaCode,area.WarehouseAreaName);
+            pickOutEvent.StockId = stock.Id;
+            pickOutEvent.HistoryRoute = StockOutHistoryRoute.ReadFrom(stock);
             await _localEventBus.PublishAsync(pickOutEvent);
         }
     }

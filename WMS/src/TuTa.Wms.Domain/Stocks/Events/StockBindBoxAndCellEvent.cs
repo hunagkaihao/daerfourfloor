@@ -8,6 +8,9 @@ namespace TuTa.Wms.Stocks.Events
     /// </summary>
     public class StockBindBoxAndCellEvent
     {
+        /// <summary>AGV完成路径已单独保存带起终点的历史；仅跳过历史订阅者，ERP和检验订阅照常处理。</summary>
+        public bool HistoryRecordedSeparately { get; set; }
+
         public string StockBarcode { get; set; }
 
         public EnumCheckType CheckType { get; set; }

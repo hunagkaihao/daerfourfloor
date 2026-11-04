@@ -2,11 +2,17 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TuTa.Wms.Stocks.ValueObjects;
+using TuTa.Wms.StockOutHistories;
 
 namespace TuTa.Wms.Stocks.Events
 {
     public class StockPickOutEvent
     {
+        /// <summary>实际领用的库存标识；旧事件未提供时为空。</summary>
+        public Guid? StockId { get; set; }
+        /// <summary>已与库存当前落位核对的出库搬运快照；没有关联搬运时为空。</summary>
+        public StockOutHistoryRoute HistoryRoute { get; set; }
+
         public StockPickOutEvent(
             string barcode,
             MaterialInfoOfStock materialInfo,

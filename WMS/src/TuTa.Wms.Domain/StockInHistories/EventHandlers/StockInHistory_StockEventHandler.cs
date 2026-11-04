@@ -37,6 +37,7 @@ namespace TuTa.Wms.StockInHistories.EventHandlers
 
         public async Task HandleEventAsync(StockBindBoxAndCellEvent eventData)
         {
+            if (eventData?.HistoryRecordedSeparately == true) return;
             using (IUnitOfWork uow = _unitOfWorkManager.Begin())
             {
                 try
